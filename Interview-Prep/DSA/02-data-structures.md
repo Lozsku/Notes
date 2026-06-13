@@ -4,6 +4,20 @@
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Master Complexity Table](#master-complexity-table)
+- [The Data Structures](#the-data-structures)
+- [Choosing the Right Data Structure](#choosing-the-right-data-structure)
+- [Language Notes](#language-notes)
+- [Real-Life Analogies](#real-life-analogies)
+- [Common Interview Questions](#common-interview-questions)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview
 
 Data structures are the substrate of every algorithm. Choosing the wrong one is the single most common reason candidates fail coding interviews — the algorithm is right, but O(n) lookups in a list where a hash map would give O(1) makes the solution too slow. This file is organized as a working reference: read top-to-bottom once, then use the complexity table and decision guide during revision.

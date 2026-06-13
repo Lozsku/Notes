@@ -4,6 +4,19 @@
 
 ---
 
+## Table of Contents
+
+- [The Machine-Coding Approach](#the-machine-coding-approach)
+- [1. LRU Cache (+ LFU Variant Note)](#1-lru-cache--lfu-variant-note)
+- [2. Parking Lot](#2-parking-lot)
+- [3. Rate Limiter](#3-rate-limiter)
+- [4. Splitwise / Expense Sharing](#4-splitwise--expense-sharing)
+- [5. Elevator System](#5-elevator-system)
+- [6. Tic-Tac-Toe (Clean OO Board Game)](#6-tic-tac-toe-clean-oo-board-game)
+- [Common Patterns Across LLD Problems](#common-patterns-across-lld-problems)
+
+---
+
 ## The Machine-Coding Approach
 
 ### Time-box strategy (45–90 min round)

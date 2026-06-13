@@ -3,6 +3,29 @@
 
 ---
 
+## Table of Contents
+
+- [Overview — What It Is](#overview--what-it-is)
+- [Why It Exists](#why-it-exists)
+- [Why FAANG Cares (Company-Specific)](#why-faang-cares-company-specific)
+- [Core Concepts](#core-concepts)
+- [SQL Deep Dive](#sql-deep-dive)
+- [Indexing & Internals](#indexing--internals)
+- [ACID, Isolation Levels & Locking](#acid-isolation-levels--locking)
+- [Architecture / Diagrams](#architecture--diagrams)
+- [NoSQL Deep Dive](#nosql-deep-dive)
+- [Real-World Examples](#real-world-examples)
+- [Real-Life Analogies](#real-life-analogies)
+- [Memory Tricks / Mnemonics](#memory-tricks--mnemonics)
+- [Common Interview Questions](#common-interview-questions)
+- [Senior-Level Discussion Points](#senior-level-discussion-points)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [How This Connects To Other Topics](#how-this-connects-to-other-topics)
+- [FAANG Interview Tips](#faang-interview-tips)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview — What It Is
 
 A **database** is a structured, persistent store of data with controlled access, concurrency management, and durability guarantees.

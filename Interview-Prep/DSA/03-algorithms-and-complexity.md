@@ -4,6 +4,19 @@
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Complexity Analysis](#complexity-analysis)
+- [Algorithms](#algorithms)
+- [Algorithm Selection Cheat Table](#algorithm-selection-cheat-table)
+- [Real-Life Analogies](#real-life-analogies)
+- [Common Interview Questions](#common-interview-questions)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview
 
 Algorithmic thinking is the foundation of every coding interview. You are not just expected to solve problems — you are expected to **reason about efficiency**, identify optimal approaches, and communicate trade-offs clearly. This file covers the complete algorithmic toolkit needed for top-tier software engineering interviews.

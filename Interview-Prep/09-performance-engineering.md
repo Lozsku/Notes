@@ -4,6 +4,27 @@
 
 ---
 
+## Table of Contents
+
+- [Overview — What it is](#overview--what-it-is)
+- [Why It Exists](#why-it-exists)
+- [Why FAANG Cares (be specific)](#why-faang-cares-be-specific)
+- [Core Concepts](#core-concepts)
+- [Key Laws & Methods](#key-laws--methods)
+- [Architecture / Diagrams](#architecture--diagrams)
+- [The Performance Investigation Workflow](#the-performance-investigation-workflow)
+- [Real-World Examples](#real-world-examples)
+- [Real-Life Analogies](#real-life-analogies)
+- [Memory Tricks / Mnemonics](#memory-tricks--mnemonics)
+- [Common Interview Questions](#common-interview-questions)
+- [Senior-Level Discussion Points](#senior-level-discussion-points)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [How This Connects To Other Topics](#how-this-connects-to-other-topics)
+- [FAANG Interview Tips](#faang-interview-tips)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview — What it is
 
 Performance Engineering is the disciplined practice of ensuring a system meets its **speed, resource, and scalability targets** under realistic conditions. It spans:

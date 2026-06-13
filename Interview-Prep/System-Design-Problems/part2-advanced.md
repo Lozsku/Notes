@@ -5,6 +5,15 @@ capacity math, API, data model, architecture, deep dives, scaling, and trade-off
 
 ---
 
+## Table of Contents
+
+- [1. Design a Video Streaming Service (YouTube / Netflix)](#1-design-a-video-streaming-service-youtube--netflix)
+- [2. Design a Ride-Hailing Service (Uber / Lyft)](#2-design-a-ride-hailing-service-uber--lyft)
+- [3. Design a Distributed Cache (like Redis/Memcached at Scale)](#3-design-a-distributed-cache-like-redismemcached-at-scale)
+- [4. Design a Web Crawler (Google-Scale)](#4-design-a-web-crawler-google-scale)
+
+---
+
 ## 1. Design a Video Streaming Service (YouTube / Netflix)
 
 ### 1. Requirements

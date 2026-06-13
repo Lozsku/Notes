@@ -4,6 +4,25 @@
 
 ---
 
+## Table of Contents
+
+- [Overview — What It Is](#overview--what-it-is)
+- [Why It Exists](#why-it-exists)
+- [Why FAANG Cares (Specifics)](#why-faang-cares-specifics)
+- [Core Concepts](#core-concepts)
+- [Architecture / Diagrams](#architecture--diagrams)
+- [Real-World Examples](#real-world-examples)
+- [Real-Life Analogies](#real-life-analogies)
+- [Memory Tricks / Mnemonics](#memory-tricks--mnemonics)
+- [Common Interview Questions](#common-interview-questions)
+- [Senior-Level Discussion Points](#senior-level-discussion-points)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [How This Connects To Other Topics](#how-this-connects-to-other-topics)
+- [FAANG Interview Tips](#faang-interview-tips)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview — What It Is
 
 An **Operating System** is the layer of software that sits between hardware and user applications. It virtualizes physical resources (CPU, RAM, disk, network) into clean abstractions that programs can use without knowing hardware details.

@@ -5,6 +5,27 @@
 
 ---
 
+## Table of Contents
+
+- [Overview — What it is](#overview--what-it-is)
+- [Why It Exists](#why-it-exists)
+- [Why FAANG Cares](#why-faang-cares)
+- [The STAR Method](#the-star-method)
+- [Core Themes](#core-themes)
+- [Amazon's 16 Leadership Principles](#amazons-16-leadership-principles)
+- [Building Your Story Bank](#building-your-story-bank)
+- [Architecture / Frameworks](#architecture--frameworks)
+- [Real-World Example Answers](#real-world-example-answers)
+- [Real-Life Analogies](#real-life-analogies)
+- [Memory Tricks / Mnemonics](#memory-tricks--mnemonics)
+- [Common Interview Questions](#common-interview-questions)
+- [Senior/Staff-Level Discussion Points](#seniorstaff-level-discussion-points)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [FAANG Interview Tips](#faang-interview-tips)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview — What it is
 
 Behavioral interviews assess *how* you work, not just *what* you can build. Interviewers ask you to recall real past situations and narrate them. The premise: **past behavior is the best predictor of future behavior.**

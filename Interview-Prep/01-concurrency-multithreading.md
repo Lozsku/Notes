@@ -4,6 +4,25 @@
 
 ---
 
+## Table of Contents
+
+- [Overview — What it is](#overview--what-it-is)
+- [Why It Exists](#why-it-exists)
+- [Why FAANG Cares](#why-faang-cares)
+- [Core Concepts](#core-concepts)
+- [Architecture / Diagrams](#architecture--diagrams)
+- [Real-World Examples](#real-world-examples)
+- [Real-Life Analogies](#real-life-analogies)
+- [Memory Tricks / Mnemonics](#memory-tricks--mnemonics)
+- [Common Interview Questions](#common-interview-questions)
+- [Senior-Level Discussion Points](#senior-level-discussion-points)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [How This Connects To Other Topics](#how-this-connects-to-other-topics)
+- [FAANG Interview Tips](#faang-interview-tips)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview — What it is
 
 **Concurrency** is the ability of a system to deal with multiple tasks at the same time — tasks make *progress* simultaneously, but not necessarily *execute* at the same instant.

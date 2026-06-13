@@ -5,6 +5,15 @@
 
 ---
 
+## Table of Contents
+
+- [1. Design a URL Shortener (TinyURL / bit.ly)](#1-design-a-url-shortener-tinyurl--bitly)
+- [2. Design a Rate Limiter](#2-design-a-rate-limiter)
+- [3. Design a News Feed (Facebook/Twitter Timeline)](#3-design-a-news-feed-facebooktwitter-timeline)
+- [4. Design a Chat System (WhatsApp / Messenger)](#4-design-a-chat-system-whatsapp--messenger)
+
+---
+
 ## 1. Design a URL Shortener (TinyURL / bit.ly)
 
 ### 1. Requirements

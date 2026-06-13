@@ -4,6 +4,18 @@
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Pattern Recognition Cheat Table](#pattern-recognition-cheat-table)
+- [The Patterns](#the-patterns)
+- [Complexity Quick Reference](#complexity-quick-reference)
+- [Interview Communication Tips](#interview-communication-tips)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview
 
 ### How to Use This File

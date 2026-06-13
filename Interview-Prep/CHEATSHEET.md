@@ -4,6 +4,24 @@
 
 ---
 
+## Table of Contents
+
+- [1. Concurrency & Multithreading](#1-concurrency--multithreading)
+- [2. Operating Systems](#2-operating-systems)
+- [3. Computer Networks](#3-computer-networks)
+- [4. Cloud & Infrastructure](#4-cloud--infrastructure)
+- [5. System Design](#5-system-design)
+- [6. Low-Level Design (LLD)](#6-low-level-design-lld)
+- [7. Distributed Systems](#7-distributed-systems)
+- [8. Databases](#8-databases)
+- [9. Performance Engineering](#9-performance-engineering)
+- [10. Security Fundamentals](#10-security-fundamentals)
+- [11. Behavioral / Leadership / Googleyness](#11-behavioral--leadership--googleyness)
+- [⚡ Cross-Topic Memory Hooks](#-cross-topic-memory-hooks)
+- [🎯 The 12 Highest-Frequency Interview Concepts (memorize cold)](#-the-12-highest-frequency-interview-concepts-memorize-cold)
+
+---
+
 ## 1. Concurrency & Multithreading
 - **Concurrency ≠ Parallelism**: concurrency = *dealing with* many things (structure); parallelism = *doing* many things at once (execution).
 - **Process** = own memory space; **Thread** = shared memory, own stack. Threads cheaper, but share state → bugs.

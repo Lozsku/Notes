@@ -5,6 +5,25 @@
 
 ---
 
+## Table of Contents
+
+- [Overview — What It Is](#overview--what-it-is)
+- [Why It Exists](#why-it-exists)
+- [Why FAANG Cares (Per Company)](#why-faang-cares-per-company)
+- [Core Concepts](#core-concepts)
+- [Architecture / Diagrams](#architecture--diagrams)
+- [Real-World Examples](#real-world-examples)
+- [Real-Life Analogies](#real-life-analogies)
+- [Memory Tricks / Mnemonics](#memory-tricks--mnemonics)
+- [Common Interview Questions](#common-interview-questions)
+- [Senior-Level Discussion Points](#senior-level-discussion-points)
+- [Typical Mistakes Candidates Make](#typical-mistakes-candidates-make)
+- [How This Connects to Other Topics](#how-this-connects-to-other-topics)
+- [FAANG Interview Tips](#faang-interview-tips)
+- [Revision Cheat Sheet](#revision-cheat-sheet)
+
+---
+
 ## Overview — What It Is
 
 Computer networking is the discipline of **connecting computing devices so they can exchange data**. Every product at scale — from a URL you type to a microservice call 10 hops away — relies on a layered stack of protocols, each solving one narrow problem.
