@@ -24,6 +24,14 @@ Each topic follows the same structure:
 | 10 | Security Fundamentals | [10-security-fundamentals.md](10-security-fundamentals.md) |
 | 11 | Behavioral / Leadership / Googleyness | [11-behavioral-leadership.md](11-behavioral-leadership.md) |
 
+## 🧩 Applied Practice Packs
+
+| Pack | What's inside |
+|------|---------------|
+| 💻 **[DSA / Coding Round](DSA/00-INDEX.md)** | Pattern recognition + templates, data structures, algorithms & complexity — the #1 interview filter. |
+| 🏗️ **System Design Problems** | 8 fully worked end-to-end designs: [Part 1 — TinyURL, Rate Limiter, News Feed, Chat](System-Design-Problems/part1-foundational.md) · [Part 2 — YouTube, Uber, Distributed Cache, Web Crawler](System-Design-Problems/part2-advanced.md) |
+| 🧱 **[LLD / Machine-Coding](LLD-Problems/coded-solutions.md)** | 6 complete runnable Python solutions: LRU Cache, Parking Lot, Rate Limiter, Splitwise, Elevator, Tic-Tac-Toe. |
+
 ## 🔗 How topics connect
 
 ```
