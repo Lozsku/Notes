@@ -916,24 +916,31 @@ PRODUCT#widget   | META             | {price, desc}
 
 ## Real-Life Analogies
 
+*One great library — every concept is a shelf, a catalogue card, or a librarian's routine.*
+
 | Concept | Analogy |
 |---|---|
-| **Index** | Book index at the back — instead of reading 500 pages, you flip to "P-209" |
-| **B+Tree** | A library catalog filing system — organized hierarchically, all books (data) on the bottom shelf (leaves) |
-| **LSM-Tree** | A notepad where you always write at the bottom; periodically sort and consolidate into a clean ledger |
-| **Clustered index** | A phone book — the book IS sorted by last name, so finding John Smith means opening to S |
-| **Non-clustered index** | A library card catalog — points you to which shelf/aisle, but you still walk there to get the book |
-| **MVCC** | Google Docs version history — you're reading last Tuesday's snapshot while someone edits right now |
-| **Dirty read** | Reading a draft email before the author sends it — they might delete it |
-| **Phantom read** | You count the chairs in a room (5), leave, someone adds a chair, you come back and count again (6) |
-| **Deadlock** | Two people in a hallway, each waiting for the other to step aside |
-| **Sharding** | Splitting a dictionary: A-M in one volume, N-Z in another |
-| **Replication** | Having multiple copies of an important document in different offices |
-| **WAL** | Writing in a journal before acting on it — if something goes wrong, the journal lets you reconstruct what happened |
-| **Optimistic locking** | Checking if a flight seat is still available right before you pay |
-| **Pessimistic locking** | Reserving a seat (locking it) the moment you start booking |
-| **Normalization** | Keeping one master address book; everyone references it |
-| **Denormalization** | Giving everyone their own copy of the address book — faster to look up, but updates must sync |
+| **Index** | The card catalogue at the entrance — find a book without walking every shelf |
+| **B+Tree** | The alphabetised catalogue drawers, with each leaf drawer linked to the next so range browsing is a single sweep across adjacent drawers |
+| **LSM-Tree** | A returns cart that fills during the day (memtable) and is periodically merged and reshelved in strict order (compaction) — the cart is fast to drop books onto; the shelving run keeps the stacks sorted |
+| **Clustered index** | Books shelved in call-number order — the shelf layout IS the catalogue; finding call number 823.914 means walking straight to that spot, no detour |
+| **Non-clustered index** | A subject-card in the catalogue that gives you a call number — you still have to walk the stacks to pull the physical book off the shelf |
+| **MVCC** | Keeping the previous edition on the shelf so current readers aren't interrupted while the librarian quietly swaps in the new edition behind the desk |
+| **Transaction** | Checking out a whole reading-list all-or-nothing — either every book is stamped and in your bag, or none leave the desk |
+| **ACID** | Library rules: all books or none leave (atomic); the catalogue stays accurate after every checkout (consistent); two patrons can't grab the same last copy mid-checkout (isolated); the stamp record survives a power cut (durable) |
+| **Dirty read** | Peeking at a book the librarian pulled but hasn't yet decided to add to the collection — it may go straight back to the supplier |
+| **Non-repeatable read** | You note a book is on shelf 4, walk to the café, come back, and it's gone — another patron checked it out between your two glances |
+| **Phantom read** | You count seven books on a topic, step away to photocopy one, return, and now there are eight — a new donation arrived in between |
+| **Deadlock** | Patron A holds the atlas and is waiting for the dictionary; Patron B holds the dictionary and is waiting for the atlas — neither budges until the librarian intervenes and asks one to put their book down |
+| **Sharding** | Splitting the collection across buildings by subject — Sciences in the East Wing, Humanities in the West Wing — so no single building is overwhelmed |
+| **Replication** | Branch libraries holding copies of the most-requested titles — the main branch updates its master copy and the branches mirror it so local readers are never turned away |
+| **WAL** | The librarian writes every incoming acquisition in the accession register before touching the shelves — if a shelf collapses mid-task, the register lets her reconstruct exactly where each book belongs |
+| **Pessimistic locking** | Clipping a "Being Used — Do Not Remove" tag on a book the moment a patron sits down with it, so no one else can grab it from under them |
+| **Optimistic locking** | No tag on the book while reading; at the checkout desk the librarian checks whether the edition number on the stamp card still matches — if someone else already updated the record, she hands the book back and asks the patron to start over |
+| **Normalization** | One master author-card per person in the catalogue — every book's record points to it rather than repeating the author's biography on every card |
+| **Denormalization** | Photocopying the author biography onto every book's catalogue card — faster to read in one place, but when the author changes address every card must be updated individually |
+| **Joins** | Cross-referencing the authors' catalogue with the books' catalogue — match each author card to every book card that shares the same author code to build the full picture |
+| **NoSQL** | A flexible scrapbook section where patrons paste in newspaper clippings, maps, and sticky notes — no rigid card format required, but you cannot run the same catalogue queries you would on a bound volume |
 
 ---
 

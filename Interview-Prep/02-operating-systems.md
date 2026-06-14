@@ -1206,26 +1206,28 @@ Virtual Address (48 bits used):
 
 ## Real-Life Analogies
 
+*One building, one facilities team — every concept is a floor, a room, or a routine in the same office.*
+
 | OS Concept | Real-Life Analogy |
 |---|---|
-| **Process** | A cooking session in a kitchen: the recipe (code), the ingredients (data), and the cook (CPU) |
-| **Thread** | Multiple sous-chefs in the same kitchen, sharing counter space and utensils |
-| **Virtual Memory** | Your personal bank account balance — you think you have $100K available, but the bank doesn't actually hold it all as cash simultaneously |
-| **Page Table** | A library card catalog: maps the book title (virtual address) to the shelf location (physical address) |
-| **TLB** | A sticky note on your desk with last week's most-used library book locations — much faster than consulting the full catalog |
-| **Page Fault** | Going to the shelf and finding the book checked out (major fault = go request it from another branch / disk); finding shelf number was wrong in your notes (minor fault = quick fix) |
-| **Context Switch** | A surgeon switching between two patients in different ORs: must save state, scrub out, scrub in, re-orient to new patient |
-| **Deadlock** | Two cars at a narrow bridge from opposite sides, each waiting for the other to back up |
-| **Scheduling (RR)** | A teacher calling on students one at a time in a rotation, giving each a fixed 30-second window to speak |
-| **MLFQ** | A hospital triage system: all patients enter through ER, quick cases (interactive) get seen first, chronic/complex cases (CPU-bound) wait longer and go to different queues |
-| **Fork + CoW** | A shared whiteboard: two people both read it; only when one starts writing does the OS give them their own private copy |
-| **Pipe** | A physical pipe: water flows one direction, sender pours in, receiver collects at the other end |
-| **Shared Memory** | A whiteboard that multiple departments in an office can read/write — fastest communication but requires coordination |
-| **File System Inode** | A library accession record: doesn't store the book (data) but stores all metadata (author, pages, location, who has it) |
-| **Journaling** | A flight checklist: pilot writes down "intend to start engine" before doing it, so if interrupted, recovery is clear |
-| **Thrashing** | A student trying to cram 20 topics the night before an exam — constantly reviewing but not retaining anything, time wasted on reviewing rather than learning |
-| **Zombie Process** | A guest who left the party but their name is still on the attendance list until the host checks it off |
-| **Semaphore** | A parking lot with a counter — cars can enter only if the counter > 0, decrement on entry, increment on exit |
+| **Process** | A company renting a full floor — its own offices, filing cabinets, and staff, physically walled off from the companies on other floors; one company can't wander into another's space |
+| **Thread** | An employee on that rented floor — shares the floor's filing cabinets and supplies with colleagues, but has their own desk, their own to-do list, and their own chair |
+| **Virtual Memory** | Every employee gets a floor map labelling their rooms 1, 2, 3 … The building manager secretly maps those numbers to real rooms scattered across many floors — the employee sees a tidy sequence; the building is a patchwork |
+| **Page Table** | The building manager's master ledger — one row per virtual room number, recording which actual room on which actual floor it corresponds to; without the ledger, no one can find anything |
+| **TLB** | The receptionist's quick-reference card of the dozen rooms she looks up every hour — she checks the card first; only if the room isn't on it does she page through the full master ledger |
+| **Page Fault** | You walk to a room listed on your map and the files aren't there — someone has boxed them and sent them to the basement archive (disk). A facilities runner fetches the box (major fault); if the map just forgot to update after a recent delivery, the runner corrects the entry on the spot (minor fault) |
+| **Context Switch** | The building has one big glass-walled meeting room. When Team A's booking ends, they pack every whiteboard note and laptop into labelled boxes; facilities wheels in Team B's boxes and pins their diagrams back up before the next session starts |
+| **Deadlock** | Team A is holding the sole projector and waiting for the laser pointer that Team B is holding — and Team B is waiting for the projector. Both teams sit in their rooms, arms folded, waiting forever |
+| **Scheduling (RR)** | The facilities team rotates access to the one shared high-speed printer: each department gets a 10-minute slot, then the next department's key card is activated, cycling through the list fairly |
+| **MLFQ** | New print jobs enter the express tray (highest priority, short slot). If a job hogs the printer through its full slot, it gets moved to the standard tray, then to the overnight bulk tray — quick one-page memos naturally stay at the top; the thousand-page report drifts to the bottom |
+| **Fork + CoW** | A company on floor 3 wants to spin up a branch office (child process). Facilities hands the branch a copy of the floor map pointing to the same filing cabinets. The moment the branch edits a document, facilities quietly makes a private copy of that cabinet drawer — until then, nothing is duplicated |
+| **Pipe** | The inter-floor mail chute: Team A drops documents in at the top, Team B collects them at the bottom; flow is strictly one-way and the chute can only hold so many envelopes before it backs up |
+| **Shared Memory** | A glass-fronted document wall in the lobby that both the 3rd-floor and 5th-floor companies can read and update directly — the fastest way to exchange data, but teams must agree on who writes when or pages get overwritten |
+| **File System Inode** | The building's asset tag record for a cabinet drawer: it doesn't hold the documents, but it records owner, creation date, number of folders inside, and exactly which shelf bays to find them in — the drawer's name is only in the floor directory, not on the record itself |
+| **Journaling** | Before facilities moves a cabinet from one room to another, the facilities manager writes the move order in the shift log. If the power cuts out mid-move, the morning crew reads the log and either completes or reverses the move — nothing is left half-done |
+| **Thrashing** | The building has 10 rooms but 15 teams each need 4 rooms simultaneously. Facilities constantly evicts one team's boxes to make space for another — everyone spends the day waiting for their boxes to arrive from the basement rather than doing any actual work |
+| **Zombie Process** | A company vacates its floor and returns the key, but facilities hasn't yet struck it from the tenant register. The floor is empty, yet the register still lists the company as an active tenant until the landlord (parent) signs off |
+| **Semaphore** | The parking-garage gate counter — a sign shows spaces remaining. Each entering car decrements the count; the gate refuses entry at zero. Exiting cars increment it, and the next waiting car is waved in |
 
 ---
 

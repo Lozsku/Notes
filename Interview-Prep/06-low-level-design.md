@@ -1288,29 +1288,35 @@ IDLE ──(selectItem)──> "Insert coin first"
 
 ## Real-Life Analogies
 
+*One smart home — every principle and pattern is a switch, a socket, or a system in the same house.*
+
 | Concept | Real-Life Analogy |
 |---|---|
-| **Encapsulation** | A car's engine — you use the steering wheel and pedals, not the pistons directly |
-| **Abstraction** | A TV remote — you press "Volume Up," you don't know about IR signals |
-| **Inheritance** | A poodle IS-A dog IS-A animal — inherits traits up the chain |
-| **Polymorphism** | "Make a sound" — dog barks, cat meows, bird chirps (same message, different response) |
-| **SRP** | A chef cooks; a waiter serves; a cashier bills — one role each |
-| **OCP** | A power strip — add new devices (extend) without rewiring the house (modify) |
-| **LSP** | A substitute teacher must be able to run a class without students noticing |
-| **ISP** | A waiter doesn't need to know how to fix the oven just because they work in a restaurant |
-| **DIP** | A lamp plugs into a standard socket (abstraction), not hardwired to a power plant |
-| **Singleton** | The President of a country — exactly one at a time |
-| **Factory** | A car factory — you order a "sedan," they decide which assembly line |
-| **Builder** | A Subway sandwich — you direct the builder step by step |
-| **Adapter** | A power plug adapter for international travel |
-| **Decorator** | Adding toppings to ice cream — layer by layer, same base |
-| **Facade** | A travel agent — one contact, hides flights/hotels/car complexity |
-| **Proxy** | A credit card — acts as proxy for your bank account |
-| **Observer** | A newspaper subscription — publisher notifies all subscribers |
-| **Strategy** | GPS route options — fastest/shortest/scenic are interchangeable strategies |
-| **Command** | A restaurant order ticket — encapsulates the request, can be undone (cancel) |
-| **State** | A traffic light — same object, behavior changes by state |
-| **Composite** | A folder — can contain files AND other folders; same operations on both |
+| **Encapsulation** | The walls hiding the wiring — you flip a switch and the light comes on; you never touch the live cables behind the plasterboard |
+| **Abstraction** | The thermostat dial — you set 21°C and walk away; the furnace, gas valve, and duct fans sort themselves out behind the wall |
+| **Inheritance** | The "Villa" plan extends the base "House" plan — it inherits every room, every circuit, every load-bearing wall, and adds a pool wing on top |
+| **Polymorphism** | One "Open" button on the smart-home app that swings the front door, rolls up the garage shutter, and tilts the skylight — each mechanism moves in its own way |
+| **SRP** | The smoke detector detects smoke; the siren makes noise; the sprinkler douses flames — one job per device, swap any one without touching the others |
+| **OCP** | The breaker panel — you snap a new circuit breaker in to power the home office extension without touching the existing breakers that run the kitchen |
+| **LSP** | Any certified light bulb — LED, halogen, or smart bulb — fits the same socket and dims when the dimmer turns; no fixture needs rewiring for the swap |
+| **ISP** | The outdoor weatherproof socket only implements the "power" interface; it knows nothing about the thermostat's heating schedule — each device gets only the interface it actually uses |
+| **DIP** | Every appliance plugs into the same standard socket — an abstraction — rather than being hard-wired to the power station; swap the supplier, not the toaster |
+| **Singleton** | The main fuse box — exactly one exists in the house; every circuit routes through it and the architect makes sure nothing bypasses it |
+| **Factory** | The prefab workshop off-site — you tell it "I need a kitchen module" and it delivers a fully fitted unit; you never see the assembly jigs or which crew built it |
+| **Abstract Factory** | The architect's room-kit catalogue — order the "Scandinavian" kit and every fitting (taps, handles, light switches) arrives from the same matching family |
+| **Builder** | Fitting out a bare shell room step by step — lay flooring, then paint walls, then hang curtains, then mount shelves — each step optional, sequence matters, one `handOver()` at the end |
+| **Prototype** | The show-home template — instead of designing each holiday-let room from scratch, you clone the master layout and tweak only the colour scheme |
+| **Adapter** | A travel plug adapter on the kitchen counter — the European two-pin appliance plugs into it, and the adapter presents the UK three-pin shape the house expects |
+| **Decorator** | Outfitting a bare concrete room layer by layer — insulation, then plasterboard, then paint, then coving, then smart lighting — each layer adds behaviour without demolishing what came before |
+| **Facade** | The smart-home app's "Movie Night" scene — one tap dims every light, lowers the blinds, turns on the projector, and silences the doorbell; you never touch seven separate sub-systems |
+| **Proxy** | The smart doorbell that screens visitors — it answers the door, checks the camera, and only rings you inside if it can't verify the caller itself |
+| **Observer** | The smoke detectors — one sensor in the kitchen smells smoke and instantly notifies every alarm, the sprinkler controller, and the security panel across the house |
+| **Strategy** | Swappable heating behind the same thermostat dial — gas boiler today, electric heat-pump tomorrow, solar thermal next year; the dial interface never changes |
+| **Command** | A scene button you programme yourself — press it once to execute a sequence of actions (dim lights, lock doors, set alarm), press again to undo, queue multiple scenes to run at midnight |
+| **State** | The thermostat's mode wheel — Home, Away, and Sleep each change what temperature the whole house targets; same thermostat, entirely different behaviour per mode |
+| **Composite** | The master suite — it groups the bedroom, en-suite, and dressing room as a single bookable unit, yet each sub-room also exposes the same `inspect()` interface individually |
+| **Template Method** | The architect's standard commissioning checklist — always: pressure-test plumbing, then certify electrics, then sign off ventilation; the steps are fixed but each trade fills in its own method |
+| **Iterator** | The electrician's walkthrough — she moves from socket to socket around every room in a fixed sequence without needing a floor-plan in her hand; the house exposes one `nextSocket()` cursor |
 
 ---
 

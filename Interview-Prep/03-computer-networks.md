@@ -1020,26 +1020,28 @@ HTTP/2 — 1 TCP connection, multiple streams:
 
 ## Real-Life Analogies
 
+*One postal network — every concept is a parcel, a courier, or a depot in the same delivery system.*
+
 | Concept | Analogy |
 |---|---|
-| **OSI Layers** | Postal service: you write a letter (application), put in envelope (session/presentation), address it (network), mail carrier handles it (transport), truck delivers (data link), roads carry the truck (physical) |
-| **TCP vs UDP** | TCP = certified mail (signed receipt, guaranteed delivery). UDP = postcards (fast, no tracking, might not arrive) |
-| **TCP 3-way handshake** | Calling someone: you dial (SYN), they say "hello?" (SYN-ACK), you say "hi, it's me" (ACK) — both know the line is open |
-| **TCP congestion control** | Merging onto a highway: start slow, speed up gradually, slam brakes if you nearly cause an accident, then ease back up |
-| **DNS** | Phone book: you know someone's name (domain), look up their number (IP address) |
-| **DNS TTL** | How often the phone book is reprinted. Short TTL = daily reprints. Long TTL = yearly (stale if someone moves) |
-| **TLS certificate** | Government-issued ID verified by a trusted authority (CA). You trust the ID because you trust the government that issued it. |
-| **Diffie-Hellman key exchange** | Mixing paint: you each start with yellow (public), add your secret color, swap, add each other's secret — end up with same complex color no one else can guess |
-| **Perfect Forward Secrecy** | Using a shredder after each letter. Even if your master key is stolen later, past letters can't be read. |
-| **Load balancer** | Bank tellers: customers (requests) go to next available teller (server). Manager (LB) directs traffic. |
-| **Round-robin LB** | Taking turns serving customers: teller A, then B, then C, repeat. |
-| **Least connections LB** | Open a new checkout lane with the shortest queue. |
-| **HTTP/2 multiplexing** | Multi-lane highway vs single-lane road. HTTP/1.1 = single lane, everyone waits. HTTP/2 = 8-lane highway, all cars move simultaneously. |
-| **QUIC/HTTP/3** | Private toll road built specifically for speed, with its own rules (no public TCP highway detours). |
-| **WebSockets** | Keeping a phone call open vs sending a text message (HTTP). Both parties can talk anytime on a call. |
-| **CORS** | A nightclub bouncer: the bouncer (browser) checks if the person (script from origin A) is on the guest list (CORS headers) before letting them in (make requests to origin B). |
-| **NAT** | A corporate receptionist: 200 employees share one public phone number. Receptionist connects calls to the right desk and routes replies back. |
-| **CDN** | Stocking local warehouses: instead of shipping from central warehouse (origin), deliver from nearest depot (edge server). |
+| **OSI Layers** | A parcel moving through the postal network: you write the contents (application), seal and label the box (presentation/session), write the full street address (network), hand it to the courier service (transport), the courier van carries it link by link (data link), and tarmac roads physically connect the depots (physical) |
+| **TCP vs UDP** | TCP = registered mail with a signature required on delivery — if no one signs, the courier re-attempts until it gets through. UDP = dropping a postcard in the public letterbox — fast, no tracking number, some never arrive, and you never find out |
+| **TCP 3-way handshake** | The courier calls ahead before dispatching a big shipment: "Parcel coming your way — ready to receive?" → "Yes, loading bay is clear" → "Great, truck is leaving now." Only after that three-beat exchange does the lorry set off |
+| **TCP congestion control** | A courier fleet entering a congested motorway: start with one van (slow start), add a van each trip as the road clears (linear growth), then a pile-up ahead forces the dispatcher to cut the convoy in half and rebuild carefully from there |
+| **DNS** | The national address directory: you know the company's trading name ("GlobalWidgets Ltd") but need its actual street address before you can send a parcel — the directory looks it up and hands back the postcode |
+| **DNS TTL** | How long a courier is allowed to use a cached address before re-checking the directory. Short TTL = re-check every day (safe if the company moves often). Long TTL = re-check yearly (risky — parcels may land at a vacated office) |
+| **TLS certificate** | A notarized identity card stapled to the parcel: a government-recognized authority has stamped "this parcel truly originates from GlobalWidgets Ltd." Both sender and recipient trust the stamp because they both recognize the authority that issued it |
+| **Diffie-Hellman key exchange** | Two couriers agree on a secret seal color without ever meeting: each mixes their private dye into a shared base color, swaps the result, and mixes again — they end up with an identical hue that no eavesdropper at the sorting depot can reproduce |
+| **Perfect Forward Secrecy** | The depot shreds the wax seal mold after every shipment. Even if a thief later steals the master key, all past parcels are already sealed with unique, destroyed molds and cannot be reopened |
+| **Load balancer** | The dispatch desk at the sorting depot: every inbound parcel lands on the desk, and the dispatcher hands it to whichever courier van is free right now, keeping the workload spread evenly across the fleet |
+| **Round-robin LB** | The dispatcher assigns parcels in strict rotation — van A, van B, van C, van A again — so every courier takes the same share of the queue regardless of how heavy each parcel is |
+| **Least connections LB** | The dispatcher checks which van has the fewest parcels still in transit and loads the next one onto that van, so no courier is buried while another idles |
+| **HTTP/2 multiplexing** | A single courier van carrying parcels for many recipients simultaneously, sorted into labeled compartments — versus the old rule where the van had to deliver one parcel completely before picking up the next |
+| **QUIC/HTTP/3** | The postal authority builds its own private courier road with built-in security checkpoints and dedicated lane markings — bypassing the congested public motorway (TCP) entirely, so vans never queue behind someone else's blocked lorry |
+| **WebSockets** | Opening a permanent, two-way courier hatch between two depots: parcels flow in both directions any time, without the sender having to knock and wait for a fresh door-opening each time |
+| **CORS** | The receiving depot's gate policy: when a parcel arrives from a third-party courier (a different origin), the gatekeeper checks the approved-senders list posted at the gate. If that courier company is not listed, the parcel is turned away — not destroyed, just refused entry |
+| **NAT** | The company mailroom: 200 staff share a single public street address on the building's front door. Every outgoing parcel is relabeled with the building's address; the mailroom log records which desk it came from so the reply can be routed back to exactly the right person |
+| **CDN** | Regional depots stocked with copies of the most popular goods: instead of every parcel shipping from the central warehouse hundreds of miles away, customers in each region collect from the nearest local depot — same goods, fraction of the journey |
 
 ---
 

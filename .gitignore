@@ -1,0 +1,7 @@
+# Python build artifacts
+__pycache__/
+*.pyc
+# Magazine builder temp/render files
+Interview-Prep/.magazine/_tmp_*.html
+Interview-Prep/.magazine/_cheat.html
+Interview-Prep/.magazine/concurrency_magazine.html

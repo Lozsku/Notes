@@ -561,20 +561,23 @@ Staff/Principal → expects org-wide influence, sets direction, drives strategy
 
 ## Real-Life Analogies
 
-These make principles memorable.
+*One team, one season — every trait is a play, a role, or a moment on the same field.*
 
 | Principle | Analogy |
 |-----------|---------|
-| Ownership | "The kitchen is everyone's." — in a great restaurant, every chef owns cleanliness, not just the dishwasher. Own the problem even when it's not your station. |
-| Disagree and Commit | Jury duty: you argue hard for your view, the jury votes, and then everyone defends the same verdict to the court. |
-| Bias for Action | Ship the prototype, don't spec the product. A landing page in 2 days beats a PRD in 2 weeks for validating a hypothesis. |
-| Influence without Authority | A good doctor convinces you to change your diet without ordering you to. Credibility + relationship + clear benefit. |
-| STAR method | Telling a campfire story: set the scene quickly, make it personal ("I saw..."), build to the moment of decision, land on the punchline. |
-| Customer Obsession | Jeff Bezos famously left an empty chair in meetings — the customer's chair. The customer is always in the room. |
-| Conflict Resolution | Playing chess vs. playing tennis: in chess you win by taking pieces; in tennis both players need each other to play. Conflict resolution is tennis. |
-| Mentoring impact | "Give a fish vs. teach to fish" — good mentoring multiplies your output through others. |
-| Ambiguity handling | Navigation before GPS: you knew your starting point, you had a general direction, and you corrected at each landmark. You didn't wait for a perfect map. |
-| Quantifying impact | "Increased performance" without numbers is like saying "I ran fast." Fast compared to what? How fast? Lap record or just beat your friend? |
+| STAR Method | A highlight reel of one play: the game situation, your role on the field, the move you made, and the score it changed — forty-five minutes of match compressed into ninety seconds of tape that shows exactly what you did. |
+| Ownership | The captain who steps up to the microphone after a 3-0 loss and says "that was on me, not the goalkeeper" — no finger-pointing, no asterisks, just full accountability for what happened on the pitch. |
+| Conflict Resolution | Two midfielders arguing opposite tactics in the huddle at half-time — each makes their case hard, the coach decides, and both players sprint back out and execute the same play with full commitment. Disagree in the locker room, commit on the field. |
+| Cross-team Collaboration | Running a set piece that only works when the forwards, the wide players, the physio who cleared the striker to start, and the video analyst who spotted the defensive gap all do their job — not just your position, the whole squad. |
+| Ambiguity | The opponent switches from a back-four to a three-man defence in the 55th minute without warning. There is no time for a coaching call: you read the formation, signal your line-mates, and adapt the press before the next goal kick lands. |
+| Mentoring | The club's ten-year veteran who stays on the training pitch after everyone else has gone in, walking the rookie through defensive transitions one repetition at a time until the movement becomes automatic. |
+| Project Impact | The season stats that actually won the title — not the flashy individual dribbles, but the goals, assists, and clean sheets that show up in the standings and land the trophy in May. |
+| Influence without Authority | The player with no armband whom every teammate looks to when the game gets tense — not appointed, just trusted, because her reading of the game has been right too many times to ignore. |
+| Leadership | Spotting that the press is breaking down before the coach sees it from the sideline, calling the defensive shape out loud mid-run, and getting eleven people moving as one without a whistle being blown. |
+| Bias for Action | Taking the shot on goal in the 88th minute instead of waiting for a more perfect angle that may never come — a 60% chance you take now beats a 90% chance that arrives after the final whistle. |
+| Customer Obsession | Building the attack around what the fans in the stands came to see — relentless movement, goals — not around tactics that are theoretically sound but empty the stadium by half-time. |
+| Failure / Learning | Watching the match film the morning after a defeat, pausing on every mistake you made personally, and running the corrected movement pattern in training until your body forgets the bad version — accountability plus repetition, not excuses. |
+| Quantifying Impact | Posting the actual scoreboard — goals, assists, clean sheets, league position — not just telling the board "we played well." The scoreboard is what gets your contract renewed. |
 
 ---
 

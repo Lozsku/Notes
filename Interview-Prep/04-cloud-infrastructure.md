@@ -1377,24 +1377,26 @@ Stripe deploys hundreds of times per day. Every production deploy goes through a
 
 ## Real-Life Analogies
 
+*One shipping port — every concept is a container, a crane, or a berth in the same terminal.*
+
 | Concept | Analogy |
 |---|---|
-| Container | A shipping container: standard size, carries any goods, same interface at any port (Docker = the container; Kubernetes = the port authority/shipping company) |
-| Kubernetes scheduler | Hotel check-in assigning rooms (nodes) to guests (pods) based on availability, preferences (affinity), and VIP status (priority) |
-| Namespaces | Apartment units in a building: separate mailboxes (pid ns), separate doorbells (net ns), but shared elevator (kernel) |
-| cgroups | Electricity circuit breakers: each apartment has limits; one neighbor can't blow everyone's power |
-| OverlayFS / image layers | Git branches stacked on commits: each layer is a diff; copy-on-write means changing a file creates a new file in your layer without touching the original |
-| etcd | The Rosetta Stone of the cluster: if lost, the cluster loses all memory of what should be running |
-| HPA | Rideshare surge pricing in reverse: more demand → more cars (pods) dispatched; demand drops → cars go home |
-| Cluster Autoscaler | A parking garage that builds new floors when all spaces are full, removes floors when empty |
-| Service Mesh | Airport security checkpoint: every passenger (request) goes through the same screening (mTLS, authz, rate limiting) regardless of which airline (service) they're flying |
-| Canary deployment | Mining canary: send a small subset of requests to new version first; if the canary is fine (no 5xx), open it to everyone |
-| Blue-Green | The TV set: you preview the new channel (green) fully before your family switches over; old channel stays ready to switch back |
-| Error Budget | A monthly allowance for teenagers: they can spend it how they like, but when it's gone, no more late nights until next month |
-| SLI/SLO/SLA | Thermometer (SLI) / Healthy temperature goal (SLO) / Doctor's signed commitment (SLA) |
-| Prometheus pull | A health inspector who visits restaurants (apps) on a schedule to check vitals; vs push = restaurants self-reporting |
-| Distributed trace | Postal tracking: each step in the journey (sort facility, truck, delivery) is a span; the whole journey is the trace |
-| IaC (Terraform) | A blueprint: instead of building one house by hand, you give the blueprint to a factory that stamps out identical houses on demand |
+| Container | A standard ISO shipping container: same corner fittings, same locking pins, carries anything from bananas to electronics, slots onto any ship, truck, or rail car without modification — Docker stamps them out, Kubernetes is the port authority that decides where each one goes |
+| Kubernetes scheduler | The port's yard planner: when a new container arrives without a berth, the planner checks every quay for spare capacity, weight limits, and hazmat restrictions (affinity/taints), scores the candidates, then writes the berth number on the manifest — that written assignment is `nodeName` on the pod spec |
+| Namespaces | Sealed container interiors: containers next to each other on the same ship share the hull (host kernel) but each has its own internal atmosphere, its own manifest ID (PID namespace), its own address label (net namespace), its own locked door (mount namespace) — neighbours can't peek inside |
+| cgroups | The port's weight-and-power allocation board: each container slot on a vessel is assigned a maximum gross weight and a shore-power amperage cap; exceed the cap and the breaker trips (OOMKill) or the crane throttles the lift speed (CPU throttling) — one overloaded box cannot capsize the whole ship |
+| OverlayFS / image layers | Stacked pallets inside a container: the bottom pallet is the base OS (read-only), the next is installed dependencies (read-only), the top is your app code; when a container needs to modify a file from a lower pallet, the terminal copies just that item to a new top sheet (copy-on-write) and edits there — the original pallets stay pristine for every other container sharing them |
+| etcd | The harbour master's logbook: every ship, every berth assignment, every container manifest is recorded here using Raft consensus so no single page can go missing; lose the logbook and the port forgets every vessel in the water, every crane allocation, every scheduled departure — the terminal grinds to a halt |
+| HPA | The terminal's shift-rostering desk: when crane throughput data shows containers piling up faster than handlers can move them, the roster desk calls in extra gangs (pod replicas); when the quay clears, surplus gangs are stood down — always targeting the throughput the terminal manager set |
+| Cluster Autoscaler | The port expansion office: when every berth is full and new ships are queuing at the harbour mouth (pending pods), the office requisitions a new quay section from the landlord (cloud API) and opens it; when half the quays sit empty for long enough, it decommissions a section to cut leasing costs |
+| Service Mesh | Port escorts assigned to every container movement: before any box moves between zones, an escort checks the container's RFID seal (mTLS identity), logs the checkpoint in the manifest system (distributed trace span), verifies the receiving zone has clearance (authz policy), and shadows the crane lift — same procedure regardless of which shipping line's logo is on the box |
+| Canary deployment | Trialling a new crane model on one berth first: the operations manager routes a single container down the new crane line; if it lands cleanly within tolerances, the rest of the day's vessels follow; if the new crane drops a box or jams, only that one trial shipment is lost and the old cranes keep running |
+| Blue-Green | Two identical deep-water berths kept in parallel: ships unload at Berth Blue while the operations team fully fits out Berth Green with the new handling equipment; once Green passes inspection, the harbour master flips the gate sign — all incoming vessels now dock at Green; Blue sits ready for five minutes so any problem means flipping the sign straight back |
+| Error Budget | The port's annual slot-delay allowance: the terminal promises carriers that no more than 0.1% of container movements will miss their time window; every incident eats into that allowance; when the allowance is exhausted the port authority freezes all non-essential crane reconfigurations until the next period resets the clock |
+| SLI/SLO/SLA | Quay throughput gauge (SLI) / the terminal's internal target of 400 moves per crane-hour (SLO) / the carrier contract that docks the port's fee by 10% if the target is missed for the month (SLA) — the gauge measures, the target disciplines operations, the contract has teeth |
+| Prometheus pull | The port inspector's rounds: every 15 seconds the inspector walks to each crane, checks the load-cycle counter, and writes it in the notebook — the cranes don't have to radio in; if a crane goes dark the inspector notices immediately because no reading is itself a signal |
+| Distributed trace | The container's full journey log: the gate scanner stamps arrival time (Span 1), the yard tractor logs pickup (Span 2), the crane logs lift-start and set-down (Span 3), the ship's computer logs stow position (Span 4); every leg shares the same bill-of-lading number (Trace ID) so investigators can reconstruct the exact path and find where the two-hour delay occurred |
+| IaC (Terraform) | The terminal's master construction blueprint: instead of building each berth, crane, and road by hand, the harbour engineer submits the blueprint to the construction system which provisions an identical layout on demand — `terraform plan` shows which berths will change before a single pile is driven, and the same blueprint can stamp out a second terminal in a different harbour without starting from scratch |
 
 ---
 

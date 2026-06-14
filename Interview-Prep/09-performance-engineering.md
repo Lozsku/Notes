@@ -780,26 +780,32 @@ struct Counter {
 
 ## Real-Life Analogies
 
+*One highway — every concept is a lane, a car, or a chokepoint in the same traffic system.*
+
 | Concept | Analogy |
 |--------|---------|
-| **Latency** | Time it takes one car to drive from city A to B |
-| **Throughput** | Number of cars per hour crossing a toll booth |
-| **Bandwidth** | Width of the highway (total capacity) |
-| **Cache** | Keeping frequently-used tools on your desk rather than in the basement |
-| **Cache miss** | Going down to the basement for a tool you should have kept at your desk |
-| **Cache stampede** | Entire office goes to basement at once when the desk supply runs out |
-| **Amdahl's Law** | Adding more workers to a restaurant kitchen only helps if the bottleneck is cooking, not the single cash register |
-| **Little's Law** | A DMV office: average wait time = (people in building) / (service rate) |
-| **GC pause** | A librarian stopping all service to reorganize the entire library before continuing |
-| **Flame graph** | A building floor plan where wider rooms = more time spent there |
-| **p99 latency** | The slowest passenger in a 100-person tour group sets the arrival time for the bus |
-| **N+1 query** | Calling each of 1,000 employees individually to ask their name instead of sending one group email |
-| **Connection pool** | A hotel key card system — limited keys, guests return them, new guests reuse them |
-| **False sharing** | Two people grabbing the same whiteboard eraser constantly, even though they're working on different sections |
-| **Tail latency amplification** | A team of 100 people: everyone must finish before the project ships. One slow person blocks everyone. |
-| **Bottleneck (Theory of Constraints)** | Traffic jam: widening the road downstream of the jam does nothing. Fix the jam. |
-| **Profiling** | Putting a time tracker on every task in a project to find where time actually goes |
-| **Premature optimization** | Polishing the lobby of a building with structural defects |
+| **Latency** | How long one car takes to drive end-to-end from the on-ramp to the exit — door to door, including every red light and merge |
+| **Throughput** | Cars per hour flowing through the highway system — the system's total productive output regardless of any one driver's trip time |
+| **Bandwidth** | The number of lanes on the highway — more lanes means more cars can move in parallel, but a narrow merge point still caps you |
+| **Cache** | An express lane with a pre-paid transponder: frequent commuters who already have clearance bypass the main toll plaza entirely and zip through |
+| **Cache miss** | Your transponder isn't recognized — you're waved out of the express lane and sent back to the regular toll booth queue |
+| **Cache stampede** | The express lane scanner breaks at rush hour; every commuter who relied on it floods the single open toll booth simultaneously, overwhelming it |
+| **Amdahl's Law** | You add ten extra highway lanes — but every car still must pass through the single toll booth at the end. No matter how wide the road, that one booth is the ceiling on total throughput |
+| **Little's Law** | The number of cars on the highway at any moment equals the arrival rate times the average trip duration — double the trip time with no extra on-ramps and the highway fills up, halving entry flow |
+| **GC pause** | The highway authority closes all lanes for an emergency resurfacing crew. Every car stops. When lanes reopen, traffic is backed up for miles — a stop-the-world event |
+| **Flame graph** | The traffic helicopter's heat map: the widest, reddest stretch of road is where cars spend the most time. That's where to send the work crews first |
+| **p99 latency** | The unlucky 1% of drivers stuck behind a multi-car pile-up on the shoulder. The other 99% sail past; these few wait for the tow truck, and their delay has nothing to do with lane count |
+| **N+1 query** | Instead of one truck delivering to all 1,000 houses on the route in a single pass, a driver returns to the depot after every single delivery to pick up the next parcel — 1,000 separate round-trips on the same road |
+| **Connection pool** | A fixed fleet of licensed taxis permanently stationed at the highway interchange. Passengers (requests) grab a waiting cab, ride, and the cab returns to the fleet — no cold-starting a new cab for every trip |
+| **False sharing** | Two drivers in adjacent lanes both need to reach into the same glovebox mounted between the seats. Every time one grabs it, the other must wait, even though they're heading to completely different exits |
+| **Tail latency amplification** | A convoy of 100 cars must all arrive before the toll gate opens. The gate stays shut until the last car clears its pile-up. One stalled car at the back holds everyone — the convoy's arrival time is the worst individual time, not the average |
+| **Bottleneck (Theory of Constraints)** | A six-lane highway that narrows to a single-lane bridge in the middle. Repaving any other stretch or adding lanes anywhere else does nothing — the bridge is the constraint, and only widening it moves the needle |
+| **Profiling** | The traffic helicopter hovering overhead, tracking where cars actually slow down with live camera feeds — instead of the city planner guessing which intersection is congested from his desk |
+| **Premature optimization** | Resurfacing the fast, empty stretch of highway at mile 80 while the one-lane bridge at mile 40 is causing a five-mile backup. You spent the budget in exactly the wrong place |
+| **Memory hierarchy** | Distance from the driver to the item: pocket (register, instant) → glove box (L1 cache, one second) → trunk (RAM, a short stop) → home garage (SSD, drive back home) → a warehouse in another city (network, a day's journey) — every extra stop costs time |
+| **Memory leak** | Cars that enter the city's parking garages and never leave — their drivers walked away for good. Every hour, more spaces fill up permanently until the garages are full and new cars circle endlessly with nowhere to park |
+| **CPU-bound vs I/O-bound** | CPU-bound: the highway is gridlocked because there are genuinely too many cars for the road capacity — you need more lanes. I/O-bound: cars are all idling at a railway crossing waiting for a slow freight train to pass — the road is empty but nothing moves until the crossing clears |
+| **Batching** | A single bus carrying fifty passengers down the highway instead of fifty separate cars, each making the same trip one at a time — one toll payment, one lane slot, one fuel stop, fifty commuters delivered |
 
 ---
 

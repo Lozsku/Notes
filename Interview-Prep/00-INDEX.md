@@ -8,6 +8,20 @@ Each topic follows the same structure:
 ## ⚡ Night-Before Cram
 **[CHEATSHEET.md](CHEATSHEET.md)** — one-page all-topics recall (all 11 topics condensed, ~20 min read). Start here the night before.
 
+## 📖 Magazine Editions (premium PDFs)
+Publication-quality, magazine-style PDFs of every topic — custom typography, framed diagrams, infographic callouts and color-coded sections. Each is self-contained (fonts embedded).
+
+| Topic | PDF | Topic | PDF |
+|-------|-----|-------|-----|
+| Concurrency ⭐ | [PDF](Concurrency-Multithreading-Magazine.pdf) | Distributed Systems | [PDF](Distributed-Systems-Magazine.pdf) |
+| Operating Systems | [PDF](OS-Magazine.pdf) | Databases | [PDF](Databases-Magazine.pdf) |
+| Computer Networks | [PDF](Networks-Magazine.pdf) | Performance Eng. | [PDF](Performance-Magazine.pdf) |
+| Cloud & Infra | [PDF](Cloud-Magazine.pdf) | Security | [PDF](Security-Magazine.pdf) |
+| System Design | [PDF](System-Design-Magazine.pdf) | Behavioral | [PDF](Behavioral-Magazine.pdf) |
+| Low-Level Design | [PDF](LLD-Magazine.pdf) | | |
+
+⭐ = flagship hand-crafted edition (custom infographics). Others are generated from the source notes with the same design system. The cheat sheet also has a [print PDF](CHEATSHEET.pdf). Builders live in `.magazine/`.
+
 ## 📚 Topics
 
 | # | Topic | File |

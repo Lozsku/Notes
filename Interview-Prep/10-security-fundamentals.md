@@ -801,25 +801,30 @@ Google eliminated VPN for employees. Every resource access requires: valid certi
 
 ## Real-Life Analogies
 
+*One fortress — every concept is a wall, a guard, a key, or a seal in the same castle.*
+
 | Security Concept | Real-Life Analogy |
 |-----------------|-------------------|
-| **Authentication** | Showing your passport at airport security — proving who you are |
-| **Authorization** | Your boarding pass — proves you're allowed on this specific flight |
-| **OAuth 2.0** | Valet parking key — you give a limited key (only unlocks/starts car, no trunk) without giving your house key |
-| **JWT** | A laminated ID badge — you can read what's on it, but the seal (signature) proves it's authentic |
-| **Symmetric encryption** | A padlock where same key locks and unlocks — both parties need a copy |
-| **Asymmetric encryption** | A mailbox with a slot — anyone can drop mail in (encrypt with public key), only owner can open it (private key) |
-| **Hashing** | A meat grinder — you can turn steak into ground beef, but not reverse it |
-| **Salt** | Adding a unique fingerprint to each password before grinding — same input produces different hash |
-| **TLS Certificate** | A notarized document — third party (CA) vouches for the identity |
-| **PKI trust chain** | Chain of notaries — you trust the ultimate authority, they vouched for intermediate, who vouched for the actual signer |
-| **CSRF** | Attacker puts a pre-filled wire transfer form on their site and tricks you into clicking Submit — your bank sees a valid request from your browser (with your session cookie) |
-| **XSS** | Attacker leaves a bug (listening device) in the bank's lobby — it reports back to them as legitimate customers use the space |
-| **Defense in depth** | Castle walls — moat, drawbridge, outer wall, inner wall, keep — attacker must breach all layers |
-| **Least privilege** | Need-to-know clearance in government — analyst can access files for their project, not all classified info |
-| **Zero trust** | Every employee must badge in to every door, even internal ones — no implicit trust from being inside the building |
-| **HMAC** | A wax seal on a letter — both the seal and the letter must match, and only the king's ring can make that seal |
-| **Secrets rotation** | Changing your locks after a contractor finishes — they no longer have working keys |
+| **Authentication** | The gate guard stops you and asks for your medallion — *who are you?* No medallion, no entry; the guard doesn't care how far you've traveled |
+| **Authorization** | Your keyring decides which doors open once you're inside — the scullery key opens the kitchen, the iron key opens the armory; having one does not grant the other |
+| **Symmetric encryption** | A strongbox where both the sender and recipient carry a copy of the same iron key — fast to lock and unlock, but you must have met in secret to exchange that key |
+| **Asymmetric encryption** | A public mail-slot in the outer wall — any courier can drop a sealed letter in (encrypt with the public slot), but only the lord inside holds the matching key to open the box |
+| **Hashing** | A tamper-evident wax seal pressed over the envelope flap — you cannot unpeel and re-seal it; you can only check whether it still matches the king's stamp |
+| **Salt (password hashing)** | Before pressing the wax seal, each scribe drips a unique drop of their own colored wax into the mix — two identical letters end up with completely different seals so a forger cannot match them from a table of known seal patterns |
+| **HMAC** | The king's signet ring pressed into the wax — only someone who physically holds that ring can produce that exact seal; anyone in the castle can check the impression, but only the king can create it |
+| **OAuth 2.0** | The front-desk clerk issues a day-pass to the glazier so he can fix windows in the east wing — he never gets your master key, the pass expires at dusk, and it works only in the rooms the clerk specified |
+| **JWT** | A signed, sealed permit on parchment that names your rank and the rooms you may enter — every guard can read it and verify the king's seal on sight; no runner needs to race back to the keep to confirm it |
+| **TLS / PKI trust chain** | The chain of royal endorsement: the High King vouches for the Lord, the Lord's seal vouches for the Knight, the Knight's letter opens the merchant's gate — you trust the end letter because you trust the unbroken chain of seals above it |
+| **Defense in depth** | First the moat, then the outer wall, then the portcullis, then the inner-ward guard, then the locked vault — an attacker who swims the moat still faces four more barriers before reaching the crown jewels |
+| **Least privilege** | Each servant carries only the keys their duties actually require — the pantry maid holds the larder key, not the armory key; if she is captured, the weapons stay locked |
+| **RBAC** | Guards are assigned to roles — Knight, Squire, Steward — and each role comes with a fixed set of room keys; changing a man's rank instantly changes every door he can open |
+| **ABAC** | A more nuanced decree: *"Any knight from the northern garrison may enter the map room, but only between dawn and dusk, and only if the kingdom is not under siege"* — the door checks attributes of the visitor, the room, and the moment |
+| **Zero trust** | Every door in the castle requires a fresh badge-check, even doors deep inside the inner keep — being past the moat grants no implicit passage; every room judges for itself |
+| **SQL injection / XSS** | A forged letter slipped into the official royal mailbag — it bears a convincing seal but contains malicious orders; the receiving clerk must inspect every letter's contents, not just its envelope, before acting on the instructions |
+| **CSRF** | An enemy herald hands you a pre-written order and asks you to press your own seal onto it — your seal is genuine, so the castle gate opens, but the order was never yours; the defense is to demand a unique countersign on every outbound order |
+| **Secrets management (Vault / KMS)** | The key-press: a locked iron cabinet in the steward's office where every master key is stored, logged, and issued only to servants who can prove their role — no key is ever written on the wall or left in a coat pocket |
+| **Secrets rotation** | After the glazier's day-pass expires, the front desk re-cuts the east-wing lock — his old pass becomes worthless even if he kept a copy; periodic re-cutting limits damage from any lost pass |
+| **TLS certificate** | The herald carries a letter of introduction bearing the Lord's seal: it names the herald, states his purpose, and expires after one season — the castle gate checks the seal and the date before letting him speak |
 
 ---
 
