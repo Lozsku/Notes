@@ -30,6 +30,14 @@ Publication-quality, magazine-style PDFs of every topic — custom typography, f
 | DSA · Data Structures | [PDF](DSA/DSA-DataStructures-Magazine.pdf) | System Design Problems II | [PDF](System-Design-Problems/SD-Problems-Part2-Magazine.pdf) |
 | DSA · Algorithms | [PDF](DSA/DSA-Algorithms-Magazine.pdf) | LLD · Machine Coding | [PDF](LLD-Problems/LLD-Problems-Magazine.pdf) |
 
+**🤖 AI / ML series** (see [AI-ML/00-INDEX.md](AI-ML/00-INDEX.md)):
+
+| Edition | PDF | Edition | PDF |
+|---------|-----|---------|-----|
+| ML Fundamentals | [PDF](AI-ML/ML-Fundamentals-Magazine.pdf) | Transformers & LLMs ⭐ | [PDF](AI-ML/Transformers-and-LLMs-Magazine.pdf) |
+| Classic ML Algorithms | [PDF](AI-ML/Classic-ML-Algorithms-Magazine.pdf) | LLM Applications & GenAI | [PDF](AI-ML/LLM-Applications-Magazine.pdf) |
+| Deep Learning | [PDF](AI-ML/Deep-Learning-Magazine.pdf) | MLOps & ML System Design | [PDF](AI-ML/MLOps-ML-System-Design-Magazine.pdf) |
+
 > 💡 Preview & edit any edition live: `cd .magazine && python3 serve.py` → http://localhost:8000
 
 ## 📚 Topics
