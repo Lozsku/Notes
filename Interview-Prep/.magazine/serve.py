@@ -7,7 +7,7 @@ Edit any source file — a diagram override in diagrams/dNN.py, the CSS/layout i
 mag.py, or the markdown notes — hit save, and the browser tab auto-reloads with
 the freshly rendered magazine. Click "Export PDF" to write the final PDF.
 """
-import sys, subprocess, pathlib, urllib.parse, os
+import sys, subprocess, pathlib, urllib.parse, os, html, json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = pathlib.Path(__file__).parent
@@ -39,6 +39,27 @@ def mtime(id):
     files = ITEMS[id][4]
     return str(max((f.stat().st_mtime for f in files if f.exists()), default=0))
 
+def edit_files(id):
+    """(label, abspath) source files you can edit in the browser for this edition."""
+    out = []
+    if id == "1":
+        out = [("build.py — flagship layout &amp; content", HERE / "build.py")]
+    elif id == "cheat":
+        out = [("CHEATSHEET.md — source", ROOT / "CHEATSHEET.md"),
+               ("cheat.py — layout", HERE / "cheat.py")]
+    else:
+        c = mag.cfg_by_n(int(id))
+        out.append((c["file"] + " — notes source (wording, sections, tables)", ROOT / c["file"]))
+        d = HERE / "diagrams" / f"d{int(id):02d}.py"
+        if d.exists():
+            out.append((f"diagrams/d{int(id):02d}.py — hand-built figures (HTML/SVG)", d))
+    out.append(("mag.py — ⚠ shared styling &amp; CONFIGS (affects ALL editions)", HERE / "mag.py"))
+    return out
+
+def _safe(p):
+    p = pathlib.Path(p).resolve()
+    return p if str(p).startswith(str(ROOT.resolve())) else None
+
 def render_html(id):
     title, acc, cmd, pdf, _ = ITEMS[id]
     r = subprocess.run(cmd, cwd=HERE, capture_output=True, text=True)
@@ -64,6 +85,7 @@ def inject(htmldoc, id, title):
            "box-shadow:0 2px 12px #0007\"><b style=\"color:#818cf8;letter-spacing:.1em\">● LIVE</b>"
            f"<span style=\"color:#9aa3b7\">{title}</span><span id=__st style=\"color:#6b7699\">watching for changes…</span>"
            "<a href=/ style=\"color:#a5b4fc;margin-left:auto;text-decoration:none\">← all editions</a>"
+           f"<a href=/edit/{id} target=_blank style=\"color:#fbbf24;text-decoration:none\">✏️ Edit source</a>"
            f"<a href=/pdf/{id} style=\"color:#fff;background:#6366f1;padding:5px 14px;border-radius:7px;"
            "text-decoration:none\">⬇ Export PDF</a></div><div style=height:38px></div>")
     script = ("<script>let last=null;async function poll(){try{let r=await fetch('/mtime?id=__ID__&_='+Date.now());"
@@ -73,42 +95,114 @@ def inject(htmldoc, id, title):
     htmldoc = htmldoc.replace("<body>", "<body>" + bar + script, 1)
     return htmldoc
 
+GROUPS = [("Core Topics", [str(i) for i in range(1, 12)]),
+          ("Practice Packs · DSA · System Design · LLD", [str(i) for i in range(12, 18)]),
+          ("AI / ML", [str(i) for i in range(18, 24)]),
+          ("Cheat Sheet", ["cheat"])]
+
 def index():
-    cards = ""
-    for id in ORDER:
+    def card(id):
         title, acc, _, pdf, _ = ITEMS[id]
-        flag = " ★" if id == "1" else ""
-        cards += (f"<a class=card href=/view/{id} style=\"--a:{acc}\">"
-                  f"<div class=dot></div><div class=ct>{title}{flag}</div>"
-                  f"<div class=cl>open live preview →</div></a>")
+        flag = " ★" if id in ("1",) else ""
+        return (f"<div class=card style=\"--a:{acc}\"><div class=dot></div>"
+                f"<div class=ct>{title}{flag}</div>"
+                f"<div class=links><a href=/view/{id}>▶ Preview</a>"
+                f"<a href=/{pdf} target=_blank>📄 PDF</a>"
+                f"<a href=/edit/{id} target=_blank>✏️ Edit</a></div></div>")
+    sections = ""
+    for name, ids in GROUPS:
+        ids = [i for i in ids if i in ITEMS]
+        if not ids: continue
+        sections += f"<h2>{name}</h2><div class=grid>" + "".join(card(i) for i in ids) + "</div>"
     return f"""<!doctype html><html><head><meta charset=utf-8><title>Magazine Studio</title>
 <style>
 *{{box-sizing:border-box}} body{{margin:0;font-family:Inter,system-ui,sans-serif;background:#0b1020;color:#e8ecf8;
-  padding:48px 40px;background-image:radial-gradient(60% 50% at 80% 0%,#1c2342 0%,#0b1020 60%)}}
+  padding:42px 40px 60px;background-image:radial-gradient(60% 50% at 80% 0%,#1c2342 0%,#0b1020 60%)}}
 h1{{font-family:'Space Grotesk',sans-serif;font-size:30px;margin:0 0 4px}}
-.sub{{color:#9aa3b7;margin:0 0 28px;font-size:14px}}
-.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;max-width:1100px}}
-.card{{display:block;text-decoration:none;color:#e8ecf8;background:#141a2e;border:1px solid #ffffff14;
-  border-radius:13px;padding:16px;position:relative;transition:.15s}}
-.card:hover{{border-color:var(--a);transform:translateY(-2px)}}
-.dot{{width:30px;height:30px;border-radius:8px;background:var(--a);margin-bottom:11px}}
-.ct{{font-family:'Space Grotesk';font-weight:700;font-size:14px}}
-.cl{{color:#6b7699;font-size:11px;margin-top:5px}}
+h2{{font-family:'Space Grotesk',sans-serif;font-size:14px;color:#818cf8;letter-spacing:.06em;text-transform:uppercase;
+  margin:30px 0 12px;border-bottom:1px solid #ffffff14;padding-bottom:7px}}
+.sub{{color:#9aa3b7;margin:0;font-size:14px}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:13px;max-width:1180px}}
+.card{{background:#141a2e;border:1px solid #ffffff14;border-radius:13px;padding:15px;transition:.15s}}
+.card:hover{{border-color:var(--a)}}
+.dot{{width:28px;height:28px;border-radius:8px;background:var(--a);margin-bottom:10px}}
+.ct{{font-family:'Space Grotesk';font-weight:700;font-size:13.5px;min-height:34px}}
+.links{{display:flex;gap:7px;margin-top:11px}}
+.links a{{flex:1;text-align:center;text-decoration:none;font-size:11px;font-weight:600;padding:6px 4px;border-radius:7px;
+  color:#cdd6f4;background:#ffffff10;border:1px solid #ffffff14}}
+.links a:hover{{background:var(--a);color:#fff;border-color:var(--a)}}
 code{{background:#ffffff14;padding:2px 6px;border-radius:5px;font-size:12px}}
-.tip{{margin-top:30px;color:#9aa3b7;font-size:12.5px;line-height:1.7;max-width:760px}}
+.tip{{margin-top:34px;color:#9aa3b7;font-size:12.5px;line-height:1.7;max-width:820px}}
 </style></head><body>
-<h1>📖 Magazine Studio <span style="color:#6b7699;font-size:15px">· live preview</span></h1>
-<p class=sub>Edit a source file → save → the open tab auto-refreshes. Click a card to start.</p>
-<div class=grid>{cards}</div>
-<div class=tip><b style="color:#a5b4fc">How to make small changes yourself:</b><br>
-• <b>A diagram</b>: edit <code>.magazine/diagrams/dNN.py</code> (HTML/SVG keyed by hash). Run <code>python3 extract.py N</code> to list a topic's diagrams + keys.<br>
-• <b>Colors / layout / fonts</b>: edit the CSS in <code>.magazine/mag.py</code> (the flagship is <code>build.py</code>).<br>
-• <b>Wording / content</b>: edit the topic's <code>NN-*.md</code> in the parent folder.<br>
-• The on-screen preview stacks content into A4-width pages; exact page breaks &amp; margins are finalized in the exported PDF.</div>
+<h1>📖 Magazine Studio</h1>
+<p class=sub><b>▶ Preview</b> = live, auto-reloading render · <b>📄 PDF</b> = the exported file · <b>✏️ Edit</b> = change the source in your browser.</p>
+{sections}
+<div class=tip><b style="color:#a5b4fc">Editing from here:</b> click <b>✏️ Edit</b> on any edition → change the notes <code>.md</code> or the diagram file (<code>diagrams/dNN.py</code>) → <b>💾 Save</b> (or Ctrl/⌘+S). Any open <b>▶ Preview</b> tab auto-reloads within a second. Hit <b>⬇ Export PDF</b> in the preview bar to write the final PDF. Page breaks &amp; margins are finalized in the exported PDF.</div>
 </body></html>"""
+
+def editor(id):
+    title = ITEMS[id][0]
+    panels = ""
+    for i, (label, p) in enumerate(edit_files(id)):
+        content = html.escape(p.read_text(encoding="utf-8")) if p.exists() else ""
+        panels += (f'<div class=panel><div class=phead><span class=lbl>{label}</span>'
+                   f'<code class=path>{html.escape(str(p))}</code>'
+                   f'<button class=save onclick="save({i})">💾 Save</button>'
+                   f'<span class=st id=st{i}></span></div>'
+                   f'<textarea id=ta{i} spellcheck=false data-path="{html.escape(str(p))}">{content}</textarea></div>')
+    return f"""<!doctype html><html><head><meta charset=utf-8><title>Edit · {html.escape(title)}</title><style>
+*{{box-sizing:border-box}} body{{margin:0;font-family:Inter,system-ui,sans-serif;background:#0b1020;color:#e8ecf8}}
+.top{{position:sticky;top:0;background:#0b1020;border-bottom:1px solid #ffffff14;padding:11px 18px;display:flex;
+  gap:16px;align-items:center;z-index:5}}
+.top b{{font-family:'Space Grotesk'}} .top a{{color:#a5b4fc;text-decoration:none;font-size:13px}}
+.top .pv{{color:#fff;background:#6366f1;padding:6px 14px;border-radius:7px;margin-left:auto}}
+.wrap{{padding:18px;max-width:1000px;margin:0 auto}}
+.panel{{background:#141a2e;border:1px solid #ffffff14;border-radius:11px;margin:0 0 16px;overflow:hidden}}
+.phead{{display:flex;gap:12px;align-items:center;padding:10px 14px;background:#10162b;border-bottom:1px solid #ffffff10}}
+.lbl{{font-weight:600;font-size:13px}} .path{{color:#6b7699;font-size:11px}}
+.save{{margin-left:auto;background:#6366f1;color:#fff;border:0;border-radius:7px;padding:6px 14px;font-weight:600;
+  cursor:pointer;font-size:12px}} .save:hover{{background:#818cf8}}
+.st{{font-size:12px;min-width:64px}}
+textarea{{width:100%;min-height:340px;max-height:70vh;border:0;background:#0d1326;color:#cdd6f4;
+  font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.5;padding:14px;resize:vertical;display:block}}
+</style></head><body>
+<div class=top><b>✏️ Editing — {html.escape(title)}</b>
+  <span style="color:#6b7699;font-size:12px">Ctrl/⌘+S saves the focused box · the preview tab auto-reloads</span>
+  <a href=/ >← all editions</a>
+  <a class=pv href=/view/{id} target=_blank>↗ Open live preview</a></div>
+<div class=wrap>{panels}</div>
+<script>
+async function save(i){{
+  const ta=document.getElementById('ta'+i), st=document.getElementById('st'+i);
+  st.textContent='saving…'; st.style.color='#9aa3b7';
+  try{{
+    const r=await fetch('/save',{{method:'POST',headers:{{'Content-Type':'application/json'}},
+      body:JSON.stringify({{path:ta.dataset.path,content:ta.value}})}});
+    const j=await r.json();
+    st.textContent=j.ok?'saved ✓':('⚠ '+j.error); st.style.color=j.ok?'#34d399':'#f87171';
+  }}catch(e){{st.textContent='⚠ '+e; st.style.color='#f87171';}}
+}}
+document.addEventListener('keydown',e=>{{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){{e.preventDefault();
+    const ta=document.activeElement; if(ta&&ta.tagName==='TEXTAREA') save(ta.id.replace('ta',''));}}
+}});
+</script></body></html>"""
 
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a): pass
+    def do_POST(self):
+        if urllib.parse.urlparse(self.path).path != "/save":
+            return self._send('{"ok":false,"error":"unknown"}', "application/json", 404)
+        try:
+            n = int(self.headers.get("Content-Length", "0"))
+            data = json.loads(self.rfile.read(n) or b"{}")
+            p = _safe(data.get("path", ""))
+            if not p:
+                return self._send('{"ok":false,"error":"path not allowed"}', "application/json", 403)
+            p.write_text(data.get("content", ""), encoding="utf-8")
+            return self._send('{"ok":true}', "application/json")
+        except Exception as e:
+            return self._send(json.dumps({"ok": False, "error": str(e)}), "application/json", 500)
     def _send(self, body, ctype="text/html; charset=utf-8", code=200):
         if isinstance(body, str): body = body.encode("utf-8")
         self.send_response(code); self.send_header("Content-Type", ctype)
@@ -127,6 +221,10 @@ class H(BaseHTTPRequestHandler):
             id = path[6:]
             if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
             return self._send(render_html(id))
+        if path.startswith("/edit/"):
+            id = path[6:]
+            if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
+            return self._send(editor(id))
         if path.startswith("/pdf/"):
             id = path[5:]
             if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
