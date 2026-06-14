@@ -60,13 +60,13 @@ def _safe(p):
     p = pathlib.Path(p).resolve()
     return p if str(p).startswith(str(ROOT.resolve())) else None
 
-def render_html(id):
+def render_html(id, embed=False):
     title, acc, cmd, pdf, _ = ITEMS[id]
     r = subprocess.run(cmd, cwd=HERE, capture_output=True, text=True)
     if r.returncode != 0:
-        return (f"<pre style='font:13px monospace;color:#c00;white-space:pre-wrap;padding:24px'>"
-                f"Build error in {id}:\n\n{r.stderr or r.stdout}</pre>")
-    return inject(r.stdout, id, title)
+        return (f"<pre style='font:12px monospace;color:#f87171;white-space:pre-wrap;padding:24px;"
+                f"background:#0b1020'>⚠ Build error in {id}:\n\n{html.escape(r.stderr or r.stdout)}</pre>")
+    return inject(r.stdout, id, title, embed)
 
 PREVIEW_CSS = """
 <style>
@@ -79,21 +79,23 @@ PREVIEW_CSS = """
 }
 </style>"""
 
-def inject(htmldoc, id, title):
+def inject(htmldoc, id, title, embed=False):
+    script = ("<script>let last=null;async function poll(){try{let r=await fetch('/mtime?id=__ID__&_='+Date.now());"
+              "let t=await r.text();if(last!==null&&t!==last){var s=document.getElementById('__st');"
+              "if(s)s.textContent='reloading…';location.reload();}last=t;}catch(e){}}setInterval(poll,1000);poll();"
+              "</script>").replace("__ID__", id)
+    htmldoc = htmldoc.replace("</head>", PREVIEW_CSS + "</head>", 1)
+    if embed:
+        return htmldoc.replace("<body>", "<body>" + script, 1)
     bar = ("<div style=\"position:fixed;top:0;left:0;right:0;z-index:99999;background:#0b1020;color:#cdd6f4;"
            "font:600 12px Inter,system-ui,sans-serif;padding:8px 16px;display:flex;gap:16px;align-items:center;"
            "box-shadow:0 2px 12px #0007\"><b style=\"color:#818cf8;letter-spacing:.1em\">● LIVE</b>"
            f"<span style=\"color:#9aa3b7\">{title}</span><span id=__st style=\"color:#6b7699\">watching for changes…</span>"
            "<a href=/ style=\"color:#a5b4fc;margin-left:auto;text-decoration:none\">← all editions</a>"
-           f"<a href=/edit/{id} target=_blank style=\"color:#fbbf24;text-decoration:none\">✏️ Edit source</a>"
+           f"<a href=/studio/{id} style=\"color:#fbbf24;text-decoration:none\">✦ Edit &amp; Render</a>"
            f"<a href=/pdf/{id} style=\"color:#fff;background:#6366f1;padding:5px 14px;border-radius:7px;"
            "text-decoration:none\">⬇ Export PDF</a></div><div style=height:38px></div>")
-    script = ("<script>let last=null;async function poll(){try{let r=await fetch('/mtime?id=__ID__&_='+Date.now());"
-              "let t=await r.text();if(last!==null&&t!==last){document.getElementById('__st').textContent='reloading…';"
-              "location.reload();}last=t;}catch(e){}}setInterval(poll,1000);poll();</script>").replace("__ID__", id)
-    htmldoc = htmldoc.replace("</head>", PREVIEW_CSS + "</head>", 1)
-    htmldoc = htmldoc.replace("<body>", "<body>" + bar + script, 1)
-    return htmldoc
+    return htmldoc.replace("<body>", "<body>" + bar + script, 1)
 
 GROUPS = [("Core Topics", [str(i) for i in range(1, 12)]),
           ("Practice Packs · DSA · System Design · LLD", [str(i) for i in range(12, 18)]),
@@ -106,9 +108,9 @@ def index():
         flag = " ★" if id in ("1",) else ""
         return (f"<div class=card style=\"--a:{acc}\"><div class=dot></div>"
                 f"<div class=ct>{title}{flag}</div>"
-                f"<div class=links><a href=/view/{id}>▶ Preview</a>"
-                f"<a href=/{pdf} target=_blank>📄 PDF</a>"
-                f"<a href=/edit/{id} target=_blank>✏️ Edit</a></div></div>")
+                f"<div class=links><a href=/studio/{id}>✦ Studio</a>"
+                f"<a href=/view/{id} target=_blank>▶ View</a>"
+                f"<a href=/{pdf} target=_blank>📄 PDF</a></div></div>")
     sections = ""
     for name, ids in GROUPS:
         ids = [i for i in ids if i in ITEMS]
@@ -135,7 +137,7 @@ code{{background:#ffffff14;padding:2px 6px;border-radius:5px;font-size:12px}}
 .tip{{margin-top:34px;color:#9aa3b7;font-size:12.5px;line-height:1.7;max-width:820px}}
 </style></head><body>
 <h1>📖 Magazine Studio</h1>
-<p class=sub><b>▶ Preview</b> = live, auto-reloading render · <b>📄 PDF</b> = the exported file · <b>✏️ Edit</b> = change the source in your browser.</p>
+<p class=sub><b>✦ Studio</b> = edit + live render side-by-side (Overleaf-style) · <b>▶ View</b> = full-screen render · <b>📄 PDF</b> = the exported file.</p>
 {sections}
 <div class=tip><b style="color:#a5b4fc">Editing from here:</b> click <b>✏️ Edit</b> on any edition → change the notes <code>.md</code> or the diagram file (<code>diagrams/dNN.py</code>) → <b>💾 Save</b> (or Ctrl/⌘+S). Any open <b>▶ Preview</b> tab auto-reloads within a second. Hit <b>⬇ Export PDF</b> in the preview bar to write the final PDF. Page breaks &amp; margins are finalized in the exported PDF.</div>
 </body></html>"""
@@ -188,6 +190,62 @@ document.addEventListener('keydown',e=>{{
 }});
 </script></body></html>"""
 
+def studio(id):
+    title = ITEMS[id][0]
+    files = edit_files(id)
+    meta_js = json.dumps([{"path": str(p)} for _, p in files])
+    opts = "".join(f'<option value="{i}">{html.escape(l)}</option>' for i, (l, p) in enumerate(files))
+    return f"""<!doctype html><html><head><meta charset=utf-8><title>Studio · {html.escape(title)}</title><style>
+*{{box-sizing:border-box}} html,body{{height:100%;margin:0}}
+body{{display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;background:#0b1020;color:#e8ecf8}}
+.bar{{display:flex;gap:11px;align-items:center;padding:8px 14px;border-bottom:1px solid #ffffff14;flex:none}}
+.bar b{{font-family:'Space Grotesk'}} .bar a{{color:#a5b4fc;text-decoration:none;font-size:13px}}
+select{{background:#141a2e;color:#e8ecf8;border:1px solid #ffffff1a;border-radius:7px;padding:6px 9px;font-size:12px;max-width:330px}}
+.btn{{border:0;border-radius:7px;padding:7px 14px;font-weight:600;font-size:12px;cursor:pointer;color:#fff}}
+.save{{background:#6366f1}} .save:hover{{background:#818cf8}} .exp{{background:#10b981;text-decoration:none}}
+.st{{font-size:12px;color:#6b7699;min-width:120px}}
+.auto{{font-size:12px;color:#9aa3b7;display:flex;gap:5px;align-items:center;cursor:pointer}}
+.split{{flex:1;display:flex;min-height:0}}
+.left{{width:46%;display:flex;flex-direction:column;min-width:240px}}
+textarea{{flex:1;width:100%;border:0;background:#0d1326;color:#cdd6f4;font-family:'JetBrains Mono',monospace;
+  font-size:12px;line-height:1.55;padding:14px;resize:none;outline:none;tab-size:2}}
+.gut{{width:6px;background:#1c2342;cursor:col-resize;flex:none}} .gut:hover{{background:#6366f1}}
+.right{{flex:1;min-width:280px}} iframe{{width:100%;height:100%;border:0;background:#4b5563}}
+</style></head><body>
+<div class=bar><b>✦ {html.escape(title)}</b>
+  <select id=fsel onchange=switchFile()>{opts}</select>
+  <button class="btn save" onclick=save()>💾 Save</button>
+  <label class=auto><input type=checkbox id=auto checked> auto-render</label>
+  <span class=st id=st></span>
+  <a class="btn exp" href=/pdf/{id} target=_blank style="margin-left:auto">⬇ Export PDF</a>
+  <a href=/ >← all</a></div>
+<div class=split>
+  <div class=left id=left><textarea id=ta spellcheck=false placeholder="loading…"></textarea></div>
+  <div class=gut id=gut></div>
+  <div class=right><iframe id=pv src="/view/{id}?embed=1"></iframe></div>
+</div>
+<script>
+const FILES={meta_js}; let cur=0, dirty=false, tmr=null;
+const ta=document.getElementById('ta'), st=document.getElementById('st');
+async function load(i){{const r=await fetch('/file?path='+encodeURIComponent(FILES[i].path));
+  ta.value=await r.text(); cur=i; dirty=false; st.textContent=FILES[i].path.split('/').pop();}}
+async function save(){{if(!dirty){{st.textContent='no changes';return;}} st.textContent='saving…';
+  const r=await fetch('/save',{{method:'POST',headers:{{'Content-Type':'application/json'}},
+    body:JSON.stringify({{path:FILES[cur].path,content:ta.value}})}});
+  const j=await r.json(); if(j.ok){{dirty=false;st.textContent='saved ✓ rendering…';rerender();}}
+  else{{st.textContent='⚠ '+j.error;}}}}
+function rerender(){{const pv=document.getElementById('pv');try{{pv.contentWindow.location.reload();}}catch(e){{pv.src=pv.src;}}}}
+async function switchFile(){{const i=+document.getElementById('fsel').value; if(dirty) await save(); load(i);}}
+ta.addEventListener('input',()=>{{dirty=true;st.textContent='● unsaved';
+  if(document.getElementById('auto').checked){{clearTimeout(tmr);tmr=setTimeout(save,1400);}}}});
+document.addEventListener('keydown',e=>{{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){{e.preventDefault();save();}}}});
+const gut=document.getElementById('gut'),left=document.getElementById('left');let drag=false;
+gut.onmousedown=()=>{{drag=true;document.body.style.userSelect='none';}};
+document.onmouseup=()=>{{drag=false;document.body.style.userSelect='';}};
+document.onmousemove=e=>{{if(drag){{let w=e.clientX/window.innerWidth*100;if(w>20&&w<80)left.style.width=w+'%';}}}};
+load(0);
+</script></body></html>"""
+
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a): pass
     def do_POST(self):
@@ -220,11 +278,19 @@ class H(BaseHTTPRequestHandler):
         if path.startswith("/view/"):
             id = path[6:]
             if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
-            return self._send(render_html(id))
+            return self._send(render_html(id, q.get("embed", ["0"])[0] == "1"))
+        if path.startswith("/studio/"):
+            id = path[8:]
+            if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
+            return self._send(studio(id))
         if path.startswith("/edit/"):
             id = path[6:]
             if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
             return self._send(editor(id))
+        if path == "/file":
+            p = _safe(q.get("path", [""])[0])
+            if not p or not p.exists(): return self._send("", "text/plain", 404)
+            return self._send(p.read_text(encoding="utf-8"), "text/plain")
         if path.startswith("/pdf/"):
             id = path[5:]
             if id not in ITEMS: return self._send("unknown id", "text/plain", 404)
