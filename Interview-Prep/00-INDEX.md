@@ -22,6 +22,16 @@ Publication-quality, magazine-style PDFs of every topic — custom typography, f
 
 ⭐ = flagship hand-crafted edition (custom infographics). Others are generated from the source notes with the same design system. The cheat sheet also has a [print PDF](CHEATSHEET.pdf). Builders live in `.magazine/`.
 
+**Applied-pack magazines:**
+
+| Pack | PDF | Pack | PDF |
+|------|-----|------|-----|
+| DSA · Coding Patterns | [PDF](DSA/DSA-Patterns-Magazine.pdf) | System Design Problems I | [PDF](System-Design-Problems/SD-Problems-Part1-Magazine.pdf) |
+| DSA · Data Structures | [PDF](DSA/DSA-DataStructures-Magazine.pdf) | System Design Problems II | [PDF](System-Design-Problems/SD-Problems-Part2-Magazine.pdf) |
+| DSA · Algorithms | [PDF](DSA/DSA-Algorithms-Magazine.pdf) | LLD · Machine Coding | [PDF](LLD-Problems/LLD-Problems-Magazine.pdf) |
+
+> 💡 Preview & edit any edition live: `cd .magazine && python3 serve.py` → http://localhost:8000
+
 ## 📚 Topics
 
 | # | Topic | File |

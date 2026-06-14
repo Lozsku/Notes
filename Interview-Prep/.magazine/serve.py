@@ -31,7 +31,8 @@ ITEMS["cheat"] = ("The Master Cheat Sheet", "#6366f1",
                   [sys.executable, "cheat.py", "--html"], "CHEATSHEET.pdf",
                   [HERE / "cheat.py", HERE / "mag.py", ROOT / "CHEATSHEET.md"])
 
-ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "cheat"]
+ORDER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
+         "12", "13", "14", "15", "16", "17", "cheat"]
 
 def mtime(id):
     files = ITEMS[id][4]

@@ -306,7 +306,7 @@ def build_html(cfg):
     _OV = load_overrides(cfg["n"])
     src = (ROOT / cfg["file"]).read_text(encoding="utf-8")
     h1 = re.search(r"^#\s+(.*)$", src, re.M).group(1)
-    title_full = re.sub(r"\s*—.*$", "", h1).strip()
+    title_full = cfg.get("name") or re.sub(r"\s*—.*$", "", h1).strip()
     intro = ""
     bq = re.search(r"\n>\s+(.*)", src)
     secs = split_sections(src)
@@ -447,6 +447,37 @@ CONFIGS = [
    sub="STAR stories, Amazon's leadership principles and the signals that pass the bar raiser.",
    title_html="Behavioral &amp; <span class='g'>Leadership</span>",
    tags=["STAR Method","Ownership","Conflict","Ambiguity","Leadership Principles","Impact"]),
+ # ---- Applied practice packs ----
+ dict(n=12, file="DSA/01-patterns-and-templates.md", out="DSA/DSA-Patterns-Magazine.pdf",
+   name="DSA Coding Patterns", acc="#8b5cf6", acc2="#6366f1",
+   sub="The “when you see X → use Y” playbook — 20+ patterns with copy-paste templates that crack LeetCode-style rounds.",
+   title_html="Coding <span class='g'>Patterns</span>",
+   tags=["Two Pointers","Sliding Window","BFS / DFS","Backtracking","Binary Search","Heap / Top-K","DP","Union-Find"]),
+ dict(n=13, file="DSA/02-data-structures.md", out="DSA/DSA-DataStructures-Magazine.pdf",
+   name="DSA Data Structures", acc="#0ea5e9", acc2="#06b6d4",
+   sub="Every structure from first principles — internals, operation complexities, and when to reach for which.",
+   title_html="Data <span class='g'>Structures</span>",
+   tags=["Arrays","Hash Tables","Linked Lists","Trees &amp; BST","Heaps","Tries","Graphs","Union-Find"]),
+ dict(n=14, file="DSA/03-algorithms-and-complexity.md", out="DSA/DSA-Algorithms-Magazine.pdf",
+   name="DSA Algorithms", acc="#14b8a6", acc2="#10b981",
+   sub="Big-O, sorting &amp; searching, graph algorithms, DP families and greedy — with code and trade-offs.",
+   title_html="Algorithms &amp; <span class='g'>Complexity</span>",
+   tags=["Big-O","Sorting","Binary Search","Dijkstra","Topological Sort","Dynamic Programming","Greedy","Bit Tricks"]),
+ dict(n=15, file="System-Design-Problems/part1-foundational.md", out="System-Design-Problems/SD-Problems-Part1-Magazine.pdf",
+   name="System Design Problems I", acc="#6366f1", acc2="#8b5cf6",
+   sub="Four foundational designs end-to-end — estimation, APIs, data models, architecture &amp; deep dives.",
+   title_html="Design <span class='g'>Problems</span> · I",
+   tags=["URL Shortener","Rate Limiter","News Feed","Chat / WhatsApp","Estimation","Bottlenecks"]),
+ dict(n=16, file="System-Design-Problems/part2-advanced.md", out="System-Design-Problems/SD-Problems-Part2-Magazine.pdf",
+   name="System Design Problems II", acc="#4f46e5", acc2="#7c3aed",
+   sub="Four advanced designs end-to-end — geo-indexing, CDNs, sharding, transcoding and the hard parts.",
+   title_html="Design <span class='g'>Problems</span> · II",
+   tags=["YouTube / Netflix","Uber / Lyft","Distributed Cache","Web Crawler","Geo-index","Trade-offs"]),
+ dict(n=17, file="LLD-Problems/coded-solutions.md", out="LLD-Problems/LLD-Problems-Magazine.pdf",
+   name="LLD Machine Coding", acc="#f59e0b", acc2="#f97316",
+   sub="Six fully coded LLD problems — runnable Python with clean OOP, design patterns and extensibility notes.",
+   title_html="Machine-Coding <span class='g'>Solutions</span>",
+   tags=["LRU Cache","Parking Lot","Rate Limiter","Splitwise","Elevator","Tic-Tac-Toe"]),
 ]
 
 if __name__ == "__main__":
