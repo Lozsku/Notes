@@ -1498,23 +1498,7 @@ Label smoothing & Prevents overconfident predictions \\
 
 \subsection{MLP Architecture}\label{mlp-architecture}
 
-\setcodelang{}
-
-\begin{verbatim}
-INPUT           HIDDEN 1        HIDDEN 2        OUTPUT
-LAYER           LAYER           LAYER           LAYER
-
-[x1] ─────────>[h1_1]─────────>[h2_1]─────────>[y1]
-[x2] ─────────>[h1_2]─────────>[h2_2]          [y2]
-[x3] ─────────>[h1_3]─────────>[h2_3]─────────>[y3]
-[x4] ─────────>[h1_4]─────────>[h2_4]
-
-  4 inputs     4 hidden       4 hidden        3 outputs
-               neurons        neurons          (e.g. classes)
-
-Every node in one layer connects to every node in next layer (fully connected).
-Each connection has a weight. Each node has a bias.
-\end{verbatim}
+\visualfigure{../figures/aiml-03-dl/03-mlp-network.pdf}{A feed-forward net stacks fully-connected layers: each neuron is a weighted sum of the previous layer plus a bias, passed through a nonlinearity.}
 
 \subsection{Forward + Backpropagation Flow}\label{forward--backpropagation-flow}
 
@@ -1561,25 +1545,7 @@ Saturates at ±∞   Saturates at ±∞   Dead for x<0    Small slope for x<0
 
 \subsection{CNN Architecture}\label{cnn-architecture}
 
-\setcodelang{}
-
-\begin{verbatim}
-INPUT           CONV+RELU       POOL            CONV+RELU       FC+SOFTMAX
-IMAGE           FEATURE MAPS    FEATURE MAPS    FEATURE MAPS    OUTPUT
-
-[28×28×1]──→[26×26×32]──→[13×13×32]──→[11×11×64]──→[FLATTEN]──→[10 classes]
-             3×3 filters   2×2 max       3×3 filters    Dense
-             32 maps       pool          64 maps
-
-Conv operation (zoomed in):
-┌───────────────┐
-│ Input patch   │    ┌─────┐
-│ 3×3 region    │ ×  │ 3×3 │  =  single output value
-│               │    │ filter│
-└───────────────┘    └─────┘
-Filter slides across entire image, producing one output value per position.
-32 different filters → 32 feature maps (different patterns detected).
-\end{verbatim}
+\visualfigure{../figures/aiml-03-dl/04-cnn-architecture.pdf}{Convolution + pooling progressively reduce spatial size while increasing channel depth, building features from edges $\rightarrow$ textures $\rightarrow$ objects, then a dense head classifies.}
 
 \subsection{Gradient Descent Visualization}\label{gradient-descent-visualization}
 

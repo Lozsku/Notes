@@ -219,6 +219,7 @@ def build_one(key, srcrel, title, kicker, num, acc, acc2, m, force=False):
     # make the style package discoverable next to the .tex
     (TEXDIR / "interviewstyle.sty").write_bytes((ASSETS/"interviewstyle.sty").read_bytes())
     md = preprocess(src.read_text())
+    md = place_figures(md, key)          # insert inline figure tokens at anchors
     tmp_md = TEXDIR / (key + ".pre.md")
     tmp_md.write_text(md)
 
@@ -245,8 +246,7 @@ def build_one(key, srcrel, title, kicker, num, acc, acc2, m, force=False):
         rec.update(src=cur, style=m["style"], pdf_ok=False, error="pandoc:"+r.stderr[:300])
         m["docs"][key] = rec; return False
 
-    postprocess_tex(tex)
-    inject_figures(tex, key)
+    postprocess_tex(tex, key)
 
     # 2) tectonic -> pdf  (delete any stale pdf first so "exists" == fresh)
     pdf.unlink(missing_ok=True)
@@ -294,14 +294,23 @@ def _style_tables(s: str) -> str:
         out.append(line)
     return "\n".join(out)
 
-def postprocess_tex(tex: Path):
+def postprocess_tex(tex: Path, key: str = ""):
     s = tex.read_text()
     s = _style_tables(s)
+    # inline figures: @@VFIGn@@ -> \visualfigure{path}{caption}
+    figs = load_figures().get(key, [])
+    def figrepl(m):
+        i = int(m.group(1))
+        if i < len(figs):
+            fn, cap = figs[i][0], figs[i][1]
+            return r"\visualfigure{../figures/%s/%s}{%s}" % (key, fn, latexify(cap))
+        return ""
+    s = re.sub(r"@@VFIG(\d+)@@", figrepl, s)
     # clickable in-document section references: "§9" -> jump to section 9
     s = re.sub(r"§\s*(\d+)", r"\\hyperlink{section.\1}{\\textcolor{acc}{§\1}}", s)
     tex.write_text(s)
 
-# ---- append a "Visual Reference" gallery of generated diagrams ----
+# ---- figures placed inline where each topic is discussed (see ANCHORS) ----
 def load_figures():
     fj = FIGDIR / "figures.json"
     if fj.exists():
@@ -309,21 +318,41 @@ def load_figures():
         except Exception: return {}
     return {}
 
-def inject_figures(tex: Path, key: str):
+def _anchor_pat(anchor: str) -> str:
+    # dash- and whitespace-flexible: "Bias-Variance" matches "Bias–Variance"
+    toks = [re.escape(t).replace(r"\-", "[-‐-―]") for t in anchor.split()]
+    return r"\s+".join(toks)
+
+def place_figures(md: str, key: str) -> str:
     figs = load_figures().get(key)
     if not figs:
-        return
-    parts = [r"\clearpage", r"\section{Visual Reference}",
-             r"\noindent A set of figures distilling the key quantitative intuitions "
-             r"of this topic.\par\vspace{4pt}"]
-    for fn, cap in figs:
-        # figures live in ../figures/<key>/ relative to tex/ ; sanitize caption glyphs
-        path = f"../figures/{key}/{fn}"
-        parts.append(r"\visualfigure{%s}{%s}" % (path, latexify(cap)))
-    block = "\n".join(parts) + "\n"
-    s = tex.read_text()
-    s = s.replace(r"\end{document}", block + r"\end{document}")
-    tex.write_text(s)
+        return md
+    for i, entry in enumerate(figs):
+        anchor = entry[2] if len(entry) > 2 else ""
+        mode = entry[3] if len(entry) > 3 else "after"
+        token = f"\n\n@@VFIG{i}@@\n\n"
+        placed = False
+        if mode == "replace" and anchor:
+            # swap the ASCII block that contains the signature for the figure
+            for fm in re.finditer(r"```[^\n]*\n.*?```", md, flags=re.DOTALL):
+                if anchor in fm.group(0):
+                    md = md[:fm.start()] + token.strip() + md[fm.end():]
+                    placed = True
+                    break
+        if not placed and anchor:
+            p = _anchor_pat(anchor)
+            # 1) right after a heading line that mentions the anchor
+            mh = re.search(r"(?im)^#{2,4}[^\n]*" + p + r"[^\n]*$", md)
+            if mh:
+                md = md[:mh.end()] + token + md[mh.end():]; placed = True
+            else:
+                # 2) after the first line that mentions it (TOC already stripped)
+                ml = re.search(r"(?im)^.*" + p + r".*\n", md)
+                if ml:
+                    md = md[:ml.end()] + token + md[ml.end():]; placed = True
+        if not placed:
+            md = md.rstrip() + token       # fallback: end of document
+    return md
 
 def main():
     ap = argparse.ArgumentParser()

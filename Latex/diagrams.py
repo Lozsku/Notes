@@ -34,14 +34,59 @@ plt.rcParams.update({
     "axes.spines.top": False, "axes.spines.right": False,
     "savefig.bbox": "tight", "savefig.pad_inches": 0.12,
 })
-REG_FIGS = {}   # key -> list of (filename, caption)
+REG_FIGS = {}   # key -> list of (filename, caption, anchor)
+
+# Where each figure should appear inline — a substring (matched case-insensitively,
+# preferring a heading line) of the section that discusses it.
+ANCHORS = {
+ "01-amdahls-law": "Amdahl", "02-deadlock": "Deadlock",
+ "01-bias-variance": "Bias-Variance", "02-learning-curves": "Learning Curve",
+ "01-roc-pr": "ROC-AUC", "02-confusion-matrix": "Confusion Matrix",
+ "01-activations": "Activation Function", "02-gradient-descent": "Gradient Descent",
+ "01-big-o-growth": "Big-O", "02-sorting-complexity": "Sorting",
+ "01-latency-ladder": "Latency Numbers", "02-tail-latency": "Percentile",
+ "01-cap-theorem": "CAP Theorem", "02-consistency-spectrum": "Consistency Model",
+ "01-osi-stack": "OSI", "02-tcp-handshake": "3-Way Handshake",
+ "01-scheduling-gantt": "Scheduling", "02-memory-hierarchy": "Memory Management",
+ "01-attention": "Self-Attention", "02-transformer-block": "Full Transformer Block",
+ "01-autoscaling": "Auto-scaling", "02-shared-responsibility": "IaaS",
+ "01-web-architecture": "Scalable Web Architecture", "02-latency-utilization": "Little",
+ "01-strategy-pattern": "Strategy", "01-btree": "B-Tree", "02-isolation-levels": "Isolation Level",
+ "01-tls-handshake": "TLS", "02-defense-in-depth": "Defense in Depth",
+ "01-star-method": "STAR", "01-sliding-window": "Sliding Window", "02-two-pointers": "Two Pointer",
+ "01-ds-complexity": "Complexity", "01-rag-pipeline": "RAG", "01-mlops-lifecycle": "Lifecycle",
+ "01-token-bucket": "Rate Limit", "01-sharding-replication": "Sharding", "01-observer-pattern": "Observer",
+}
+
+# Figures that REPLACE a specific ASCII block: value = a distinctive signature
+# inside that block, so build.py swaps the ASCII for the image in place.
+REPLACE = {
+ "03-consistent-hashing": "Consistent Hashing Ring",
+ "04-two-phase-commit": "Phase 1 (Prepare):",
+ "03-dns-resolution": "Root NS      .com NS",
+ "03-address-space": "Process Virtual Address Space",
+ "03-mlp-network": "HIDDEN 1        HIDDEN 2",
+ "04-cnn-architecture": "CONV+RELU       POOL",
+ "03-caching-patterns": "CACHE-ASIDE:",
+ "03-latency-path": "Client → DNS → CDN → Load Balancer",
+ "04-flame-graph": "Flame Graph (CPU profiler",
+ "03-infra-stack": "Physical Hardware  →  Hypervisor",
+ "04-kafka-partitions": 'Topic: "user-events"',
+ "02-genai-decision": "START: What's the problem?",
+ "02-ride-state-machine": "REQUESTED ──► SEARCHING",
+ "03-pattern-decision-tree": "Is array sorted or can we sort it?",
+}
 
 def _save(key, name, fig, caption):
     d = FIG / key; d.mkdir(parents=True, exist_ok=True)
     fn = f"{name}.pdf"
     fig.savefig(d / fn)
     plt.close(fig)
-    REG_FIGS.setdefault(key, []).append([fn, caption])
+    if name in REPLACE:
+        anchor, mode = REPLACE[name], "replace"
+    else:
+        anchor, mode = ANCHORS.get(name, ""), "after"
+    REG_FIGS.setdefault(key, []).append([fn, caption, anchor, mode])
     print(f"  + {key}/{fn}")
 
 def acc(key, default="#6366f1"):
@@ -158,7 +203,7 @@ def learning_curves():
           "high error on both that more data won't fix signals bias.")
 
 def roc_pr():
-    key = "aiml-02-classic"; c = acc(key)
+    key = "aiml-01-fund"; c = acc(key)
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.2, 3.5))
     fpr = np.linspace(0, 1, 200)
     for auc, col, lab in [(0.95, c, "strong (AUC 0.95)"), (0.80, "#a78bfa", "fair (AUC 0.80)"),
@@ -855,7 +900,7 @@ def tail_latency():
           "p95/p99, not averages — at scale, the tail is what every user eventually hits.")
 
 def confusion_matrix():
-    key = "aiml-02-classic"; c = acc(key)
+    key = "aiml-01-fund"; c = acc(key)
     M = np.array([[85, 10], [8, 97]])
     fig, ax = plt.subplots(figsize=(5.2, 4.4))
     im = ax.imshow(M, cmap="Purples")
@@ -953,6 +998,326 @@ def two_pointers():
           "On sorted input, two pointers from both ends turn an O(n²) pair-search into O(n): "
           "move the pointer that brings the sum toward the target.")
 
+def consistent_hashing():
+    key = "07-distributed"; c = acc(key)
+    fig, ax = plt.subplots(figsize=(5.6, 4.8)); ax.set_aspect("equal"); ax.axis("off")
+    ax.add_patch(plt.Circle((0, 0), 1.0, fill=False, ec=c, lw=2.4))
+    nodes = {"Node A\n(10)": 90, "Node B\n(120)": -20, "Node C\n(250)": -150, "Node D\n(340)": 160}
+    pos = {}
+    for name, ang in nodes.items():
+        x, y = math.cos(math.radians(ang)), math.sin(math.radians(ang))
+        pos[name] = (x, y)
+        ax.plot(x, y, "o", ms=15, color=c, zorder=4)
+        lx, ly = 1.34*x, 1.34*y
+        ax.text(lx, ly, name, ha="center", va="center", fontsize=8.6, weight="bold", color=INK)
+    ax.text(0, 1.16, "0 / 2³²", ha="center", fontsize=8.5, color=INK2)
+    keys = [("user:42 → 180", -160, "Node C\n(250)"), ("order:7 → 90", 30, "Node B\n(120)"),
+            ("product:1 → 5", 80, "Node A\n(10)")]
+    for i, (lab, ang, node) in enumerate(keys):
+        x, y = 0.62*math.cos(math.radians(ang)), 0.62*math.sin(math.radians(ang))
+        ax.plot(x, y, "s", ms=6, color="#d97706", zorder=4)
+        ax.annotate("", xy=pos[node], xytext=(x, y),
+                    arrowprops=dict(arrowstyle="->", color="#d97706", lw=1.3,
+                                    connectionstyle="arc3,rad=0.25"))
+        ax.text(0.0, -1.62-i*0.22, "• "+lab+"  ↻ "+node.split("\n")[0], ha="center",
+                fontsize=7.6, color=INK2)
+    ax.set_xlim(-2.1, 2.1); ax.set_ylim(-2.3, 1.6)
+    ax.set_title("Consistent hashing ring", color=INK, fontsize=12.5, weight="bold")
+    _save(key, "03-consistent-hashing", fig,
+          "Keys map to the first node clockwise on a hash ring. Adding/removing a node remaps "
+          "only ~1/N of keys (not all of them as in naive modulo hashing).")
+
+def two_phase_commit():
+    key = "07-distributed"; c = acc(key)
+    fig, ax = _canvas((6.6, 4.2), "Two-phase commit (2PC)", (0, 12), (0, 10))
+    _box(ax, 6, 8.6, 3.0, 1.1, "Coordinator", ec=c)
+    parts = [(2.5, "Participant A"), (6.0, "Participant B"), (9.5, "Participant C")]
+    for x, nm in parts:
+        _box(ax, x, 5.4, 2.6, 1.0, nm, ec="#2563eb", fs=8.6)
+        _arrow(ax, (6, 8.05), (x, 5.95), c, rad=0.0)
+    ax.text(0.4, 3.4, "Phase 1 — Prepare:", fontsize=9, weight="bold", color=c)
+    ax.text(0.7, 2.6, "Coordinator asks \"Prepare?\"; each locks rows, writes redo/undo log, "
+            "votes Yes/No", fontsize=8, color=INK2)
+    ax.text(0.4, 1.6, "Phase 2 — Commit / Abort:", fontsize=9, weight="bold", color="#059669")
+    ax.text(0.7, 0.8, "All Yes → Commit to all (release locks, apply).  Any No → Abort to all "
+            "(rollback).", fontsize=8, color=INK2)
+    _save(key, "04-two-phase-commit", fig,
+          "2PC gives atomic commit across nodes: a prepare vote then a commit/abort decision. "
+          "Its weakness — if the coordinator dies after prepare, participants block holding locks.")
+
+def dns_resolution():
+    key = "03-networks"; c = acc(key)
+    fig, ax = _canvas((7.4, 4.0), "Recursive DNS resolution", (0, 12), (0, 11))
+    actors = [("Browser", 1.2), ("Resolver", 3.5), ("Root NS", 6.0), (".com NS", 8.5), ("Auth NS", 10.8)]
+    xof = {}
+    for nm, x in actors:
+        _box(ax, x, 10.2, 1.7, 0.8, nm, ec=c, fs=8.6); xof[nm] = x
+        ax.plot([x, x], [0.6, 9.7], color="#dbe2f0", lw=1.3, zorder=0)
+    msgs = [(9.0, "Browser", "Resolver", "google.com?", c, False),
+            (8.0, "Resolver", "Root NS", "google.com?", "#2563eb", False),
+            (7.0, "Root NS", "Resolver", "ask .com NS", "#94a3b8", True),
+            (6.0, "Resolver", ".com NS", "google.com?", "#2563eb", False),
+            (5.0, ".com NS", "Resolver", "ask Auth NS", "#94a3b8", True),
+            (4.0, "Resolver", "Auth NS", "google.com?", "#2563eb", False),
+            (3.0, "Auth NS", "Resolver", "142.250.80.78", "#059669", True),
+            (2.0, "Resolver", "Browser", "142.250.80.78 (cached, TTL)", "#059669", True)]
+    for y, a, b, txt, col, dashed in msgs:
+        x1, x2 = xof[a], xof[b]
+        ax.annotate("", xy=(x2, y), xytext=(x1, y),
+                    arrowprops=dict(arrowstyle="-|>", color=col, lw=1.4,
+                                    ls="--" if dashed else "-"))
+        ax.text((x1+x2)/2, y+0.2, txt, ha="center", fontsize=7.2, color=col,
+                bbox=dict(fc="white", ec="none", pad=0.4))
+    _save(key, "03-dns-resolution", fig,
+          "The resolver does the legwork: it walks the hierarchy (root → TLD → authoritative) "
+          "on the client's behalf, then caches the answer for the TTL.")
+
+def address_space():
+    key = "02-os"; c = acc(key)
+    fig, ax = plt.subplots(figsize=(6.2, 4.8)); ax.axis("off")
+    bands = [("Kernel space", "#475569", "not user-accessible", 1.0),
+             ("Stack  ↓ grows down", c, "locals, call frames", 0.9),
+             ("mmap region", "#0ea5a4", "shared libs, mmap files", 0.9),
+             ("Heap  ↑ grows up", "#2563eb", "malloc / new", 0.9),
+             ("BSS", "#7c3aed", "uninit globals", 0.6),
+             ("Data", "#7c3aed", "init globals", 0.6),
+             ("Text (code)", "#db2777", "the program", 0.6)]
+    addrs = ["0xFFFF…FFFF", "0x00007F…", "", "", "", "", "0x00400000", "0x0"]
+    y = 8.2
+    ax.text(2.0, y+0.5, "high addr", fontsize=7.5, color=INK2, ha="center")
+    for i, (name, col, sub, h) in enumerate(bands):
+        ax.add_patch(FancyBboxPatch((2.2, y-h), 6.2, h-0.08, boxstyle="round,pad=0.02,rounding_size=0.05",
+                     fc=_tint(col, 0.78), ec=col, lw=1.3))
+        ax.text(5.3, y-h/2, name, ha="center", va="center", fontsize=9, weight="bold", color=INK)
+        ax.text(8.6, y-h/2, sub, ha="left", va="center", fontsize=7.4, color=INK2)
+        y -= h + 0.12
+    ax.text(2.0, y+0.1, "low addr", fontsize=7.5, color=INK2, ha="center")
+    ax.set_xlim(0, 13.5); ax.set_ylim(y-0.3, 9.2)
+    ax.set_title("Process virtual address space (x86-64 Linux)", color=INK, fontsize=12, weight="bold")
+    _save(key, "03-address-space", fig,
+          "A process sees a flat virtual address space: code and globals at the bottom, the heap "
+          "growing up and the stack growing down toward each other, kernel mapped on top.")
+
+def mlp_network():
+    key = "aiml-03-dl"; c = acc(key)
+    fig, ax = _canvas((6.4, 4.0), "Fully-connected neural network", (0, 10), (0, 10))
+    layers = [(1.5, 4, "Input"), (4.0, 4, "Hidden 1"), (6.5, 4, "Hidden 2"), (9.0, 3, "Output")]
+    cols = [c, "#2563eb", "#2563eb", "#059669"]
+    coords = []
+    for (x, n, lab), col in zip(layers, cols):
+        ys = np.linspace(2.2, 7.8, n)
+        coords.append([(x, y) for y in ys])
+        for y in ys:
+            ax.add_patch(plt.Circle((x, y), 0.32, fc=_tint(col, 0.5), ec=col, lw=1.6, zorder=3))
+        ax.text(x, 8.8, lab, ha="center", fontsize=8.8, weight="bold", color=INK)
+    for li in range(len(coords)-1):
+        for (x1, y1) in coords[li]:
+            for (x2, y2) in coords[li+1]:
+                ax.plot([x1+0.3, x2-0.3], [y1, y2], color="#cbd5e1", lw=0.6, zorder=1)
+    ax.text(5, 1.0, "every node connects to all nodes in the next layer · each edge a weight, each node a bias",
+            ha="center", fontsize=7.6, color=INK2, style="italic")
+    _save(key, "03-mlp-network", fig,
+          "A feed-forward net stacks fully-connected layers: each neuron is a weighted sum of the "
+          "previous layer plus a bias, passed through a nonlinearity.")
+
+def cnn_arch():
+    key = "aiml-03-dl"; c = acc(key)
+    fig, ax = _canvas((7.6, 3.4), "CNN architecture (image classification)", (0, 15), (0, 7))
+    stages = [("Input\n28×28×1", "#64748b", 1.4, 2.6), ("Conv+ReLU\n26×26×32", c, 1.4, 2.3),
+              ("Pool\n13×13×32", "#2563eb", 1.3, 1.9), ("Conv+ReLU\n11×11×64", c, 1.3, 1.6),
+              ("Flatten", "#7c3aed", 1.0, 1.1), ("FC+Softmax\n10 classes", "#059669", 1.5, 1.6)]
+    x = 1.4
+    prev = None
+    for label, col, w, h in stages:
+        _box(ax, x, 3.6, w, h, label, ec=col, fs=7.8)
+        if prev is not None:
+            _arrow(ax, (prev, 3.6), (x-w/2, 3.6), INK2)
+        prev = x + w/2
+        x += w + 1.0
+    ax.text(7.5, 1.3, "spatial dims shrink (conv/pool) while channels grow → hierarchical features",
+            ha="center", fontsize=7.8, color=INK2, style="italic")
+    _save(key, "04-cnn-architecture", fig,
+          "Convolution + pooling progressively reduce spatial size while increasing channel depth, "
+          "building features from edges → textures → objects, then a dense head classifies.")
+
+def caching_patterns():
+    key = "05-system-design"; c = acc(key)
+    fig, ax = _canvas((7.2, 4.2), "Caching strategies", (0, 12), (0, 10))
+    cards = [("Cache-Aside", ["Read: App→Cache (miss)→DB→Cache", "Write: App→DB, invalidate Cache"], 3.0, 7.4, "#059669"),
+             ("Write-Through", ["Write: App→Cache→DB (sync)", "Read: App→Cache (always fresh)"], 9.0, 7.4, "#2563eb"),
+             ("Write-Back", ["Write: App→Cache (async→DB)", "Risk: data loss on cache crash"], 3.0, 3.0, "#d97706"),
+             ("Write-Around", ["Write: App→DB (bypass cache)", "Read: App→Cache (miss)→DB→Cache"], 9.0, 3.0, "#db2777")]
+    for title, lines, x, y, col in cards:
+        ax.add_patch(FancyBboxPatch((x-2.8, y-1.5), 5.6, 3.0, boxstyle="round,pad=0.04,rounding_size=0.18",
+                     fc=_tint(col, 0.92), ec=col, lw=1.6))
+        ax.text(x, y+1.05, title, ha="center", fontsize=10, weight="bold", color=col)
+        for i, ln in enumerate(lines):
+            ax.text(x, y+0.2-i*0.7, ln, ha="center", fontsize=7.6, color=INK)
+    _save(key, "03-caching-patterns", fig,
+          "The four write/read cache patterns trade freshness, latency and durability. Cache-aside "
+          "is the default; write-through favours consistency; write-back favours write latency.")
+
+def latency_path():
+    key = "09-performance"; c = acc(key)
+    fig, ax = _canvas((7.6, 3.8), "Where request latency hides — hop by hop", (0, 16), (0, 8))
+    hops = [("Client", "JS bundle, render"), ("DNS", "lookup <5ms"), ("CDN", "miss→origin"),
+            ("LB", "hot-server skew"), ("App", "GC, CPU, threads"), ("Cache", "miss→DB hop"),
+            ("DB", "slow query, locks, I/O")]
+    x = 1.3
+    prev = None
+    for i, (nm, note) in enumerate(hops):
+        _box(ax, x, 5.6, 1.7, 1.0, nm, ec=c, fs=8.4)
+        if prev is not None:
+            _arrow(ax, (prev, 5.6), (x-0.85, 5.6), INK2)
+        ax.plot([x, x], [5.05, 3.6], color="#cbd5e1", lw=1.0, ls=":")
+        ax.text(x, 3.3, note, ha="center", va="top", fontsize=6.9, color=INK2, rotation=0,
+                wrap=True)
+        prev = x + 0.85
+        x += 2.1
+    ax.text(8, 1.2, "trace each hop → find the one that's >50% of total → profile there first",
+            ha="center", fontsize=8, color=c, style="italic", weight="bold")
+    _save(key, "03-latency-path",  fig,
+          "End-to-end latency is a sum over hops. Instrument every hop, find the one dominating "
+          "the budget, and optimize that — don't guess.")
+
+def flame_graph():
+    key = "09-performance"; c = acc(key)
+    fig, ax = _canvas((7.0, 3.8), "Reading a flame graph", (0, 100), (0, 6))
+    # (level, x0, width, label, color)
+    bars = [(0, 0, 100, "main()", "#64748b"),
+            (1, 0, 70, "handle_request()", c), (1, 72, 22, "auth()", "#2563eb"),
+            (2, 0, 34, "process_data()", "#7c3aed"), (2, 36, 28, "serialize()", "#0ea5a4"),
+            (3, 0, 20, "parse_json()  ← hottest", "#dc2626"), (3, 22, 12, "query_db()", "#059669")]
+    for lvl, x0, w, lab, col in bars:
+        ax.add_patch(FancyBboxPatch((x0+0.3, lvl*1.05+0.1), w-0.6, 0.9,
+                     boxstyle="round,pad=0.01,rounding_size=0.04", fc=_tint(col, 0.45), ec=col, lw=1.0))
+        if w > 10:
+            ax.text(x0+w/2, lvl*1.05+0.55, lab, ha="center", va="center", fontsize=7.2,
+                    color=INK, weight="bold")
+    ax.annotate("widest top bar = bottleneck", xy=(10, 3.25), xytext=(34, 4.6),
+                fontsize=8, color="#dc2626", weight="bold",
+                arrowprops=dict(arrowstyle="->", color="#dc2626"))
+    ax.set_xlim(-2, 102); ax.set_ylim(0, 5.4)
+    ax.set_title("Reading a flame graph (CPU profile)", color=INK, fontsize=12, weight="bold")
+    _save(key, "04-flame-graph", fig,
+          "Width = time spent. A wide bar with little above it is a self-time hot spot. Find the "
+          "widest plateau near the top and optimize that function first.")
+
+def infra_stack():
+    key = "04-cloud"; c = acc(key)
+    layers = ["Infrastructure as Code (Terraform)", "Observability (metrics·logs·traces)",
+              "CI/CD pipelines", "Service mesh (Istio / Envoy)",
+              "Orchestration (Kubernetes)", "VMs / Containers", "Hypervisor / OS kernel",
+              "Physical hardware"]
+    fig, ax = plt.subplots(figsize=(6.4, 4.4)); ax.axis("off")
+    cols = plt.cm.viridis(np.linspace(0.1, 0.85, len(layers)))
+    y = len(layers)
+    for lab, col in zip(layers, cols):
+        ax.add_patch(FancyBboxPatch((1, y-0.85), 8.4, 0.74, boxstyle="round,pad=0.02,rounding_size=0.06",
+                     fc=_tint(matplotlib.colors.to_hex(col), 0.55), ec=matplotlib.colors.to_hex(col), lw=1.3))
+        ax.text(5.2, y-0.48, lab, ha="center", va="center", fontsize=9, weight="bold", color=INK)
+        y -= 1
+    ax.annotate("", xy=(0.6, len(layers)-0.4), xytext=(0.6, 0.4),
+                arrowprops=dict(arrowstyle="->", color=c, lw=1.6))
+    ax.text(0.3, len(layers)/2, "abstraction", rotation=90, va="center", ha="center",
+            color=c, fontsize=8.5, weight="bold")
+    ax.set_xlim(-0.2, 10); ax.set_ylim(0, len(layers)+0.5)
+    ax.set_title("The modern cloud-native stack", color=INK, fontsize=12.5, weight="bold")
+    _save(key, "03-infra-stack", fig,
+          "Each layer abstracts the one below: hardware → hypervisor → containers → orchestration "
+          "→ mesh → delivery → observability, all declared as code.")
+
+def kafka_partitions():
+    key = "05-system-design"; c = acc(key)
+    fig, ax = _canvas((7.2, 3.6), 'Kafka topic — partitions & consumer groups', (0, 13), (0, 8))
+    ax.add_patch(FancyBboxPatch((0.4, 1.0), 7.0, 6.2, boxstyle="round,pad=0.03,rounding_size=0.1",
+                 fc=_tint(c, 0.95), ec=c, lw=1.4))
+    ax.text(3.9, 6.7, 'Topic  "user-events"', ha="center", fontsize=9.5, weight="bold", color=c)
+    msgs = [["m1", "m3", "m5"], ["m2", "m4", "m6"], ["m7", "m8", "m9"]]
+    for p in range(3):
+        y = 5.2 - p*1.5
+        ax.text(1.0, y, f"P{p}", ha="center", va="center", fontsize=8.5, weight="bold", color=INK)
+        for i, mm in enumerate(msgs[p]):
+            ax.add_patch(FancyBboxPatch((1.6+i*1.5, y-0.35), 1.3, 0.7,
+                         boxstyle="round,pad=0.02,rounding_size=0.05", fc="white", ec="#94a3b8", lw=1.0))
+            ax.text(2.25+i*1.5, y, mm, ha="center", va="center", fontsize=7.6, color=INK2)
+        _box(ax, 10.6, y, 2.4, 0.9, f"Consumer {p+1}", ec="#059669", fs=8)
+        _arrow(ax, (7.5, y), (9.4, y), INK2)
+    ax.text(6.5, 0.4, "one partition → one consumer per group · groups consume independently",
+            ha="center", fontsize=7.6, color=INK2, style="italic")
+    _save(key, "04-kafka-partitions", fig,
+          "A topic is split into partitions for parallelism. Within a consumer group each partition "
+          "is read by exactly one consumer; different groups read the same data independently.")
+
+def genai_decision():
+    key = "aiml-05-genai"; c = acc(key)
+    fig, ax = _canvas((7.2, 4.4), "Prompting vs RAG vs fine-tuning — what to reach for", (0, 14), (0, 11))
+    _box(ax, 3.2, 9.8, 4.6, 1.0, "What's failing?", ec=c, fs=9.5)
+    rows = [("Missing private knowledge?", "corpus < context → prompt;  else → RAG", "#2563eb", 8.0),
+            ("Wrong format / style?", "system prompt + few-shot;  else → fine-tune", "#7c3aed", 6.3),
+            ("Too slow / expensive?", "distill to smaller model;  or model routing", "#d97706", 4.6),
+            ("Hallucinates on domain?", "RAG with ground-truth docs;  fine-tune if it still fails", "#dc2626", 2.9)]
+    ax.plot([1.0, 1.0], [rows[-1][3], 9.3], color="#cbd5e1", lw=1.4, zorder=0)  # spine
+    for q, a, col, y in rows:
+        ax.plot([1.0, 1.4], [y, y], color="#cbd5e1", lw=1.4, zorder=0)
+        _box(ax, 4.0, y, 5.2, 0.95, q, ec=col, fs=8.4)
+        ax.text(7.0, y, "→", ha="center", va="center", fontsize=13, color=col)
+        ax.text(7.5, y, a, ha="left", va="center", fontsize=8, color=INK)
+    _arrow(ax, (3.2, 9.3), (1.0, 9.3), c)
+    ax.text(7, 1.0, "default order: prompt → few-shot → RAG → fine-tune (last resort)",
+            ha="center", fontsize=8, color=c, weight="bold", style="italic")
+    _save(key, "02-genai-decision", fig,
+          "Reach for the cheapest fix first: prompting, then few-shot, then RAG for knowledge "
+          "gaps; fine-tune only when format or domain accuracy still falls short.")
+
+def ride_state():
+    key = "sdp-2"; c = acc(key)
+    fig, ax = _canvas((4.6, 5.2), "Ride lifecycle state machine", (0, 8), (0, 13))
+    states = ["REQUESTED", "SEARCHING", "DRIVER_ASSIGNED", "DRIVER_EN_ROUTE",
+              "ARRIVED_AT_PICKUP", "IN_PROGRESS", "COMPLETED / CANCELLED"]
+    y = 12
+    prev = None
+    for i, s in enumerate(states):
+        col = c if i < len(states)-1 else "#059669"
+        _box(ax, 4, y, 5.4, 1.0, s, ec=col, fs=8.8)
+        if prev is not None:
+            _arrow(ax, (4, prev-0.5), (4, y+0.5), INK2)
+        prev = y
+        y -= 1.7
+    _save(key, "02-ride-state-machine", fig,
+          "Modeling the ride as an explicit state machine makes valid transitions (and the events "
+          "that trigger them) unambiguous — the backbone of the matching and trip services.")
+
+def pattern_tree():
+    key = "dsa-01-patterns"; c = acc(key)
+    fig, ax = _canvas((7.2, 6.0), "Which DSA pattern? — a decision guide", (0, 14), (0, 16))
+    _box(ax, 4.5, 15.0, 6.0, 1.0, "Is the array sorted (or sortable)?", ec=c, fs=9)
+    _box(ax, 2.0, 13.3, 3.4, 0.9, "Yes → Two Pointers /\nBinary Search", ec="#059669", fs=7.8)
+    _arrow(ax, (3.4, 14.5), (2.3, 13.8), "#059669")
+    _arrow(ax, (5.6, 14.5), (7.2, 13.8), INK2)
+    branches = [("Subarray / substring window?", "Sliding Window"),
+                ("Linked list?", "Fast & Slow / Reversal"),
+                ("Shortest path / min steps?", "BFS"),
+                ("All paths / components?", "DFS / Backtracking"),
+                ("Dependency order?", "Topological Sort"),
+                ("Dynamic connectivity?", "Union-Find"),
+                ("Top-K / K-way merge?", "Heap"),
+                ("Overlapping intervals?", "Merge Intervals"),
+                ("Count ways / optimal value?", "Dynamic Programming"),
+                ("Prefix / autocomplete?", "Trie"),
+                ("Next greater / histogram?", "Monotonic Stack"),
+                ("Subarray-sum queries?", "Prefix Sum")]
+    y = 12.4
+    for q, a in branches:
+        ax.text(5.4, y, "•", fontsize=11, color=c, ha="center")
+        ax.text(5.8, y, q, fontsize=7.8, color=INK, va="center")
+        ax.text(10.4, y, "→ "+a, fontsize=7.8, color=c, va="center", weight="bold")
+        y -= 1.0
+    ax.plot([5.4, 5.4], [12.7, y+0.7], color="#cbd5e1", lw=1.0)
+    _save(key, "03-pattern-decision-tree", fig,
+          "Most coding-interview problems map to a small set of patterns. Read the input shape and "
+          "the asked-for quantity, and this guide points you to the right tool.")
+
 def main():
     figset = [
         # original 12
@@ -966,6 +1331,10 @@ def main():
         # second batch
         deadlock, memory_hierarchy, tcp_handshake, consistency_spectrum, tail_latency,
         confusion_matrix, transformer_block, sorting_complexity, two_pointers,
+        # third batch — bespoke conversions of specific ASCII diagrams (replace in place)
+        consistent_hashing, two_phase_commit, dns_resolution, address_space, mlp_network,
+        cnn_arch, caching_patterns, latency_path, flame_graph, infra_stack,
+        kafka_partitions, genai_decision, ride_state, pattern_tree,
     ]
     for f in figset:
         try:

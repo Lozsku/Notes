@@ -1764,32 +1764,7 @@ USER: "What's the weather in Tokyo?"
 
 \subsection{Prompting vs RAG vs Fine-Tuning Decision Tree}\label{prompting-vs-rag-vs-fine-tuning-decision-tree}
 
-\setcodelang{}
-
-\begin{verbatim}
-START: What's the problem?
-          |
-          ├──→ Model doesn't know your private data?
-          │         YES → Has corpus < context window?
-          │                   YES → Just stuff in context (prompting)
-          │                   NO  → Use RAG
-          │
-          ├──→ Model knows the data but gives wrong format/style?
-          │         YES → Try system prompt + few-shot first
-          │                   Still failing? → Fine-tune
-          │
-          ├──→ Model too slow or too expensive?
-          │         YES → Distill to smaller model (fine-tune)
-          │              or use model routing
-          │
-          ├──→ Model hallucinates on domain?
-          │         YES → Add RAG with your ground-truth docs
-          │              Fine-tune only if RAG still fails
-          │
-          └──→ None of the above?
-                    → Profile, evaluate, identify exact failure mode
-                      Don't fine-tune as a first resort
-\end{verbatim}
+\visualfigure{../figures/aiml-05-genai/02-genai-decision.pdf}{Reach for the cheapest fix first: prompting, then few-shot, then RAG for knowledge gaps; fine-tune only when format or domain accuracy still falls short.}
 
 \subsection{LLM App System Architecture}\label{llm-app-system-architecture}
 

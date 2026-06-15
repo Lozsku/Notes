@@ -395,28 +395,7 @@ Linearizable → Sequential → Causal → Read-your-writes → Eventual
 
 \textbf{Solution:} Place both nodes and keys on a virtual ring {[}0, 2\^{}32). A key maps to the nearest node clockwise.
 
-\setcodelang{}
-
-\begin{verbatim}
-ASCII: Consistent Hashing Ring
-
-              0 / 2^32
-                  |
-           NodeA (10)
-          /          \
-    NodeD (340)     NodeB (120)
-          \          /
-           NodeC (250)
-
-Key "user:42" → hash → 180 → NodeC (nearest clockwise from 180)
-Key "order:7" → hash → 90  → NodeB (nearest clockwise from 90)
-Key "product:1" → hash → 5 → NodeA (nearest clockwise from 5)
-
-When NodeB is REMOVED:
-  - Keys 90..250 that were on NodeB move to NodeC
-  - ALL other keys remain on their nodes
-  - Only ~1/N of keys need remapping (vs 100% in naive hashing)
-\end{verbatim}
+\visualfigure{../figures/07-distributed/03-consistent-hashing.pdf}{Keys map to the first node clockwise on a hash ring. Adding/removing a node remaps only ~1/N of keys (not all of them as in naive modulo hashing).}
 
 \textbf{Virtual nodes (vnodes):}
 Each physical node owns multiple positions on the ring. This improves load distribution and makes rebalancing smoother.
@@ -792,30 +771,7 @@ C=[1,2,1] vs A=[2,0,0]: C[0]=1 < A[0]=2 but C[1]=2 > A[1]=0 → CONCURRENT
 
 \subsubsection{2PC Flow}\label{2pc-flow}
 
-\setcodelang{}
-
-\begin{verbatim}
-                     COORDINATOR
-                         |
-         ┌───────────────┼───────────────┐
-         ↓               ↓               ↓
-    Participant A   Participant B   Participant C
-
-Phase 1 (Prepare):
-  Coordinator → Prepare? → All participants
-  Each participant:
-    - Acquires locks
-    - Writes to redo/undo log
-    - Replies Yes or No
-
-Phase 2 (Commit):
-  If ALL said Yes:
-    Coordinator → Commit → All participants
-    Participants release locks, apply changes
-  If ANY said No:
-    Coordinator → Abort → All participants
-    Participants rollback
-\end{verbatim}
+\visualfigure{../figures/07-distributed/04-two-phase-commit.pdf}{2PC gives atomic commit across nodes: a prepare vote then a commit/abort decision. Its weakness — if the coordinator dies after prepare, participants block holding locks.}
 
 \textbf{2PC Problems:}
 

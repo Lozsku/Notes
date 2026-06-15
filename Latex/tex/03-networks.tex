@@ -501,26 +501,7 @@ Example
 
 \subsubsection{DNS Resolution Flow (Full Recursive)}\label{dns-resolution-flow-full-recursive}
 
-\setcodelang{}
-
-\begin{verbatim}
-Browser         Resolver        Root NS      .com NS     Auth NS
-   |               |               |            |            |
-   |──"google.com?"|               |            |            |
-   |  (check local cache)          |            |            |
-   |               |               |            |            |
-   |               |──"google.com?"│            |            |
-   |               |◄──────────────| "Ask .com NS at 192.5.6.30"
-   |               |               |            |            |
-   |               |──"google.com?"────────────►|            |
-   |               |◄──────────────────────────| "Ask auth NS at 216.239.32.10"
-   |               |               |            |            |
-   |               |──"google.com?"─────────────────────────►|
-   |               |◄───────────────────────────────────────| "142.250.80.78, TTL=300"
-   |               |               |            |            |
-   |◄──────────────| 142.250.80.78 |            |            |
-   |  (cache it)   |               |            |            |
-\end{verbatim}
+\visualfigure{../figures/03-networks/03-dns-resolution.pdf}{The resolver does the legwork: it walks the hierarchy (root $\rightarrow$ TLD $\rightarrow$ authoritative) on the client's behalf, then caches the answer for the TTL.}
 
 \textbf{Caching at every level:}
 

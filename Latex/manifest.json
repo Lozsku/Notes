@@ -1,194 +1,194 @@
 {
-  "style": "50ca244cb5ec",
+  "style": "bf7668d111ed",
   "docs": {
     "01-concurrency": {
       "src": "ef5dac1e8e64",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:38"
+      "built": "2026-06-15 22:58"
     },
     "00-index": {
       "src": "7c28028c4ca4",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:37"
+      "built": "2026-06-15 22:58"
     },
     "02-os": {
       "src": "fefb9a274fa3",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:38"
+      "built": "2026-06-15 22:59"
     },
     "03-networks": {
       "src": "96d76bde91c4",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:38"
+      "built": "2026-06-15 22:57"
     },
     "04-cloud": {
       "src": "22b315321b93",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:38"
+      "built": "2026-06-15 22:59"
     },
     "05-system-design": {
       "src": "6b6ae61ee624",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:38"
+      "built": "2026-06-15 22:59"
     },
     "06-lld": {
       "src": "77be50bb4ae7",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:39"
+      "built": "2026-06-15 22:59"
     },
     "07-distributed": {
       "src": "bd1e7169a7d2",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:39"
+      "built": "2026-06-15 22:57"
     },
     "08-databases": {
       "src": "e763b1b81a00",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:39"
+      "built": "2026-06-15 23:00"
     },
     "09-performance": {
       "src": "8244bfaea236",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:39"
+      "built": "2026-06-15 23:00"
     },
     "10-security": {
       "src": "d22bd4d290c7",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:39"
+      "built": "2026-06-15 23:00"
     },
     "11-behavioral": {
       "src": "a899059d130a",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 23:00"
     },
     "cheatsheet": {
       "src": "0e4612a939be",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 23:00"
     },
     "dsa-00-index": {
       "src": "e37147de7ebd",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 23:00"
     },
     "dsa-01-patterns": {
       "src": "7da272ab4ec6",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 22:58"
     },
     "dsa-02-ds": {
       "src": "a3c69c282669",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 23:01"
     },
     "dsa-03-algos": {
       "src": "df55fdb4a900",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 23:01"
     },
     "aiml-00-index": {
       "src": "f4f0beeba0c7",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:40"
+      "built": "2026-06-15 23:01"
     },
     "aiml-01-fund": {
       "src": "c7aefbf4c0e9",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:41"
+      "built": "2026-06-15 23:01"
     },
     "aiml-02-classic": {
       "src": "de63bdb52579",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:41"
+      "built": "2026-06-15 23:01"
     },
     "aiml-03-dl": {
       "src": "3404a4de131b",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:41"
+      "built": "2026-06-15 22:57"
     },
     "aiml-04-tf": {
       "src": "1fd29ca8d236",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:42"
+      "built": "2026-06-15 23:02"
     },
     "aiml-05-genai": {
       "src": "af1870cd7d5a",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:42"
+      "built": "2026-06-15 23:02"
     },
     "aiml-06-mlops": {
       "src": "a421ed3057f1",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:42"
+      "built": "2026-06-15 23:02"
     },
     "sdp-1": {
       "src": "27635e7aaee1",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:42"
+      "built": "2026-06-15 23:02"
     },
     "sdp-2": {
       "src": "48bef9646bf4",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:42"
+      "built": "2026-06-15 23:02"
     },
     "lld-coded": {
       "src": "547ba7f4c776",
-      "style": "50ca244cb5ec",
+      "style": "bf7668d111ed",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-15 19:42"
+      "built": "2026-06-15 23:02"
     }
   }
 }

@@ -757,29 +757,7 @@ Benefits:
   \textbf{Demand paging} --- only load pages actually accessed
 \end{enumerate}
 
-\setcodelang{}
-
-\begin{verbatim}
-Process Virtual Address Space (64-bit, Linux x86-64):
-
-0xFFFFFFFFFFFFFFFF ─────────────────────
-                    Kernel Space        ← not accessible from user mode
-0xFFFF800000000000 ─────────────────────
-     ...            (canonical hole)
-0x00007FFFFFFFFFFF ─────────────────────
-                    Stack               ← grows down
-                    (grows ↓)
-                    Memory mapped files
-                    (mmap region)
-                    Heap                ← grows up
-                    (grows ↑)
-                    BSS
-                    Data
-                    Text (code)
-0x0000000000400000 ─────────────────────
-                    (reserved/null page)
-0x0000000000000000 ─────────────────────
-\end{verbatim}
+\visualfigure{../figures/02-os/03-address-space.pdf}{A process sees a flat virtual address space: code and globals at the bottom, the heap growing up and the stack growing down toward each other, kernel mapped on top.}
 
 \subsection{Paging}\label{paging}
 

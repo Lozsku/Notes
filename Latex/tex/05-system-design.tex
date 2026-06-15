@@ -1055,18 +1055,7 @@ Operations & Complex (Zookeeper, brokers) & Moderate & None (managed) \\
 \end{longtable}
 
 \textbf{Kafka deep dive:}
-
-\setcodelang{}
-
-\begin{verbatim}
-Topic: "user-events"
-  Partition 0: [msg1, msg3, msg5, ...]  → Consumer Group A, Consumer 1
-  Partition 1: [msg2, msg4, msg6, ...]  → Consumer Group A, Consumer 2
-  Partition 2: [msg7, msg8, msg9, ...]  → Consumer Group A, Consumer 3
-
-Each consumer group tracks its own offset per partition.
-Multiple consumer groups can independently consume the same topic.
-\end{verbatim}
+\visualfigure{../figures/05-system-design/04-kafka-partitions.pdf}{A topic is split into partitions for parallelism. Within a consumer group each partition is read by exactly one consumer; different groups read the same data independently.}
 
 \textbf{Kafka use cases:} Event sourcing, change data capture (CDC), log aggregation, stream processing, activity tracking.
 
@@ -1578,17 +1567,7 @@ Application Layer
 
 \subsection{Caching Patterns}\label{caching-patterns}
 
-\setcodelang{}
-
-\begin{verbatim}
-CACHE-ASIDE:                    WRITE-THROUGH:
-Read: App→Cache(miss)→DB→Cache  Write: App→Cache→DB (sync)
-Write: App→DB, invalidate Cache Read: App→Cache (always hit)
-
-WRITE-BACK:                     WRITE-AROUND:
-Write: App→Cache (async→DB)     Write: App→DB (bypass cache)
-Risk: data loss on cache crash  Read: App→Cache(miss)→DB→Cache
-\end{verbatim}
+\visualfigure{../figures/05-system-design/03-caching-patterns.pdf}{The four write/read cache patterns trade freshness, latency and durability. Cache-aside is the default; write-through favours consistency; write-back favours write latency.}
 
 \subsection{Message Queue Flow}\label{message-queue-flow}
 

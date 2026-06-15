@@ -75,11 +75,16 @@ interrupted run continues from where it stopped.
   and inline `§N` references become **clickable** links to that section.
 - The merged `Complete-Collection.pdf` is assembled with **pypdf** (`make_index.py`), which
   preserves each edition's internal bookmarks and nests them under a per-edition entry.
-- **29 diagrams across 23 editions** (`diagrams.py` → vector PDFs in `figures/`), embedded
-  as a per-topic "Visual Reference" section: architecture box-diagrams, sequence diagrams
-  (TLS), class diagrams (Strategy/Observer), heatmaps (isolation levels, DS complexity),
-  and plots (Amdahl, bias–variance, ROC, gradient descent, latency ladder, CAP, …). Each
-  figure is themed to its edition's accent color.
+- **52 hand-crafted diagrams** (`diagrams.py` → vector PDFs in `figures/`), each placed
+  **inline in the section that discusses it** (not in a bottom gallery). Two placement modes
+  in `build.py` (`place_figures`): `ANCHORS` (insert after a matching heading) and `REPLACE`
+  (swap a specific ASCII block for the bespoke figure in place). Architecture/box diagrams,
+  sequence diagrams (TLS/TCP/DNS), class diagrams, state machines, heatmaps, neural-net &
+  CNN schematics, flame graph, consistent-hashing ring, decision trees, plots, … — each
+  themed to its edition's accent.
+- To add a figure: write a function in `diagrams.py`, `_save(...)` it, and add either an
+  `ANCHORS` entry (heading substring → placed after it) or a `REPLACE` entry (a signature
+  inside an ASCII block → that block is replaced by the figure).
 - Unicode in prose (arrows, Greek, math operators, ✓/✗) is converted to real LaTeX math
   during preprocessing (see `SYM` in `build.py`), because the body serif has no glyphs
   for them and XeTeX does no automatic font fallback. Inside code/diagram blocks the

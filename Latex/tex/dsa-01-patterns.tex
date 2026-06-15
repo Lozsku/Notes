@@ -2440,27 +2440,7 @@ Pattern
 
 \subsection{Decision Tree (30-second pattern picker)}\label{decision-tree-30-second-pattern-picker}
 
-\setcodelang{}
-
-\begin{verbatim}
-Is array sorted or can we sort it?
-├── Yes → Two Pointers or Binary Search
-└── No
-    ├── Subarray/substring condition? → Sliding Window
-    ├── Linked list? → Fast & Slow or LL Reversal
-    ├── Graph/tree?
-    │   ├── Shortest path / min steps? → BFS
-    │   ├── All paths / components? → DFS / Backtracking
-    │   ├── Dependency order? → Topological Sort
-    │   └── Connected components (dynamic)? → Union-Find
-    ├── K elements? → Heap (Top-K or K-way Merge)
-    ├── Intervals? → Merge Intervals
-    ├── Count ways / optimal value? → Dynamic Programming
-    ├── Prefix search / autocomplete? → Trie
-    ├── Next greater / histogram? → Monotonic Stack
-    ├── Subarray sum queries? → Prefix Sum
-    └── XOR / bits / unique? → Bit Manipulation
-\end{verbatim}
+\visualfigure{../figures/dsa-01-patterns/03-pattern-decision-tree.pdf}{Most coding-interview problems map to a small set of patterns. Read the input shape and the asked-for quantity, and this guide points you to the right tool.}
 
 \subsection{Quick Complexity Reminder}\label{quick-complexity-reminder}
 

@@ -2,199 +2,357 @@
   "01-concurrency": [
     [
       "01-amdahls-law.pdf",
-      "Amdahl's Law: maximum speedup is capped by the serial fraction. Even at 95\\% parallel, 256 cores yield only ~17x \u2014 the serial 5\\% dominates."
+      "Amdahl's Law: maximum speedup is capped by the serial fraction. Even at 95\\% parallel, 256 cores yield only ~17x \u2014 the serial 5\\% dominates.",
+      "Amdahl",
+      "after"
     ],
     [
       "02-deadlock.pdf",
-      "Deadlock needs all four Coffman conditions at once; the tell-tale sign is a cycle in the wait-for graph. Break any one condition (e.g. lock ordering) to prevent it."
+      "Deadlock needs all four Coffman conditions at once; the tell-tale sign is a cycle in the wait-for graph. Break any one condition (e.g. lock ordering) to prevent it.",
+      "Deadlock",
+      "after"
     ]
   ],
   "aiml-01-fund": [
     [
       "01-bias-variance.pdf",
-      "Total generalization error decomposes into bias$^2$ + variance + irreducible noise. Minimizing it means balancing model capacity, not maximizing fit."
+      "Total generalization error decomposes into bias$^2$ + variance + irreducible noise. Minimizing it means balancing model capacity, not maximizing fit.",
+      "Bias-Variance",
+      "after"
     ],
     [
       "02-learning-curves.pdf",
-      "A large train\u2013validation gap that closes with more data signals variance; high error on both that more data won't fix signals bias."
-    ]
-  ],
-  "aiml-02-classic": [
+      "A large train\u2013validation gap that closes with more data signals variance; high error on both that more data won't fix signals bias.",
+      "Learning Curve",
+      "after"
+    ],
     [
       "01-roc-pr.pdf",
-      "ROC summarizes ranking quality across thresholds; PR is more informative under heavy class imbalance, where a high AUC can still hide poor precision."
+      "ROC summarizes ranking quality across thresholds; PR is more informative under heavy class imbalance, where a high AUC can still hide poor precision.",
+      "ROC-AUC",
+      "after"
     ],
     [
       "02-confusion-matrix.pdf",
-      "Every classifier error is a false positive or false negative. Precision penalizes FPs, recall penalizes FNs \u2014 which matters more depends on the cost of each mistake."
+      "Every classifier error is a false positive or false negative. Precision penalizes FPs, recall penalizes FNs \u2014 which matters more depends on the cost of each mistake.",
+      "Confusion Matrix",
+      "after"
     ]
   ],
   "aiml-03-dl": [
     [
       "01-activations.pdf",
-      "Nonlinearities let networks model non-linear functions. ReLU/GELU dominate deep nets (cheap, no saturation for x>0); sigmoid/tanh saturate and can vanish gradients."
+      "Nonlinearities let networks model non-linear functions. ReLU/GELU dominate deep nets (cheap, no saturation for x>0); sigmoid/tanh saturate and can vanish gradients.",
+      "Activation Function",
+      "after"
     ],
     [
       "02-gradient-descent.pdf",
-      "Each step moves opposite the gradient. Elongated (ill-conditioned) valleys make vanilla gradient descent zig-zag across the steep axis \u2014 motivating momentum, RMSProp and Adam."
+      "Each step moves opposite the gradient. Elongated (ill-conditioned) valleys make vanilla gradient descent zig-zag across the steep axis \u2014 motivating momentum, RMSProp and Adam.",
+      "Gradient Descent",
+      "after"
+    ],
+    [
+      "03-mlp-network.pdf",
+      "A feed-forward net stacks fully-connected layers: each neuron is a weighted sum of the previous layer plus a bias, passed through a nonlinearity.",
+      "HIDDEN 1        HIDDEN 2",
+      "replace"
+    ],
+    [
+      "04-cnn-architecture.pdf",
+      "Convolution + pooling progressively reduce spatial size while increasing channel depth, building features from edges \u2192 textures \u2192 objects, then a dense head classifies.",
+      "CONV+RELU       POOL",
+      "replace"
     ]
   ],
   "dsa-03-algos": [
     [
       "01-big-o-growth.pdf",
-      "Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n\u00b2); exponential is infeasible past ~n=30."
+      "Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n\u00b2); exponential is infeasible past ~n=30.",
+      "Big-O",
+      "after"
     ],
     [
       "02-sorting-complexity.pdf",
-      "No single sort wins everywhere: merge sort is stable and worst-case O(n log n) but needs O(n) space; quicksort is faster in practice but O(n\u00b2) worst case."
+      "No single sort wins everywhere: merge sort is stable and worst-case O(n log n) but needs O(n) space; quicksort is faster in practice but O(n\u00b2) worst case.",
+      "Sorting",
+      "after"
     ]
   ],
   "09-performance": [
     [
       "01-latency-ladder.pdf",
-      "Orders of magnitude separate cache, memory, SSD, disk and network. Designing for performance means counting which tier each operation touches."
+      "Orders of magnitude separate cache, memory, SSD, disk and network. Designing for performance means counting which tier each operation touches.",
+      "Latency Numbers",
+      "after"
     ],
     [
       "02-tail-latency.pdf",
-      "A handful of slow requests barely move the mean but dominate user experience. Track p95/p99, not averages \u2014 at scale, the tail is what every user eventually hits."
+      "A handful of slow requests barely move the mean but dominate user experience. Track p95/p99, not averages \u2014 at scale, the tail is what every user eventually hits.",
+      "Percentile",
+      "after"
+    ],
+    [
+      "03-latency-path.pdf",
+      "End-to-end latency is a sum over hops. Instrument every hop, find the one dominating the budget, and optimize that \u2014 don't guess.",
+      "Client \u2192 DNS \u2192 CDN \u2192 Load Balancer",
+      "replace"
+    ],
+    [
+      "04-flame-graph.pdf",
+      "Width = time spent. A wide bar with little above it is a self-time hot spot. Find the widest plateau near the top and optimize that function first.",
+      "Flame Graph (CPU profiler",
+      "replace"
     ]
   ],
   "07-distributed": [
     [
       "01-cap-theorem.pdf",
-      "When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable."
+      "When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable.",
+      "CAP Theorem",
+      "after"
     ],
     [
       "02-consistency-spectrum.pdf",
-      "Consistency is a dial, not a switch. Stronger models are easier to reason about but cost availability and latency under partitions \u2014 pick per use-case."
+      "Consistency is a dial, not a switch. Stronger models are easier to reason about but cost availability and latency under partitions \u2014 pick per use-case.",
+      "Consistency Model",
+      "after"
+    ],
+    [
+      "03-consistent-hashing.pdf",
+      "Keys map to the first node clockwise on a hash ring. Adding/removing a node remaps only ~1/N of keys (not all of them as in naive modulo hashing).",
+      "Consistent Hashing Ring",
+      "replace"
+    ],
+    [
+      "04-two-phase-commit.pdf",
+      "2PC gives atomic commit across nodes: a prepare vote then a commit/abort decision. Its weakness \u2014 if the coordinator dies after prepare, participants block holding locks.",
+      "Phase 1 (Prepare):",
+      "replace"
     ]
   ],
   "03-networks": [
     [
       "01-osi-stack.pdf",
-      "Each layer adds a header and treats the layer above as opaque payload. Interview framing: name the layer, its addressing unit, and a protocol."
+      "Each layer adds a header and treats the layer above as opaque payload. Interview framing: name the layer, its addressing unit, and a protocol.",
+      "OSI",
+      "after"
     ],
     [
       "02-tcp-handshake.pdf",
-      "TCP opens with SYN / SYN-ACK / ACK to agree on sequence numbers, then tears down with a four-way FIN/ACK exchange. This reliability is what UDP trades away for speed."
+      "TCP opens with SYN / SYN-ACK / ACK to agree on sequence numbers, then tears down with a four-way FIN/ACK exchange. This reliability is what UDP trades away for speed.",
+      "3-Way Handshake",
+      "after"
+    ],
+    [
+      "03-dns-resolution.pdf",
+      "The resolver does the legwork: it walks the hierarchy (root \u2192 TLD \u2192 authoritative) on the client's behalf, then caches the answer for the TTL.",
+      "Root NS      .com NS",
+      "replace"
     ]
   ],
   "02-os": [
     [
       "01-scheduling-gantt.pdf",
-      "FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches."
+      "FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches.",
+      "Scheduling",
+      "after"
     ],
     [
       "02-memory-hierarchy.pdf",
-      "Each level trades capacity for speed by orders of magnitude. Performance comes from keeping the working set in the fastest tier that fits \u2014 the basis of caching."
+      "Each level trades capacity for speed by orders of magnitude. Performance comes from keeping the working set in the fastest tier that fits \u2014 the basis of caching.",
+      "Memory Management",
+      "after"
+    ],
+    [
+      "03-address-space.pdf",
+      "A process sees a flat virtual address space: code and globals at the bottom, the heap growing up and the stack growing down toward each other, kernel mapped on top.",
+      "Process Virtual Address Space",
+      "replace"
     ]
   ],
   "aiml-04-tf": [
     [
       "01-attention.pdf",
-      "Each query token forms a weighted average over all tokens via softmax(QK\u1d40/\u221ad). Rows sum to 1 \u2014 the model learns which context positions matter."
+      "Each query token forms a weighted average over all tokens via softmax(QK\u1d40/\u221ad). Rows sum to 1 \u2014 the model learns which context positions matter.",
+      "Self-Attention",
+      "after"
     ],
     [
       "02-transformer-block.pdf",
-      "A transformer layer = self-attention (mix information across tokens) + a position-wise MLP, each wrapped in a residual connection and LayerNorm. Stack N of them."
+      "A transformer layer = self-attention (mix information across tokens) + a position-wise MLP, each wrapped in a residual connection and LayerNorm. Stack N of them.",
+      "Full Transformer Block",
+      "after"
     ]
   ],
   "04-cloud": [
     [
       "01-autoscaling.pdf",
-      "Static peak provisioning wastes capacity (red area) most of the day. Autoscaling tracks demand in steps, trading a little headroom for large cost savings."
+      "Static peak provisioning wastes capacity (red area) most of the day. Autoscaling tracks demand in steps, trading a little headroom for large cost savings.",
+      "Auto-scaling",
+      "after"
     ],
     [
       "02-shared-responsibility.pdf",
-      "Moving from IaaS to SaaS hands more of the stack to the provider. Knowing the boundary tells you what you must still secure, patch and scale yourself."
+      "Moving from IaaS to SaaS hands more of the stack to the provider. Knowing the boundary tells you what you must still secure, patch and scale yourself.",
+      "IaaS",
+      "after"
+    ],
+    [
+      "03-infra-stack.pdf",
+      "Each layer abstracts the one below: hardware \u2192 hypervisor \u2192 containers \u2192 orchestration \u2192 mesh \u2192 delivery \u2192 observability, all declared as code.",
+      "Physical Hardware  \u2192  Hypervisor",
+      "replace"
     ]
   ],
   "05-system-design": [
     [
       "01-web-architecture.pdf",
-      "The canonical pattern: stateless app servers behind a load balancer, a CDN for static edge content, a cache to absorb reads, and a primary DB with read replicas."
+      "The canonical pattern: stateless app servers behind a load balancer, a CDN for static edge content, a cache to absorb reads, and a primary DB with read replicas.",
+      "Scalable Web Architecture",
+      "after"
     ],
     [
       "02-latency-utilization.pdf",
-      "Latency stays flat until utilization approaches capacity, then rises sharply as queues build. Plan for headroom \u2014 running hot (>70-80\\%) is a tail-latency trap."
+      "Latency stays flat until utilization approaches capacity, then rises sharply as queues build. Plan for headroom \u2014 running hot (>70-80\\%) is a tail-latency trap.",
+      "Little",
+      "after"
+    ],
+    [
+      "03-caching-patterns.pdf",
+      "The four write/read cache patterns trade freshness, latency and durability. Cache-aside is the default; write-through favours consistency; write-back favours write latency.",
+      "CACHE-ASIDE:",
+      "replace"
+    ],
+    [
+      "04-kafka-partitions.pdf",
+      "A topic is split into partitions for parallelism. Within a consumer group each partition is read by exactly one consumer; different groups read the same data independently.",
+      "Topic: \"user-events\"",
+      "replace"
     ]
   ],
   "06-lld": [
     [
       "01-strategy-pattern.pdf",
-      "Strategy encapsulates interchangeable algorithms behind one interface. The Context delegates to a strategy object, so new behaviors are added without modifying it."
+      "Strategy encapsulates interchangeable algorithms behind one interface. The Context delegates to a strategy object, so new behaviors are added without modifying it.",
+      "Strategy",
+      "after"
     ]
   ],
   "08-databases": [
     [
       "01-btree.pdf",
-      "B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap."
+      "B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap.",
+      "B-Tree",
+      "after"
     ],
     [
       "02-isolation-levels.pdf",
-      "Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed."
+      "Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed.",
+      "Isolation Level",
+      "after"
     ]
   ],
   "10-security": [
     [
       "01-tls-handshake.pdf",
-      "TLS 1.3 establishes a shared secret via key shares in the first flight, so encrypted application data flows after just one round trip (0-RTT on resumption)."
+      "TLS 1.3 establishes a shared secret via key shares in the first flight, so encrypted application data flows after just one round trip (0-RTT on resumption).",
+      "TLS",
+      "after"
     ],
     [
       "02-defense-in-depth.pdf",
-      "No single control is trusted alone. Independent layers \u2014 perimeter, network, host, app, data \u2014 mean an attacker must defeat each in turn."
+      "No single control is trusted alone. Independent layers \u2014 perimeter, network, host, app, data \u2014 mean an attacker must defeat each in turn.",
+      "Defense in Depth",
+      "after"
     ]
   ],
   "11-behavioral": [
     [
       "01-star-method.pdf",
-      "Structure every behavioral story as Situation \u2192 Task \u2192 Action \u2192 Result. Lead with context, but spend most words on your specific actions and a measurable result."
+      "Structure every behavioral story as Situation \u2192 Task \u2192 Action \u2192 Result. Lead with context, but spend most words on your specific actions and a measurable result.",
+      "STAR",
+      "after"
     ]
   ],
   "dsa-01-patterns": [
     [
       "01-sliding-window.pdf",
-      "Instead of recomputing each window from scratch (O(n\u00b7k)), slide the window: add the entering element and drop the leaving one, achieving O(n)."
+      "Instead of recomputing each window from scratch (O(n\u00b7k)), slide the window: add the entering element and drop the leaving one, achieving O(n).",
+      "Sliding Window",
+      "after"
     ],
     [
       "02-two-pointers.pdf",
-      "On sorted input, two pointers from both ends turn an O(n\u00b2) pair-search into O(n): move the pointer that brings the sum toward the target."
+      "On sorted input, two pointers from both ends turn an O(n\u00b2) pair-search into O(n): move the pointer that brings the sum toward the target.",
+      "Two Pointer",
+      "after"
+    ],
+    [
+      "03-pattern-decision-tree.pdf",
+      "Most coding-interview problems map to a small set of patterns. Read the input shape and the asked-for quantity, and this guide points you to the right tool.",
+      "Is array sorted or can we sort it?",
+      "replace"
     ]
   ],
   "dsa-02-ds": [
     [
       "01-ds-complexity.pdf",
-      "Pick the structure that makes your hot operation O(1)/O(log n). Hash tables win for lookups; balanced trees keep order; heaps give cheap min/max."
+      "Pick the structure that makes your hot operation O(1)/O(log n). Hash tables win for lookups; balanced trees keep order; heaps give cheap min/max.",
+      "Complexity",
+      "after"
     ]
   ],
   "aiml-05-genai": [
     [
       "01-rag-pipeline.pdf",
-      "RAG embeds the query, retrieves the most similar chunks from a vector store, and injects them into the prompt \u2014 grounding the LLM in current, citable facts."
+      "RAG embeds the query, retrieves the most similar chunks from a vector store, and injects them into the prompt \u2014 grounding the LLM in current, citable facts.",
+      "RAG",
+      "after"
+    ],
+    [
+      "02-genai-decision.pdf",
+      "Reach for the cheapest fix first: prompting, then few-shot, then RAG for knowledge gaps; fine-tune only when format or domain accuracy still falls short.",
+      "START: What's the problem?",
+      "replace"
     ]
   ],
   "aiml-06-mlops": [
     [
       "01-mlops-lifecycle.pdf",
-      "Production ML is a loop: monitoring detects data/concept drift and triggers retraining, closing the gap between a one-off model and a living system."
+      "Production ML is a loop: monitoring detects data/concept drift and triggers retraining, closing the gap between a one-off model and a living system.",
+      "Lifecycle",
+      "after"
     ]
   ],
   "sdp-1": [
     [
       "01-token-bucket.pdf",
-      "A bucket refills at a steady rate up to a capacity. Each request spends a token; an empty bucket throttles. This smooths traffic while allowing short bursts."
+      "A bucket refills at a steady rate up to a capacity. Each request spends a token; an empty bucket throttles. This smooths traffic while allowing short bursts.",
+      "Rate Limit",
+      "after"
     ]
   ],
   "sdp-2": [
     [
       "01-sharding-replication.pdf",
-      "Sharding partitions data by key to scale writes across nodes; replication copies each shard for read scaling and failover. Most large datastores combine both."
+      "Sharding partitions data by key to scale writes across nodes; replication copies each shard for read scaling and failover. Most large datastores combine both.",
+      "Sharding",
+      "after"
+    ],
+    [
+      "02-ride-state-machine.pdf",
+      "Modeling the ride as an explicit state machine makes valid transitions (and the events that trigger them) unambiguous \u2014 the backbone of the matching and trip services.",
+      "REQUESTED \u2500\u2500\u25ba SEARCHING",
+      "replace"
     ]
   ],
   "lld-coded": [
     [
       "01-observer-pattern.pdf",
-      "Observer lets a subject notify many observers of state changes without knowing their concrete types \u2014 the basis of event systems and reactive UIs."
+      "Observer lets a subject notify many observers of state changes without knowing their concrete types \u2014 the basis of event systems and reactive UIs.",
+      "Observer",
+      "after"
     ]
   ]
 }

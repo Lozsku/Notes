@@ -906,20 +906,7 @@ Google S2
 
 \subsubsection{6.5 Trip Lifecycle --- State Machine}\label{65-trip-lifecycle--state-machine}
 
-\setcodelang{}
-
-\begin{verbatim}
-REQUESTED ──► SEARCHING ──► DRIVER_ASSIGNED ──► DRIVER_EN_ROUTE
-                                                      │
-                                                      ▼
-                                               ARRIVED_AT_PICKUP
-                                                      │
-                                                      ▼
-                                                IN_PROGRESS
-                                                      │
-                                                      ▼
-                                               COMPLETED / CANCELLED
-\end{verbatim}
+\visualfigure{../figures/sdp-2/02-ride-state-machine.pdf}{Modeling the ride as an explicit state machine makes valid transitions (and the events that trigger them) unambiguous — the backbone of the matching and trip services.}
 
 State transitions are persisted in Postgres with timestamps. Events published to Kafka on each transition. Kafka consumers handle: notifications, billing trigger (on COMPLETED), analytics.
 

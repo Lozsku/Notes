@@ -74,23 +74,7 @@ Cloud \& Infrastructure is the discipline of \textbf{packaging, deploying, opera
 
 The stack from atoms to apps:
 
-\setcodelang{}
-
-\begin{verbatim}
-Physical Hardware  →  Hypervisor / OS Kernel
-         ↓
-Virtual Machines / Containers
-         ↓
-Container Orchestration (Kubernetes)
-         ↓
-Service Mesh (Istio / Envoy)
-         ↓
-CI/CD Pipelines
-         ↓
-Observability (Metrics · Logs · Traces)
-         ↓
-Infrastructure as Code (Terraform / CloudFormation)
-\end{verbatim}
+\visualfigure{../figures/04-cloud/03-infra-stack.pdf}{Each layer abstracts the one below: hardware $\rightarrow$ hypervisor $\rightarrow$ containers $\rightarrow$ orchestration $\rightarrow$ mesh $\rightarrow$ delivery $\rightarrow$ observability, all declared as code.}
 
 Key players: \textbf{AWS, GCP, Azure} (IaaS/PaaS/SaaS providers), \textbf{Docker} (container runtime), \textbf{Kubernetes} (orchestrator), \textbf{Istio/Envoy} (service mesh), \textbf{Terraform} (IaC), \textbf{Prometheus/Grafana} (observability).
 
