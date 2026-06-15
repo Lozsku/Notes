@@ -1,0 +1,200 @@
+{
+  "01-concurrency": [
+    [
+      "01-amdahls-law.pdf",
+      "Amdahl's Law: maximum speedup is capped by the serial fraction. Even at 95\\% parallel, 256 cores yield only ~17x \u2014 the serial 5\\% dominates."
+    ],
+    [
+      "02-deadlock.pdf",
+      "Deadlock needs all four Coffman conditions at once; the tell-tale sign is a cycle in the wait-for graph. Break any one condition (e.g. lock ordering) to prevent it."
+    ]
+  ],
+  "aiml-01-fund": [
+    [
+      "01-bias-variance.pdf",
+      "Total generalization error decomposes into bias$^2$ + variance + irreducible noise. Minimizing it means balancing model capacity, not maximizing fit."
+    ],
+    [
+      "02-learning-curves.pdf",
+      "A large train\u2013validation gap that closes with more data signals variance; high error on both that more data won't fix signals bias."
+    ]
+  ],
+  "aiml-02-classic": [
+    [
+      "01-roc-pr.pdf",
+      "ROC summarizes ranking quality across thresholds; PR is more informative under heavy class imbalance, where a high AUC can still hide poor precision."
+    ],
+    [
+      "02-confusion-matrix.pdf",
+      "Every classifier error is a false positive or false negative. Precision penalizes FPs, recall penalizes FNs \u2014 which matters more depends on the cost of each mistake."
+    ]
+  ],
+  "aiml-03-dl": [
+    [
+      "01-activations.pdf",
+      "Nonlinearities let networks model non-linear functions. ReLU/GELU dominate deep nets (cheap, no saturation for x>0); sigmoid/tanh saturate and can vanish gradients."
+    ],
+    [
+      "02-gradient-descent.pdf",
+      "Each step moves opposite the gradient. Elongated (ill-conditioned) valleys make vanilla gradient descent zig-zag across the steep axis \u2014 motivating momentum, RMSProp and Adam."
+    ]
+  ],
+  "dsa-03-algos": [
+    [
+      "01-big-o-growth.pdf",
+      "Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n\u00b2); exponential is infeasible past ~n=30."
+    ],
+    [
+      "02-sorting-complexity.pdf",
+      "No single sort wins everywhere: merge sort is stable and worst-case O(n log n) but needs O(n) space; quicksort is faster in practice but O(n\u00b2) worst case."
+    ]
+  ],
+  "09-performance": [
+    [
+      "01-latency-ladder.pdf",
+      "Orders of magnitude separate cache, memory, SSD, disk and network. Designing for performance means counting which tier each operation touches."
+    ],
+    [
+      "02-tail-latency.pdf",
+      "A handful of slow requests barely move the mean but dominate user experience. Track p95/p99, not averages \u2014 at scale, the tail is what every user eventually hits."
+    ]
+  ],
+  "07-distributed": [
+    [
+      "01-cap-theorem.pdf",
+      "When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable."
+    ],
+    [
+      "02-consistency-spectrum.pdf",
+      "Consistency is a dial, not a switch. Stronger models are easier to reason about but cost availability and latency under partitions \u2014 pick per use-case."
+    ]
+  ],
+  "03-networks": [
+    [
+      "01-osi-stack.pdf",
+      "Each layer adds a header and treats the layer above as opaque payload. Interview framing: name the layer, its addressing unit, and a protocol."
+    ],
+    [
+      "02-tcp-handshake.pdf",
+      "TCP opens with SYN / SYN-ACK / ACK to agree on sequence numbers, then tears down with a four-way FIN/ACK exchange. This reliability is what UDP trades away for speed."
+    ]
+  ],
+  "02-os": [
+    [
+      "01-scheduling-gantt.pdf",
+      "FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches."
+    ],
+    [
+      "02-memory-hierarchy.pdf",
+      "Each level trades capacity for speed by orders of magnitude. Performance comes from keeping the working set in the fastest tier that fits \u2014 the basis of caching."
+    ]
+  ],
+  "aiml-04-tf": [
+    [
+      "01-attention.pdf",
+      "Each query token forms a weighted average over all tokens via softmax(QK\u1d40/\u221ad). Rows sum to 1 \u2014 the model learns which context positions matter."
+    ],
+    [
+      "02-transformer-block.pdf",
+      "A transformer layer = self-attention (mix information across tokens) + a position-wise MLP, each wrapped in a residual connection and LayerNorm. Stack N of them."
+    ]
+  ],
+  "04-cloud": [
+    [
+      "01-autoscaling.pdf",
+      "Static peak provisioning wastes capacity (red area) most of the day. Autoscaling tracks demand in steps, trading a little headroom for large cost savings."
+    ],
+    [
+      "02-shared-responsibility.pdf",
+      "Moving from IaaS to SaaS hands more of the stack to the provider. Knowing the boundary tells you what you must still secure, patch and scale yourself."
+    ]
+  ],
+  "05-system-design": [
+    [
+      "01-web-architecture.pdf",
+      "The canonical pattern: stateless app servers behind a load balancer, a CDN for static edge content, a cache to absorb reads, and a primary DB with read replicas."
+    ],
+    [
+      "02-latency-utilization.pdf",
+      "Latency stays flat until utilization approaches capacity, then rises sharply as queues build. Plan for headroom \u2014 running hot (>70-80\\%) is a tail-latency trap."
+    ]
+  ],
+  "06-lld": [
+    [
+      "01-strategy-pattern.pdf",
+      "Strategy encapsulates interchangeable algorithms behind one interface. The Context delegates to a strategy object, so new behaviors are added without modifying it."
+    ]
+  ],
+  "08-databases": [
+    [
+      "01-btree.pdf",
+      "B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap."
+    ],
+    [
+      "02-isolation-levels.pdf",
+      "Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed."
+    ]
+  ],
+  "10-security": [
+    [
+      "01-tls-handshake.pdf",
+      "TLS 1.3 establishes a shared secret via key shares in the first flight, so encrypted application data flows after just one round trip (0-RTT on resumption)."
+    ],
+    [
+      "02-defense-in-depth.pdf",
+      "No single control is trusted alone. Independent layers \u2014 perimeter, network, host, app, data \u2014 mean an attacker must defeat each in turn."
+    ]
+  ],
+  "11-behavioral": [
+    [
+      "01-star-method.pdf",
+      "Structure every behavioral story as Situation \u2192 Task \u2192 Action \u2192 Result. Lead with context, but spend most words on your specific actions and a measurable result."
+    ]
+  ],
+  "dsa-01-patterns": [
+    [
+      "01-sliding-window.pdf",
+      "Instead of recomputing each window from scratch (O(n\u00b7k)), slide the window: add the entering element and drop the leaving one, achieving O(n)."
+    ],
+    [
+      "02-two-pointers.pdf",
+      "On sorted input, two pointers from both ends turn an O(n\u00b2) pair-search into O(n): move the pointer that brings the sum toward the target."
+    ]
+  ],
+  "dsa-02-ds": [
+    [
+      "01-ds-complexity.pdf",
+      "Pick the structure that makes your hot operation O(1)/O(log n). Hash tables win for lookups; balanced trees keep order; heaps give cheap min/max."
+    ]
+  ],
+  "aiml-05-genai": [
+    [
+      "01-rag-pipeline.pdf",
+      "RAG embeds the query, retrieves the most similar chunks from a vector store, and injects them into the prompt \u2014 grounding the LLM in current, citable facts."
+    ]
+  ],
+  "aiml-06-mlops": [
+    [
+      "01-mlops-lifecycle.pdf",
+      "Production ML is a loop: monitoring detects data/concept drift and triggers retraining, closing the gap between a one-off model and a living system."
+    ]
+  ],
+  "sdp-1": [
+    [
+      "01-token-bucket.pdf",
+      "A bucket refills at a steady rate up to a capacity. Each request spends a token; an empty bucket throttles. This smooths traffic while allowing short bursts."
+    ]
+  ],
+  "sdp-2": [
+    [
+      "01-sharding-replication.pdf",
+      "Sharding partitions data by key to scale writes across nodes; replication copies each shard for read scaling and failover. Most large datastores combine both."
+    ]
+  ],
+  "lld-coded": [
+    [
+      "01-observer-pattern.pdf",
+      "Observer lets a subject notify many observers of state changes without knowing their concrete types \u2014 the basis of event systems and reactive UIs."
+    ]
+  ]
+}

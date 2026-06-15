@@ -75,6 +75,7 @@ Classic ML algorithms are \textbf{mathematically grounded, interpretable models}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3061}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6939}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Family
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -85,10 +86,13 @@ Algorithms
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Linear Models} & Linear Regression, Logistic Regression, SVM \\
+\rowcolor{zebra}
 \textbf{Tree-Based} & Decision Trees, Random Forests, Gradient Boosting (GBM/XGBoost/LightGBM) \\
 \textbf{Instance-Based} & k-Nearest Neighbors \\
+\rowcolor{zebra}
 \textbf{Probabilistic} & Naive Bayes \\
 \textbf{Clustering} & k-Means, Hierarchical, DBSCAN \\
+\rowcolor{zebra}
 \textbf{Dimensionality Reduction} & PCA, t-SNE, UMAP \\
 \textbf{Ensembles} & Bagging, Boosting, Stacking \\
 \end{longtable}
@@ -426,28 +430,28 @@ Variance reduction: Var(parent) - weighted_avg[Var(children)]
 
 \subsubsection{The Splitting Algorithm (CART)}\label{the-splitting-algorithm-cart}
 
-\setcodelang{Python}
+\setcodelang{JavaScript}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{function BuildTree(data, depth):}
-    \ControlFlowTok{if}\NormalTok{ stopping\_criterion\_met:}
-        \ControlFlowTok{return}\NormalTok{ Leaf(majority\_class }\KeywordTok{or}\NormalTok{ mean(y))}
+\KeywordTok{function} \FunctionTok{BuildTree}\NormalTok{(data}\OperatorTok{,}\NormalTok{ depth)}\OperatorTok{:}
+    \ControlFlowTok{if}\NormalTok{ stopping\_criterion\_met}\OperatorTok{:}
+        \ControlFlowTok{return} \FunctionTok{Leaf}\NormalTok{(majority\_class or }\FunctionTok{mean}\NormalTok{(y))}
     
-\NormalTok{    best\_feature, best\_threshold }\OperatorTok{=} \VariableTok{None}\NormalTok{, }\VariableTok{None}
+\NormalTok{    best\_feature}\OperatorTok{,}\NormalTok{ best\_threshold }\OperatorTok{=}\NormalTok{ None}\OperatorTok{,}\NormalTok{ None}
 \NormalTok{    best\_gain }\OperatorTok{=} \OperatorTok{{-}}\NormalTok{inf}
     
-    \ControlFlowTok{for}\NormalTok{ each feature f:}
-        \ControlFlowTok{for}\NormalTok{ each candidate threshold t:}
-\NormalTok{            gain }\OperatorTok{=}\NormalTok{ impurity(data) }\OperatorTok{{-}}\NormalTok{ weighted\_impurity(split(data, f, t))}
-            \ControlFlowTok{if}\NormalTok{ gain }\OperatorTok{\textgreater{}}\NormalTok{ best\_gain:}
+    \ControlFlowTok{for}\NormalTok{ each feature f}\OperatorTok{:}
+        \ControlFlowTok{for}\NormalTok{ each candidate threshold t}\OperatorTok{:}
+\NormalTok{            gain }\OperatorTok{=} \FunctionTok{impurity}\NormalTok{(data) }\OperatorTok{{-}} \FunctionTok{weighted\_impurity}\NormalTok{(}\FunctionTok{split}\NormalTok{(data}\OperatorTok{,}\NormalTok{ f}\OperatorTok{,}\NormalTok{ t))}
+            \ControlFlowTok{if}\NormalTok{ gain }\OperatorTok{\textgreater{}}\NormalTok{ best\_gain}\OperatorTok{:}
 \NormalTok{                best\_gain }\OperatorTok{=}\NormalTok{ gain}
-\NormalTok{                best\_feature, best\_threshold }\OperatorTok{=}\NormalTok{ f, t}
+\NormalTok{                best\_feature}\OperatorTok{,}\NormalTok{ best\_threshold }\OperatorTok{=}\NormalTok{ f}\OperatorTok{,}\NormalTok{ t}
     
-\NormalTok{    left, right }\OperatorTok{=}\NormalTok{ split(data, best\_feature, best\_threshold)}
-    \ControlFlowTok{return}\NormalTok{ Node(best\_feature, best\_threshold,}
-\NormalTok{                left}\OperatorTok{=}\NormalTok{BuildTree(left, depth}\OperatorTok{+}\DecValTok{1}\NormalTok{),}
-\NormalTok{                right}\OperatorTok{=}\NormalTok{BuildTree(right, depth}\OperatorTok{+}\DecValTok{1}\NormalTok{))}
+\NormalTok{    left}\OperatorTok{,}\NormalTok{ right }\OperatorTok{=} \FunctionTok{split}\NormalTok{(data}\OperatorTok{,}\NormalTok{ best\_feature}\OperatorTok{,}\NormalTok{ best\_threshold)}
+    \ControlFlowTok{return} \BuiltInTok{Node}\NormalTok{(best\_feature}\OperatorTok{,}\NormalTok{ best\_threshold}\OperatorTok{,}
+\NormalTok{                left}\OperatorTok{=}\FunctionTok{BuildTree}\NormalTok{(left}\OperatorTok{,}\NormalTok{ depth}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{,}
+\NormalTok{                right}\OperatorTok{=}\FunctionTok{BuildTree}\NormalTok{(right}\OperatorTok{,}\NormalTok{ depth}\OperatorTok{+}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -531,26 +535,26 @@ Train \textbf{many decision trees on random subsets of data and features}, then 
 
 \subsubsection{The Algorithm: Bagging + Feature Subsampling}\label{the-algorithm-bagging--feature-subsampling}
 
-\setcodelang{Python}
+\setcodelang{JavaScript}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{function RandomForest(X, y, n\_trees, max\_features):}
+\KeywordTok{function} \FunctionTok{RandomForest}\NormalTok{(X}\OperatorTok{,}\NormalTok{ y}\OperatorTok{,}\NormalTok{ n\_trees}\OperatorTok{,}\NormalTok{ max\_features)}\OperatorTok{:}
 \NormalTok{    trees }\OperatorTok{=}\NormalTok{ []}
-    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \FloatTok{1.}\NormalTok{.n\_trees:}
-        \CommentTok{\# Bootstrap sample}
-\NormalTok{        X\_boot, y\_boot }\OperatorTok{=}\NormalTok{ bootstrap(X, y)          }\CommentTok{\# sample n rows WITH replacement}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \FloatTok{1.}\OperatorTok{.}\AttributeTok{n\_trees}\OperatorTok{:}
+\NormalTok{        \# Bootstrap sample}
+\NormalTok{        X\_boot}\OperatorTok{,}\NormalTok{ y\_boot }\OperatorTok{=} \FunctionTok{bootstrap}\NormalTok{(X}\OperatorTok{,}\NormalTok{ y)          \# sample n rows WITH replacement}
         
-        \CommentTok{\# Build tree with feature subsampling}
-\NormalTok{        tree }\OperatorTok{=}\NormalTok{ BuildTree(X\_boot, y\_boot,}
-\NormalTok{                         max\_features}\OperatorTok{=}\NormalTok{sqrt(p))     }\CommentTok{\# at each split, consider only sqrt(p) features}
-\NormalTok{        trees.append(tree)}
+\NormalTok{        \# Build tree }\ControlFlowTok{with}\NormalTok{ feature subsampling}
+\NormalTok{        tree }\OperatorTok{=} \FunctionTok{BuildTree}\NormalTok{(X\_boot}\OperatorTok{,}\NormalTok{ y\_boot}\OperatorTok{,}
+\NormalTok{                         max\_features}\OperatorTok{=}\FunctionTok{sqrt}\NormalTok{(p))     \# at each split}\OperatorTok{,}\NormalTok{ consider only }\FunctionTok{sqrt}\NormalTok{(p) features}
+\NormalTok{        trees}\OperatorTok{.}\FunctionTok{append}\NormalTok{(tree)}
     
     \ControlFlowTok{return}\NormalTok{ trees}
 
-\NormalTok{function Predict(x, trees):}
-\NormalTok{    predictions }\OperatorTok{=}\NormalTok{ [tree.predict(x) }\ControlFlowTok{for}\NormalTok{ tree }\KeywordTok{in}\NormalTok{ trees]}
-    \ControlFlowTok{return}\NormalTok{ majority\_vote(predictions)              }\CommentTok{\# or mean() for regression}
+\KeywordTok{function} \FunctionTok{Predict}\NormalTok{(x}\OperatorTok{,}\NormalTok{ trees)}\OperatorTok{:}
+\NormalTok{    predictions }\OperatorTok{=}\NormalTok{ [tree}\OperatorTok{.}\FunctionTok{predict}\NormalTok{(x) }\ControlFlowTok{for}\NormalTok{ tree }\KeywordTok{in}\NormalTok{ trees]}
+    \ControlFlowTok{return} \FunctionTok{majority\_vote}\NormalTok{(predictions)              \# or }\FunctionTok{mean}\NormalTok{() }\ControlFlowTok{for}\NormalTok{ regression}
 \end{Highlighting}
 \end{Shaded}
 
@@ -718,6 +722,7 @@ Bin continuous features into 255 buckets. Huge memory and speed win.
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1569}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2745}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -734,12 +739,16 @@ CatBoost
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Speed} & Slow & Medium & Fast & Medium \\
+\rowcolor{zebra}
 \textbf{Memory} & High & Medium & Low & Medium \\
 \textbf{GPU support} & No & Yes & Yes & Yes \\
+\rowcolor{zebra}
 \textbf{Categorical features} & Manual encoding & Manual encoding & Native (limited) & Native (excellent) \\
 \textbf{Tree growth} & Level-wise & Level-wise & Leaf-wise & Symmetric \\
+\rowcolor{zebra}
 \textbf{Regularization} & Shrinkage & L1, L2, tree complexity & L1, L2 & Leaf-wise + ordered boosting \\
 \textbf{Missing values} & Manual & Native & Native & Native \\
+\rowcolor{zebra}
 \textbf{Best for} & Baseline & General & Large datasets & Categorical-heavy \\
 \end{longtable}
 
@@ -859,6 +868,7 @@ Replace \texttt{x\_i\^{}T\ x\_j} with \texttt{K(x\_i,\ x\_j)} --- a \textbf{kern
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3561}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5015}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Kernel
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -871,8 +881,10 @@ When to use
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Linear} & \texttt{K(x,z)\ =\ x\^{}T\ z} & Linearly separable, high-dim sparse (text) \\
+\rowcolor{zebra}
 \textbf{Polynomial} & \texttt{K(x,z)\ =\ (gamma*x\^{}T\ z\ +\ r)\^{}d} & Moderate non-linearity, image features \\
 \textbf{RBF/Gaussian} & `K(x,z) = exp(-gamma * & \\
+\rowcolor{zebra}
 \textbf{Sigmoid} & \texttt{K(x,z)\ =\ tanh(gamma*x\^{}T\ z\ +\ r)} & Similar to neural net activation, rarely used \\
 \end{longtable}
 
@@ -1213,6 +1225,7 @@ Cut at height h → determines number of clusters
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4844}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4192}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Linkage
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1225,8 +1238,10 @@ Behavior
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Single} & \texttt{min\ d(a,b),\ a\ in\ C\_i,\ b\ in\ C\_j} & Chaining effect, elongated clusters \\
+\rowcolor{zebra}
 \textbf{Complete} & \texttt{max\ d(a,b),\ a\ in\ C\_i,\ b\ in\ C\_j} & Compact, equal-size clusters \\
 \textbf{Average} & \texttt{mean\ d(a,b),\ a\ in\ C\_i,\ b\ in\ C\_j} & Balance between single and complete \\
+\rowcolor{zebra}
 \textbf{Ward} & Minimize within-cluster variance increase & Usually best, similar to k-means \\
 \end{longtable}
 
@@ -1264,29 +1279,29 @@ Behavior
 
 \subsubsection{The Algorithm}\label{the-algorithm-1}
 
-\setcodelang{Python}
+\setcodelang{JavaScript}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{for}\NormalTok{ each unvisited point p:}
-\NormalTok{    neighbors }\OperatorTok{=} \BuiltInTok{all}\NormalTok{ points within eps of p}
+\ControlFlowTok{for}\NormalTok{ each unvisited point p}\OperatorTok{:}
+\NormalTok{    neighbors }\OperatorTok{=}\NormalTok{ all points within eps }\KeywordTok{of}\NormalTok{ p}
     
-    \ControlFlowTok{if} \OperatorTok{|}\NormalTok{neighbors}\OperatorTok{|} \OperatorTok{\textless{}}\NormalTok{ min\_samples:}
+    \ControlFlowTok{if} \OperatorTok{|}\NormalTok{neighbors}\OperatorTok{|} \OperatorTok{\textless{}}\NormalTok{ min\_samples}\OperatorTok{:}
 \NormalTok{        label p }\ImportTok{as}\NormalTok{ NOISE}
-    \ControlFlowTok{else}\NormalTok{:}
-\NormalTok{        create new cluster C}
+    \ControlFlowTok{else}\OperatorTok{:}
+\NormalTok{        create }\KeywordTok{new}\NormalTok{ cluster C}
 \NormalTok{        add p to C}
-\NormalTok{        expandCluster(p, neighbors, C, eps, min\_samples)}
+        \FunctionTok{expandCluster}\NormalTok{(p}\OperatorTok{,}\NormalTok{ neighbors}\OperatorTok{,}\NormalTok{ C}\OperatorTok{,}\NormalTok{ eps}\OperatorTok{,}\NormalTok{ min\_samples)}
 
-\NormalTok{function expandCluster(p, neighbors, C, eps, min\_samples):}
-    \ControlFlowTok{for}\NormalTok{ each q }\KeywordTok{in}\NormalTok{ neighbors:}
-        \ControlFlowTok{if}\NormalTok{ q }\KeywordTok{is}\NormalTok{ NOISE: add q to C (border point)}
-        \ControlFlowTok{if}\NormalTok{ q }\KeywordTok{is}\NormalTok{ unvisited:}
+\KeywordTok{function} \FunctionTok{expandCluster}\NormalTok{(p}\OperatorTok{,}\NormalTok{ neighbors}\OperatorTok{,}\NormalTok{ C}\OperatorTok{,}\NormalTok{ eps}\OperatorTok{,}\NormalTok{ min\_samples)}\OperatorTok{:}
+    \ControlFlowTok{for}\NormalTok{ each q }\KeywordTok{in}\NormalTok{ neighbors}\OperatorTok{:}
+        \ControlFlowTok{if}\NormalTok{ q is NOISE}\OperatorTok{:}\NormalTok{ add q to }\FunctionTok{C}\NormalTok{ (border point)}
+        \ControlFlowTok{if}\NormalTok{ q is unvisited}\OperatorTok{:}
 \NormalTok{            mark q }\ImportTok{as}\NormalTok{ visited}
-\NormalTok{            q\_neighbors }\OperatorTok{=} \BuiltInTok{all}\NormalTok{ points within eps of q}
-            \ControlFlowTok{if} \OperatorTok{|}\NormalTok{q\_neighbors}\OperatorTok{|} \OperatorTok{\textgreater{}=}\NormalTok{ min\_samples:  }\CommentTok{\# q is also a core point}
-\NormalTok{                neighbors }\OperatorTok{=}\NormalTok{ neighbors U q\_neighbors  }\CommentTok{\# expand search}
-            \ControlFlowTok{if}\NormalTok{ q }\KeywordTok{not} \KeywordTok{in} \BuiltInTok{any}\NormalTok{ cluster:}
+\NormalTok{            q\_neighbors }\OperatorTok{=}\NormalTok{ all points within eps }\KeywordTok{of}\NormalTok{ q}
+            \ControlFlowTok{if} \OperatorTok{|}\NormalTok{q\_neighbors}\OperatorTok{|} \OperatorTok{\textgreater{}=}\NormalTok{ min\_samples}\OperatorTok{:}\NormalTok{  \# q is also a core point}
+\NormalTok{                neighbors }\OperatorTok{=}\NormalTok{ neighbors U q\_neighbors  \# expand search}
+            \ControlFlowTok{if}\NormalTok{ q not }\KeywordTok{in}\NormalTok{ any cluster}\OperatorTok{:}
 \NormalTok{                add q to C}
 \end{Highlighting}
 \end{Shaded}
@@ -1556,6 +1571,7 @@ Level 1 (Meta-model):
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2247}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2697}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1570,12 +1586,16 @@ Stacking
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Error type targeted} & Variance & Bias & Both \\
+\rowcolor{zebra}
 \textbf{Training order} & Parallel & Sequential & Two-stage \\
 \textbf{Data sampling} & Bootstrap & Weighted/full & Full (CV for meta) \\
+\rowcolor{zebra}
 \textbf{Base model} & High-variance (deep trees) & High-bias (stumps) & Diverse \\
 \textbf{Combination} & Average/vote & Weighted sum & Meta-model \\
+\rowcolor{zebra}
 \textbf{Speed} & Fast (parallel) & Slow (sequential) & Medium \\
 \textbf{Overfitting risk} & Low & Medium (can overfit) & High (if leakage) \\
+\rowcolor{zebra}
 \textbf{Example} & Random Forest & XGBoost & Kaggle winning solutions \\
 \textbf{When to use} & Reduce overfitting & Boost a weak model & Maximum accuracy \\
 \end{longtable}
@@ -1881,6 +1901,7 @@ RF total error < Single Tree total error
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5354}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3434}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1893,16 +1914,22 @@ Key Behavior
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Decision Tree} & The triage nurse with a printed flowchart: "Temp \textgreater{} 38.5°C? \(\rightarrow\) Yes \(\rightarrow\) Chest pain? \(\rightarrow\) No \(\rightarrow\) Rule out pneumonia." & Follows explicit branching rules; fast but rigid; one wrong branch goes down the wrong path \\
+\rowcolor{zebra}
 \textbf{Random Forest} & The \textbf{medical board}: 100 doctors each examine a random patient subset and a random subset of symptoms; majority vote wins & Cancels out individual doctor errors; much more reliable than any single doctor \\
 \textbf{Gradient Boosting} & The \textbf{residency training program}: Intern makes a diagnosis \(\rightarrow\) Senior corrects the mistakes \(\rightarrow\) Fellow corrects remaining errors \(\rightarrow\) Sequential improvement & Each successive doctor specializes in what the previous missed; powerful but takes time to train \\
+\rowcolor{zebra}
 \textbf{SVM} & The \textbf{surgeon} who draws the clearest anatomical line between healthy and diseased tissue, maximizing the margin for error & Maximizes separation; only cares about boundary cases (support vectors) \\
 \textbf{k-NN} & The doctor who says \emph{"Let me look up the 5 most similar patients we\textquotesingle ve seen and see what happened to them"} & No model training --- pure case-based reasoning; only as good as the patient database \\
+\rowcolor{zebra}
 \textbf{Naive Bayes} & The \textbf{phone triage doctor} who assumes symptoms are independent: "Fever? +10 pts. Cough? +5 pts. Fatigue? +3 pts." & Fast; wrong about independence (fever and cough often co-occur) but often right enough \\
 \textbf{Logistic Regression} & The \textbf{general practitioner} who weighs each symptom linearly: "I assign 2.3\(\times\) weight to chest pain and 0.7\(\times\) to age" and gives a probability & Interpretable weights; can explain decision; good calibrated probabilities \\
+\rowcolor{zebra}
 \textbf{k-Means} & The \textbf{epidemiologist} grouping patients into symptom clusters: "Group A = respiratory, Group B = cardiovascular" & Discovers natural groupings without labels; must specify number of groups upfront \\
 \textbf{PCA} & The \textbf{chief diagnostician} who identifies the 3 "vital sign combinations" (principal components) that explain 95\% of patient variation & Reduces 50 measurements to 3 key dimensions; loses some detail but gains clarity \\
+\rowcolor{zebra}
 \textbf{DBSCAN} & The \textbf{outbreak investigator} finding clusters of patients who live near each other + flagging isolated cases as "outliers" & No need to specify clusters; naturally identifies anomalies \\
 \textbf{Hierarchical Clustering} & The \textbf{taxonomy specialist} building a family tree of related conditions from common to rare & Produces a full hierarchy; shows how conditions relate at different levels of similarity \\
+\rowcolor{zebra}
 \textbf{Stacking} & The \textbf{hospital committee}: GP, cardiologist, and pulmonologist each give a diagnosis; a chief of medicine combines their opinions with learned weights & Best accuracy by leveraging diverse specialist views; but complex and slow \\
 \end{longtable}
 
@@ -2275,6 +2302,7 @@ This enables optimal closed-form leaf weights: \texttt{w\_j*\ =\ -G\_j\ /\ (H\_j
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3955}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6045}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2285,8 +2313,10 @@ When to Use
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Grid Search} & Small search space, deterministic needs \\
+\rowcolor{zebra}
 \textbf{Random Search} & Practical default --- often finds good params faster than grid search (Bergstra \& Bengio) \\
 \textbf{Bayesian Optimization (Optuna, Hyperopt)} & Expensive models, important to find optimum \\
+\rowcolor{zebra}
 \textbf{Early Stopping + CV} & Tree models --- add trees until validation error stops improving \\
 \textbf{Population-Based Training} & Parallel GPU training at Google DeepMind scale \\
 \end{longtable}
@@ -2538,6 +2568,7 @@ You may be asked to implement from scratch:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3209}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3615}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Scenario
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2550,28 +2581,40 @@ Why
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Tabular data, maximize accuracy} & LightGBM / XGBoost & State-of-the-art on tabular; handles all feature types \\
+\rowcolor{zebra}
 \textbf{Need interpretability / regulatory compliance} & Logistic Regression or Decision Tree (shallow) & Explicit feature coefficients or printable rules \\
 \textbf{Baseline model} & Logistic Regression & Fast, calibrated, easy to improve upon \\
+\rowcolor{zebra}
 \textbf{High-dimensional sparse features (text/NLP)} & Logistic Regression (L1/L2) or Linear SVM & Efficient on sparse data; SVM with linear kernel is L2-LR \\
 \textbf{Small dataset (n \textless{} 1000), many features} & SVM (RBF kernel) & Effective in high p/n ratio; global optimum \\
+\rowcolor{zebra}
 \textbf{Non-linear patterns, medium dataset} & SVM + RBF kernel or Random Forest & Kernel SVM for structured non-linearity; RF for robustness \\
 \textbf{Very large dataset (n \textgreater{} 1M), need speed} & LightGBM & Fastest tree-based; designed for large-scale \\
+\rowcolor{zebra}
 \textbf{Text classification, real-time} & Naive Bayes & Sub-millisecond inference; surprisingly competitive \\
 \textbf{Need calibrated probabilities} & Logistic Regression or calibrated GBM & LR is naturally calibrated; GBM + Platt scaling \\
+\rowcolor{zebra}
 \textbf{Missing values, heterogeneous features} & XGBoost / LightGBM & Native missing value handling; no preprocessing \\
 \textbf{Unknown number of clusters, outlier detection} & DBSCAN & Finds k automatically; labels noise points \\
+\rowcolor{zebra}
 \textbf{Known k, spherical clusters} & k-Means & Fast, interpretable, works well with good init \\
 \textbf{Cluster hierarchy / exploratory analysis} & Hierarchical (Ward linkage) & Dendrogram shows structure at all levels \\
+\rowcolor{zebra}
 \textbf{Nearest neighbor retrieval at scale} & FAISS / HNSW (ANN) & Exact k-NN is O(n*p); ANN is O(log n) \\
 \textbf{Recommendation (item-item, user-item)} & k-NN in embedding space & After generating embeddings with Matrix Factorization/DNN \\
+\rowcolor{zebra}
 \textbf{Remove multicollinearity before linear model} & PCA & Creates orthogonal features \\
 \textbf{Visualization of high-dim data} & t-SNE / UMAP & Preserves local/global structure; PCA first for large n \\
+\rowcolor{zebra}
 \textbf{Feature compression (autoencoder alternative)} & PCA & Linear compression; interpretable explained variance \\
 \textbf{Online/streaming learning} & Logistic Regression (SGD) & Tree models can\textquotesingle t update incrementally \\
+\rowcolor{zebra}
 \textbf{Maximum accuracy, no latency constraint} & Stacking (GBM + RF + LR meta) & Combines diverse model predictions \\
 \textbf{Interpretable feature interactions} & Decision Tree \(\rightarrow\) tree.plot() & Explicit IF-THEN rules for business users \\
+\rowcolor{zebra}
 \textbf{Imbalanced classes, small minority} & XGBoost + class\_weight + threshold tuning & Robust to imbalance; easy threshold calibration \\
 \textbf{Anomaly detection (labeled)} & Logistic Regression / Isolation Forest & LR if labeled; IF for unsupervised \\
+\rowcolor{zebra}
 \textbf{Anomaly detection (unlabeled)} & DBSCAN / Isolation Forest / Autoencoder & DBSCAN: density-based; IF: tree-based isolation \\
 \end{longtable}
 
@@ -2583,6 +2626,7 @@ Why
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3514}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1081}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2597,16 +2641,22 @@ Memory
 \bottomrule\noalign{}
 \endlastfoot
 Linear Regression & O(n*p\^{}2) closed form & O(p) & O(p) \\
+\rowcolor{zebra}
 Logistic Regression & O(n\emph{p}iter) & O(p) & O(p) \\
 Decision Tree & O(n\emph{p}log\^{}2 n) & O(depth) & O(n) \\
+\rowcolor{zebra}
 Random Forest & O(B\emph{n}sqrt(p)*log\^{}2 n) & O(B*depth) & O(B*n) \\
 XGBoost & O(M\emph{n}p*log n) & O(M*depth) & O(n*p) \\
+\rowcolor{zebra}
 LightGBM & O(M\emph{n}255*log n) & O(M*depth) & O(n*255) \\
 SVM & O(n\^{}2 p to n\^{}3 p) & O(n\_sv * p) & O(n\_sv) \\
+\rowcolor{zebra}
 k-NN & O(n*p) store & O(n*p + n log n) per query & O(n*p) \\
 Naive Bayes & O(n*p) & O(p*K) & O(p*K) \\
+\rowcolor{zebra}
 k-Means & O(n\emph{k}p*iter) & O(k*p) & O(n*k) \\
 Hierarchical & O(n\^{}2 log n) & O(1) post & O(n\^{}2) \\
+\rowcolor{zebra}
 DBSCAN & O(n log n) with index & O(1) & O(n) \\
 PCA & O(n\emph{p}k) randomized & O(p*k) & O(p*k) \\
 \end{longtable}
@@ -2672,4 +2722,5 @@ PCA & O(n\emph{p}k) randomized & O(p*k) & O(p*k) \\
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/aiml-02-classic/01-roc-pr.pdf}{ROC summarizes ranking quality across thresholds; PR is more informative under heavy class imbalance, where a high AUC can still hide poor precision.}
+\visualfigure{../figures/aiml-02-classic/02-confusion-matrix.pdf}{Every classifier error is a false positive or false negative. Precision penalizes FPs, recall penalizes FNs — which matters more depends on the cost of each mistake.}
 \end{document}

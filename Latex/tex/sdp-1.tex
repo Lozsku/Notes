@@ -356,6 +356,7 @@ created_at    TIMESTAMP
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2616}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3002}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Approach
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -370,8 +371,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{MD5 / SHA-256 hash} & Hash long URL, take first 6--8 chars & Deterministic (same URL \(\rightarrow\) same code) & Collisions possible; must check DB on every write \\
+\rowcolor{zebra}
 \textbf{Counter + Base62} & Global atomic counter \(\rightarrow\) encode in Base62 & No collisions; simple & Single counter = SPOF; reveals ordering/volume \\
 \textbf{Pre-generated KGS} & Dedicated service pre-generates \& stores unused keys in a "keys" table & No collision checking at write time; fast & Additional service to maintain; key theft if service crashes \\
+\rowcolor{zebra}
 \textbf{UUID} & Generate random UUID, take first 8 chars & Simple & High collision probability at scale \\
 \end{longtable}
 
@@ -400,6 +403,7 @@ KGS design:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3940}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4194}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 301 Permanent
@@ -411,8 +415,10 @@ KGS design:
 \bottomrule\noalign{}
 \endlastfoot
 Browser caches? & Yes --- browser won\textquotesingle t call TinyURL again & No --- browser calls TinyURL on every click \\
+\rowcolor{zebra}
 Analytics accuracy & \textbf{Broken} --- browser bypasses your servers & \textbf{Accurate} --- every click hits your servers \\
 Load on TinyURL & Lower after first visit & Higher (every click) \\
+\rowcolor{zebra}
 \textbf{Recommendation} & Use only if analytics not needed & \textbf{Use 302 for full analytics capability} \\
 \end{longtable}
 
@@ -543,6 +549,7 @@ With KGS, collisions are impossible --- keys are pre-assigned and marked used at
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1826}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3693}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -557,10 +564,13 @@ Reason
 \bottomrule\noalign{}
 \endlastfoot
 Key generation & \textbf{KGS (pre-generated)} & Hash + collision check & No collision risk; predictable latency \\
+\rowcolor{zebra}
 DB for URLs & \textbf{Cassandra (NoSQL)} & PostgreSQL & Write scalability; simple key-value access pattern \\
 Redirect type & \textbf{302 Temporary} & 301 Permanent & Enables accurate analytics \\
+\rowcolor{zebra}
 Cache & \textbf{Redis (LRU)} & Memcached & Rich data types; TTL support; persistence \\
 Analytics pipeline & \textbf{Kafka \(\rightarrow\) ClickHouse (async)} & Sync write to SQL & Decouples write path; handles bursty click events \\
+\rowcolor{zebra}
 Custom aliases & \textbf{Supported (rate-limited)} & Not supported & Product differentiator; must prevent abuse \\
 \end{longtable}
 
@@ -824,6 +834,7 @@ Rules flow:
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2647}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1674}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -840,8 +851,10 @@ Best for
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Fixed Window Counter} & Reset counter every N seconds & Simple; O(1) memory & Boundary burst: 2\(\times\) limit possible at window edge & Simple internal limits \\
+\rowcolor{zebra}
 \textbf{Sliding Window Log} & Store timestamp of every request in sorted set; count within window & Accurate & O(n) memory per user (n = requests in window) & Low-volume, high-accuracy needs \\
 \textbf{Sliding Window Counter} & Blend current + previous window counts weighted by overlap & Near-accurate, O(1) memory & Slight inaccuracy (\textasciitilde0.003\% over-limit) & \textbf{Best general choice} \\
+\rowcolor{zebra}
 \textbf{Token Bucket} & Bucket of tokens refilled at rate R; request consumes one & Allows bursts up to bucket size & Harder to reason about exact limits; burst may confuse users & APIs that allow bursting \\
 \textbf{Leaky Bucket} & Queue requests; process at constant rate & Smooth output rate & Queue introduces latency; bursty requests get delayed & Network traffic shaping \\
 \end{longtable}
@@ -901,6 +914,7 @@ Redis implementation:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3512}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4208}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Placement
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -913,8 +927,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Client-side} & Zero server load & Easily bypassed; untrustworthy \\
+\rowcolor{zebra}
 \textbf{API Gateway} & Single enforcement point; language-agnostic & Gateway becomes a bottleneck; less context \\
 \textbf{Service middleware} & Per-service granularity; business context & Duplicated logic across services; harder to change rules centrally \\
+\rowcolor{zebra}
 \textbf{Dedicated Rate Limit Service} & Centralized rules; all services call it & Extra network hop; additional failure point \\
 \textbf{Recommended: Gateway + Redis} & Rules centralized in Redis; enforced at gateway & Need to handle Redis failure gracefully \\
 \end{longtable}
@@ -1019,6 +1035,7 @@ Problem: race between INCR and EXPIRE if server crashes. Mitigate with \texttt{S
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1873}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4757}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1033,10 +1050,13 @@ Reason
 \bottomrule\noalign{}
 \endlastfoot
 Algorithm & \textbf{Sliding Window Counter} & Token Bucket & Near-exact accuracy; O(1) memory; prevents boundary bursts \\
+\rowcolor{zebra}
 State store & \textbf{Redis Cluster} & In-process memory & Distributed consistency across servers; fast enough \\
 Placement & \textbf{API Gateway middleware} & Dedicated service & Avoids extra network hop; centralizes enforcement \\
+\rowcolor{zebra}
 Atomicity & \textbf{Redis Lua scripts} & Redis WATCH/MULTI & Simpler; no retry logic needed \\
 Failure mode & \textbf{Fail-open} & Fail-closed & Availability \textgreater{} perfect accuracy for most systems \\
+\rowcolor{zebra}
 Rules storage & \textbf{etcd + in-process cache} & DB query per request & Rules rarely change; in-process cache eliminates lookup overhead \\
 \end{longtable}
 
@@ -1309,6 +1329,7 @@ Feed read flow:      Feed Svc → Redis cache → (miss) Cassandra
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2860}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1690}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1325,6 +1346,7 @@ Best for
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Fanout-on-Write (Push)} & On post creation, write post\_id to each follower\textquotesingle s feed cache & Feed reads O(1) --- just read from cache & Write amplification: 1 post \(\rightarrow\) N writes; celebrity (10M followers) = 10M cache writes & Average users \\
+\rowcolor{zebra}
 \textbf{Fanout-on-Read (Pull)} & On feed request, fetch posts from each followee, merge, sort & No write amplification & Feed read O(N followees) --- slow for users following many people & Celebrity accounts, inactive followers \\
 \textbf{Hybrid (recommended)} & Push to regular followers; pull for celebrities at read time; don\textquotesingle t push to inactive users & Balances read and write load & More complex logic & \textbf{Large-scale production systems} \\
 \end{longtable}
@@ -1452,6 +1474,7 @@ Total:                  ~60 ms  (well within 200 ms budget)
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2012}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4051}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1466,10 +1489,13 @@ Reason
 \bottomrule\noalign{}
 \endlastfoot
 Fanout strategy & \textbf{Hybrid (push+pull)} & Pure push or pure pull & Balances write amplification vs read latency \\
+\rowcolor{zebra}
 Feed storage & \textbf{Redis sorted sets} & DB query at read time & Sub-10ms reads; DB can\textquotesingle t handle 87K reads/sec directly \\
 Feed ordering & \textbf{Reverse-chronological (MVP)} & ML-ranked feed & Simpler; ranked feed is a layer on top \\
+\rowcolor{zebra}
 Pagination & \textbf{Cursor-based} & Offset-based & Stable under inserts; no duplicate/skip on new posts \\
 Post DB & \textbf{Cassandra} & PostgreSQL (sharded) & Write throughput; natural time-series clustering \\
+\rowcolor{zebra}
 Celebrity handling & \textbf{Pull at read time} & Fanout to all followers & Avoids 10M+ write storms per celebrity post \\
 \end{longtable}
 
@@ -1797,6 +1823,7 @@ unread_count         INT
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2005}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3251}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1811,8 +1838,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 Short polling & Client polls every N seconds & Simple & Wasted requests; high latency (up to N sec) \\
+\rowcolor{zebra}
 Long polling & Server holds request until message or timeout & Fewer round trips & Still HTTP overhead; server holds threads \\
 \textbf{WebSocket} & Full-duplex TCP connection & True real-time; low overhead & Stateful --- servers must track who is connected where \\
+\rowcolor{zebra}
 SSE (Server-Sent Events) & Server pushes, client uses XHR for sends & Simpler than WS & Unidirectional; need separate channel for sends \\
 \end{longtable}
 
@@ -2083,6 +2112,7 @@ read:       Recipient opened the conversation (client sends "read" ack).
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2110}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3598}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2097,12 +2127,16 @@ Reason
 \bottomrule\noalign{}
 \endlastfoot
 Real-time transport & \textbf{WebSocket} & Long polling / SSE & Full-duplex; lowest latency; widely supported \\
+\rowcolor{zebra}
 Message storage & \textbf{Cassandra (conv-partitioned)} & MySQL (sharded) & Write throughput; time-series access pattern; no joins needed \\
 Connection registry & \textbf{Redis (TTL-based)} & Consistent hash routing & Fast lookup; auto-evicts stale connections on TTL expiry \\
+\rowcolor{zebra}
 Message ordering & \textbf{Server-assigned seq\_num (Redis INCR)} & Vector clocks & Simple; sufficient for single-conversation ordering \\
 Group delivery & \textbf{Fanout to members (\textless{} 500) / pull (\textgreater{} 500)} & Always pull & Balances latency vs write amplification by group size \\
+\rowcolor{zebra}
 Presence heartbeat & \textbf{10s client heartbeat, 30s TTL} & Server-push disconnect events & Handles silent disconnects (network failure, app killed) \\
 Read receipts & \textbf{Per-message status in Cassandra} & Separate receipt table & Avoids join; co-located with message data \\
+\rowcolor{zebra}
 Media & \textbf{S3 + CDN (URL in message)} & In-message blob & Media over WebSocket is impractical at scale \\
 \end{longtable}
 

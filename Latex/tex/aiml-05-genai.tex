@@ -78,6 +78,7 @@ The core building blocks:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4653}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3754}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Layer
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -90,12 +91,16 @@ Examples
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Model} & Token prediction, instruction following & GPT-4o, Claude 3.5, Gemini 1.5 \\
+\rowcolor{zebra}
 \textbf{Prompt} & Controls model behavior without retraining & System prompts, few-shot examples \\
 \textbf{Context / RAG} & Supplies external knowledge at query time & Customer docs, code repos, wikis \\
+\rowcolor{zebra}
 \textbf{Orchestration} & Chains calls, manages state, routes tasks & LangChain, LlamaIndex, custom \\
 \textbf{Tools / Agents} & LLM calls external functions, loops & Web search, calculators, APIs \\
+\rowcolor{zebra}
 \textbf{Evaluation} & Measures quality, catches regressions & LLM-as-judge, golden sets \\
 \textbf{Safety} & Prevents misuse, leaks, and injections & Guardrails, content filters \\
+\rowcolor{zebra}
 \textbf{Infrastructure} & Cost, latency, reliability & Caching, routing, batching \\
 \end{longtable}
 
@@ -426,6 +431,7 @@ RAG is the most important pattern in production LLM systems. It solves the two b
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2667}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2571}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Problem
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -440,10 +446,13 @@ Prompting
 \bottomrule\noalign{}
 \endlastfoot
 Stale knowledge & Requires retraining & Hot-swap data & Stuff everything in context \\
+\rowcolor{zebra}
 Hallucination & Still hallucinates & Grounded in retrieved text & Still hallucinates \\
 Private/proprietary data & Data must leave your infra & Data stays in your vector DB & Context injection \\
+\rowcolor{zebra}
 Updatability & Expensive retraining & Update vector DB & Update prompt \\
 Cost & High one-time + inference & Moderate & Low (until context is huge) \\
+\rowcolor{zebra}
 Latency & Fast inference & Adds retrieval step & Fast \\
 \end{longtable}
 
@@ -495,6 +504,7 @@ The most underappreciated problem in RAG. Bad chunking = bad retrieval.
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2054}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2225}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -509,12 +519,16 @@ Pitfall
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Fixed-size} & Split every N tokens/chars & Quick prototyping & Cuts sentences mid-thought \\
+\rowcolor{zebra}
 \textbf{Sentence splitting} & Split on \texttt{.}, \texttt{?}, \texttt{!} & Articles, FAQs & Loses paragraph context \\
 \textbf{Recursive character} & Try \texttt{\textbackslash{}n\textbackslash{}n}, then \texttt{\textbackslash{}n}, then space & General text & Misses semantic units \\
+\rowcolor{zebra}
 \textbf{Semantic chunking} & Split when embedding similarity drops & Dense technical docs & Expensive, slower \\
 \textbf{Structural / Markdown} & Split on H1/H2/H3 headers & Docs, wikis & Uneven chunk sizes \\
+\rowcolor{zebra}
 \textbf{Sliding window} & Fixed-size with N-token overlap & Long documents & Doubles storage \\
 \textbf{Parent-child} & Small child chunks \(\rightarrow\) large parent retrieval & Best precision + context & Complex indexing \\
+\rowcolor{zebra}
 \textbf{Agentic chunking} & LLM decides where to split & Critical high-value docs & Very expensive \\
 \end{longtable}
 
@@ -567,6 +581,7 @@ Pitfall
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3894}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2764}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -581,10 +596,13 @@ Note
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{text-embedding-3-small} & 1536 & Fast, cheap & OpenAI, default choice \\
+\rowcolor{zebra}
 \texttt{text-embedding-3-large} & 3072 & Best OpenAI quality & 2x cost \\
 \texttt{text-embedding-ada-002} & 1536 & Legacy OpenAI & Replaced by above \\
+\rowcolor{zebra}
 \texttt{bge-large-en-v1.5} & 1024 & Best open-source English & HuggingFace \\
 \texttt{e5-mistral-7b-instruct} & 4096 & Frontier open-source & Instruction-tuned \\
+\rowcolor{zebra}
 \texttt{cohere-embed-v3} & 1024 & Multi-lingual, with input types & Production grade \\
 \end{longtable}
 
@@ -618,6 +636,7 @@ Storing millions of 768-dim vectors and finding the top-K nearest neighbors in m
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0600}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.3059}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -636,8 +655,10 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{HNSW} & Hierarchical navigable small world graphs & Very fast & Very high & High RAM & Default choice; used by Pinecone, Weaviate \\
+\rowcolor{zebra}
 \textbf{IVF} & Cluster vectors, search only nearby clusters & Fast & High & Lower & FAISS default; tunable with nprobe \\
 \textbf{PQ (Product Quantization)} & Compress vectors to save memory & Fast & Moderate & Low & Combine with IVF: IVF-PQ \\
+\rowcolor{zebra}
 \textbf{ScaNN} & Google\textquotesingle s optimized ANN & Very fast & High & Moderate & Used in Google Search \\
 \textbf{Annoy} & Forest of random projection trees & Moderate & Moderate & Low & Spotify\textquotesingle s open-source; read-only index \\
 \end{longtable}
@@ -679,6 +700,7 @@ Build: Each node has long-range connections in upper layers,
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3275}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3042}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 DB
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -695,10 +717,13 @@ Best for
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{FAISS} & Library & Hundreds of millions & Facebook; in-memory; many algorithms & Research, self-hosted, maximum control \\
+\rowcolor{zebra}
 \textbf{Pinecone} & Managed SaaS & Billions & Simple API, auto-scaling, metadata filters & Production, quick start \\
 \textbf{Weaviate} & OSS + Cloud & Millions & GraphQL API, multi-modal, hybrid search & Feature-rich OSS \\
+\rowcolor{zebra}
 \textbf{Qdrant} & OSS + Cloud & Millions & Rust, fast, payload filtering & Performance-sensitive \\
 \textbf{Chroma} & OSS & Thousands--millions & Simple, Python-native, embedded & Prototyping, local dev \\
+\rowcolor{zebra}
 \textbf{pgvector} & Postgres extension & Millions & SQL joins with vectors, exact + ANN & If you already use Postgres \\
 \textbf{Milvus} & OSS + Cloud & Billions & Most scalable OSS, complex ops & Large-scale self-hosted \\
 \end{longtable}
@@ -811,6 +836,7 @@ After retrieving top-K (e.g., 20) candidates, use a cross-encoder to re-score an
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4092}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4048}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -823,8 +849,10 @@ How
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Context Recall} & Did retrieval find the right docs? & Compare retrieved docs to ground-truth docs \\
+\rowcolor{zebra}
 \textbf{Context Precision} & Are retrieved docs relevant (not noisy)? & \% of retrieved docs that are relevant \\
 \textbf{Answer Faithfulness} & Is the answer grounded in retrieved context? & LLM-as-judge checks for hallucinations \\
+\rowcolor{zebra}
 \textbf{Answer Relevance} & Does the answer address the question? & LLM-as-judge or embedding similarity \\
 \textbf{E2E Accuracy} & Is the final answer correct? & Compare to golden answer set \\
 \end{longtable}
@@ -1012,6 +1040,7 @@ Modern LLMs have native function-calling capability --- the model outputs struct
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1915}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3830}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Memory Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1026,8 +1055,10 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{In-context (working)} & Current prompt & Immediate & Recent conversation turns \\
+\rowcolor{zebra}
 \textbf{External episodic} & Vector DB & Semantic retrieval & "User mentioned their dog last week" \\
 \textbf{External semantic} & Traditional DB & Key lookup & User preferences, profile \\
+\rowcolor{zebra}
 \textbf{Procedural} & Prompt / fine-tuning & Implicit & How to format responses \\
 \textbf{Summaries} & Compacted context & Injected & Summary of earlier conversation \\
 \end{longtable}
@@ -1073,6 +1104,7 @@ Multiple specialized agents collaborating on complex tasks.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4318}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3719}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1085,8 +1117,10 @@ When
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Orchestrator-Worker} & One agent plans, delegates to specialists & Complex tasks needing specialization \\
+\rowcolor{zebra}
 \textbf{Peer-to-peer} & Agents message each other directly & Loosely coupled, event-driven \\
 \textbf{Supervisor} & One agent reviews/critiques another\textquotesingle s output & Quality-sensitive tasks \\
+\rowcolor{zebra}
 \textbf{Debate} & Multiple agents argue, vote on answer & High-stakes decisions \\
 \textbf{Ensemble} & N agents in parallel, aggregate & Reduce variance \\
 \end{longtable}
@@ -1122,6 +1156,7 @@ The hardest unsolved problem in production GenAI. Traditional ML metrics (accura
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2182}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2942}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1136,10 +1171,13 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Golden set / human eval} & Humans label correct answers, compare & Ground truth & Expensive, slow, doesn\textquotesingle t scale \\
+\rowcolor{zebra}
 \textbf{LLM-as-judge} & GPT-4 or Claude scores model outputs & Scalable, surprisingly accurate & Biased toward verbose/GPT-4-style; expensive \\
 \textbf{ROUGE/BLEU} & N-gram overlap with reference & Fast, cheap & Doesn\textquotesingle t capture semantics \\
+\rowcolor{zebra}
 \textbf{BERTScore} & Embedding similarity with reference & Better than ROUGE & Reference still needed \\
 \textbf{Benchmarks} & MMLU, HumanEval, MT-Bench, HELM & Standardized comparison & Doesn\textquotesingle t reflect your use case \\
+\rowcolor{zebra}
 \textbf{A/B testing} & Route traffic to two models, measure user satisfaction & Real signal & Slow, needs user base \\
 \textbf{Unit tests} & Deterministic assertions for known inputs & Fast, reliable & Limited coverage \\
 \end{longtable}
@@ -1183,6 +1221,7 @@ Cons
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3908}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4790}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Dimension
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1195,8 +1234,10 @@ Online
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{When} & Before deployment & In production \\
+\rowcolor{zebra}
 \textbf{Signal} & Golden set accuracy, LLM-as-judge & Click-through, thumbs up, task completion \\
 \textbf{Speed} & Fast (hours) & Slow (days/weeks for significance) \\
+\rowcolor{zebra}
 \textbf{Reliability} & May not reflect real distribution & Ground truth \\
 \textbf{Cost} & Cheap & Risk of bad user experience \\
 \end{longtable}
@@ -1328,6 +1369,7 @@ The most common interview question in GenAI system design.
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2703}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2973}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Factor
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1342,12 +1384,16 @@ Fine-Tuning
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Knowledge scope} & Model\textquotesingle s training data & External indexed corpus & Baked into weights \\
+\rowcolor{zebra}
 \textbf{Knowledge freshness} & Stale (training cutoff) & Real-time updatable & Stale until retraining \\
 \textbf{Cost} & Lowest & Medium (embedding + retrieval) & High (training) + lower inference \\
+\rowcolor{zebra}
 \textbf{Latency} & Lowest & +50--200ms for retrieval & Lowest inference \\
 \textbf{Hallucination} & High risk & Lower (grounded) & Varies \\
+\rowcolor{zebra}
 \textbf{Customization} & Style via system prompt & Style + knowledge & Deep style + behavior \\
 \textbf{Data privacy} & Data in prompt & Data in your vector DB & Data used in training \\
+\rowcolor{zebra}
 \textbf{When to use} & Simple tasks, no private data & Large knowledge bases, FAQs & Specific tone/style/format needed \\
 \end{longtable}
 
@@ -1458,6 +1504,7 @@ Context = money. Every token costs.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4761}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3027}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1470,8 +1517,10 @@ When
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Truncation} & Drop oldest turns & Simple chatbot \\
+\rowcolor{zebra}
 \textbf{Summarization} & LLM summarizes old turns into paragraph & Long-running conversations \\
 \textbf{Selective retrieval} & Retrieve only relevant history & Agents, complex workflows \\
+\rowcolor{zebra}
 \textbf{Map-reduce} & Chunk large doc, summarize each, combine & Long document tasks \\
 \textbf{Hierarchical} & Summary of summaries for very long context & Book-length tasks \\
 \end{longtable}
@@ -1533,6 +1582,7 @@ LLMs that process multiple input modalities (text, images, audio, video).
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4106}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4106}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1545,12 +1595,16 @@ Key Challenge
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Chatbot} & Conversational Q\&A with memory & Context management, hallucination \\
+\rowcolor{zebra}
 \textbf{Copilot} & Inline assistance in a workflow & Latency (\textless300ms), context awareness \\
 \textbf{Summarization} & Condense long documents & Faithfulness, coverage, length \\
+\rowcolor{zebra}
 \textbf{Extraction} & Pull structured data from unstructured text & JSON validity, missing fields \\
 \textbf{Semantic search} & Find relevant documents by meaning & Recall vs. precision, latency \\
+\rowcolor{zebra}
 \textbf{Classification} & Categorize inputs into predefined labels & Handling edge cases, confidence calibration \\
 \textbf{Code generation} & Write, complete, or explain code & Correctness, security, testing \\
+\rowcolor{zebra}
 \textbf{Agents / Autopilot} & Take actions on behalf of users & Reliability, safety, fallback \\
 \end{longtable}
 
@@ -1813,6 +1867,7 @@ RAG over case law and client documents. Fine-tuned on legal reasoning patterns. 
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2057}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7943}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1823,28 +1878,40 @@ Library Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{LLM} & The brilliant research assistant --- knowledgeable, articulate, but only knows what they\textquotesingle ve studied \\
+\rowcolor{zebra}
 \textbf{Prompt} & Your instructions to the assistant at the start of each session \\
 \textbf{System prompt} & The library\textquotesingle s employment contract and rules of conduct \\
+\rowcolor{zebra}
 \textbf{Few-shot examples} & Showing the assistant 3 completed reports so they match your style \\
 \textbf{Chain-of-thought} & Asking the assistant to "walk me through your reasoning before concluding" \\
+\rowcolor{zebra}
 \textbf{RAG} & The assistant fetches relevant books from the stacks before answering \\
 \textbf{Embeddings} & The library\textquotesingle s smart catalog that groups books by topic proximity, not just title \\
+\rowcolor{zebra}
 \textbf{Vector DB} & The catalog system --- can find "books similar to this one" in milliseconds \\
 \textbf{Retrieval} & The assistant pulling the right shelf of books based on your question \\
+\rowcolor{zebra}
 \textbf{Reranking} & After pulling 20 books, the assistant picks the 3 most directly relevant \\
 \textbf{Agent} & An assistant who can also use the phone, calculator, and computer \\
+\rowcolor{zebra}
 \textbf{Function calling} & You hand the assistant a specific labeled tool: "use this to check the database" \\
 \textbf{Tool use} & The assistant actually picks up the tool and returns the result to you \\
+\rowcolor{zebra}
 \textbf{Hallucination} & The assistant confidently cites a book that doesn\textquotesingle t exist (and sounds plausible) \\
 \textbf{Context window} & How many open books fit on the assistant\textquotesingle s desk at once \\
+\rowcolor{zebra}
 \textbf{Token limit} & The desk fills up; old books must be put away to make room \\
 \textbf{Chunking} & Cutting books into chapters so the right chapter can be placed on the desk \\
+\rowcolor{zebra}
 \textbf{Guardrails} & The library\textquotesingle s rules: no helping with illegal research, no sharing private files \\
 \textbf{Prompt injection} & A malicious note in a retrieved book that says "ignore your instructions" \\
+\rowcolor{zebra}
 \textbf{Fine-tuning} & The assistant enrolls in a specialized course in your domain \\
 \textbf{Distillation} & A junior assistant shadows the senior one and learns to do common tasks \\
+\rowcolor{zebra}
 \textbf{Multi-agent} & A team of assistants, each specialized, coordinated by a project manager \\
 \textbf{Memory} & The assistant\textquotesingle s notepad from previous sessions \\
+\rowcolor{zebra}
 \textbf{Semantic cache} & "We answered a very similar question last Tuesday --- here\textquotesingle s that answer" \\
 \textbf{LLM-as-judge} & A senior librarian grades the assistant\textquotesingle s responses for quality \\
 \end{longtable}
@@ -2205,6 +2272,7 @@ An agent is a loop: Thought \(\rightarrow\) Action \(\rightarrow\) Observation \
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3857}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3889}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Failure Mode
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2217,10 +2285,13 @@ Fix
 \bottomrule\noalign{}
 \endlastfoot
 Relevant doc not retrieved & Chunking cut the relevant text, or embedding didn\textquotesingle t capture semantics & Overlap, semantic chunking, better embedding model \\
+\rowcolor{zebra}
 Retrieved wrong docs & Query is ambiguous or embedding model poor & Query expansion, HyDE (hypothetical document embeddings), better model \\
 Answer contradicts context & Model ignores context (context-faithfulness failure) & Stronger system prompt, faithfulness eval, shorter context \\
+\rowcolor{zebra}
 Stale information retrieved & Index not updated & Incremental indexing, TTL on chunks, date metadata filter \\
 Access control bypass & User retrieves other\textquotesingle s private docs & Pre-filter by user permissions in vector DB metadata \\
+\rowcolor{zebra}
 Noisy retrieval degrades answer & Top-K includes irrelevant docs & Reranker, lower K, precision threshold \\
 "Lost in the middle" & Model ignores middle context & Reorder: put most relevant chunks first and last \\
 \end{longtable}
@@ -2479,6 +2550,7 @@ Prompt injection is a novel attack surface that traditional security doesn\textq
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4590}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5410}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thing
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2489,14 +2561,19 @@ Number
 \bottomrule\noalign{}
 \endlastfoot
 Optimal chunk size & 256--512 tokens \\
+\rowcolor{zebra}
 Chunk overlap & 10--20\% \\
 Top-K retrieval & 20 for reranking, 3--5 for context \\
+\rowcolor{zebra}
 HNSW M parameter & 16--64 (typical) \\
 LLM-as-judge sampling & 3 judges, average \\
+\rowcolor{zebra}
 Embed query latency & \textasciitilde50ms \\
 Cross-encoder rerank latency & \textasciitilde100ms \\
+\rowcolor{zebra}
 GPT-4o cost & \$5/1M in, \$15/1M out \\
 Semantic cache threshold & 0.93--0.97 cosine \\
+\rowcolor{zebra}
 Golden set size & 100--500 examples minimum \\
 \end{longtable}
 
@@ -2508,6 +2585,7 @@ Golden set size & 100--500 examples minimum \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3231}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2000}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Prompting
@@ -2521,12 +2599,16 @@ Fine-Tuning
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Cost} & Lowest & Medium & High upfront \\
+\rowcolor{zebra}
 \textbf{Iteration speed} & Hours & Days & Weeks \\
 \textbf{Knowledge} & Training data & External corpus & Baked in \\
+\rowcolor{zebra}
 \textbf{Freshness} & Stale & Real-time & Stale \\
 \textbf{Hallucination risk} & High & Low (grounded) & Medium \\
+\rowcolor{zebra}
 \textbf{Customization} & Style only & Style + knowledge & Deep behavior \\
 \textbf{Min data needed} & 0 (zero-shot) & Corpus of docs & 500+ examples \\
+\rowcolor{zebra}
 \textbf{Use first?} & YES & After prompting fails & Last resort \\
 \end{longtable}
 

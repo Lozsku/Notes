@@ -114,6 +114,7 @@ LLD exists to produce code that is:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1967}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8033}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Goal
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -124,8 +125,10 @@ What It Means
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Extensible} & Add features by adding code, not changing existing code \\
+\rowcolor{zebra}
 \textbf{Maintainable} & A new engineer understands a class in \textless{} 5 minutes \\
 \textbf{Testable} & Classes have clear contracts; can be tested in isolation \\
+\rowcolor{zebra}
 \textbf{Reusable} & Components are general enough to appear in multiple contexts \\
 \textbf{Readable} & Code reads like prose; intent is obvious \\
 \end{longtable}
@@ -393,6 +396,7 @@ Two flavors:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3943}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3584}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Letter
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -407,8 +411,10 @@ Smell It Prevents
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{S} & Single Responsibility & A class has ONE reason to change & God class, spaghetti \\
+\rowcolor{zebra}
 \textbf{O} & Open/Closed & Open for extension, closed for modification & Feature additions break existing code \\
 \textbf{L} & Liskov Substitution & Subtypes must be substitutable for their base type & Broken inheritance hierarchies \\
+\rowcolor{zebra}
 \textbf{I} & Interface Segregation & Clients shouldn\textquotesingle t depend on methods they don\textquotesingle t use & Fat interfaces force stub implementations \\
 \textbf{D} & Dependency Inversion & Depend on abstractions, not concretions & Hard coupling to third-party libraries \\
 \end{longtable}
@@ -554,6 +560,7 @@ Smell It Prevents
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4419}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3372}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Inheritance
@@ -565,8 +572,10 @@ Composition
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Relationship} & IS-A & HAS-A \\
+\rowcolor{zebra}
 \textbf{Coupling} & Tight (child knows parent internals) & Loose (owns a reference) \\
 \textbf{Reuse mechanism} & Inherit behavior & Delegate to component \\
+\rowcolor{zebra}
 \textbf{Runtime flexibility} & Fixed at compile time & Can swap component at runtime \\
 \textbf{Deep hierarchies} & Brittle ("fragile base class" problem) & Flat, easy to follow \\
 \end{longtable}
@@ -625,6 +634,7 @@ Composition
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3922}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3197}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Principle
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -639,6 +649,7 @@ Anti-pattern it prevents
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{DRY} & Don\textquotesingle t Repeat Yourself & Every piece of knowledge has a single representation & Copy-paste bugs, inconsistent updates \\
+\rowcolor{zebra}
 \textbf{KISS} & Keep It Simple, Stupid & Prefer simple solutions over clever ones & Over-engineered abstractions \\
 \textbf{YAGNI} & You Ain\textquotesingle t Gonna Need It & Don\textquotesingle t build features until they\textquotesingle re needed & Speculative generality, unused code \\
 \end{longtable}
@@ -657,6 +668,7 @@ Design patterns are \textbf{named solutions to recurring design problems}. They 
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4349}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3161}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -671,20 +683,28 @@ Real-World Use
 \bottomrule\noalign{}
 \endlastfoot
 Singleton & Creational & One instance, global access & Config, Logger, Connection Pool \\
+\rowcolor{zebra}
 Factory Method & Creational & Subclass decides which object to create & Document editors, UI widgets \\
 Abstract Factory & Creational & Family of related objects without specifying classes & Cross-platform UI toolkits \\
+\rowcolor{zebra}
 Builder & Creational & Construct complex objects step by step & SQL query builders, HTTP requests \\
 Prototype & Creational & Clone existing objects & Undo/redo, game object spawning \\
+\rowcolor{zebra}
 Adapter & Structural & Wrap incompatible interface & Third-party library integration \\
 Decorator & Structural & Add behavior dynamically without subclassing & Java I/O streams, middleware \\
+\rowcolor{zebra}
 Facade & Structural & Simplified interface to a subsystem & SDK wrappers, home theater \\
 Proxy & Structural & Control access to another object & Lazy loading, caching, auth \\
+\rowcolor{zebra}
 Composite & Structural & Treat individual/groups uniformly & File systems, UI component trees \\
 Strategy & Behavioral & Define interchangeable algorithms & Sorting, pricing, compression \\
+\rowcolor{zebra}
 Observer & Behavioral & One-to-many event notification & Event listeners, MVC, pub/sub \\
 Command & Behavioral & Encapsulate a request as an object & Undo/redo, queued jobs, macros \\
+\rowcolor{zebra}
 State & Behavioral & Object changes behavior when state changes & Order lifecycle, traffic light \\
 Template Method & Behavioral & Define skeleton; subclasses fill in steps & Game loops, data export pipelines \\
+\rowcolor{zebra}
 Iterator & Behavioral & Sequential access without exposing internals & Collection traversal \\
 \end{longtable}
 
@@ -1385,6 +1405,7 @@ Realization        A - - - - - ▷ B         A implements interface B
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3786}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4255}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Relationship
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1399,10 +1420,13 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Association} & \texttt{──\textgreater{}} & General link between classes & Student uses Library \\
+\rowcolor{zebra}
 \textbf{Aggregation} & \texttt{◇──\textgreater{}} & Weak whole-part (part survives) & Team has Players (players exist without team) \\
 \textbf{Composition} & \texttt{◆──\textgreater{}} & Strong whole-part (part dies with whole) & House has Rooms (room has no meaning without house) \\
+\rowcolor{zebra}
 \textbf{Inheritance} & \texttt{──▷} & IS-A, extends/implements & Car extends Vehicle \\
 \textbf{Dependency} & \texttt{-\ -\textgreater{}} & Uses temporarily (parameter/local var) & Controller depends on Service \\
+\rowcolor{zebra}
 \textbf{Realization} & \texttt{-\ -▷} & Implements interface & MySQLDB realizes Database \\
 \end{longtable}
 
@@ -1631,6 +1655,7 @@ IDLE ──(selectItem)──> "Insert coin first"
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1286}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8714}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1641,28 +1666,40 @@ Real-Life Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Encapsulation} & The walls hiding the wiring --- you flip a switch and the light comes on; you never touch the live cables behind the plasterboard \\
+\rowcolor{zebra}
 \textbf{Abstraction} & The thermostat dial --- you set 21°C and walk away; the furnace, gas valve, and duct fans sort themselves out behind the wall \\
 \textbf{Inheritance} & The "Villa" plan extends the base "House" plan --- it inherits every room, every circuit, every load-bearing wall, and adds a pool wing on top \\
+\rowcolor{zebra}
 \textbf{Polymorphism} & One "Open" button on the smart-home app that swings the front door, rolls up the garage shutter, and tilts the skylight --- each mechanism moves in its own way \\
 \textbf{SRP} & The smoke detector detects smoke; the siren makes noise; the sprinkler douses flames --- one job per device, swap any one without touching the others \\
+\rowcolor{zebra}
 \textbf{OCP} & The breaker panel --- you snap a new circuit breaker in to power the home office extension without touching the existing breakers that run the kitchen \\
 \textbf{LSP} & Any certified light bulb --- LED, halogen, or smart bulb --- fits the same socket and dims when the dimmer turns; no fixture needs rewiring for the swap \\
+\rowcolor{zebra}
 \textbf{ISP} & The outdoor weatherproof socket only implements the "power" interface; it knows nothing about the thermostat\textquotesingle s heating schedule --- each device gets only the interface it actually uses \\
 \textbf{DIP} & Every appliance plugs into the same standard socket --- an abstraction --- rather than being hard-wired to the power station; swap the supplier, not the toaster \\
+\rowcolor{zebra}
 \textbf{Singleton} & The main fuse box --- exactly one exists in the house; every circuit routes through it and the architect makes sure nothing bypasses it \\
 \textbf{Factory} & The prefab workshop off-site --- you tell it "I need a kitchen module" and it delivers a fully fitted unit; you never see the assembly jigs or which crew built it \\
+\rowcolor{zebra}
 \textbf{Abstract Factory} & The architect\textquotesingle s room-kit catalogue --- order the "Scandinavian" kit and every fitting (taps, handles, light switches) arrives from the same matching family \\
 \textbf{Builder} & Fitting out a bare shell room step by step --- lay flooring, then paint walls, then hang curtains, then mount shelves --- each step optional, sequence matters, one \texttt{handOver()} at the end \\
+\rowcolor{zebra}
 \textbf{Prototype} & The show-home template --- instead of designing each holiday-let room from scratch, you clone the master layout and tweak only the colour scheme \\
 \textbf{Adapter} & A travel plug adapter on the kitchen counter --- the European two-pin appliance plugs into it, and the adapter presents the UK three-pin shape the house expects \\
+\rowcolor{zebra}
 \textbf{Decorator} & Outfitting a bare concrete room layer by layer --- insulation, then plasterboard, then paint, then coving, then smart lighting --- each layer adds behaviour without demolishing what came before \\
 \textbf{Facade} & The smart-home app\textquotesingle s "Movie Night" scene --- one tap dims every light, lowers the blinds, turns on the projector, and silences the doorbell; you never touch seven separate sub-systems \\
+\rowcolor{zebra}
 \textbf{Proxy} & The smart doorbell that screens visitors --- it answers the door, checks the camera, and only rings you inside if it can\textquotesingle t verify the caller itself \\
 \textbf{Observer} & The smoke detectors --- one sensor in the kitchen smells smoke and instantly notifies every alarm, the sprinkler controller, and the security panel across the house \\
+\rowcolor{zebra}
 \textbf{Strategy} & Swappable heating behind the same thermostat dial --- gas boiler today, electric heat-pump tomorrow, solar thermal next year; the dial interface never changes \\
 \textbf{Command} & A scene button you programme yourself --- press it once to execute a sequence of actions (dim lights, lock doors, set alarm), press again to undo, queue multiple scenes to run at midnight \\
+\rowcolor{zebra}
 \textbf{State} & The thermostat\textquotesingle s mode wheel --- Home, Away, and Sleep each change what temperature the whole house targets; same thermostat, entirely different behaviour per mode \\
 \textbf{Composite} & The master suite --- it groups the bedroom, en-suite, and dressing room as a single bookable unit, yet each sub-room also exposes the same \texttt{inspect()} interface individually \\
+\rowcolor{zebra}
 \textbf{Template Method} & The architect\textquotesingle s standard commissioning checklist --- always: pressure-test plumbing, then certify electrics, then sign off ventilation; the steps are fixed but each trade fills in its own method \\
 \textbf{Iterator} & The electrician\textquotesingle s walkthrough --- she moves from socket to socket around every room in a fixed sequence without needing a floor-plan in her hand; the house exposes one \texttt{nextSocket()} cursor \\
 \end{longtable}
@@ -1678,6 +1715,7 @@ Real-Life Analogy
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2715}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6393}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Letter
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1690,8 +1728,10 @@ Memory Hook
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{S} & Single Responsibility & \textbf{S}niper --- one target at a time \\
+\rowcolor{zebra}
 \textbf{O} & Open/Closed & \textbf{O}pen door, closed vault --- can enter new, can\textquotesingle t change old \\
 \textbf{L} & Liskov & \textbf{L}egacy employee --- should work like original without surprises \\
+\rowcolor{zebra}
 \textbf{I} & Interface Segregation & \textbf{I}nterface diet --- no fat interfaces \\
 \textbf{D} & Dependency Inversion & \textbf{D}on\textquotesingle t call us, we\textquotesingle ll call you (Hollywood principle) \\
 \end{longtable}
@@ -1728,6 +1768,7 @@ Memory Hook
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6863}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3137}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Trigger Word
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1738,20 +1779,28 @@ Pattern
 \bottomrule\noalign{}
 \endlastfoot
 "Only one instance" & Singleton \\
+\rowcolor{zebra}
 "Create without knowing exact type" & Factory Method \\
 "Family of related objects" & Abstract Factory \\
+\rowcolor{zebra}
 "Step by step construction" & Builder \\
 "Clone an expensive object" & Prototype \\
+\rowcolor{zebra}
 "Incompatible interfaces" & Adapter \\
 "Add behavior dynamically" & Decorator \\
+\rowcolor{zebra}
 "Simplify complex subsystem" & Facade \\
 "Control access / lazy load" & Proxy \\
+\rowcolor{zebra}
 "Tree structure, treat uniformly" & Composite \\
 "Swappable algorithms" & Strategy \\
+\rowcolor{zebra}
 "Event notification" & Observer \\
 "Undo/redo, queue requests" & Command \\
+\rowcolor{zebra}
 "Behavior changes with state" & State \\
 "Fixed skeleton, variable steps" & Template Method \\
+\rowcolor{zebra}
 "Sequential collection traversal" & Iterator \\
 \end{longtable}
 
@@ -1764,6 +1813,7 @@ Pattern
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3585}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3774}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Prompt
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1776,14 +1826,19 @@ Important Classes
 \bottomrule\noalign{}
 \endlastfoot
 Design a Parking Lot & Singleton, Factory, Strategy, Observer & ParkingLot, Floor, Spot, Vehicle, Ticket \\
+\rowcolor{zebra}
 Design an Elevator & State, Strategy, Observer & Elevator, Request, Scheduler, State \\
 Design a Vending Machine & State, Singleton, Command & VendingMachine, Slot, CoinSlot \\
+\rowcolor{zebra}
 Design a Library System & Facade, Observer, Strategy & Library, Book, Member, Loan \\
 Design a Chess Game & Factory, State, Composite & Board, Piece, Player, Move \\
+\rowcolor{zebra}
 Design a Hotel Booking & Factory, Strategy, Observer & Hotel, Room, Booking, Payment \\
 Design an ATM & State, Command, Strategy & ATM, Card, Account, Transaction \\
+\rowcolor{zebra}
 Design a Food Ordering App & Factory, Observer, Strategy & Restaurant, Menu, Order, Delivery \\
 Design a Movie Ticket System & Factory, Strategy, Observer & Cinema, Show, Seat, Booking \\
+\rowcolor{zebra}
 Design a Ride-sharing App & Observer, Strategy, State & Driver, Rider, Trip, Location \\
 \end{longtable}
 
@@ -1832,6 +1887,7 @@ Design a Ride-sharing App & Observer, Strategy, State & Driver, Rider, Trip, Loc
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2379}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7621}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1842,10 +1898,13 @@ Don\textquotesingle t Use When
 \bottomrule\noalign{}
 \endlastfoot
 Singleton & You need testability (inject dependencies instead) \\
+\rowcolor{zebra}
 Abstract Factory & Only one product family exists now \\
 Observer & Notification order matters (observers execute in undefined order) \\
+\rowcolor{zebra}
 Decorator & You need to inspect the wrapped type at runtime \\
 Command & Simple one-shot operations with no undo requirement \\
+\rowcolor{zebra}
 State & Only 2-3 states that rarely change (if-else is clearer) \\
 \end{longtable}
 
@@ -1925,6 +1984,7 @@ In production code, instead of hard-coding \texttt{new\ MySQLDB()} everywhere, u
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Mistake
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1937,14 +1997,19 @@ What to Do Instead
 \bottomrule\noalign{}
 \endlastfoot
 Jump straight to code & Missed requirements surface mid-code & Always clarify, then diagram \\
+\rowcolor{zebra}
 Only one class per problem & Shows shallow thinking & Identify 5--8 entities minimum \\
 All public fields & Breaks encapsulation & Private fields + controlled access \\
+\rowcolor{zebra}
 Inheritance for code reuse & Tight coupling, brittle & Compose if no IS-A relationship \\
 No interfaces/abstractions & Hard-codes concrete types & Define abstractions first \\
+\rowcolor{zebra}
 Name patterns without applying them & Sounds cargo-cult & Explain WHY, show how it helps \\
 Over-pattern small problems & Shows poor judgment & Know when simple if-else is fine \\
+\rowcolor{zebra}
 Skip extensibility discussion & Misses senior signal & Always say "if X changes, we can..." \\
 Anemic model (all logic in services) & Not OOP thinking & Put behavior in the right object \\
+\rowcolor{zebra}
 Forget to mention thread safety & Incomplete for concurrent systems & Always ask "is this multi-threaded?" \\
 \end{longtable}
 
@@ -2050,6 +2115,7 @@ Good LLD makes testing easy:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7500}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Topic
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2060,24 +2126,34 @@ Topic
 \bottomrule\noalign{}
 \endlastfoot
 Encapsulation & Hide state; expose behavior \\
+\rowcolor{zebra}
 Abstraction & Code to interfaces, not implementations \\
 Inheritance & IS-A, use sparingly, max 2-3 levels \\
+\rowcolor{zebra}
 Polymorphism & Same message, different behavior \\
 SRP & One reason to change \\
+\rowcolor{zebra}
 OCP & Extend don\textquotesingle t modify \\
 LSP & Subtypes must honor base contract \\
+\rowcolor{zebra}
 ISP & Small, focused interfaces \\
 DIP & Depend on abstractions \\
+\rowcolor{zebra}
 Singleton & One instance, controlled access \\
 Factory & Decouple creation from usage \\
+\rowcolor{zebra}
 Builder & Step-by-step complex construction \\
 Strategy & Swappable algorithms \\
+\rowcolor{zebra}
 Observer & Event-driven notification \\
 Command & Encapsulate requests for undo/queue \\
+\rowcolor{zebra}
 State & Behavior changes with state \\
 Decorator & Add behavior without subclassing \\
+\rowcolor{zebra}
 Facade & Simplify complex subsystem \\
 Adapter & Bridge incompatible interfaces \\
+\rowcolor{zebra}
 Proxy & Control access / lazy load \\
 Composite & Tree structures, uniform treatment \\
 \end{longtable}
@@ -2089,6 +2165,7 @@ Composite & Tree structures, uniform treatment \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4205}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2955}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 SOLID
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2101,8 +2178,10 @@ One Fix
 \bottomrule\noalign{}
 \endlastfoot
 S --- Single Responsibility & God class & Extract class \\
+\rowcolor{zebra}
 O --- Open/Closed & Modification to add features & Polymorphism + Strategy \\
 L --- Liskov & Broken override (NotImplementedError) & Redesign hierarchy \\
+\rowcolor{zebra}
 I --- Interface Segregation & Fat interface, stub methods & Split into role interfaces \\
 D --- Dependency Inversion & \texttt{new\ ConcreteClass()} in business logic & Constructor injection \\
 \end{longtable}
@@ -2112,6 +2191,7 @@ D --- Dependency Inversion & \texttt{new\ ConcreteClass()} in business logic & C
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4400}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3467}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2124,20 +2204,28 @@ Use When
 \bottomrule\noalign{}
 \endlastfoot
 Singleton & One instance globally & Config, Logger, Pool \\
+\rowcolor{zebra}
 Factory Method & Create without knowing type & Plugin systems \\
 Abstract Factory & Create a family of objects & Cross-platform UI \\
+\rowcolor{zebra}
 Builder & Build complex object step-by-step & Many optional fields \\
 Prototype & Clone expensive objects & Object pools, game spawn \\
+\rowcolor{zebra}
 Adapter & Use incompatible API & 3rd party integration \\
 Decorator & Add behavior at runtime & Middleware, I/O streams \\
+\rowcolor{zebra}
 Facade & Hide subsystem complexity & SDK wrappers \\
 Proxy & Control/delay/cache access & Lazy load, auth, cache \\
+\rowcolor{zebra}
 Composite & Treat tree nodes uniformly & File system, UI trees \\
 Strategy & Swap algorithms at runtime & Sorting, pricing, routing \\
+\rowcolor{zebra}
 Observer & Notify dependents on change & Events, MVC, pub/sub \\
 Command & Queue/undo/log requests & Undo, task queues \\
+\rowcolor{zebra}
 State & Change behavior with state & Order, elevator, traffic \\
 Template Method & Fix skeleton, vary steps & Export pipeline, game loop \\
+\rowcolor{zebra}
 Iterator & Traverse collection uniformly & Collections, cursors \\
 \end{longtable}
 

@@ -82,6 +82,7 @@ Machine Learning (ML) is a subfield of Artificial Intelligence where systems lea
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2296}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6263}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Symbol
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -94,6 +95,7 @@ Example (spam filter)
 \bottomrule\noalign{}
 \endlastfoot
 E & Experience & Labeled emails (spam/not spam) \\
+\rowcolor{zebra}
 T & Task & Classify incoming emails \\
 P & Performance & Accuracy on new emails \\
 \end{longtable}
@@ -130,6 +132,7 @@ The model IS the learned rules --- a function \texttt{f(x)\ →\ y} where:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2969}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3469}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Paradigm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -144,8 +147,10 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Supervised} & Yes, explicit & Direct feedback on every prediction & Image classification, spam detection \\
+\rowcolor{zebra}
 \textbf{Unsupervised} & No & Structure in data itself & Customer clustering, anomaly detection \\
 \textbf{Self-Supervised} & No explicit, auto-generated & Predict part of input from rest & GPT (predict next token), BERT (fill mask) \\
+\rowcolor{zebra}
 \textbf{Reinforcement} & No labels, rewards & Sparse reward signal after actions & AlphaGo, game-playing agents, RLHF \\
 \end{longtable}
 
@@ -287,6 +292,7 @@ Each company has multi-billion dollar ML bets. Interviewers want engineers who u
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4820}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4581}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -299,12 +305,16 @@ Why Fundamentals Matter
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Google} & Search ranking (BERT/MUM), ads CTR prediction, Gmail spam, Maps ETA, Translate, YouTube recommendations & Every product is powered by models; engineers need to understand model quality signals and deployment \\
+\rowcolor{zebra}
 \textbf{Meta} & News Feed ranking, ad targeting, content moderation, Reels recommendations, Instagram explore & Billions of predictions/second; bias-variance and calibration directly impact revenue \\
 \textbf{Amazon} & Product recommendations ("customers also bought"), Alexa NLU, fraud detection, demand forecasting, delivery ETA & Wrong recommendations = lost revenue; demand forecasting affects billion-dollar inventory \\
+\rowcolor{zebra}
 \textbf{Apple} & Siri NLP, Face ID (on-device), autocorrect, Health app anomaly detection, photo classification & On-device ML with strict memory/latency; privacy constraints change the training paradigm \\
 \textbf{Microsoft} & Copilot (GitHub/Office), Azure ML platform, Bing search, Xbox matchmaking & Platform-level ML tooling; Azure competes with GCP/AWS on ML infra \\
+\rowcolor{zebra}
 \textbf{Uber} & Surge pricing ML, ETA prediction, fraud detection, driver-rider matching, Eats recommendations & Real-time predictions under strict latency SLAs; poor calibration = driver/rider unhappiness \\
 \textbf{Netflix} & Content recommendations (saves \$1B/year per their claim), thumbnail personalization, encoding quality prediction & A/B testing culture; every model change is measured against watch time and retention \\
+\rowcolor{zebra}
 \textbf{OpenAI} & Foundation model training (GPT), RLHF alignment, safety classifiers, API latency optimization & Pushing the boundary of what ML fundamentals (loss surfaces, optimization) look like at 100B+ parameters \\
 \end{longtable}
 
@@ -329,6 +339,7 @@ Each phase has failure modes that interviews love to probe:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4299}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3919}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Phase
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -341,10 +352,13 @@ Interview Signal
 \bottomrule\noalign{}
 \endlastfoot
 Problem Definition & Wrong metric (optimizing accuracy on imbalanced data) & Do you challenge requirements? \\
+\rowcolor{zebra}
 Data Collection & Selection bias, survivorship bias & Do you question data provenance? \\
 Feature Engineering & Data leakage & Do you know why leakage is catastrophic? \\
+\rowcolor{zebra}
 Model Selection & Too complex for data size & Do you consider bias-variance? \\
 Evaluation & Only using test set for tuning & Do you understand train/val/test discipline? \\
+\rowcolor{zebra}
 Deployment & Training-serving skew & Do you think about production? \\
 Monitoring & No data drift detection & Do you think about model decay? \\
 \end{longtable}
@@ -409,6 +423,7 @@ Final CV Score = mean(score_1..5) ± std(score_1..5)
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2293}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7707}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variant
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -419,8 +434,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Stratified K-Fold} & Classification with class imbalance --- preserves class ratio in each fold \\
+\rowcolor{zebra}
 \textbf{Time-Series Split} & Temporal data --- always train on past, validate on future (no leakage) \\
 \textbf{Leave-One-Out (LOO)} & Tiny datasets --- each sample is the validation set once (expensive) \\
+\rowcolor{zebra}
 \textbf{Nested CV} & Hyperparameter tuning without test set contamination (outer loop = eval, inner loop = tuning) \\
 \end{longtable}
 
@@ -447,6 +464,7 @@ Use Case
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4749}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3767}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Component
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -459,6 +477,7 @@ Intuition
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Bias} & Error from wrong assumptions in the model (underfitting) & Model is too simple to capture the true pattern \\
+\rowcolor{zebra}
 \textbf{Variance} & Error from sensitivity to small training data fluctuations (overfitting) & Model memorizes noise, fails on new data \\
 \textbf{Irreducible Noise} & Inherent randomness in data & Cannot be reduced; sets the floor \\
 \end{longtable}
@@ -537,6 +556,7 @@ High Bias (Underfit):       High Variance (Overfit):
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4474}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4042}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Symptom
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -549,10 +569,13 @@ Underfitting
 \bottomrule\noalign{}
 \endlastfoot
 Training error & Very low & High \\
+\rowcolor{zebra}
 Validation error & Much higher than training & Also high \\
 Gap (val - train) & Large & Small \\
+\rowcolor{zebra}
 Root cause & Model too complex / too little data & Model too simple / too few features \\
 Fix & More data, regularization, simpler model, dropout, early stopping & More features, more complex model, less regularization \\
+\rowcolor{zebra}
 Also called & High variance & High bias \\
 \end{longtable}
 
@@ -645,6 +668,7 @@ Where \texttt{λ} (lambda) controls the regularization strength:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3624}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3983}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -657,12 +681,16 @@ L2 (Ridge)
 \bottomrule\noalign{}
 \endlastfoot
 Penalty & `Σ & wᵢ \\
+\rowcolor{zebra}
 Effect on weights & Drives to exactly 0 & Shrinks toward 0 (rarely 0) \\
 Feature selection & Yes --- implicit & No \\
+\rowcolor{zebra}
 Solution shape & Sparse & Dense \\
 Differentiability & No (at 0) & Yes \\
+\rowcolor{zebra}
 Handles correlated features & Picks one, zeros others & Shares weight among all \\
 Best for & High-dimensional, many irrelevant features & Correlated features, all features somewhat relevant \\
+\rowcolor{zebra}
 Geometric intuition & Diamond constraint (L1 ball) & Circle constraint (L2 ball) \\
 \end{longtable}
 
@@ -759,6 +787,7 @@ Actual  Pos  [ TP  |  FN ]   ← Row: Actual Positives
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4190}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5168}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Cell
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -771,8 +800,10 @@ Meaning
 \bottomrule\noalign{}
 \endlastfoot
 TP & True Positive & Predicted Positive, Actually Positive \\
+\rowcolor{zebra}
 TN & True Negative & Predicted Negative, Actually Negative \\
 FP & False Positive (Type I Error) & Predicted Positive, Actually Negative \\
+\rowcolor{zebra}
 FN & False Negative (Type II Error) & Predicted Negative, Actually Positive \\
 \end{longtable}
 
@@ -797,6 +828,7 @@ Specificity = TN / (TN + FP) ← True Negative Rate
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3897}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5315}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -809,8 +841,10 @@ When to Prioritize
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Precision} & TP/(TP+FP) & FP is costly --- spam filter (don\textquotesingle t block good email), medical screening pre-test \\
+\rowcolor{zebra}
 \textbf{Recall} & TP/(TP+FN) & FN is costly --- cancer detection (don\textquotesingle t miss cases), fraud detection (don\textquotesingle t miss fraud) \\
 \textbf{F1} & Harmonic mean of P \& R & Neither FP nor FN dominates; balanced view \\
+\rowcolor{zebra}
 \textbf{F-beta} & (1+\(\beta\)\(^2\)) \(\times\) P\(\times\)R / (\(\beta\)\(^2\)\(\times\)P + R) & \(\beta\)\textgreater1: favor recall; \(\beta\)\textless1: favor precision \\
 \end{longtable}
 
@@ -856,6 +890,7 @@ AUC = area under curve. Higher = better.
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1240}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8760}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -866,6 +901,7 @@ Best When
 \bottomrule\noalign{}
 \endlastfoot
 ROC-AUC & Classes roughly balanced; care about ranking ability \\
+\rowcolor{zebra}
 PR-AUC & Severe class imbalance; care about positive class performance \\
 \end{longtable}
 
@@ -899,6 +935,7 @@ Log Loss = -(1/N) × Σ [yᵢ × log(ŷᵢ) + (1 - yᵢ) × log(1 - ŷᵢ)]
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4824}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2662}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -913,8 +950,10 @@ Sensitive to Outliers?
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{MSE} & \texttt{(1/n)Σ(yᵢ\ -\ ŷᵢ)²} & Average squared error; in squared units & Very (squares errors) \\
+\rowcolor{zebra}
 \textbf{RMSE} & \texttt{√MSE} & Same units as target; penalizes large errors & Very \\
 \textbf{MAE} & `(1/n)Σ & yᵢ - ŷᵢ & ` \\
+\rowcolor{zebra}
 \textbf{R\(^2\)} & \texttt{1\ -\ SS\_res/SS\_tot} & Fraction of variance explained; 0--1 (higher = better) & Moderate \\
 \textbf{MAPE} & `(1/n)Σ & (yᵢ - ŷᵢ)/yᵢ & ` \\
 \end{longtable}
@@ -1001,6 +1040,7 @@ Why needed: Many algorithms (SVM, KNN, gradient descent-based) are sensitive to 
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2823}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3358}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1015,8 +1055,10 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Min-Max Scaling} & \texttt{(x\ -\ min)/(max\ -\ min)} & Bounded range needed {[}0,1{]} & Sensitive to outliers \\
+\rowcolor{zebra}
 \textbf{Standardization (Z-score)} & \texttt{(x\ -\ μ)/σ} & Most cases; gradient descent & Assumes roughly Gaussian; not bounded \\
 \textbf{Robust Scaling} & \texttt{(x\ -\ median)/IQR} & Data has outliers & Uses median and IQR instead of mean/std \\
+\rowcolor{zebra}
 \textbf{Log Transform} & \texttt{log(1\ +\ x)} & Right-skewed data (income, counts) & Brings outliers closer; requires x \(\geq\) 0 \\
 \textbf{L2 Normalization} & `x / & & x \\
 \end{longtable}
@@ -1130,6 +1172,7 @@ A naive model that always predicts "legitimate" gets 99\% accuracy --- utterly u
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2342}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2947}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Technique
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1144,8 +1187,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Oversampling (SMOTE)} & Generate synthetic minority samples & Increases minority class signal & Can introduce noise if features overlap \\
+\rowcolor{zebra}
 \textbf{Undersampling} & Remove majority class samples randomly & Faster training & Loses majority class information \\
 \textbf{Class Weights} & Penalize misclassifying minority class more & Simple, no data modification & May destabilize training \\
+\rowcolor{zebra}
 \textbf{Threshold Moving} & Lower decision threshold from 0.5 & Easy post-hoc & Requires calibrated probabilities \\
 \textbf{Ensemble (BalancedRF)} & Bootstrap with balanced classes per tree & Robust & More compute \\
 \end{longtable}
@@ -1244,6 +1289,7 @@ Where:
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2654}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variant
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1260,6 +1306,7 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Batch GD} & All N samples & Once per epoch & Stable gradient & Slow, memory intensive, stuck in saddle points \\
+\rowcolor{zebra}
 \textbf{Stochastic GD (SGD)} & 1 sample & N times per epoch & Fast updates, escapes local minima & Noisy, oscillates \\
 \textbf{Mini-Batch GD} & 32--512 samples & N/batch times & Best of both: stable + fast & Batch size is a hyperparameter \\
 \end{longtable}
@@ -1622,6 +1669,7 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4622}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4003}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 ML Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1634,26 +1682,37 @@ One-Line Explanation
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Data (training set)} & Textbooks and practice problems & The raw material the student learns from \\
+\rowcolor{zebra}
 \textbf{Model} & The student\textquotesingle s brain & The learnable system that stores patterns \\
 \textbf{Parameters/weights} & The student\textquotesingle s understanding and heuristics & Adjustable internal representations \\
+\rowcolor{zebra}
 \textbf{Training} & Studying and doing homework & Iteratively adjusting understanding to minimize errors \\
 \textbf{Loss function} & Number of mistakes on practice problems & The signal that tells us how wrong we are \\
+\rowcolor{zebra}
 \textbf{Gradient descent} & A tutor pointing out WHY answers are wrong and nudging the student to correct their thinking & Step-by-step guided improvement toward fewer mistakes \\
 \textbf{Learning rate} & How big a conceptual leap the student takes per study session & Too big = confused; too small = no progress \\
+\rowcolor{zebra}
 \textbf{Validation set} & Mock exams / practice tests & Unseen problems during studying --- gauge true understanding \\
 \textbf{Test set} & The final exam & Seen only once, after ALL studying is done \\
+\rowcolor{zebra}
 \textbf{Overfitting} & Memorizing past paper answers without understanding & Scores 100\% on known papers, fails when questions change \\
 \textbf{Underfitting} & Not studying enough, oversimplifying & Fails both practice tests AND the final \\
+\rowcolor{zebra}
 \textbf{Regularization} & Forcing the student to explain principles, not just recall & Discourages rote memorization, forces deeper understanding \\
 \textbf{High bias} & Student believes all history is just dates (oversimplified mental model) & Wrong assumptions \(\rightarrow\) systematic errors regardless of data \\
+\rowcolor{zebra}
 \textbf{High variance} & Student panics on any unfamiliar question phrasing & Too sensitive to surface details, fails to generalize \\
 \textbf{Feature engineering} & Highlighting the most important passages, making summary cards & Transforming raw input into informative representations \\
+\rowcolor{zebra}
 \textbf{Feature scaling} & Converting all measurements to the same units & Ensures no single feature dominates due to scale \\
 \textbf{Dropout} & Randomly covering parts of notes while reviewing & Forces redundant learning paths, prevents over-reliance on any single fact \\
+\rowcolor{zebra}
 \textbf{Early stopping} & Stopping study when practice test scores stop improving & Avoid over-studying a practice paper to the point of memorizing it \\
 \textbf{Data leakage} & Student sees the final exam questions before sitting it & Invalidates the performance estimate --- cheating \\
+\rowcolor{zebra}
 \textbf{Class imbalance} & 99 easy questions and 1 trick question in practice --- student learns to ignore trick questions & Minority class gets ignored because it barely affects overall score \\
 \textbf{Cross-validation} & Taking 5 different mock exams, averaging scores & More robust performance estimate than a single mock \\
+\rowcolor{zebra}
 \textbf{Generalization} & Being able to apply learned concepts to brand-new problems in life & The ultimate goal --- performance on unseen data \\
 \textbf{Irreducible noise} & Ambiguous exam questions that even perfect studying can\textquotesingle t answer & Inherent randomness; cannot be eliminated \\
 \end{longtable}
@@ -2260,6 +2319,7 @@ Machine Learning = learning a function f(x)\(\rightarrow\)y from data. Four para
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3859}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4597}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2272,22 +2332,31 @@ Interview Punchline
 \bottomrule\noalign{}
 \endlastfoot
 Bias & Systematic error from wrong assumptions & Model too simple; fix with more complexity \\
+\rowcolor{zebra}
 Variance & Sensitivity to training data & Model too complex; fix with regularization \\
 Total MSE & Bias\(^2\) + Variance + Noise & Can\textquotesingle t reduce noise; optimize the other two \\
+\rowcolor{zebra}
 Precision & TP/(TP+FP) & Of predicted positives, fraction that are real \\
 Recall & TP/(TP+FN) & Of real positives, fraction we caught \\
+\rowcolor{zebra}
 F1 & 2PR/(P+R) & Harmonic mean; forces both P and R to be high \\
 ROC-AUC & Area under TPR-FPR curve & Threshold-independent ranking ability \\
+\rowcolor{zebra}
 PR-AUC & Area under Precision-Recall curve & Better than ROC-AUC for imbalanced data \\
 L1 (Lasso) & Loss + \(\lambda\)\(\Sigma\) & w \\
+\rowcolor{zebra}
 L2 (Ridge) & Loss + \(\lambda\)\(\Sigma\)w\(^2\) & Dense weights; handles correlated features \\
 Elastic Net & L1 + L2 & Best of both worlds \\
+\rowcolor{zebra}
 Dropout & Zero neurons with prob p at train time & Ensemble of sub-networks; don\textquotesingle t apply at test \\
 Early Stopping & Stop when val loss stops improving & Cheapest regularization trick \\
+\rowcolor{zebra}
 SMOTE & Interpolate minority samples & Fix class imbalance without losing majority data \\
 Gradient Descent & \(\theta\) \(\leftarrow\) \(\theta\) - \(\alpha\)\(\nabla\)L & Step downhill on loss surface \\
+\rowcolor{zebra}
 Adam & Adaptive lr + momentum & Default optimizer; lr=3e-4 is a good start \\
 Data Leakage & Future info in past prediction & Undetectable until production failure \\
+\rowcolor{zebra}
 Cross-Entropy & -\(\Sigma\)y\(\cdot\)log(ŷ) & Penalizes confident errors; training loss for classifiers \\
 R\(^2\) & 1 - SS\_res/SS\_tot & 1=perfect; 0=mean baseline; \textless0=worse than baseline \\
 \end{longtable}

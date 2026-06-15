@@ -108,6 +108,7 @@ Classical software engineering has a clean input-output contract: given the same
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3463}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6537}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Classical Software
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -118,10 +119,13 @@ ML Systems
 \bottomrule\noalign{}
 \endlastfoot
 Logic is explicit in code & Logic is latent in model weights \\
+\rowcolor{zebra}
 Bug = wrong code & Bug = wrong data, wrong objective, or distribution shift \\
 Version = git commit & Version = code + data + hyperparameters + environment \\
+\rowcolor{zebra}
 Testing = unit tests & Testing = statistical evaluation on held-out sets \\
 Deployment is one-time & Deployment requires continuous retraining \\
+\rowcolor{zebra}
 Failure is deterministic & Failure is gradual (silent model decay) \\
 \end{longtable}
 
@@ -150,6 +154,7 @@ At FAANG scale, ML systems are not infrastructure --- they ARE the product.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2857}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6143}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -163,8 +168,10 @@ Revenue / Business Impact
 \endlastfoot
 Google & Ad CTR prediction & \(220B+/yr ad revenue; 1% CTR improvement = ~
 \)2B \\
+\rowcolor{zebra}
 Meta & News Feed ranking & Core DAU driver; feed determines time-on-site \\
 Amazon & Product recommendations & 35\% of Amazon\textquotesingle s revenue attributed to recommendations \\
+\rowcolor{zebra}
 Netflix & Content recommendations & Saves \textasciitilde\$1B/yr in churn; 80\% of watched content is recommended \\
 TikTok & For You page ranking & Primary retention mechanism for 1B+ MAU \\
 \end{longtable}
@@ -242,6 +249,7 @@ Translate the business goal into a precise ML problem.
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1932}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2045}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Business Goal
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -256,8 +264,10 @@ Business Metric
 \bottomrule\noalign{}
 \endlastfoot
 Increase engagement & Maximize click probability & AUC-ROC, log-loss & CTR, DAU \\
+\rowcolor{zebra}
 Increase revenue & Maximize conversion \(\times\) revenue & NDCG, MAP & Revenue/query \\
 Reduce churn & Predict 30-day churn & F1, Recall & Retention rate \\
+\rowcolor{zebra}
 Improve search & Rank relevant docs higher & NDCG@10, MRR & Click-through-rank \\
 \end{longtable}
 
@@ -331,6 +341,7 @@ Improve search & Rank relevant docs higher & NDCG@10, MRR & Click-through-rank \
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1836}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4132}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -345,6 +356,7 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 Offline/batch & Hours-days & Low & User\textquotesingle s 30-day watch history \\
+\rowcolor{zebra}
 Near-real-time & Minutes & Medium & User\textquotesingle s last 1-hour behavior \\
 Real-time/online & Seconds & Must be fast & Current session activity \\
 \end{longtable}
@@ -598,6 +610,7 @@ This causes training-serving skew and duplicated engineering work.
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0756}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3275}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Freshness
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -614,6 +627,7 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 Batch & Daily/hourly & Low & Low & Long-term user preferences \\
+\rowcolor{zebra}
 Near-real-time & Minutes & Medium & Medium & Recent session behavior \\
 Real-time & Seconds & \textless{} 10ms required & High & Current context features \\
 \end{longtable}
@@ -752,6 +766,7 @@ Real-time & Seconds & \textless{} 10ms required & High & Current context feature
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4553}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3159}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Architecture
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -764,10 +779,13 @@ Parameter Server
 \bottomrule\noalign{}
 \endlastfoot
 Gradient aggregation & Ring all-reduce (each worker sends/receives) & Central PS node aggregates \\
+\rowcolor{zebra}
 Communication pattern & Peer-to-peer & Hub-and-spoke \\
 Bottleneck & Network bandwidth & PS becomes bottleneck \\
+\rowcolor{zebra}
 Fault tolerance & Worker failure affects ring & PS can be replicated \\
 Best for & Homogeneous GPU clusters & Heterogeneous, sparse models \\
+\rowcolor{zebra}
 Example & Horovod, PyTorch DDP & TensorFlow PS, Uber Petastorm \\
 \end{longtable}
 
@@ -852,6 +870,7 @@ Partitions optimizer states, gradients, and parameters across data-parallel work
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5750}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2615}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 ZeRO Stage
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -864,6 +883,7 @@ Memory Reduction
 \bottomrule\noalign{}
 \endlastfoot
 Stage 1 & Optimizer states & 4x \\
+\rowcolor{zebra}
 Stage 2 & Optimizer states + gradients & 8x \\
 Stage 3 & Optimizer states + gradients + parameters & 64x \\
 \end{longtable}
@@ -879,6 +899,7 @@ Stage 3 & Optimizer states + gradients + parameters & 64x \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3695}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2937}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Paradigm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -895,6 +916,7 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Batch inference} & Hours & Very high & Precomputed embeddings, offline scoring & Weekly product recs \\
+\rowcolor{zebra}
 \textbf{Online/real-time} & \textless{} 100ms & Medium & Interactive queries, search ranking & Search results \\
 \textbf{Streaming} & Seconds & High & Continuous event processing & Fraud detection on transactions \\
 \end{longtable}
@@ -906,6 +928,7 @@ Example
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4306}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -918,10 +941,13 @@ Online
 \bottomrule\noalign{}
 \endlastfoot
 Trigger & Schedule (cron) & User request \\
+\rowcolor{zebra}
 Latency SLA & None (hours) & Strict (\textless{} 100ms) \\
 Compute cost & Cheaper (spot instances) & Higher (always-on) \\
+\rowcolor{zebra}
 Feature freshness & Stale (hours-days) & Fresh (milliseconds) \\
 Model complexity & Any & Limited by latency budget \\
+\rowcolor{zebra}
 Infrastructure & Spark, Beam & FastAPI, TorchServe, TF Serving \\
 Failure handling & Retry easily & Circuit breakers, fallbacks \\
 \end{longtable}
@@ -985,6 +1011,7 @@ Response
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4444}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Framework
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -997,10 +1024,13 @@ Key Feature
 \bottomrule\noalign{}
 \endlastfoot
 TensorFlow Serving & TF models, production-grade & gRPC, REST, versioning \\
+\rowcolor{zebra}
 TorchServe & PyTorch models & Custom handlers, dynamic batching \\
 NVIDIA Triton & Any framework, GPU-first & Ensemble pipelines, GPU optimization \\
+\rowcolor{zebra}
 BentoML & ML-framework agnostic & Python-native, easy packaging \\
 Ray Serve & Python-native, distributed & Actor-based, online learning \\
+\rowcolor{zebra}
 vLLM & LLM inference & PagedAttention, continuous batching \\
 \end{longtable}
 
@@ -1059,6 +1089,7 @@ Traffic → [Experiment Assignment] → Control (A) or Treatment (B)
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1165}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3592}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1073,8 +1104,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 A/B test & Split users into control/treatment & Slow (weeks) & Standard \\
+\rowcolor{zebra}
 Interleaving & Merge ranked lists from A and B & 100x faster & Ranking systems \\
 Multi-armed bandit & Dynamic traffic allocation & Adaptive & When exploration-exploitation matters \\
+\rowcolor{zebra}
 Switchback & Alternate between A/B by time period & Fast & Marketplace, supply-side effects \\
 \end{longtable}
 
@@ -1116,6 +1149,7 @@ Switchback & Alternate between A/B by time period & Fast & Marketplace, supply-s
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3097}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3304}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Drift Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1130,8 +1164,10 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Data drift} & Input feature distribution P(X) & KL divergence, PSI, Kolmogorov-Smirnov & User demographics shift after product expansion \\
+\rowcolor{zebra}
 \textbf{Concept drift} & Relationship P(Y\textbar X) & Monitor prediction accuracy on new labels & COVID changed search intent for "mask" \\
 \textbf{Label drift} & Label distribution P(Y) & Monitor label statistics & Fraud patterns shift seasonally \\
+\rowcolor{zebra}
 \textbf{Prediction drift} & Model output distribution P(Ŷ) & Monitor prediction distribution & Sudden spike in high-confidence predictions \\
 \end{longtable}
 
@@ -1223,6 +1259,7 @@ Monitoring Pipeline (Spark Streaming / Flink)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3659}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5331}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Stage
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1235,10 +1272,13 @@ ML CI/CD
 \bottomrule\noalign{}
 \endlastfoot
 Trigger & Code push & Code push OR new data OR drift alert \\
+\rowcolor{zebra}
 Build & Compile, lint & Data validation, feature pipeline \\
 Test & Unit tests, integration tests & Model evaluation, slice analysis, bias checks \\
+\rowcolor{zebra}
 Artifact & Docker image & Model weights + preprocessing pipeline \\
 Deploy & Container rollout & Canary model rollout \\
+\rowcolor{zebra}
 Monitor & Uptime, error rate & Prediction quality, data drift \\
 \end{longtable}
 
@@ -1617,6 +1657,7 @@ Production ──▶ Feature Logging ──▶ Data Store (S3)
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2204}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7796}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Category
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1627,10 +1668,13 @@ Features
 \bottomrule\noalign{}
 \endlastfoot
 User & user\_id embedding, age, country, subscription tier \\
+\rowcolor{zebra}
 User behavior & watched\_video\_ids (last 50), search\_queries (last 10), avg\_watch\_time \\
 Item & video\_id embedding, category, duration, language, upload\_date \\
+\rowcolor{zebra}
 Item popularity & view\_count\_24h, like\_rate, comment\_rate \\
 Context & time\_of\_day, device\_type, session\_number \\
+\rowcolor{zebra}
 Cross & user\textquotesingle s historical engagement with this creator/category \\
 \end{longtable}
 
@@ -1771,6 +1815,7 @@ Cross & user\textquotesingle s historical engagement with this creator/category 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6537}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1524}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Category
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1783,10 +1828,13 @@ Freshness
 \bottomrule\noalign{}
 \endlastfoot
 User & age, gender, interest categories, past ad click history & Daily batch \\
+\rowcolor{zebra}
 User real-time & Last 5 ads clicked this session, last search query & Real-time \\
 Ad & ad\_id, advertiser, category, creative type, bid price & Ad metadata \\
+\rowcolor{zebra}
 Query/context & search query embeddings, page topic, device, time & Per-request \\
 Cross features & user-ad category match, query-ad relevance & Per-request \\
+\rowcolor{zebra}
 Historical & user CTR for this ad, CTR for advertiser, position stats & Daily batch \\
 \end{longtable}
 
@@ -1950,6 +1998,7 @@ Social Graph + All Candidate Posts (last 7 days from network)
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3318}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6682}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1960,10 +2009,13 @@ Example Features
 \bottomrule\noalign{}
 \endlastfoot
 Post content & text length, image/video, sentiment, entity mentions \\
+\rowcolor{zebra}
 Post freshness & time since posting (exponential decay weighting) \\
 Creator & creator\_id embed, follower count, past post engagement rate \\
+\rowcolor{zebra}
 User-creator relationship & interaction frequency last 30 days, recency of last interaction \\
 Social signals & how many of user\textquotesingle s friends engaged with this post \\
+\rowcolor{zebra}
 User session & time of day, session length, last 10 posts interacted with \\
 \end{longtable}
 
@@ -2175,6 +2227,7 @@ Query → Query Understanding → Retrieval → Ranking → Results
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2540}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5999}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 MLOps Component
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2187,20 +2240,28 @@ Why The Parallel Works
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Data pipeline} & Baggage conveyor system & Raw bags (events) ingested, sorted, routed to the right destination (data store) --- constantly moving, with error handling for mislabeled bags (schema violations) \\
+\rowcolor{zebra}
 \textbf{Feature store (offline)} & Pre-prepped airline meal depot & Meals prepared hours ahead in batches, stored by route type; training uses these historical meal logs to know what passengers on Route X typically ate \\
 \textbf{Feature store (online)} & Fuel depot at the gate & Real-time fuel requested per specific flight, delivered in seconds before departure; must be fresh and correct or the flight is grounded \\
+\rowcolor{zebra}
 \textbf{Model registry} & Certified aircraft archive & Every aircraft model has a certification record --- airworthiness tests passed, maintenance history, approved for which routes. You only fly certified aircraft \\
 \textbf{Training} & Pilot training in flight simulators & Pilots train on simulated scenarios (historical data); new conditions require recertification (retraining) \\
+\rowcolor{zebra}
 \textbf{Serving (real-time)} & Live flights departing on schedule & Gate assignments, departure sequences --- decisions made in seconds, must be correct, must scale to 1000 daily flights \\
 \textbf{Batch serving} & Pre-printed passenger manifests & Generated hours before the flight for all passengers; fine to be slightly stale \\
+\rowcolor{zebra}
 \textbf{A/B testing} & Testing two runway configurations & North runway vs. south runway: measure average taxi time, fuel burn, delays. Switch all traffic to winner \\
 \textbf{Monitoring/drift} & Control tower watching weather change & Tower continuously monitors conditions; if wind pattern shifts (drift), immediately reroutes aircraft or triggers holds \\
+\rowcolor{zebra}
 \textbf{Model decay} & Flight routes becoming outdated & Routes planned for old demand patterns; if a city grows (distribution shift), the old route plan serves it poorly \\
 \textbf{Retraining} & Recertifying crews after new regulations & FAA changes rules (concept drift); all crews must be retrained and recertified before flying under new conditions \\
+\rowcolor{zebra}
 \textbf{CI/CD pipeline} & Pre-flight safety checklist** & Before any flight departs (model deploys), the same rigorous checklist is run every time --- no shortcuts \\
 \textbf{Latency (P99)} & On-time departure rate & P99 latency = the flight that takes longest even on a bad day; 99th percentile delays cascade through the hub \\
+\rowcolor{zebra}
 \textbf{Data versioning} & Black box flight recorder & Every flight records exactly what happened; if a crash occurs (model failure), you replay the recording to find the root cause \\
 \textbf{Shadow deployment} & Test flight with no passengers & New aircraft configuration runs a full route but carries no revenue passengers --- validates before trusting with real load \\
+\rowcolor{zebra}
 \textbf{Canary release} & Single gate uses new boarding process & Try new boarding procedure on 2 flights/day; if it works, roll out to all 500 gates \\
 \end{longtable}
 
@@ -2802,6 +2863,7 @@ MLOps solves the gap between model training and reliable production impact. The 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3826}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2645}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2814,18 +2876,25 @@ Interview Trigger
 \bottomrule\noalign{}
 \endlastfoot
 Feature store & Offline (S3) + Online (Redis) + shared code & "training-serving skew" question \\
+\rowcolor{zebra}
 Data parallelism & Full model per GPU, split data, all-reduce & "distributed training" question \\
 Model parallelism & Split model, flow activations & "large model / LLM" question \\
+\rowcolor{zebra}
 Ring all-reduce & Each GPU sends receives one full tensor total & "why not parameter server?" \\
 Two-tower model & User tower + item tower + dot product + ANN & "recommendation system" \\
+\rowcolor{zebra}
 Candidate \(\rightarrow\) Rank \(\rightarrow\) Re-rank & Millions \(\rightarrow\) 500 \(\rightarrow\) 50 \(\rightarrow\) 20 & "recommendation funnel" \\
 Wide \& Deep / DCN & Dense + sparse + cross features & "CTR prediction model" \\
+\rowcolor{zebra}
 PSI \textgreater{} 0.2 & Major distribution shift, take action & "drift detection" \\
 Concept drift & P(Y\textbar X) changed, not just P(X) & "monitoring" question \\
+\rowcolor{zebra}
 Interleaving & 100x faster than A/B for ranking & "online evaluation" question \\
 Point-in-time join & No future leakage in training features & "training-serving skew" \\
+\rowcolor{zebra}
 Continuous training & Retrain triggered by drift or schedule & "retraining strategy" \\
 Batch serving & Pre-compute, hours old OK, cheap & "latency not critical" \\
+\rowcolor{zebra}
 Online serving & Request-triggered, \textless{} 100ms, GPU cluster & "real-time scoring" \\
 Calibration & P(click) exact value must be correct & "ad auction" question \\
 \end{longtable}

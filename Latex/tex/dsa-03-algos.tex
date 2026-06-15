@@ -99,6 +99,7 @@ Complexity notation describes \textbf{how resource usage scales with input size}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2738}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5833}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Notation
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -111,6 +112,7 @@ Meaning
 \bottomrule\noalign{}
 \endlastfoot
 O(f(n)) & Big-O (upper bound) & Algorithm runs in \textbf{at most} f(n) steps (worst case) \\
+\rowcolor{zebra}
 \(\Omega\)(f(n)) & Big-Omega (lower bound) & Algorithm runs in \textbf{at least} f(n) steps (best case) \\
 \(\Theta\)(f(n)) & Big-Theta (tight bound) & Algorithm runs in \textbf{exactly} f(n) steps (avg case matches both) \\
 \end{longtable}
@@ -295,6 +297,7 @@ Let critical exponent: \emph{\emph{c} = log\_b(a)}*
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3385}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1830}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Case
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -309,6 +312,7 @@ Intuition
 \bottomrule\noalign{}
 \endlastfoot
 Case 1 & f(n) = O(n\^{}(c*\(-\)\(\varepsilon\))) for some \(\varepsilon\) \textgreater{} 0 & T(n) = \(\Theta\)(n\^{}c*) & Leaves dominate \\
+\rowcolor{zebra}
 Case 2 & f(n) = \(\Theta\)(n\^{}c* \(\cdot\) log\^{}k n), k \(\geq\) 0 & T(n) = \(\Theta\)(n\^{}c* \(\cdot\) log\^{}(k+1) n) & Equal work per level \\
 Case 3 & f(n) = \(\Omega\)(n\^{}(c*+\(\varepsilon\))) and regularity holds & T(n) = \(\Theta\)(f(n)) & Root dominates \\
 \end{longtable}
@@ -324,6 +328,7 @@ Case 3 & f(n) = \(\Omega\)(n\^{}(c*+\(\varepsilon\))) and regularity holds & T(n
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0634}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2342}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Recurrence
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -344,10 +349,13 @@ Result
 \bottomrule\noalign{}
 \endlastfoot
 T(n) = 2T(n/2) + n & 2 & 2 & 1 & n = \(\Theta\)(n¹) & 2 & \(\Theta\)(n log n) \\
+\rowcolor{zebra}
 T(n) = 2T(n/2) + 1 & 2 & 2 & 1 & 1 = O(n\^{}0.5) & 1 & \(\Theta\)(n) \\
 T(n) = 4T(n/2) + n\(^2\) & 4 & 2 & 2 & n\(^2\) = \(\Theta\)(n\(^2\)) & 2 & \(\Theta\)(n\(^2\) log n) \\
+\rowcolor{zebra}
 T(n) = 4T(n/2) + n\(^3\) & 4 & 2 & 2 & n\(^3\) = \(\Omega\)(n\^{}2.5) & 3 & \(\Theta\)(n\(^3\)) \\
 T(n) = T(n/2) + 1 & 1 & 2 & 0 & 1 = \(\Theta\)(1) & 2 & \(\Theta\)(log n) \\
+\rowcolor{zebra}
 T(n) = 3T(n/3) + n & 3 & 3 & 1 & n = \(\Theta\)(n¹) & 2 & \(\Theta\)(n log n) \\
 \end{longtable}
 
@@ -374,6 +382,7 @@ Use this table to instantly identify which algorithms are feasible given constra
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3474}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4471}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 n (input size)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -386,12 +395,16 @@ Typical algorithm
 \bottomrule\noalign{}
 \endlastfoot
 n \(\leq\) 10 & O(n!) or O(n\^{}n) & Brute-force, permutations \\
+\rowcolor{zebra}
 n \(\leq\) 20 & O(2\(^n\)\(\cdot\)n) & Bitmask DP, meet in the middle \\
 n \(\leq\) 100 & O(n\(^3\)) or O(n\(^4\)) & Floyd-Warshall, naive string matching \\
+\rowcolor{zebra}
 n \(\leq\) 1,000 & O(n\(^2\)) & Insertion sort, naive DP \\
 n \(\leq\) 10,000 & O(n\(^2\) log n) & Slower O(n\(^2\)) algorithms \\
+\rowcolor{zebra}
 n \(\leq\) 100,000 & O(n log n) or O(n\(\surd\)n) & Merge sort, segment tree, sqrt decomp \\
 n \(\leq\) 1,000,000 & O(n log n) & Merge sort, heap operations \\
+\rowcolor{zebra}
 n \(\leq\) 10,000,000 & O(n) & Linear scans, counting sort \\
 n \textgreater{} 10\^{}8 & O(log n) or O(1) & Binary search, math formulas \\
 \end{longtable}
@@ -649,6 +662,7 @@ Non-comparison sorts break the O(n log n) barrier by exploiting structure of key
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0688}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.4031}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -669,14 +683,19 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 Merge Sort & O(n log n) & O(n log n) & O(n log n) & O(n) & Yes & Guaranteed; good for linked lists \\
+\rowcolor{zebra}
 Quick Sort & O(n log n) & O(n log n) & O(n\(^2\)) & O(log n)* & No & Fastest in practice; randomize pivot \\
 Heap Sort & O(n log n) & O(n log n) & O(n log n) & O(1) & No & Cache-unfriendly \\
+\rowcolor{zebra}
 Insertion Sort & O(n) & O(n\(^2\)) & O(n\(^2\)) & O(1) & Yes & Best for small/nearly-sorted \\
 Selection Sort & O(n\(^2\)) & O(n\(^2\)) & O(n\(^2\)) & O(1) & No & Never use in interviews \\
+\rowcolor{zebra}
 Bubble Sort & O(n) & O(n\(^2\)) & O(n\(^2\)) & O(1) & Yes & Never use in interviews \\
 Counting Sort & O(n+k) & O(n+k) & O(n+k) & O(n+k) & Yes & Only integers in small range \\
+\rowcolor{zebra}
 Radix Sort & O(d\(\cdot\)n) & O(d\(\cdot\)n) & O(d\(\cdot\)n) & O(n+k) & Yes & Fixed-width keys \\
 Bucket Sort & O(n+k) & O(n+k) & O(n\(^2\)) & O(n+k) & Yes & Uniform float data \\
+\rowcolor{zebra}
 Tim Sort & O(n) & O(n log n) & O(n log n) & O(n) & Yes & Python\textquotesingle s built-in; hybrid merge+insertion \\
 \end{longtable}
 
@@ -1201,6 +1220,7 @@ All-pairs shortest paths; handles negative edges; detects negative cycles.
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0964}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.3034}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1219,8 +1239,10 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 Dijkstra & No & No & Single source & O((V+E) log V) & Fastest for non-negative; use with priority queue \\
+\rowcolor{zebra}
 Bellman-Ford & Yes & Detects & Single source & O(V\(\cdot\)E) & Use when negative edges exist \\
 Floyd-Warshall & Yes & Detects & All pairs & O(V\(^3\)) & Best for dense graphs, all-pairs \\
+\rowcolor{zebra}
 BFS & No (unit weights only) & No & Single source & O(V+E) & Optimal for unweighted graphs \\
 DAG Shortest Path & Yes (DAG only) & N/A & Single source & O(V+E) & Topo sort + relax; fastest for DAGs \\
 \end{longtable}
@@ -1475,6 +1497,7 @@ DP solves problems by \textbf{breaking them into overlapping subproblems} and st
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4306}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4167}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Memoization (Top-Down)
@@ -1486,10 +1509,13 @@ Tabulation (Bottom-Up)
 \bottomrule\noalign{}
 \endlastfoot
 Approach & Recursive with cache & Iterative, fill table \\
+\rowcolor{zebra}
 Direction & Problem \(\rightarrow\) subproblems & Base cases \(\rightarrow\) problem \\
 Space & O(depth) stack + memo & O(states) table \\
+\rowcolor{zebra}
 Complexity & Same asymptotically & Often faster constants \\
 Ease & Easier to implement & Better for optimization \\
+\rowcolor{zebra}
 When to use & Not all subproblems needed & All subproblems computed \\
 \end{longtable}
 
@@ -2065,6 +2091,7 @@ Computers operate on binary; bit tricks exploit this for O(1) operations.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4048}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Operation
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2077,12 +2104,16 @@ Effect
 \bottomrule\noalign{}
 \endlastfoot
 Set bit k & `n & = (1 \textless\textless{} k)` \\
+\rowcolor{zebra}
 Clear bit k & \texttt{n\ \&=\ \textasciitilde{}(1\ \textless{}\textless{}\ k)} & Force bit k to 0 \\
 Toggle bit k & \texttt{n\ \^{}=\ (1\ \textless{}\textless{}\ k)} & Flip bit k \\
+\rowcolor{zebra}
 Check bit k & \texttt{(n\ \textgreater{}\textgreater{}\ k)\ \&\ 1} & Get value of bit k \\
 Clear lowest set bit & \texttt{n\ \&\ (n\ -\ 1)} & Removes rightmost 1 bit \\
+\rowcolor{zebra}
 Isolate lowest set bit & \texttt{n\ \&\ (-n)} & Gets rightmost 1 bit only \\
 Check power of 2 & \texttt{n\ \textgreater{}\ 0\ and\ (n\ \&\ (n-1))\ ==\ 0} & True iff exactly one bit set \\
+\rowcolor{zebra}
 Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or \texttt{n.bit\_count()} & Hamming weight \\
 \end{longtable}
 
@@ -2373,6 +2404,7 @@ Compute a\^{}b in O(log b):
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2222}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2222}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Problem Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2387,28 +2419,40 @@ Complexity
 \bottomrule\noalign{}
 \endlastfoot
 Shortest path, unweighted & BFS in grid/graph & BFS & O(V+E) \\
+\rowcolor{zebra}
 Shortest path, non-negative weights & Edge weights, single source & Dijkstra & O((V+E)log V) \\
 Shortest path, negative weights & Negative edges allowed & Bellman-Ford & O(VE) \\
+\rowcolor{zebra}
 All-pairs shortest path & Need dist between all pairs & Floyd-Warshall & O(V\(^3\)) \\
 Minimum spanning tree & Connect all nodes cheaply & Kruskal or Prim & O(E log E) \\
+\rowcolor{zebra}
 Sort, general & n \(\leq\) 10\^{}6 & Quick sort / Merge sort & O(n log n) \\
 Sort, small integer range & Keys in {[}0, k{]} & Counting sort / Radix sort & O(n+k) \\
+\rowcolor{zebra}
 Cycle detection, undirected & Find cycle in graph & Union-Find or DFS & O(\(\alpha\)(n)) or O(V+E) \\
 Cycle detection, directed & Find cycle in digraph & DFS (3-color) & O(V+E) \\
+\rowcolor{zebra}
 Topological order & DAG dependency order & Kahn\textquotesingle s or DFS topo & O(V+E) \\
 Connected components & Group nodes & DFS/BFS + visited set & O(V+E) \\
+\rowcolor{zebra}
 Optimal value with choices & Overlapping subproblems & Dynamic Programming & Varies \\
 Make decisions greedily & Exchange argument holds & Greedy & O(n log n) or O(n) \\
+\rowcolor{zebra}
 All subsets/permutations & Enumerate possibilities & Backtracking & O(2\^{}n) or O(n!) \\
 Find element in sorted array & Array is sorted & Binary search & O(log n) \\
+\rowcolor{zebra}
 Find minimum X satisfying condition & Monotone predicate on integers & Binary search on answer & O(log n \(\cdot\) check) \\
 Frequency counting & Count occurrences & Hash map / Counting array & O(n) \\
+\rowcolor{zebra}
 Range minimum/maximum & Static range queries & Sparse table & O(n log n) pre, O(1) query \\
 Range sum queries & Prefix sums or updates & Prefix sum / Fenwick tree & O(n) or O(n log n) \\
+\rowcolor{zebra}
 Substring search & Pattern in text & KMP / Rabin-Karp & O(n+m) \\
 Disjoint set operations & Dynamic connectivity & Union-Find & O(\(\alpha\)(n)) amortized \\
+\rowcolor{zebra}
 Large integers, divisibility & Modular arithmetic & Fermat\textquotesingle s theorem, sieve & O(log n) \\
 Find unique / pair in XOR & XOR properties & Bit manipulation & O(n) \\
+\rowcolor{zebra}
 Multiple choices at each step & Combinatorial search & Backtracking + pruning & Exponential \\
 Maximize non-overlapping intervals & Interval scheduling & Greedy (sort by end time) & O(n log n) \\
 \end{longtable}
@@ -2419,6 +2463,7 @@ Maximize non-overlapping intervals & Interval scheduling & Greedy (sort by end t
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3239}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6761}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm / Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2429,22 +2474,31 @@ Real-Life Analogy
 \bottomrule\noalign{}
 \endlastfoot
 BFS & Ripple in a pond --- spreads layer by layer from center \\
+\rowcolor{zebra}
 DFS & Solving a maze by always turning left until you hit a wall, then backtracking \\
 Dijkstra & Google Maps routing --- always expand the nearest unvisited city \\
+\rowcolor{zebra}
 Bellman-Ford & Send rumors through a network; after n-1 rounds, everyone knows the shortest path \\
 Dynamic Programming & Filling out a tax form --- use last year\textquotesingle s answers to compute this year\textquotesingle s \\
+\rowcolor{zebra}
 Memoization & Sticky notes --- write down each sub-answer once so you never recalculate it \\
 Greedy (interval scheduling) & Booking meeting rooms --- always pick the meeting that ends soonest \\
+\rowcolor{zebra}
 Merge Sort & Library sorting books by splitting into piles, sorting each pile, then merging \\
 Quick Sort & Separating audience by height relative to a pivot person, then recursing \\
+\rowcolor{zebra}
 Binary Search & Guessing a number --- always guess the middle of the remaining range \\
 Topological Sort & Course prerequisite ordering --- take prerequisites before the main course \\
+\rowcolor{zebra}
 Union-Find & Friend groups --- if A and B are friends, merge their groups; check if same group \\
 Backtracking & Trying all keys on a keyring --- discard a key as soon as it doesn\textquotesingle t fit \\
+\rowcolor{zebra}
 Sieve of Eratosthenes & Crossing out multiples on a number grid to find primes \\
 Amortized Analysis & Buying coffee with a punch card --- most coffees are cheap, the 10th is free \\
+\rowcolor{zebra}
 Big-O & Speed limit signs --- tells you the worst that can happen, not typical speed \\
 MST (Kruskal) & Building cheapest road network by adding roads from cheapest to most expensive \\
+\rowcolor{zebra}
 Hash Table & Lockers with assigned numbers --- direct access by computing the locker number \\
 Heap & Hospital triage --- the most critical patient always treated next \\
 \end{longtable}
@@ -2690,6 +2744,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Operation
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2702,26 +2757,37 @@ Time
 \bottomrule\noalign{}
 \endlastfoot
 Access by index & Array & O(1) \\
+\rowcolor{zebra}
 Search & Array (unsorted) & O(n) \\
 Search & Array (sorted) & O(log n) \\
+\rowcolor{zebra}
 Insert/Delete & Array (arbitrary position) & O(n) \\
 Insert/Delete & Linked List & O(1) at head; O(n) to find \\
+\rowcolor{zebra}
 Push/Pop & Stack/Queue & O(1) \\
 Insert/Delete/Search & Hash Table & O(1) avg, O(n) worst \\
+\rowcolor{zebra}
 Insert/Delete/Search & BST (balanced) & O(log n) \\
 Insert/Extract-Min & Min-Heap & O(log n) \\
+\rowcolor{zebra}
 Build heap from array & Heap & O(n) \\
 DFS/BFS & Graph & O(V+E) \\
+\rowcolor{zebra}
 Dijkstra & Graph (non-neg) & O((V+E) log V) \\
 Bellman-Ford & Graph & O(VE) \\
+\rowcolor{zebra}
 Floyd-Warshall & Graph & O(V\(^3\)) \\
 Kruskal/Prim & Graph & O(E log E) \\
+\rowcolor{zebra}
 Merge Sort / Heap Sort & Array & O(n log n) \\
 Quick Sort & Array & O(n log n) avg \\
+\rowcolor{zebra}
 Counting Sort & Array & O(n+k) \\
 Binary Search & Sorted Array & O(log n) \\
+\rowcolor{zebra}
 Union-Find & DSU & O(\(\alpha\)(n)) amortized \\
 Sieve of Eratosthenes & - & O(n log log n) \\
+\rowcolor{zebra}
 GCD & - & O(log(min(a,b))) \\
 Fast Exponentiation & - & O(log n) \\
 \end{longtable}
@@ -2732,6 +2798,7 @@ Fast Exponentiation & - & O(log n) \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4595}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5405}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 You see...
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2742,30 +2809,43 @@ Think...
 \bottomrule\noalign{}
 \endlastfoot
 Shortest path, no weights & BFS \\
+\rowcolor{zebra}
 Shortest path, positive weights & Dijkstra \\
 Shortest path, negative weights & Bellman-Ford \\
+\rowcolor{zebra}
 All-pairs shortest path & Floyd-Warshall \\
 Minimum spanning tree & Kruskal (sparse) / Prim (dense) \\
+\rowcolor{zebra}
 "Connected components" or "groups" & Union-Find or DFS \\
 "Cycle in directed graph" & Topological sort (Kahn\textquotesingle s) or DFS 3-color \\
+\rowcolor{zebra}
 "Dependency ordering" & Topological sort \\
 "Count ways", "min/max cost" & Dynamic Programming \\
+\rowcolor{zebra}
 "Optimal choice at each step" & Greedy (verify with exchange argument) \\
 "All possibilities / enumerate" & Backtracking \\
+\rowcolor{zebra}
 "Sorted array, find X" & Binary search \\
 "Find minimum X such that..." & Binary search on answer \\
+\rowcolor{zebra}
 "Sliding window, subarray" & Two pointers or sliding window \\
 "Top K elements" & Heap (size K) \\
+\rowcolor{zebra}
 "Anagram / frequency" & Hash map or counting array \\
 "Intervals, overlapping" & Sort by start/end + greedy \\
+\rowcolor{zebra}
 "Parentheses, matching" & Stack \\
 "Next greater element" & Monotonic stack \\
+\rowcolor{zebra}
 "Integer keys, small range" & Counting sort / bucket \\
 "Large integers mod prime" & Modular arithmetic + Fermat \\
+\rowcolor{zebra}
 "Find single number in pairs" & XOR trick \\
 "Power of 2 / bit patterns" & Bit manipulation \\
+\rowcolor{zebra}
 "String matching" & KMP / Rabin-Karp \\
 "2D grid, path finding" & BFS (shortest) / DFS (any path) \\
+\rowcolor{zebra}
 "Subsets, combinations" & Backtracking or bitmask \\
 "Repeated subproblems visible" & Memoize it \(\rightarrow\) DP \\
 \end{longtable}
@@ -2801,4 +2881,5 @@ Minimum spanning tree & Kruskal (sparse) / Prim (dense) \\
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/dsa-03-algos/01-big-o-growth.pdf}{Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n$^2$); exponential is infeasible past ~n=30.}
+\visualfigure{../figures/dsa-03-algos/02-sorting-complexity.pdf}{No single sort wins everywhere: merge sort is stable and worst-case O(n log n) but needs O(n) space; quicksort is faster in practice but O(n$^2$) worst case.}
 \end{document}

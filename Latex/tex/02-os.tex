@@ -89,6 +89,7 @@ Core OS abstractions:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3457}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6543}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Physical Resource
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -99,8 +100,10 @@ OS Abstraction
 \bottomrule\noalign{}
 \endlastfoot
 CPU & Process / Thread \\
+\rowcolor{zebra}
 RAM & Virtual Address Space \\
 Disk & File System \\
+\rowcolor{zebra}
 Network card & Socket \\
 I/O devices & Device drivers / file-like interfaces \\
 \end{longtable}
@@ -327,6 +330,7 @@ Process with 3 threads:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3904}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4165}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -339,10 +343,13 @@ Thread
 \bottomrule\noalign{}
 \endlastfoot
 Memory space & Own virtual address space & Shared with other threads in process \\
+\rowcolor{zebra}
 Creation cost & High (copy page tables, file descriptors) & Low (just allocate stack + registers) \\
 Communication & IPC (pipes, sockets, shared memory) & Direct (shared variables --- but needs locks) \\
+\rowcolor{zebra}
 Isolation & Crash in one doesn\textquotesingle t affect another & Crash (segfault) kills entire process \\
 Context switch cost & High (flush TLB, switch page tables) & Low (same address space, partial register save) \\
+\rowcolor{zebra}
 Typical overhead & \textasciitilde MB & \textasciitilde few KB \\
 Linux implementation & \texttt{fork()} & \texttt{clone()} with shared flags \\
 \end{longtable}
@@ -697,6 +704,7 @@ updates P1's vruntime → reinsert → tree rebalances
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1767}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2709}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -715,10 +723,13 @@ Drawback
 \bottomrule\noalign{}
 \endlastfoot
 FCFS & No & No & Yes & Batch jobs & Convoy effect \\
+\rowcolor{zebra}
 SJF (non-preempt) & No & Yes & No & Min avg wait & Needs burst time \\
 SRTF & Yes & Yes & No & Min avg wait & Needs burst time \\
+\rowcolor{zebra}
 Round Robin & Yes & No & No & Interactive & Context switch overhead \\
 Priority & Both & Yes & No & Varied needs & Starvation \\
+\rowcolor{zebra}
 MLFQ & Yes & No (aging) & No & General purpose & Complex tuning \\
 CFS & Yes & No & No & Linux general & Complex impl \\
 \end{longtable}
@@ -1007,6 +1018,7 @@ Linux uses a variant: pages have active/inactive lists, with the clock-like mech
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2351}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2812}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1023,10 +1035,13 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 FIFO & High & Low & Yes & Simple, bad \\
+\rowcolor{zebra}
 Optimal & Lowest & Impossible & No & Theoretical benchmark \\
 LRU & Low & High (true impl) & No & Best practical choice \\
+\rowcolor{zebra}
 Clock & Low-Medium & Low & No & Linux approximation \\
 LFU & Medium & Medium & No & Frequency, not recency \\
+\rowcolor{zebra}
 Random & High & Negligible & No & Surprisingly decent \\
 \end{longtable}
 
@@ -1217,6 +1232,7 @@ Asynchronous notification to a process. \texttt{kill(pid,\ SIGTERM)}, \texttt{ki
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1562}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2708}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1235,10 +1251,13 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 Pipe & Fast & Stream & Blocking by default & Local (related) & Shell pipes, parent-child \\
+\rowcolor{zebra}
 Named Pipe & Fast & Stream & Blocking & Local & Unrelated local processes \\
 Shared Memory & Fastest & Large & Manual (semaphores) & Local & High-perf data sharing \\
+\rowcolor{zebra}
 Message Queue & Medium & Messages & Built-in & Local & Producer-consumer patterns \\
 Unix Socket & Fast & Stream/Dgram & N/A & Local & Service-to-service local \\
+\rowcolor{zebra}
 TCP Socket & Medium & Stream & N/A & Network & Distributed systems \\
 Signal & Very fast & None (signal\#) & N/A & Local & Process control \\
 \end{longtable}
@@ -1284,6 +1303,7 @@ Mnemonic: \textbf{MHNC} --- "My Habits Negatively Create" deadlocks
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1760}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3372}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1298,8 +1318,10 @@ Used When
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Prevention} & Eliminate one of Coffman\textquotesingle s 4 conditions & May reduce concurrency & Design time \\
+\rowcolor{zebra}
 \textbf{Avoidance} & Banker\textquotesingle s algorithm --- only allocate if safe state & Overhead per allocation & Known max resources \\
 \textbf{Detection + Recovery} & Let it happen, detect cycles, kill/rollback & Detection overhead & Databases (timeout + retry) \\
+\rowcolor{zebra}
 \textbf{Ignore (Ostrich)} & Pretend deadlocks won\textquotesingle t happen & None & Linux/Windows (rare deadlocks \(\rightarrow\) reboot) \\
 \end{longtable}
 
@@ -1448,6 +1470,7 @@ Common system calls and what they do:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2075}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6457}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Category
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1460,20 +1483,28 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 Process & \texttt{fork()} & Clone current process \\
+\rowcolor{zebra}
 Process & \texttt{exec()} & Replace process image with new program \\
 Process & \texttt{exit()} & Terminate process \\
+\rowcolor{zebra}
 Process & \texttt{wait()} & Wait for child to exit \\
 Process & \texttt{getpid()} & Get process ID \\
+\rowcolor{zebra}
 Memory & \texttt{brk()} & Extend/shrink heap \\
 Memory & \texttt{mmap()} & Map file/anonymous memory \\
+\rowcolor{zebra}
 Memory & \texttt{munmap()} & Unmap memory region \\
 File & \texttt{open()} & Open file, return fd \\
+\rowcolor{zebra}
 File & \texttt{read()} & Read from fd \\
 File & \texttt{write()} & Write to fd \\
+\rowcolor{zebra}
 File & \texttt{close()} & Close fd \\
 File & \texttt{stat()} & Get file metadata \\
+\rowcolor{zebra}
 IPC & \texttt{pipe()} & Create pipe \\
 IPC & \texttt{socket()} & Create socket \\
+\rowcolor{zebra}
 IPC & \texttt{send()}/\texttt{recv()} & Socket I/O \\
 Sync & \texttt{futex()} & Fast userspace mutex (basis for pthreads) \\
 \end{longtable}
@@ -1671,6 +1702,7 @@ Virtual Address (48 bits used):
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.0977}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.9023}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 OS Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1681,22 +1713,31 @@ Real-Life Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Process} & A company renting a full floor --- its own offices, filing cabinets, and staff, physically walled off from the companies on other floors; one company can\textquotesingle t wander into another\textquotesingle s space \\
+\rowcolor{zebra}
 \textbf{Thread} & An employee on that rented floor --- shares the floor\textquotesingle s filing cabinets and supplies with colleagues, but has their own desk, their own to-do list, and their own chair \\
 \textbf{Virtual Memory} & Every employee gets a floor map labelling their rooms 1, 2, 3 \ldots{} The building manager secretly maps those numbers to real rooms scattered across many floors --- the employee sees a tidy sequence; the building is a patchwork \\
+\rowcolor{zebra}
 \textbf{Page Table} & The building manager\textquotesingle s master ledger --- one row per virtual room number, recording which actual room on which actual floor it corresponds to; without the ledger, no one can find anything \\
 \textbf{TLB} & The receptionist\textquotesingle s quick-reference card of the dozen rooms she looks up every hour --- she checks the card first; only if the room isn\textquotesingle t on it does she page through the full master ledger \\
+\rowcolor{zebra}
 \textbf{Page Fault} & You walk to a room listed on your map and the files aren\textquotesingle t there --- someone has boxed them and sent them to the basement archive (disk). A facilities runner fetches the box (major fault); if the map just forgot to update after a recent delivery, the runner corrects the entry on the spot (minor fault) \\
 \textbf{Context Switch} & The building has one big glass-walled meeting room. When Team A\textquotesingle s booking ends, they pack every whiteboard note and laptop into labelled boxes; facilities wheels in Team B\textquotesingle s boxes and pins their diagrams back up before the next session starts \\
+\rowcolor{zebra}
 \textbf{Deadlock} & Team A is holding the sole projector and waiting for the laser pointer that Team B is holding --- and Team B is waiting for the projector. Both teams sit in their rooms, arms folded, waiting forever \\
 \textbf{Scheduling (RR)} & The facilities team rotates access to the one shared high-speed printer: each department gets a 10-minute slot, then the next department\textquotesingle s key card is activated, cycling through the list fairly \\
+\rowcolor{zebra}
 \textbf{MLFQ} & New print jobs enter the express tray (highest priority, short slot). If a job hogs the printer through its full slot, it gets moved to the standard tray, then to the overnight bulk tray --- quick one-page memos naturally stay at the top; the thousand-page report drifts to the bottom \\
 \textbf{Fork + CoW} & A company on floor 3 wants to spin up a branch office (child process). Facilities hands the branch a copy of the floor map pointing to the same filing cabinets. The moment the branch edits a document, facilities quietly makes a private copy of that cabinet drawer --- until then, nothing is duplicated \\
+\rowcolor{zebra}
 \textbf{Pipe} & The inter-floor mail chute: Team A drops documents in at the top, Team B collects them at the bottom; flow is strictly one-way and the chute can only hold so many envelopes before it backs up \\
 \textbf{Shared Memory} & A glass-fronted document wall in the lobby that both the 3rd-floor and 5th-floor companies can read and update directly --- the fastest way to exchange data, but teams must agree on who writes when or pages get overwritten \\
+\rowcolor{zebra}
 \textbf{File System Inode} & The building\textquotesingle s asset tag record for a cabinet drawer: it doesn\textquotesingle t hold the documents, but it records owner, creation date, number of folders inside, and exactly which shelf bays to find them in --- the drawer\textquotesingle s name is only in the floor directory, not on the record itself \\
 \textbf{Journaling} & Before facilities moves a cabinet from one room to another, the facilities manager writes the move order in the shift log. If the power cuts out mid-move, the morning crew reads the log and either completes or reverses the move --- nothing is left half-done \\
+\rowcolor{zebra}
 \textbf{Thrashing} & The building has 10 rooms but 15 teams each need 4 rooms simultaneously. Facilities constantly evicts one team\textquotesingle s boxes to make space for another --- everyone spends the day waiting for their boxes to arrive from the basement rather than doing any actual work \\
 \textbf{Zombie Process} & A company vacates its floor and returns the key, but facilities hasn\textquotesingle t yet struck it from the tenant register. The floor is empty, yet the register still lists the company as an active tenant until the landlord (parent) signs off \\
+\rowcolor{zebra}
 \textbf{Semaphore} & The parking-garage gate counter --- a sign shows spaces remaining. Each entering car decrements the count; the gate refuses entry at zero. Exiting cars increment it, and the next waiting car is waved in \\
 \end{longtable}
 
@@ -2089,6 +2130,7 @@ Pick a topic (say, "page table walk") and explain it out loud from scratch. If y
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6389}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3611}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2099,14 +2141,19 @@ Value
 \bottomrule\noalign{}
 \endlastfoot
 Page size & 4KB (typical) \\
+\rowcolor{zebra}
 TLB hit & \textasciitilde1 cycle \\
 TLB miss (page walk) & \textasciitilde100 cycles \\
+\rowcolor{zebra}
 Context switch overhead & \textasciitilde1-10 \(\mu\)s \\
 System call cost & \textasciitilde100-1000 ns \\
+\rowcolor{zebra}
 Major page fault (SSD) & \textasciitilde100 \(\mu\)s \\
 Major page fault (HDD) & \textasciitilde10 ms \\
+\rowcolor{zebra}
 L1 cache & \textasciitilde1 ns \\
 L3 cache & \textasciitilde40 ns \\
+\rowcolor{zebra}
 DRAM access & \textasciitilde100 ns \\
 \end{longtable}
 
@@ -2117,6 +2164,7 @@ DRAM access & \textasciitilde100 ns \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4102}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4193}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Topic
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2129,26 +2177,37 @@ Interview Gotcha
 \bottomrule\noalign{}
 \endlastfoot
 Process vs Thread & Different address space vs shared & Threads not isolated from each other \\
+\rowcolor{zebra}
 fork() & CoW, not a full copy & Heavy writes after fork() = doubled memory \\
 exec() & Replaces address space, same PID & Must follow fork() in typical usage \\
+\rowcolor{zebra}
 Zombie & Child done, parent hasn\textquotesingle t wait()\textquotesingle d & Consumes PID and PCB \\
 Virtual Memory & Illusion of full address space & Virtual \(\neq\) physical \\
+\rowcolor{zebra}
 Page Table & Maps VPN \(\rightarrow\) PFN & Multi-level to save space \\
 TLB & Cache of VPN\(\rightarrow\)PFN & Flush on context switch (process) \\
+\rowcolor{zebra}
 Page Fault & Minor (fast), Major (disk), Segfault (die) & Minor faults are normal and expected \\
 FCFS & FIFO, simple & Convoy effect \\
+\rowcolor{zebra}
 RR & Fair, quantum-based & Quantum size matters \\
 SJF & Optimal wait time & Needs burst time, starvation \\
+\rowcolor{zebra}
 MLFQ & Learns I/O vs CPU dynamically & No starvation (aging) \\
 CFS & vruntime + red-black tree & Linux actual scheduler \\
+\rowcolor{zebra}
 Deadlock & Need all 4 Coffman conditions & Circular wait alone \(\neq\) deadlock \\
 Lock ordering & Prevents circular wait & Most practical deadlock prevention \\
+\rowcolor{zebra}
 Shared memory & Fastest IPC & Needs explicit synchronization \\
 Pipes & Unidirectional byte stream & Only between related processes \\
+\rowcolor{zebra}
 Inode & Metadata, not filename & Filename stored in directory entry \\
 Journaling & Write intent before acting & ext4 ordered mode = default \\
+\rowcolor{zebra}
 Thrashing & Sum of working sets \textgreater{} RAM & Reduce multiprogramming degree \\
 CoW & Shared pages until write & Redis fork() + heavy writes = 2\(\times\) memory \\
+\rowcolor{zebra}
 Huge Pages & Reduce TLB pressure & THP can cause latency spikes \\
 cgroups & Limit CPU/memory per process group & Foundation of containers \\
 \end{longtable}
@@ -2184,4 +2243,5 @@ cgroups & Limit CPU/memory per process group & Foundation of containers \\
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/02-os/01-scheduling-gantt.pdf}{FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches.}
+\visualfigure{../figures/02-os/02-memory-hierarchy.pdf}{Each level trades capacity for speed by orders of magnitude. Performance comes from keeping the working set in the fastest tier that fits — the basis of caching.}
 \end{document}

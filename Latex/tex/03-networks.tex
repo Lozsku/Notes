@@ -78,6 +78,7 @@ Computer networking is the discipline of \textbf{connecting computing devices so
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1346}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8654}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Term
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -88,10 +89,13 @@ Definition
 \bottomrule\noalign{}
 \endlastfoot
 Protocol & Agreed rules for formatting and transmitting data \\
+\rowcolor{zebra}
 Packet & Fixed-size chunk of data with header metadata \\
 Socket & (IP, Port) pair --- the addressing unit for a connection \\
+\rowcolor{zebra}
 Latency & Time for one packet to travel source \(\rightarrow\) destination \\
 Bandwidth & Maximum data volume per unit time on a link \\
+\rowcolor{zebra}
 Throughput & Actual data successfully delivered per unit time \\
 MTU & Maximum Transmission Unit --- largest packet a link can carry (typically 1500 bytes on Ethernet) \\
 \end{longtable}
@@ -122,6 +126,7 @@ This separation of concerns is why you can swap WiFi for Ethernet without changi
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1255}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8745}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -132,10 +137,13 @@ Specific Concern
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Google} & Invented QUIC (now HTTP/3), SPDY (became HTTP/2), gRPC. Operates one of the largest private WANs (B4). Networking is core infrastructure. \\
+\rowcolor{zebra}
 \textbf{Meta} & Runs one of the largest CDNs + social graph. L4/L7 load balancing at petabyte scale. QUIC adoption early. Open-sourced Proxygen, Katran. \\
 \textbf{Amazon (AWS)} & Sells networking primitives: VPC, ELB, Route 53, CloudFront, Direct Connect. Candidates must understand the product they are building on. \\
+\rowcolor{zebra}
 \textbf{Netflix} & 30\%+ of peak US internet traffic. Deep CDN (Open Connect), adaptive bitrate streaming, chaos engineering on network paths. \\
 \textbf{Apple} & iMessage, FaceTime, iCloud --- all require secure, efficient transport. Certificate pinning, TLS, push notifications (APNs). \\
+\rowcolor{zebra}
 \textbf{Uber/Airbnb} & Real-time dispatch, WebSocket connections, microservice mesh, service discovery. \\
 \end{longtable}
 
@@ -408,6 +416,7 @@ No connection, no sequencing, no retransmission, no congestion control.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4022}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3696}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -420,12 +429,16 @@ UDP
 \bottomrule\noalign{}
 \endlastfoot
 Connection & Connection-oriented (3-way handshake) & Connectionless \\
+\rowcolor{zebra}
 Reliability & Guaranteed delivery + retransmission & No guarantee \\
 Ordering & In-order delivery & May arrive out of order \\
+\rowcolor{zebra}
 Overhead & 20+ byte header, RTT to establish & 8-byte header, no setup \\
 Flow control & Yes (window-based) & No \\
+\rowcolor{zebra}
 Congestion control & Yes (slow start, CUBIC) & No \\
 Speed & Slower (reliability cost) & Faster \\
+\rowcolor{zebra}
 Use cases & HTTP, SMTP, SSH, FTP & DNS, video streaming, gaming, VoIP \\
 Head-of-line blocking & Yes (one lost packet stalls stream) & No (each datagram independent) \\
 \end{longtable}
@@ -457,6 +470,7 @@ DNS is the \textbf{phone book of the internet} --- maps human-readable names to 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4533}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4686}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Record
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -469,12 +483,16 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{A} & Hostname \(\rightarrow\) IPv4 & \texttt{google.com\ →\ 142.250.80.78} \\
+\rowcolor{zebra}
 \textbf{AAAA} & Hostname \(\rightarrow\) IPv6 & \texttt{google.com\ →\ 2607:f8b0:...} \\
 \textbf{CNAME} & Alias \(\rightarrow\) canonical name & \texttt{www.example.com\ →\ example.com} \\
+\rowcolor{zebra}
 \textbf{MX} & Mail server for domain & \texttt{example.com\ →\ mail.example.com} \\
 \textbf{NS} & Nameserver for domain & \texttt{example.com\ →\ ns1.google.com} \\
+\rowcolor{zebra}
 \textbf{TXT} & Arbitrary text & SPF records, domain verification \\
 \textbf{PTR} & Reverse lookup (IP \(\rightarrow\) hostname) & \texttt{78.80.250.142.in-addr.arpa\ →\ google.com} \\
+\rowcolor{zebra}
 \textbf{SOA} & Start of Authority --- zone metadata & Serial number, refresh intervals \\
 \textbf{SRV} & Service location & \texttt{\_http.\_tcp.example.com\ →\ 80\ www.example.com} \\
 \end{longtable}
@@ -530,6 +548,7 @@ Browser         Resolver        Root NS      .com NS     Auth NS
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0765}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.6156}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -544,12 +563,16 @@ Purpose
 \bottomrule\noalign{}
 \endlastfoot
 GET & Yes & Yes & Retrieve resource \\
+\rowcolor{zebra}
 HEAD & Yes & Yes & GET but headers only \\
 POST & No & No & Create resource / submit data \\
+\rowcolor{zebra}
 PUT & Yes & No & Replace entire resource \\
 PATCH & No & No & Partial update \\
+\rowcolor{zebra}
 DELETE & Yes & No & Remove resource \\
 OPTIONS & Yes & Yes & Discover allowed methods (CORS) \\
+\rowcolor{zebra}
 CONNECT & No & No & Tunnel (used for HTTPS through proxy) \\
 \end{longtable}
 
@@ -725,6 +748,7 @@ Browser walks up chain verifying each signature until it reaches a trusted root.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3500}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4000}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -737,10 +761,13 @@ TLS 1.3
 \bottomrule\noalign{}
 \endlastfoot
 Handshake RTTs & 2 RTTs & 1 RTT \\
+\rowcolor{zebra}
 0-RTT resumption & Session tickets (weak) & 0-RTT (replay risk) \\
 Cipher suites & Many (including weak ones) & Only strong ones \\
+\rowcolor{zebra}
 Forward secrecy & Optional (RSA key exchange!) & Mandatory (ECDHE only) \\
 Key exchange & RSA or DH & ECDHE only \\
+\rowcolor{zebra}
 Handshake encryption & Partly encrypted & Fully encrypted from ServerHello \\
 \end{longtable}
 
@@ -853,6 +880,7 @@ Versioning:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3070}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2719}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -867,14 +895,19 @@ GraphQL
 \bottomrule\noalign{}
 \endlastfoot
 Protocol & HTTP/1.1 or 2 & HTTP/2 & HTTP/1.1 or 2 \\
+\rowcolor{zebra}
 Format & JSON/XML (text) & Protobuf (binary) & JSON \\
 Typing & No schema (OpenAPI optional) & Strongly typed .proto & Strongly typed schema \\
+\rowcolor{zebra}
 Streaming & Limited (SSE) & Full bidirectional & Subscriptions (WebSocket) \\
 Performance & Good & Excellent & Good \\
+\rowcolor{zebra}
 Overfetch/underfetch & Common & Possible & Solved by design \\
 Browser support & Native & Needs grpc-web proxy & Native \\
+\rowcolor{zebra}
 Learning curve & Low & Medium & Medium-High \\
 Best for & Public APIs, simple CRUD & Internal microservices, low latency & Complex queries, mobile clients \\
+\rowcolor{zebra}
 Versioning & URI/header & Proto fields (additive) & Schema evolution \\
 Code generation & Optional (OpenAPI) & Required & Optional \\
 \end{longtable}
@@ -960,6 +993,7 @@ Opcodes: 0x1=text, 0x2=binary, 0x8=close, 0x9=ping, 0xA=pong
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2475}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2871}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -974,14 +1008,19 @@ WebSocket
 \bottomrule\noalign{}
 \endlastfoot
 Direction & Bidirectional (request each way) & Server \(\rightarrow\) Client & Full duplex \\
+\rowcolor{zebra}
 Protocol & HTTP & HTTP & WS (TCP upgrade) \\
 Latency & \textasciitilde500ms+ & Low & Very low \\
+\rowcolor{zebra}
 Overhead & High (repeated headers) & Low & Low (small frames) \\
 Reconnection & Manual & Automatic & Manual \\
+\rowcolor{zebra}
 Proxy/firewall & Works everywhere & Works & Sometimes blocked \\
 Load balancer & Easy (stateless) & Easy & Sticky sessions needed \\
+\rowcolor{zebra}
 Browser support & Universal & Modern browsers & Modern browsers \\
 Use case & Legacy fallback & Live feeds, notifications & Chat, games, collaboration \\
+\rowcolor{zebra}
 Scalability & Harder at scale & Easier & Harder (stateful connections) \\
 \end{longtable}
 
@@ -1083,6 +1122,7 @@ HTTP/3+QUIC:       QUIC+TLS(1 RTT)             = 1 RTT before data
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2432}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2432}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1097,14 +1137,19 @@ HTTP/3
 \bottomrule\noalign{}
 \endlastfoot
 Transport & TCP & TCP & QUIC (UDP) \\
+\rowcolor{zebra}
 TLS & Optional & Optional & Mandatory \\
 Multiplexing & No (one req/conn) & Yes & Yes \\
+\rowcolor{zebra}
 HOL blocking & Yes (HTTP) & Yes (TCP) & No \\
 Header compression & No & HPACK & QPACK \\
+\rowcolor{zebra}
 Server push & No & Yes (rarely used) & Yes \\
 Connection setup & TCP + TLS separate & TCP + TLS separate & Combined 1-RTT \\
+\rowcolor{zebra}
 0-RTT & No & No & Yes (with caveats) \\
 Connection migration & No & No & Yes (QUIC CID) \\
+\rowcolor{zebra}
 Adoption & Universal & \textasciitilde60\% & \textasciitilde25\% growing \\
 \end{longtable}
 
@@ -1121,6 +1166,7 @@ A single server can handle N requests/second. To handle 10N, you need 10 servers
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4000}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4000}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Dimension
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1133,12 +1179,16 @@ L7 (Application Layer)
 \bottomrule\noalign{}
 \endlastfoot
 OSI Layer & 4 (TCP/UDP) & 7 (HTTP/gRPC) \\
+\rowcolor{zebra}
 What it sees & IP addresses, ports & URLs, headers, cookies, body \\
 Decision basis & IP + port only & URL path, Host header, cookie \\
+\rowcolor{zebra}
 Speed & Very fast (minimal processing) & Slower (parse HTTP) \\
 Sticky sessions & By IP (coarse) & By cookie (precise) \\
+\rowcolor{zebra}
 SSL termination & Pass-through or offload & Always terminates \\
 Examples & AWS NLB, HAProxy TCP mode & AWS ALB, nginx, Envoy, Traefik \\
+\rowcolor{zebra}
 Use case & High throughput, non-HTTP & HTTP routing, canary deploys \\
 Health checks & TCP connect & HTTP endpoint check \\
 \end{longtable}
@@ -1170,6 +1220,7 @@ Client ──► L7 LB (terminates TCP+TLS, parses HTTP)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4709}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3175}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1182,12 +1233,16 @@ Best for
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Round Robin} & Requests distributed in order: A, B, C, A, B, C... & Uniform server capacity \\
+\rowcolor{zebra}
 \textbf{Weighted Round Robin} & A gets 2x traffic of B if weight=2 & Mixed server capacity \\
 \textbf{Least Connections} & Route to server with fewest active connections & Variable request duration \\
+\rowcolor{zebra}
 \textbf{Least Response Time} & Route to fastest responding server & Heterogeneous services \\
 \textbf{IP Hash} & hash(client\_IP) \% N \(\rightarrow\) consistent server & Basic session affinity \\
+\rowcolor{zebra}
 \textbf{Random} & Pick random server & Simple, avoids thundering herd \\
 \textbf{Consistent Hashing} & Ring-based hash, minimal disruption on add/remove & Cache affinity (CDNs) \\
+\rowcolor{zebra}
 \textbf{Resource-based} & Route by server CPU/memory utilization & Compute-intensive workloads \\
 \end{longtable}
 
@@ -1442,6 +1497,7 @@ HTTP/2 — 1 TCP connection, multiple streams:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1386}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8614}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1452,22 +1508,31 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{OSI Layers} & A parcel moving through the postal network: you write the contents (application), seal and label the box (presentation/session), write the full street address (network), hand it to the courier service (transport), the courier van carries it link by link (data link), and tarmac roads physically connect the depots (physical) \\
+\rowcolor{zebra}
 \textbf{TCP vs UDP} & TCP = registered mail with a signature required on delivery --- if no one signs, the courier re-attempts until it gets through. UDP = dropping a postcard in the public letterbox --- fast, no tracking number, some never arrive, and you never find out \\
 \textbf{TCP 3-way handshake} & The courier calls ahead before dispatching a big shipment: "Parcel coming your way --- ready to receive?" \(\rightarrow\) "Yes, loading bay is clear" \(\rightarrow\) "Great, truck is leaving now." Only after that three-beat exchange does the lorry set off \\
+\rowcolor{zebra}
 \textbf{TCP congestion control} & A courier fleet entering a congested motorway: start with one van (slow start), add a van each trip as the road clears (linear growth), then a pile-up ahead forces the dispatcher to cut the convoy in half and rebuild carefully from there \\
 \textbf{DNS} & The national address directory: you know the company\textquotesingle s trading name ("GlobalWidgets Ltd") but need its actual street address before you can send a parcel --- the directory looks it up and hands back the postcode \\
+\rowcolor{zebra}
 \textbf{DNS TTL} & How long a courier is allowed to use a cached address before re-checking the directory. Short TTL = re-check every day (safe if the company moves often). Long TTL = re-check yearly (risky --- parcels may land at a vacated office) \\
 \textbf{TLS certificate} & A notarized identity card stapled to the parcel: a government-recognized authority has stamped "this parcel truly originates from GlobalWidgets Ltd." Both sender and recipient trust the stamp because they both recognize the authority that issued it \\
+\rowcolor{zebra}
 \textbf{Diffie-Hellman key exchange} & Two couriers agree on a secret seal color without ever meeting: each mixes their private dye into a shared base color, swaps the result, and mixes again --- they end up with an identical hue that no eavesdropper at the sorting depot can reproduce \\
 \textbf{Perfect Forward Secrecy} & The depot shreds the wax seal mold after every shipment. Even if a thief later steals the master key, all past parcels are already sealed with unique, destroyed molds and cannot be reopened \\
+\rowcolor{zebra}
 \textbf{Load balancer} & The dispatch desk at the sorting depot: every inbound parcel lands on the desk, and the dispatcher hands it to whichever courier van is free right now, keeping the workload spread evenly across the fleet \\
 \textbf{Round-robin LB} & The dispatcher assigns parcels in strict rotation --- van A, van B, van C, van A again --- so every courier takes the same share of the queue regardless of how heavy each parcel is \\
+\rowcolor{zebra}
 \textbf{Least connections LB} & The dispatcher checks which van has the fewest parcels still in transit and loads the next one onto that van, so no courier is buried while another idles \\
 \textbf{HTTP/2 multiplexing} & A single courier van carrying parcels for many recipients simultaneously, sorted into labeled compartments --- versus the old rule where the van had to deliver one parcel completely before picking up the next \\
+\rowcolor{zebra}
 \textbf{QUIC/HTTP/3} & The postal authority builds its own private courier road with built-in security checkpoints and dedicated lane markings --- bypassing the congested public motorway (TCP) entirely, so vans never queue behind someone else\textquotesingle s blocked lorry \\
 \textbf{WebSockets} & Opening a permanent, two-way courier hatch between two depots: parcels flow in both directions any time, without the sender having to knock and wait for a fresh door-opening each time \\
+\rowcolor{zebra}
 \textbf{CORS} & The receiving depot\textquotesingle s gate policy: when a parcel arrives from a third-party courier (a different origin), the gatekeeper checks the approved-senders list posted at the gate. If that courier company is not listed, the parcel is turned away --- not destroyed, just refused entry \\
 \textbf{NAT} & The company mailroom: 200 staff share a single public street address on the building\textquotesingle s front door. Every outgoing parcel is relabeled with the building\textquotesingle s address; the mailroom log records which desk it came from so the reply can be routed back to exactly the right person \\
+\rowcolor{zebra}
 \textbf{CDN} & Regional depots stocked with copies of the most popular goods: instead of every parcel shipping from the central warehouse hundreds of miles away, customers in each region collect from the nearest local depot --- same goods, fraction of the journey \\
 \end{longtable}
 
@@ -2058,6 +2123,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5385}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4615}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Item
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2068,18 +2134,25 @@ Value
 \bottomrule\noalign{}
 \endlastfoot
 IPv4 address bits & 32 bits \\
+\rowcolor{zebra}
 IPv6 address bits & 128 bits \\
 TCP header min size & 20 bytes \\
+\rowcolor{zebra}
 UDP header size & 8 bytes \\
 Ethernet MTU & 1500 bytes \\
+\rowcolor{zebra}
 HTTP port & 80 \\
 HTTPS port & 443 \\
+\rowcolor{zebra}
 DNS port & 53 (UDP and TCP) \\
 SSH port & 22 \\
+\rowcolor{zebra}
 TLS 1.3 handshake & 1 RTT \\
 TLS 1.2 handshake & 2 RTTs \\
+\rowcolor{zebra}
 TIME\_WAIT duration & \textasciitilde60 seconds (2\(\times\)MSL) \\
 Browser TCP conns per domain & 6 (HTTP/1.1) \\
+\rowcolor{zebra}
 /24 subnet usable hosts & 254 \\
 /16 subnet addresses & 65,536 \\
 \end{longtable}
@@ -2095,6 +2168,7 @@ Browser TCP conns per domain & 6 (HTTP/1.1) \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0948}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1896}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Protocol
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2115,16 +2189,22 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 REST & 7 & TCP & Text (JSON) & No (SSE only) & Yes & Public APIs \\
+\rowcolor{zebra}
 gRPC & 7 & TCP (HTTP/2) & Binary (Protobuf) & Bidirectional & Via proxy & Internal RPC \\
 GraphQL & 7 & TCP & Text (JSON) & Subscriptions & Yes & Flexible queries \\
+\rowcolor{zebra}
 WebSocket & 7 & TCP (upgrade) & Text/Binary & Full duplex & Yes & Real-time \\
 SSE & 7 & TCP (HTTP) & Text & Server\(\rightarrow\)Client & Yes & Live feeds \\
+\rowcolor{zebra}
 DNS & 7 & UDP (mostly) & Binary & No & N/A & Name resolution \\
 HTTP/1.1 & 7 & TCP & Text & No & Yes & Web \\
+\rowcolor{zebra}
 HTTP/2 & 7 & TCP & Binary & Yes (streams) & Yes & Web (modern) \\
 HTTP/3 & 7 & QUIC/UDP & Binary & Yes (streams) & Yes (75\%) & Web (fast) \\
+\rowcolor{zebra}
 TCP & 4 & --- & Binary & Byte stream & --- & Reliable transport \\
 UDP & 4 & --- & Binary & Datagrams & --- & Fast transport \\
+\rowcolor{zebra}
 IP & 3 & --- & Binary & Packets & --- & Routing \\
 \end{longtable}
 
@@ -2159,4 +2239,5 @@ IP & 3 & --- & Binary & Packets & --- & Routing \\
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/03-networks/01-osi-stack.pdf}{Each layer adds a header and treats the layer above as opaque payload. Interview framing: name the layer, its addressing unit, and a protocol.}
+\visualfigure{../figures/03-networks/02-tcp-handshake.pdf}{TCP opens with SYN / SYN-ACK / ACK to agree on sequence numbers, then tears down with a four-way FIN/ACK exchange. This reliability is what UDP trades away for speed.}
 \end{document}

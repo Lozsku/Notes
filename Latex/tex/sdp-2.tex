@@ -405,6 +405,7 @@ Peak (2× avg)                               = 360 Gbps served by CDN PoPs
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4578}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3735}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -417,10 +418,13 @@ DASH (MPEG)
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Standard} & Apple proprietary \(\rightarrow\) RFC 8216 & MPEG open standard \\
+\rowcolor{zebra}
 \textbf{Container} & MPEG-TS or fMP4 & fMP4 (CMAF) \\
 \textbf{iOS/Safari} & Native support & Requires MSE (not on older iOS) \\
+\rowcolor{zebra}
 \textbf{Android/Chrome} & Via MSE & Native support \\
 \textbf{DRM} & FairPlay & Widevine / PlayReady \\
+\rowcolor{zebra}
 \textbf{Latency (live)} & 6--30 s (LLHLS: 1--3 s) & 2--8 s (CMAF chunked) \\
 \textbf{Adoption} & YouTube, Netflix (backup) & Netflix (primary), Disney+ \\
 \end{longtable}
@@ -458,6 +462,7 @@ Archive (> 1yr, < 10K views)   → S3 Glacier Deep Archive (pennies/GB)
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3866}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6134}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Bottleneck
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -468,10 +473,13 @@ Mitigation
 \bottomrule\noalign{}
 \endlastfoot
 Transcoding backlog & Auto-scale k8s transcoding pods on Kafka consumer lag metric \\
+\rowcolor{zebra}
 Metadata DB hot rows (view counts) & Counter service with Redis; async batch-write to DB \\
 CDN cache misses for new videos & Pre-warm CDN by pushing manifest URL to CDN after transcoding \\
+\rowcolor{zebra}
 S3 request throttling & Randomize S3 key prefixes (avoid date-prefix hotspot) \\
 Recommendation latency & Pre-compute + cache feeds; async refresh \\
+\rowcolor{zebra}
 Single-region failure & Multi-region S3 replication; CDN absorbs reads; DB cross-region replica \\
 \end{longtable}
 
@@ -483,6 +491,7 @@ Single-region failure & Multi-region S3 replication; CDN absorbs reads; DB cross
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1930}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3158}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -497,8 +506,10 @@ Option B
 \bottomrule\noalign{}
 \endlastfoot
 Transcoding: per-video vs sharded & Single big VM per video & K8s pod per resolution & \textbf{K8s pods} (parallelism, cost) \\
+\rowcolor{zebra}
 Metadata DB & MySQL sharded & Spanner / CockroachDB & \textbf{Spanner} if global consistency needed \\
 Streaming format & HLS-only & HLS + DASH (CMAF) & \textbf{Both} (broadest device coverage) \\
+\rowcolor{zebra}
 Recommendation serving & Real-time inference & Pre-computed feed & \textbf{Pre-computed} (latency wins) \\
 Storage tiering & All S3 Standard & Tiered (hot/warm/cold) & \textbf{Tiered} (10\(\times\) cost reduction) \\
 \end{longtable}
@@ -767,6 +778,7 @@ trip_locations (
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2315}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3148}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -781,10 +793,13 @@ Google S2
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Structure} & Base-32 string, hierarchical & Tree of rectangular cells & Hilbert-curve cells on sphere \\
+\rowcolor{zebra}
 \textbf{Precision control} & String length (1--12 chars) & Tree depth & Level (0--30) \\
 \textbf{Query type} & String prefix match & Tree traversal & Cell union + covering \\
+\rowcolor{zebra}
 \textbf{Edge distortion} & Yes (poles, antimeridian) & Yes (aspect ratio varies) & Minimal (spherical geometry) \\
 \textbf{Neighbor lookup} & 8 neighbors (manual computation) & Tree sibling traversal & S2::GetEdgeNeighbors \\
+\rowcolor{zebra}
 \textbf{Used by} & MongoDB, Elasticsearch, Redis & Older game engines & Uber (H3), Google Maps, Foursquare \\
 \textbf{Complexity} & Simple & Moderate & Higher (library dependency) \\
 \end{longtable}
@@ -920,6 +935,7 @@ State transitions are persisted in Postgres with timestamps. Events published to
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3652}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6348}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Bottleneck
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -930,10 +946,13 @@ Mitigation
 \bottomrule\noalign{}
 \endlastfoot
 Location write storm & Redis Cluster, shard by city/geohash; accept at-most-once semantics \\
+\rowcolor{zebra}
 Matching hot cities (NYC peak) & City-level matching service instances; limit to local Redis shard \\
 Rides DB write contention & Shard by \texttt{city\_id}; use UUIDs to avoid hot auto-increment keys \\
+\rowcolor{zebra}
 WebSocket connection scaling & Stateful WS servers behind L4 LB; use Redis Pub/Sub as broker \\
 Driver double-booking & Redis NX lock on \texttt{driver\_id} during match; release on timeout \\
+\rowcolor{zebra}
 Surge pricing staleness & Short TTL (30 s) + frequent recalculation; eventual consistency OK \\
 \end{longtable}
 
@@ -945,6 +964,7 @@ Surge pricing staleness & Short TTL (30 s) + frequent recalculation; eventual co
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2056}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3178}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -959,10 +979,13 @@ Option B
 \bottomrule\noalign{}
 \endlastfoot
 Geospatial index & Geohash (Redis GEODATA) & Custom Quadtree & \textbf{Geohash (Redis)} \\
+\rowcolor{zebra}
 Driver location transport & HTTP polling (4 s) & Persistent WebSocket & \textbf{HTTP/2} (simpler, scales well) \\
 Matching concurrency control & Postgres FOR UPDATE & Redis distributed lock & \textbf{Redis lock} (lower latency) \\
+\rowcolor{zebra}
 Location store & Redis in-memory & PostGIS & \textbf{Redis} (1M+ writes/sec) \\
 Trip state persistence & Postgres & Cassandra & \textbf{Postgres} (ACID for state machines) \\
+\rowcolor{zebra}
 Routing engine & Google Maps API & Self-hosted OSRM & \textbf{OSRM} at scale (cost) \\
 \end{longtable}
 
@@ -1218,6 +1241,7 @@ key → hash(key) → position on ring → clockwise next node = owner
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5128}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3077}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Policy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1230,10 +1254,13 @@ Use case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{noeviction} & Return error when memory full & Primary DB (never evict) \\
+\rowcolor{zebra}
 \textbf{allkeys-lru} & Evict globally least-recently-used key & General cache \\
 \textbf{volatile-lru} & Evict LRU only among keys with TTL set & Mixed TTL/no-TTL data \\
+\rowcolor{zebra}
 \textbf{allkeys-lfu} & Evict least-frequently-used (Redis 4.0+) & Skewed access patterns \\
 \textbf{volatile-ttl} & Evict key with shortest remaining TTL & Time-sensitive caching \\
+\rowcolor{zebra}
 \textbf{allkeys-random} & Evict random key & Uniform access, simplest \\
 \end{longtable}
 
@@ -1259,6 +1286,7 @@ Use case
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1672}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2150}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1273,10 +1301,13 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{TTL expiry} & Set TTL on write; auto-expire & Simple & Stale window = TTL duration \\
+\rowcolor{zebra}
 \textbf{Write-through} & Write to cache + DB simultaneously & Always consistent & Write latency increased \\
 \textbf{Write-behind (async)} & Write to cache, async flush to DB & Low write latency & Data loss risk \\
+\rowcolor{zebra}
 \textbf{Cache-aside} & App reads cache; miss \(\rightarrow\) read DB \(\rightarrow\) populate cache & DB is source of truth & Cache miss latency spike \\
 \textbf{Read-through} & Cache library fetches from DB on miss automatically & Transparent to app & Library complexity \\
+\rowcolor{zebra}
 \textbf{Event-driven invalidation} & DB change \(\rightarrow\) CDC event \(\rightarrow\) DEL from cache & Real-time consistency & Infrastructure complexity \\
 \end{longtable}
 
@@ -1357,6 +1388,7 @@ Cache-Aside:     Client → DB directly; read-path populates cache
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3133}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6867}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Bottleneck
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1367,10 +1399,13 @@ Mitigation
 \bottomrule\noalign{}
 \endlastfoot
 Hot key (single shard 100K QPS) & Key fan-out / local in-process cache \\
+\rowcolor{zebra}
 Memory exhaustion & Eviction policy; monitor \texttt{used\_memory\_rss}; add nodes \\
 Network bandwidth (large values) & Compress values at client (snappy/lz4); max value size policy \\
+\rowcolor{zebra}
 Failover latency (1--3 s) & Keepalive + health checks; pre-elect backup masters \\
 Replication lag & \texttt{WAIT\ 1\ 100} for critical writes; monitor \texttt{repl\_lag} metric \\
+\rowcolor{zebra}
 Cross-datacenter replication & Redis Cluster doesn\textquotesingle t span DCs natively; use CRDT-based solutions or geo-replicas with eventual consistency \\
 \end{longtable}
 
@@ -1382,6 +1417,7 @@ Cross-datacenter replication & Redis Cluster doesn\textquotesingle t span DCs na
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2371}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3814}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1396,10 +1432,13 @@ Option B
 \bottomrule\noalign{}
 \endlastfoot
 Sharding strategy & Consistent hashing & Range-based sharding & \textbf{Consistent hashing} (smooth rebalance) \\
+\rowcolor{zebra}
 Eviction & LRU & LFU & \textbf{LFU} (scan-resistant) \\
 Cache invalidation & TTL only & TTL + CDC events & \textbf{TTL + CDC} (real-time for critical) \\
+\rowcolor{zebra}
 Write policy & Write-through & Cache-aside & \textbf{Cache-aside} (DB authoritative) \\
 Hot key & Replica reads & Client-side local cache & \textbf{Local cache} (zero network) \\
+\rowcolor{zebra}
 Stampede protection & Mutex lock & Stale-while-revalidate & \textbf{SWR} (no latency penalty) \\
 Persistence & RDB only & AOF everysec & \textbf{AOF everysec} (\textless{} 1s loss) \\
 \end{longtable}
@@ -1701,6 +1740,7 @@ Selector: reads from front-end queues proportionally to priority.
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1852}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1852}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Approach
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1717,8 +1757,10 @@ False negatives
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Bloom Filter (1\% FPR)} & \textasciitilde12 GB & O(k) hashes & 1\% (skip new URL) & 0\% \\
+\rowcolor{zebra}
 \textbf{Bloom Filter (0.1\% FPR)} & \textasciitilde14.4 GB & O(k) hashes & 0.1\% & 0\% \\
 \textbf{Hash Set (in-memory)} & \textasciitilde1 TB (impractical) & O(1) & 0\% & 0\% \\
+\rowcolor{zebra}
 \textbf{Cassandra exact store} & \textasciitilde200 GB on disk & 1--5 ms & 0\% & 0\% \\
 \textbf{Redis Set} & \textasciitilde600 GB & O(1) & 0\% & 0\% \\
 \end{longtable}
@@ -1869,6 +1911,7 @@ Storage: 8 bytes per page × 10B pages = 80 GB → manageable in distributed sto
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2102}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5094}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Page type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1881,10 +1924,13 @@ Signal
 \bottomrule\noalign{}
 \endlastfoot
 News article (first 1h) & Every 15 min & Source is major news domain + recent publish \\
+\rowcolor{zebra}
 News article (1--24h) & Every 2 hr & Declining share velocity \\
 Popular blog post & Daily & Sitemap \texttt{changefreq=daily} \\
+\rowcolor{zebra}
 Product page & Weekly & Sitemap \texttt{changefreq=weekly} \\
 Static reference page & Monthly & Sitemap \texttt{changefreq=monthly} or inferred \\
+\rowcolor{zebra}
 Newly discovered URL & Once (ASAP) & Not yet crawled \\
 \end{longtable}
 
@@ -1906,6 +1952,7 @@ Newly discovered URL & Once (ASAP) & Not yet crawled \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3554}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6446}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Bottleneck
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1916,12 +1963,16 @@ Mitigation
 \bottomrule\noalign{}
 \endlastfoot
 URL Frontier throughput & Partition Kafka topics by domain-hash; horizontal Frontier shards \\
+\rowcolor{zebra}
 Bloom filter accuracy drift & Use Counting Bloom Filter or periodic rebuild; monitor FP rate \\
 DNS resolution rate & Dedicated internal DNS cluster + per-node LRU cache \\
+\rowcolor{zebra}
 S3 write throughput & Randomize S3 key prefix; use multipart upload for large HTML batches \\
 robots.txt fetch overhead & Redis cache (TTL=24h); prefetch on domain discovery \\
+\rowcolor{zebra}
 Spider traps infinite loop & URL depth limit + per-domain URL count cap \\
 Crawler node failure & Frontier requeues in\_flight URLs after heartbeat timeout \\
+\rowcolor{zebra}
 Hot domains (Reddit, Twitter) & Per-domain rate limit enforced strictly; queue backs up, not domain \\
 \end{longtable}
 
@@ -1933,6 +1984,7 @@ Hot domains (Reddit, Twitter) & Per-domain rate limit enforced strictly; queue b
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2408}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3499}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1947,10 +1999,13 @@ Option B
 \bottomrule\noalign{}
 \endlastfoot
 URL dedup & Exact hash set (Cassandra) & Bloom filter + exact fallback & \textbf{BF + exact fallback} (14 GB vs 200 GB) \\
+\rowcolor{zebra}
 URL frontier storage & Database (Postgres) & Kafka topics + Redis ZSETs & \textbf{Kafka + Redis} (throughput) \\
 DNS & Public resolvers (8.8.8.8) & Internal recursive DNS cluster & \textbf{Internal DNS} (rate limit avoidance) \\
+\rowcolor{zebra}
 Content storage & HDFS & S3 & \textbf{S3} (elastic, cheap, managed) \\
 Near-duplicate detection & Full content MD5 comparison & SimHash (64-bit) & \textbf{SimHash} (O(1) compare, 8B/page) \\
+\rowcolor{zebra}
 JS rendering & Skip JS pages & Headless Chrome (Puppeteer) & \textbf{Skip first pass} (cost); headless for top-N sites \\
 Crawl scheduling & Fixed interval & Adaptive (change-rate based) & \textbf{Adaptive} (better freshness/cost ratio) \\
 \end{longtable}

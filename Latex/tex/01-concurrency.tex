@@ -64,7 +64,7 @@
 \clearpage
 
 \begin{quote}
-\textbf{How to use this file:} Read top-to-bottom for deep understanding. Jump to §9 (Interview Questions) + §14 (Cheat Sheet) for last-minute revision.
+\textbf{How to use this file:} Read top-to-bottom for deep understanding. Jump to \hyperlink{section.9}{\textcolor{acc}{§9}} (Interview Questions) + \hyperlink{section.14}{\textcolor{acc}{§14}} (Cheat Sheet) for last-minute revision.
 \end{quote}
 
 \section{Overview --- What it is}\label{overview--what-it-is}
@@ -88,6 +88,7 @@ Core 0: [T1][T2][T1][T2]      Core 0: [T1][T1][T1]
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3980}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4549}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Dimension
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -100,8 +101,10 @@ Parallelism
 \bottomrule\noalign{}
 \endlastfoot
 Goal & Structure / responsiveness & Speed / throughput \\
+\rowcolor{zebra}
 Requires & Scheduler, context switching & Multiple CPU cores \\
 Example & Single-threaded event loop & Matrix multiplication on 8 cores \\
+\rowcolor{zebra}
 Risk & Race conditions, deadlocks & False sharing, synchronization \\
 \end{longtable}
 
@@ -166,6 +169,7 @@ Request 2:          [CPU work]---[WAIT]---[CPU work]
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1188}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8812}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -176,10 +180,13 @@ Where Concurrency Is Critical
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Google} & Search index serving (billions of queries/day), Bigtable/Spanner distributed transactions, MapReduce parallelism \\
+\rowcolor{zebra}
 \textbf{Meta} & Thrift RPC servers handle millions of concurrent connections; News Feed ranking runs parallel ML inference pipelines \\
 \textbf{Amazon} & DynamoDB uses lock-free skip lists; Lambda cold starts require efficient thread/process pool management \\
+\rowcolor{zebra}
 \textbf{Apple} & Grand Central Dispatch (GCD) --- their concurrency framework; Core Data multi-context concurrency \\
 \textbf{Microsoft} & Azure Service Bus, .NET async/await model, SQL Server lock manager, Windows thread scheduler \\
+\rowcolor{zebra}
 \textbf{Uber} & Real-time dispatch: matching riders/drivers under microsecond SLAs; surge pricing uses atomic counters \\
 \textbf{Databricks} & Spark executor thread pools, Delta Lake transaction log with optimistic concurrency, shuffle service parallelism \\
 \end{longtable}
@@ -440,6 +447,7 @@ Thread 2:  holds Lock B, waiting for Lock A
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4442}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3911}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Condition
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -452,8 +460,10 @@ Prevention Strategy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{M}utual Exclusion & Resources can\textquotesingle t be shared & Use shareable resources where possible \\
+\rowcolor{zebra}
 \textbf{H}old-and-Wait & Thread holds resource while waiting for another & Acquire all resources at once (atomic) \\
 \textbf{N}o Preemption & Resources can\textquotesingle t be forcibly taken & Allow preemption (rollback and retry) \\
+\rowcolor{zebra}
 \textbf{C}ircular Wait & Circular chain of threads waiting & \textbf{Impose lock ordering} (most practical!) \\
 \end{longtable}
 
@@ -647,6 +657,7 @@ A spinlock is a lock where the waiting thread \textbf{busy-waits} (spins in a lo
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3702}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4679}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -659,8 +670,10 @@ Spinlock
 \bottomrule\noalign{}
 \endlastfoot
 Waiting & Thread sleeps (OS schedules out) & Thread spins (burns CPU) \\
+\rowcolor{zebra}
 Context switch & Yes (\textasciitilde1-10 µs overhead) & No \\
 Best for & Long hold times, many threads & Very short critical sections, few threads \\
+\rowcolor{zebra}
 CPU waste & No (blocked thread uses 0 CPU) & Yes (spinning = 100\% CPU on core) \\
 Use in kernel & Yes (interrupts can\textquotesingle t sleep) & Yes \\
 \end{longtable}
@@ -1200,6 +1213,7 @@ Pre-Java 8: one lock per segment (16 segments = 16-way parallelism). Java 8+: CA
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1962}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8038}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1210,22 +1224,31 @@ Analogy --- \emph{the restaurant kitchen}
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Thread} & A line cook at a station --- shares the kitchen (process) but works their own tickets and prep (stack) \\
+\rowcolor{zebra}
 \textbf{Process} & A separate restaurant down the street --- its own kitchen and pantry; the two only talk by phone (IPC) \\
 \textbf{Mutex} & The single razor-sharp chef\textquotesingle s knife --- only one cook can hold it; the rest wait their turn to chop \\
+\rowcolor{zebra}
 \textbf{Semaphore} & The stove\textquotesingle s 4 burners --- at most 4 dishes cook at once; finish one and the next cook claims the burner \\
 \textbf{Deadlock} & Cook A holds the only pan and needs the oven; Cook B holds the oven and needs the pan --- both freeze \\
+\rowcolor{zebra}
 \textbf{Livelock} & Two cooks meet in the narrow doorway and keep stepping the same way to yield --- polite, but nobody passes \\
 \textbf{Starvation} & The new cook who\textquotesingle s always skipped for the busy grill --- everyone else keeps getting picked first \\
+\rowcolor{zebra}
 \textbf{Race Condition} & Two cooks grab the last egg for different orders --- one ticket goes out wrong \\
 \textbf{Spinlock} & A cook hovering at the oven, opening it every few seconds to check if it\textquotesingle s free instead of prepping \\
+\rowcolor{zebra}
 \textbf{Condition Variable} & The expo bell --- cooks rest until "order up!" rings, then wake and plate \\
 \textbf{volatile} & The shared specials whiteboard --- everyone reads the same board instantly, not private notepads \\
+\rowcolor{zebra}
 \textbf{CAS} & "Is table 5\textquotesingle s ticket still unclaimed?" --- glance at the rail before grabbing it; if taken, try the next \\
 \textbf{Thread Pool} & A fixed brigade pulling tickets off the rail --- idle cooks wait, finished cooks grab the next ticket \\
+\rowcolor{zebra}
 \textbf{False Sharing} & Two cooks elbowing over one cutting board for different vegetables --- both slow down without truly sharing \\
 \textbf{ABA Problem} & A burner looked free; a cook used and cleared it while you blinked --- you assume nothing changed, get burned \\
+\rowcolor{zebra}
 \textbf{Producer-Consumer} & Chefs plate onto the pass shelf (limited space); waiters carry out --- chefs pause when full, waiters wait when empty \\
 \textbf{Reader-Writer} & The recipe board --- any number of cooks read at once, but the head chef locks it alone to rewrite a recipe \\
+\rowcolor{zebra}
 \textbf{GIL} & A tiny kitchen with a single stove --- hire ten cooks, but only one can actually cook at any moment \\
 \textbf{Async/Await} & One waiter working ten tables --- takes the next order while the kitchen cooks the last, never idle \\
 \end{longtable}
@@ -1782,6 +1805,7 @@ Lock-free:                 CAS-based, no locks
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3316}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6684}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Good Answer
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1792,8 +1816,10 @@ Great Answer
 \bottomrule\noalign{}
 \endlastfoot
 "Use a mutex" & "Mutex here, but if reads dominate, ReadWriteLock improves throughput" \\
+\rowcolor{zebra}
 "volatile makes it thread-safe" & "volatile ensures visibility and ordering but not compound atomicity" \\
 "Threads run concurrently" & "On N cores, up to N threads run in parallel; others context-switch" \\
+\rowcolor{zebra}
 "Use thread pool" & "I/O-bound \(\rightarrow\) size at cores\(\times\)(1+wait/compute); CPU-bound \(\rightarrow\) cores+1" \\
 "Deadlock: two threads waiting" & "Four Coffman conditions; break circular wait via lock ordering" \\
 \end{longtable}
@@ -1893,6 +1919,7 @@ Great Answer
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2647}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2880}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1907,20 +1934,28 @@ Gotcha
 \bottomrule\noalign{}
 \endlastfoot
 Thread & Lightweight execution unit, shared memory & \texttt{new\ Thread(runnable).start()} & Stack is separate; heap is shared \\
+\rowcolor{zebra}
 Process & Isolated address space & \texttt{fork()} / \texttt{ProcessBuilder} & IPC needed for communication \\
 Mutex & Binary lock with ownership & \texttt{lock.acquire();\ ...\ lock.release()} & Forgetting release = deadlock \\
+\rowcolor{zebra}
 Semaphore & Counter lock, any thread signals & \texttt{sem.wait();\ ...\ sem.signal()} & Acquire resource sem before mutex \\
 Condition Var & Sleep + release lock atomically & \texttt{while(!cond)\ cv.wait(lock)} & Use while, not if \\
+\rowcolor{zebra}
 volatile & Visibility + ordering, no atomicity & \texttt{volatile\ boolean\ ready} & Not enough for \texttt{count++} \\
 CAS / Atomic & Hardware read-modify-write & \texttt{AtomicInt.compareAndSet(old,\ new)} & ABA problem \\
+\rowcolor{zebra}
 Spinlock & Busy-wait loop & \texttt{while(lock.test\_and\_set())\ \{\}} & Wastes CPU; only for short waits \\
 Deadlock & Circular wait for resources & 4 conditions: MHNC & Prevent: global lock ordering \\
+\rowcolor{zebra}
 Livelock & Active but no progress & Randomized backoff & Looks like progress, isn\textquotesingle t \\
 Starvation & One thread perpetually denied & Fair queue (FIFO lock) & Different from deadlock \\
+\rowcolor{zebra}
 Thread Pool & Pre-created workers + task queue & cores+1 (CPU), cores\(\times\)10 (I/O) & Unbounded queue = memory leak \\
 False Sharing & Different vars, same cache line & Pad to 64 bytes & Hard to detect; use perf tools \\
+\rowcolor{zebra}
 Python GIL & One thread at a time in CPython & Use multiprocessing for CPU work & I/O threads still help \\
 ReadWriteLock & Multiple readers OR one writer & \texttt{rwLock.readLock()} & Not worth it for write-heavy \\
+\rowcolor{zebra}
 Producer-Consumer & Bounded buffer sync problem & empty + full semaphores + mutex & Order: resource sem \(\rightarrow\) mutex \\
 async/await & Cooperative coroutines on event loop & \texttt{await\ asyncio.gather(*tasks)} & Sync code blocks entire loop \\
 \end{longtable}
@@ -1959,4 +1994,5 @@ async/await & Cooperative coroutines on event loop & \texttt{await\ asyncio.gath
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/01-concurrency/01-amdahls-law.pdf}{Amdahl's Law: maximum speedup is capped by the serial fraction. Even at 95\% parallel, 256 cores yield only ~17x — the serial 5\% dominates.}
+\visualfigure{../figures/01-concurrency/02-deadlock.pdf}{Deadlock needs all four Coffman conditions at once; the tell-tale sign is a cycle in the wait-for graph. Break any one condition (e.g. lock ordering) to prevent it.}
 \end{document}

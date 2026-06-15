@@ -240,6 +240,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2657}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2805}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Level
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -254,8 +255,10 @@ Phantom
 \bottomrule\noalign{}
 \endlastfoot
 Read Uncommitted & possible & & \\
+\rowcolor{zebra}
 Read Committed & & & \\
 Repeatable Read & & & (MySQL: via MVCC) \\
+\rowcolor{zebra}
 Serializable & & & \\
 \end{longtable}
 
@@ -355,6 +358,7 @@ Serializable & & & \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4383}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5617}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Connection
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -365,10 +369,13 @@ Hook
 \bottomrule\noalign{}
 \endlastfoot
 OS \(\leftrightarrow\) Concurrency & Threads/processes/scheduling/locks are OS primitives concurrency builds on \\
+\rowcolor{zebra}
 Networks \(\leftrightarrow\) System Design & LB, caching, CDN, protocols = the plumbing of every design \\
 Databases \(\leftrightarrow\) Distributed Systems & CAP, replication, sharding, quorum, consistency overlap heavily \\
+\rowcolor{zebra}
 Cloud \(\leftrightarrow\) Distributed Systems & K8s/service-mesh = distributed-systems patterns productized \\
 Performance \(\leftrightarrow\) everything & Profiling + tail latency + caching cut across OS, DB, network \\
+\rowcolor{zebra}
 Security \(\leftrightarrow\) Networks/System Design & TLS, auth, secrets are non-functional requirements in every design \\
 \end{longtable}
 

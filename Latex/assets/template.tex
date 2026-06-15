@@ -1,0 +1,29 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{$if(themename)$$themename$$else$Interview Notes$endif$}
+\newcommand{\ThemeKicker}{$if(themekicker)$$themekicker$$else$FAANG Master Notes$endif$}
+\newcommand{\ThemeNumber}{$if(themenumber)$$themenumber$$else$$endif$}
+
+\usepackage{interviewstyle}
+$if(accent)$\setthemecolor{$accent$}{$accent2$}$endif$
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+$highlighting-macros$
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+$body$
+
+\end{document}

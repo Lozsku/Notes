@@ -75,11 +75,11 @@ Dense, copy-pasteable, built for fast recognition and last-minute revision.
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Before interview}: read the Pattern Recognition Cheat Table (§2) until you can map a problem sentence to a pattern in under 10 seconds.
+  \textbf{Before interview}: read the Pattern Recognition Cheat Table (\hyperlink{section.2}{\textcolor{acc}{§2}}) until you can map a problem sentence to a pattern in under 10 seconds.
 \item
-  \textbf{During prep}: for each pattern in §3, memorize the trigger signal, copy the template, and solve the listed problems.
+  \textbf{During prep}: for each pattern in \hyperlink{section.3}{\textcolor{acc}{§3}}, memorize the trigger signal, copy the template, and solve the listed problems.
 \item
-  \textbf{Night before}: skim the Revision Cheat Sheet (§7).
+  \textbf{Night before}: skim the Revision Cheat Sheet (\hyperlink{section.7}{\textcolor{acc}{§7}}).
 \end{itemize}
 
 \subsection{Universal Problem-Solving Workflow}\label{universal-problem-solving-workflow}
@@ -112,6 +112,7 @@ The most important section. Map the problem\textquotesingle s key phrases to a p
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6789}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3211}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 If the problem says / asks for ...
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -122,32 +123,46 @@ Reach for this pattern
 \bottomrule\noalign{}
 \endlastfoot
 Sorted array, find pair/triplet with target sum & \textbf{Two Pointers} \\
+\rowcolor{zebra}
 Remove duplicates in-place, sorted array & \textbf{Two Pointers} \\
 Longest/shortest subarray/substring with condition & \textbf{Sliding Window (variable)} \\
+\rowcolor{zebra}
 Subarray of exact size K with property & \textbf{Sliding Window (fixed)} \\
 Linked list cycle, middle of list, palindrome LL & \textbf{Fast \& Slow Pointers} \\
+\rowcolor{zebra}
 Overlapping intervals, merge/insert intervals & \textbf{Merge Intervals} \\
 Array 0..N-1, find missing/duplicate number & \textbf{Cyclic Sort} \\
+\rowcolor{zebra}
 Reverse a linked list, K-group reversal & \textbf{In-place LL Reversal} \\
 Shortest path, level-order traversal, minimum steps & \textbf{BFS} \\
+\rowcolor{zebra}
 All paths, connected components, flood fill & \textbf{DFS / Backtracking} \\
 All subsets, all permutations, all combinations & \textbf{Backtracking / Subsets} \\
+\rowcolor{zebra}
 "Find minimum/maximum satisfying condition", search space is monotonic & \textbf{Binary Search on Answer} \\
 Top K largest/smallest, K closest, Kth element & \textbf{Heap (Top-K)} \\
+\rowcolor{zebra}
 Merge K sorted lists/arrays & \textbf{K-way Merge (Heap)} \\
 Median of stream, two halves balanced & \textbf{Two Heaps} \\
+\rowcolor{zebra}
 Next greater element, stock prices, daily temperatures & \textbf{Monotonic Stack} \\
 Subarray sum equals K, running sum queries & \textbf{Prefix Sum} \\
+\rowcolor{zebra}
 Connected components, union/cycle in graph & \textbf{Union-Find (DSU)} \\
 Course schedule, dependency order, DAG ordering & \textbf{Topological Sort} \\
+\rowcolor{zebra}
 Word search, prefix matching, autocomplete & \textbf{Trie} \\
 Count ways, min cost, max value, overlapping sub-problems & \textbf{Dynamic Programming} \\
+\rowcolor{zebra}
 0/1 choice per item, weight/capacity constraint & \textbf{DP --- 0/1 Knapsack} \\
 Unlimited copies of items allowed & \textbf{DP --- Unbounded Knapsack} \\
+\rowcolor{zebra}
 Longest common subsequence/substring & \textbf{DP --- LCS} \\
 Longest increasing subsequence & \textbf{DP --- LIS} \\
+\rowcolor{zebra}
 Grid, min path, unique paths & \textbf{DP --- Matrix/Grid} \\
 Intervals, burst balloons, matrix chain & \textbf{DP --- Interval DP} \\
+\rowcolor{zebra}
 Locally optimal choice leads to global optimum & \textbf{Greedy} \\
 XOR, AND, OR, bit shift tricks, unique element & \textbf{Bit Manipulation} \\
 \end{longtable}
@@ -2160,6 +2175,7 @@ Exploit binary properties: XOR cancels duplicates, AND/OR extract/set bits, shif
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1070}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1846}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Operation
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2180,10 +2196,13 @@ Sorted Array
 \bottomrule\noalign{}
 \endlastfoot
 Access by index & O(1) & O(N) & N/A & N/A & N/A & O(1) \\
+\rowcolor{zebra}
 Search & O(N) & O(N) & O(1) & O(log N) & O(N) & O(log N) \\
 Insert (end) & O(1)* & O(1) & O(1) & O(log N) & O(log N) & O(N) \\
+\rowcolor{zebra}
 Insert (middle) & O(N) & O(1)** & O(1) & O(log N) & O(log N) & O(N) \\
 Delete & O(N) & O(1)** & O(1) & O(log N) & O(log N) & O(N) \\
+\rowcolor{zebra}
 Min/Max & O(N) & O(N) & O(N) & O(log N) & O(1) & O(1) \\
 \end{longtable}
 
@@ -2196,6 +2215,7 @@ Min/Max & O(N) & O(N) & O(N) & O(log N) & O(1) & O(1) \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5185}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1481}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2208,12 +2228,16 @@ Space
 \bottomrule\noalign{}
 \endlastfoot
 Binary Search & O(log N) & O(1) \\
+\rowcolor{zebra}
 Quick Sort & O(N log N) avg, O(N\(^2\)) worst & O(log N) \\
 Merge Sort & O(N log N) & O(N) \\
+\rowcolor{zebra}
 Heap Sort & O(N log N) & O(1) \\
 BFS / DFS & O(V + E) & O(V) \\
+\rowcolor{zebra}
 Dijkstra (heap) & O((V+E) log V) & O(V) \\
 Topological Sort & O(V + E) & O(V) \\
+\rowcolor{zebra}
 Union-Find & O(\(\alpha\)(N)) per op & O(N) \\
 Trie insert/search & O(L) & O(L) \\
 \end{longtable}
@@ -2225,6 +2249,7 @@ Trie insert/search & O(L) & O(L) \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3123}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5030}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 N (input size)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2237,14 +2262,19 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 N \(\leq\) 10 & O(N!) & Permutations, backtracking with full exploration \\
+\rowcolor{zebra}
 N \(\leq\) 20 & O(2\^{}N) & Bitmask DP, subset enumeration \\
 N \(\leq\) 100 & O(N\(^3\)) & Matrix chain, interval DP, Floyd-Warshall \\
+\rowcolor{zebra}
 N \(\leq\) 500 & O(N\(^2\)) & Some DP, all-pairs work \\
 N \(\leq\) 1,000 & O(N\(^2\)) & Bubble/insertion sort if needed, O(N\(^2\)) DP \\
+\rowcolor{zebra}
 N \(\leq\) 10,000 & O(N\(^2\) log N) & Rarely; O(N\(^2\)) should work \\
 N \(\leq\) 100,000 & O(N log N) & Sort, heap operations, segment tree \\
+\rowcolor{zebra}
 N \(\leq\) 1,000,000 & O(N log N) & Must be near-linear \\
 N \(\leq\) 10,000,000 & O(N) & Linear only --- prefix sum, two pointers, sliding window \\
+\rowcolor{zebra}
 N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
 \end{longtable}
 
@@ -2318,6 +2348,7 @@ N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4258}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5742}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Mistake
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2328,18 +2359,25 @@ Fix
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Jumping to code without clarifying} & Always spend 2-3 min clarifying before touching code \\
+\rowcolor{zebra}
 \textbf{Skipping brute force} & State it first; it demonstrates structured thinking and sets a baseline \\
 \textbf{Not handling edge cases} & Build a checklist: empty, single element, all same, negatives, overflow \\
+\rowcolor{zebra}
 \textbf{Vague variable names} (\texttt{i}, \texttt{j}, \texttt{tmp}) & Use descriptive names even if it takes 5 more seconds \\
 \textbf{Not stating complexity} & Interviewers almost always ask; volunteer it proactively \\
+\rowcolor{zebra}
 \textbf{Silently debugging} & Narrate: "I think the bug is here because..." \\
 \textbf{Confusing inclusive/exclusive bounds} & Write \texttt{\#\ inclusive} or \texttt{\#\ exclusive} in comments \\
+\rowcolor{zebra}
 \textbf{Off-by-one in binary search} & Stick to one template and test \texttt{{[}1{]}}, \texttt{{[}1,2{]}}, \texttt{{[}1,2,3{]}} \\
 \textbf{Forgetting to copy list before appending} & \texttt{result.append(current{[}:{]})} not \texttt{result.append(current)} \\
+\rowcolor{zebra}
 \textbf{Not tracking the \texttt{visited} set} & Add it before BFS/DFS; mark visited when enqueuing \\
 \textbf{Wrong loop order in DP} & 0/1 knapsack: reverse; unbounded: forward \\
+\rowcolor{zebra}
 \textbf{Greedy without justification} & Briefly argue why greedy works or think about exchange argument \\
 \textbf{Python recursion limit} & Add \texttt{sys.setrecursionlimit(10**6)} for deep DFS \\
+\rowcolor{zebra}
 \textbf{Mutating input} & Ask "can I modify the input?" or work on a copy \\
 \end{longtable}
 
@@ -2352,6 +2390,7 @@ Fix
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2690}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6772}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \#
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2364,24 +2403,34 @@ Pattern
 \bottomrule\noalign{}
 \endlastfoot
 1 & \textbf{Two Pointers} & Sorted + pair/triplet \(\rightarrow\) shrink from both ends \\
+\rowcolor{zebra}
 2 & \textbf{Sliding Window} & Contiguous subarray condition \(\rightarrow\) shrink/grow window \\
 3 & \textbf{Fast \& Slow Pointers} & Cycle / middle \(\rightarrow\) tortoise and hare \\
+\rowcolor{zebra}
 4 & \textbf{Merge Intervals} & Overlapping intervals \(\rightarrow\) sort by start, merge greedily \\
 5 & \textbf{Cyclic Sort} & Array with {[}1..N{]} \(\rightarrow\) each number belongs at index n-1 \\
+\rowcolor{zebra}
 6 & \textbf{LL Reversal} & Reverse linked list \(\rightarrow\) prev/curr/next dance \\
 7 & \textbf{BFS} & Shortest path / level order \(\rightarrow\) queue + visited \\
+\rowcolor{zebra}
 8 & \textbf{DFS / Backtracking} & All paths / all configs \(\rightarrow\) recurse + undo \\
 9 & \textbf{Binary Search} & Sorted / monotonic predicate \(\rightarrow\) halve search space \\
+\rowcolor{zebra}
 10 & \textbf{Top-K Heap} & K largest/smallest \(\rightarrow\) min-heap of size K \\
 11 & \textbf{K-way Merge} & K sorted lists \(\rightarrow\) heap with one from each \\
+\rowcolor{zebra}
 12 & \textbf{Two Heaps} & Median of stream \(\rightarrow\) max-heap left, min-heap right \\
 13 & \textbf{Monotonic Stack} & Next greater/smaller \(\rightarrow\) pop when violated \\
+\rowcolor{zebra}
 14 & \textbf{Prefix Sum} & Subarray sum = K \(\rightarrow\) hash map of prefix sums \\
 15 & \textbf{Union-Find} & Dynamic connectivity \(\rightarrow\) compress + rank \\
+\rowcolor{zebra}
 16 & \textbf{Topo Sort} & DAG ordering / cycle \(\rightarrow\) Kahn\textquotesingle s (BFS in-degree) \\
 17 & \textbf{Trie} & Prefix search \(\rightarrow\) character tree \\
+\rowcolor{zebra}
 18 & \textbf{0/1 Knapsack DP} & Pick or skip + capacity \(\rightarrow\) 2D or reverse-1D DP \\
 19 & \textbf{Greedy} & Local optimal = global optimal \(\rightarrow\) sort + scan \\
+\rowcolor{zebra}
 20 & \textbf{Bit Manipulation} & XOR / AND / shifts \(\rightarrow\) bitmask tricks \\
 \end{longtable}
 
@@ -2429,4 +2478,5 @@ O(N!)      → permutations
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/dsa-01-patterns/01-sliding-window.pdf}{Instead of recomputing each window from scratch (O(n$\cdot$k)), slide the window: add the entering element and drop the leaving one, achieving O(n).}
+\visualfigure{../figures/dsa-01-patterns/02-two-pointers.pdf}{On sorted input, two pointers from both ends turn an O(n$^2$) pair-search into O(n): move the pointer that brings the sum toward the target.}
 \end{document}

@@ -123,6 +123,7 @@ That is a \textbf{500 million\(\times\) gap.} Software that ignores these asymme
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6461}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2678}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -135,8 +136,10 @@ Lesson
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Amazon} & Every 100 ms of latency costs \textasciitilde1\% of sales (Vogels, 2006). At Amazon\textquotesingle s scale that is hundreds of millions of dollars per year. & Latency is revenue. \\
+\rowcolor{zebra}
 \textbf{Google} & "Tail at Scale" (Dean \& Barroso, 2013): a single slow backend in a fan-out request makes the whole response slow. At 1,000 backends, p99 of one is p50 of the aggregate. & Tail latency amplifies at scale. \\
 \textbf{Netflix} & Chaos Engineering + performance SLOs. They measure streaming start time to the millisecond --- each 500 ms increase noticeably drops subscriber retention. & Real-time systems require p99 discipline. \\
+\rowcolor{zebra}
 \textbf{Facebook/Meta} & HipHop VM, Hack type system, HHVM \(\rightarrow\) all performance-motivated. PHP at 1 billion users required compiler-level optimization. & Optimization compounds across requests. \\
 \textbf{Uber} & Switched from PostgreSQL to Cassandra for write throughput; built in-house time-series DB (M3) because OSS could not handle their cardinality. & Bottleneck forces architectural change. \\
 \end{longtable}
@@ -155,6 +158,7 @@ These three terms are \textbf{not interchangeable} --- a classic interview trap.
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1370}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3941}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Term
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -169,6 +173,7 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Latency} & Time for one request to complete end-to-end & ms, µs, ns & Time to drive from A to B \\
+\rowcolor{zebra}
 \textbf{Throughput} & Number of requests completed per unit time & req/s, TPS, QPS & Cars crossing a bridge per hour \\
 \textbf{Bandwidth} & Maximum data transfer capacity of a channel & bits/s, MB/s & Width of the highway (lanes \(\times\) speed limit) \\
 \end{longtable}
@@ -244,12 +249,12 @@ Those slow 10\% are real users having bad experiences.
 
 If a request fans out to N backends, the overall latency is the \textbf{maximum} of the N individual latencies:
 
-\setcodelang{Python}
+\setcodelang{JavaScript}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{P(}\BuiltInTok{all}\NormalTok{ N }\OperatorTok{\textless{}}\NormalTok{ x) }\OperatorTok{=}\NormalTok{ P(one }\OperatorTok{\textless{}}\NormalTok{ x)}\OperatorTok{\^{}}\NormalTok{N}
-\OperatorTok{=\textgreater{}}\NormalTok{ P(}\BuiltInTok{max} \OperatorTok{\textgreater{}}\NormalTok{ x) }\OperatorTok{=} \DecValTok{1} \OperatorTok{{-}}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ P(one }\OperatorTok{\textgreater{}}\NormalTok{ x))}\OperatorTok{\^{}}\NormalTok{N}
+\FunctionTok{P}\NormalTok{(all N }\OperatorTok{\textless{}}\NormalTok{ x) }\OperatorTok{=} \FunctionTok{P}\NormalTok{(one }\OperatorTok{\textless{}}\NormalTok{ x)}\OperatorTok{\^{}}\NormalTok{N}
+\KeywordTok{=\textgreater{}} \FunctionTok{P}\NormalTok{(max }\OperatorTok{\textgreater{}}\NormalTok{ x) }\OperatorTok{=} \DecValTok{1} \OperatorTok{{-}}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}} \FunctionTok{P}\NormalTok{(one }\OperatorTok{\textgreater{}}\NormalTok{ x))}\OperatorTok{\^{}}\NormalTok{N}
 \end{Highlighting}
 \end{Shaded}
 
@@ -332,6 +337,7 @@ Every system has \textbf{one binding constraint} at any moment (Theory of Constr
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2570}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3180}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Bound
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -346,8 +352,10 @@ Fix
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{CPU-bound} & CPU\% near 100\%, low I/O wait, scales with CPU count & \texttt{top}, \texttt{perf\ stat}, flame graphs & Algorithmic optimization, parallelism, SIMD, faster language \\
+\rowcolor{zebra}
 \textbf{Memory-bound} & High LLC miss rate, CPU stalls, memory bandwidth saturated & \texttt{perf\ stat\ -e\ cache-misses}, \texttt{valgrind\ -\/-cachegrind} & Cache-friendly data structures, reduce working set size, NUMA awareness \\
 \textbf{I/O-bound} & Low CPU\%, high \texttt{iowait}, disk throughput saturated & \texttt{iostat\ -x}, \texttt{iotop} & Async I/O, better indexes, read-ahead, SSD/NVMe upgrade \\
+\rowcolor{zebra}
 \textbf{Network-bound} & Low CPU\%, NIC saturated, high packet drop & \texttt{netstat\ -s}, \texttt{ss}, \texttt{sar\ -n\ DEV} & Compression, batching, CDN, larger MTU, more NICs \\
 \textbf{Lock-bound (Concurrency)} & Many threads, low CPU utilization, high context switches & \texttt{perf\ lock}, \texttt{jstack} thread dumps & Reduce lock scope, lock-free structures, sharding \\
 \end{longtable}
@@ -467,6 +475,7 @@ Each layer reduces load on the next. Cache hit at CDN = zero application server 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3907}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3226}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Policy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -479,8 +488,10 @@ Best For
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{LRU} (Least Recently Used) & Evict the item not accessed for the longest time & General purpose; temporal locality \\
+\rowcolor{zebra}
 \textbf{LFU} (Least Frequently Used) & Evict the least-accessed item & Repeated access patterns \\
 \textbf{FIFO} & Evict oldest item regardless of access & Simple; streaming data \\
+\rowcolor{zebra}
 \textbf{ARC} (Adaptive Replacement Cache) & Hybrid: tracks both recency and frequency & Production systems (ZFS, PostgreSQL) \\
 \textbf{TTL-based} & Evict after a time-to-live expires & Cache invalidation via expiry \\
 \end{longtable}
@@ -506,6 +517,7 @@ Best For
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1481}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1995}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -522,8 +534,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Cache-aside (Lazy)} & Write DB directly; invalidate cache & Read cache; on miss, load from DB & Eventual & Most common; flexible \\
+\rowcolor{zebra}
 \textbf{Write-through} & Write to cache AND DB synchronously & Read cache (always fresh) & Strong & Read-heavy, low write tolerance \\
 \textbf{Write-behind (Write-back)} & Write to cache; async flush to DB & Read cache & Eventual (risk of loss) & Write-heavy, can tolerate loss \\
+\rowcolor{zebra}
 \textbf{Read-through} & Write to DB & Cache fetches from DB on miss automatically & Eventual & Simpler client code \\
 \end{longtable}
 
@@ -739,6 +753,7 @@ For every \textbf{resource} in the system, check three things:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5258}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3737}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -751,6 +766,7 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Utilization} & \% of time the resource is busy (or \% capacity used) & CPU at 80\% \\
+\rowcolor{zebra}
 \textbf{Saturation} & Degree to which the resource has extra work queued (cannot service immediately) & Run queue length \textgreater{} 0, disk I/O queue depth \\
 \textbf{Errors} & Error events (both correctable and not) & Network packet drops, disk errors \\
 \end{longtable}
@@ -805,6 +821,7 @@ For every \textbf{service/microservice}, check:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4218}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4569}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -817,6 +834,7 @@ Focus
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{USE} & Infrastructure resources & Hardware/OS bottlenecks \\
+\rowcolor{zebra}
 \textbf{RED} & Services / microservices & User-facing request health \\
 \end{longtable}
 
@@ -1156,6 +1174,7 @@ Threads 0-3 each update their own counter, but because all four share a cache li
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1819}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8181}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1166,26 +1185,37 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Latency} & How long one car takes to drive end-to-end from the on-ramp to the exit --- door to door, including every red light and merge \\
+\rowcolor{zebra}
 \textbf{Throughput} & Cars per hour flowing through the highway system --- the system\textquotesingle s total productive output regardless of any one driver\textquotesingle s trip time \\
 \textbf{Bandwidth} & The number of lanes on the highway --- more lanes means more cars can move in parallel, but a narrow merge point still caps you \\
+\rowcolor{zebra}
 \textbf{Cache} & An express lane with a pre-paid transponder: frequent commuters who already have clearance bypass the main toll plaza entirely and zip through \\
 \textbf{Cache miss} & Your transponder isn\textquotesingle t recognized --- you\textquotesingle re waved out of the express lane and sent back to the regular toll booth queue \\
+\rowcolor{zebra}
 \textbf{Cache stampede} & The express lane scanner breaks at rush hour; every commuter who relied on it floods the single open toll booth simultaneously, overwhelming it \\
 \textbf{Amdahl\textquotesingle s Law} & You add ten extra highway lanes --- but every car still must pass through the single toll booth at the end. No matter how wide the road, that one booth is the ceiling on total throughput \\
+\rowcolor{zebra}
 \textbf{Little\textquotesingle s Law} & The number of cars on the highway at any moment equals the arrival rate times the average trip duration --- double the trip time with no extra on-ramps and the highway fills up, halving entry flow \\
 \textbf{GC pause} & The highway authority closes all lanes for an emergency resurfacing crew. Every car stops. When lanes reopen, traffic is backed up for miles --- a stop-the-world event \\
+\rowcolor{zebra}
 \textbf{Flame graph} & The traffic helicopter\textquotesingle s heat map: the widest, reddest stretch of road is where cars spend the most time. That\textquotesingle s where to send the work crews first \\
 \textbf{p99 latency} & The unlucky 1\% of drivers stuck behind a multi-car pile-up on the shoulder. The other 99\% sail past; these few wait for the tow truck, and their delay has nothing to do with lane count \\
+\rowcolor{zebra}
 \textbf{N+1 query} & Instead of one truck delivering to all 1,000 houses on the route in a single pass, a driver returns to the depot after every single delivery to pick up the next parcel --- 1,000 separate round-trips on the same road \\
 \textbf{Connection pool} & A fixed fleet of licensed taxis permanently stationed at the highway interchange. Passengers (requests) grab a waiting cab, ride, and the cab returns to the fleet --- no cold-starting a new cab for every trip \\
+\rowcolor{zebra}
 \textbf{False sharing} & Two drivers in adjacent lanes both need to reach into the same glovebox mounted between the seats. Every time one grabs it, the other must wait, even though they\textquotesingle re heading to completely different exits \\
 \textbf{Tail latency amplification} & A convoy of 100 cars must all arrive before the toll gate opens. The gate stays shut until the last car clears its pile-up. One stalled car at the back holds everyone --- the convoy\textquotesingle s arrival time is the worst individual time, not the average \\
+\rowcolor{zebra}
 \textbf{Bottleneck (Theory of Constraints)} & A six-lane highway that narrows to a single-lane bridge in the middle. Repaving any other stretch or adding lanes anywhere else does nothing --- the bridge is the constraint, and only widening it moves the needle \\
 \textbf{Profiling} & The traffic helicopter hovering overhead, tracking where cars actually slow down with live camera feeds --- instead of the city planner guessing which intersection is congested from his desk \\
+\rowcolor{zebra}
 \textbf{Premature optimization} & Resurfacing the fast, empty stretch of highway at mile 80 while the one-lane bridge at mile 40 is causing a five-mile backup. You spent the budget in exactly the wrong place \\
 \textbf{Memory hierarchy} & Distance from the driver to the item: pocket (register, instant) \(\rightarrow\) glove box (L1 cache, one second) \(\rightarrow\) trunk (RAM, a short stop) \(\rightarrow\) home garage (SSD, drive back home) \(\rightarrow\) a warehouse in another city (network, a day\textquotesingle s journey) --- every extra stop costs time \\
+\rowcolor{zebra}
 \textbf{Memory leak} & Cars that enter the city\textquotesingle s parking garages and never leave --- their drivers walked away for good. Every hour, more spaces fill up permanently until the garages are full and new cars circle endlessly with nowhere to park \\
 \textbf{CPU-bound vs I/O-bound} & CPU-bound: the highway is gridlocked because there are genuinely too many cars for the road capacity --- you need more lanes. I/O-bound: cars are all idling at a railway crossing waiting for a slow freight train to pass --- the road is empty but nothing moves until the crossing clears \\
+\rowcolor{zebra}
 \textbf{Batching} & A single bus carrying fifty passengers down the highway instead of fifty separate cars, each making the same trip one at a time --- one toll payment, one lane slot, one fuel stop, fifty commuters delivered \\
 \end{longtable}
 
@@ -1510,6 +1540,7 @@ Example: Target 100,000 req/s at p99 \textless{} 100ms. Each server can handle 5
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4294}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4114}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Trade-off
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1522,8 +1553,10 @@ Reliability/Cost Benefit
 \bottomrule\noalign{}
 \endlastfoot
 Replication & Higher write latency (must wait for N replicas) & Higher availability, read scalability \\
+\rowcolor{zebra}
 Compression & CPU overhead per request & Lower bandwidth, reduced network costs \\
 Batching & Higher individual latency (wait to batch) & Much higher throughput, lower per-item cost \\
+\rowcolor{zebra}
 Async processing & Response before work done & Higher throughput; harder error handling \\
 Caching & Stale data risk & Much lower latency, reduced backend load \\
 \end{longtable}
@@ -1588,6 +1621,7 @@ Caching & Stale data risk & Much lower latency, reduced backend load \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1752}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8248}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Topic
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1598,10 +1632,13 @@ Connection
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Operating Systems} & CPU scheduling affects context switch overhead. Virtual memory and page faults affect memory latency. \texttt{epoll}/\texttt{kqueue} enables async I/O. \texttt{mmap} eliminates user-kernel copy. NUMA affects memory latency for multi-socket systems. \\
+\rowcolor{zebra}
 \textbf{Concurrency} & Thread contention is a performance bottleneck. Lock-free data structures reduce contention. Goroutines/fibers allow millions of concurrent operations. False sharing is a concurrency + cache interaction. \\
 \textbf{Databases} & Query planning, indexes, buffer pool (InnoDB buffer pool = L3 cache for DB), connection pooling, read replicas, write-ahead log (WAL) are all performance levers. EXPLAIN ANALYZE is a profiler for queries. \\
+\rowcolor{zebra}
 \textbf{System Design} & Horizontal vs vertical scaling decisions require capacity planning (Little\textquotesingle s Law). Caching layer placement is architectural. Microservices fan-out creates tail latency amplification. CDN is a cache at the network edge. \\
 \textbf{Cloud / Observability} & CloudWatch, Datadog, Prometheus+Grafana implement RED method. AWS X-Ray, Google Cloud Trace, Jaeger implement distributed tracing (latency per span). Auto-scaling is dynamic capacity adjustment. \\
+\rowcolor{zebra}
 \textbf{Networking} & TCP slow start affects connection reuse value. Nagle\textquotesingle s algorithm causes latency in bursty small-packet workloads (disable with \texttt{TCP\_NODELAY}). HTTP/2 multiplexing reduces head-of-line blocking. TLS handshake adds latency (use session resumption). \\
 \textbf{Algorithms \& Data Structures} & Cache-oblivious algorithms. B-trees are cache-friendly for disk (large nodes match disk pages). Hash maps have poor cache behavior due to random access. Sorted arrays enable binary search with good cache behavior. \\
 \end{longtable}
@@ -1703,6 +1740,7 @@ Performance engineering = measure \(\rightarrow\) profile \(\rightarrow\) bottle
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4407}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4092}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1715,18 +1753,25 @@ Key Number
 \bottomrule\noalign{}
 \endlastfoot
 Little\textquotesingle s Law & L = \(\lambda\)W (throughput = concurrency / latency) & --- \\
+\rowcolor{zebra}
 Amdahl\textquotesingle s Law & S = 1/((1-P) + P/N) & 5\% serial \(\rightarrow\) max 20\(\times\) speedup \\
 p99 fan-out & P(any slow) = 1-(1-p)\^{}N & N=100, p=1\% \(\rightarrow\) 63\% affected \\
+\rowcolor{zebra}
 L1 cache hit & \textasciitilde0.5 ns & 1 ns \(\approx\) 1 CPU cycle \\
 RAM access & \textasciitilde100 ns & 200\(\times\) slower than L1 \\
+\rowcolor{zebra}
 NVMe SSD & \textasciitilde100 µs & 1000\(\times\) slower than RAM \\
 Network LAN & \textasciitilde100 µs RTT & Same as NVMe \\
+\rowcolor{zebra}
 Network WAN & \textasciitilde50-150 ms & 500,000\(\times\) slower than L1 \\
 Cache line & 64 bytes & Pad structs to avoid false sharing \\
+\rowcolor{zebra}
 USE method & Utilization, Saturation, Errors & Per resource \\
 RED method & Rate, Errors, Duration & Per service \\
+\rowcolor{zebra}
 GC strategy & ZGC \textless{} 1ms pauses & Java 15+, low-latency prod \\
 Hedged requests & \textasciitilde5\% extra load & Cuts tail latency dramatically \\
+\rowcolor{zebra}
 Connection pool & Reuse TCP connections & DB: \textasciitilde100-300 max connections \\
 \end{longtable}
 
@@ -1763,4 +1808,5 @@ Connection pool & Reuse TCP connections & DB: \textasciitilde100-300 max connect
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/09-performance/01-latency-ladder.pdf}{Orders of magnitude separate cache, memory, SSD, disk and network. Designing for performance means counting which tier each operation touches.}
+\visualfigure{../figures/09-performance/02-tail-latency.pdf}{A handful of slow requests barely move the mean but dominate user experience. Track p95/p99, not averages — at scale, the tail is what every user eventually hits.}
 \end{document}

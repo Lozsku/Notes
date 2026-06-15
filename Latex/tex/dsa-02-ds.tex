@@ -99,6 +99,7 @@ All complexities are average-case unless marked. W = worst case.
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0600}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.3571}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Data Structure
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -119,26 +120,37 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 Array (static) & O(1) & O(n) & O(n) & O(n) & O(n) & Insert/delete shifts elements \\
+\rowcolor{zebra}
 Dynamic Array (list) & O(1) & O(n) & O(1) amort & O(n) & O(n) & Append amortized O(1) \\
 String (immutable) & O(1) & O(n) & O(n) & O(n) & O(n) & Concat is O(n); use StringBuilder \\
+\rowcolor{zebra}
 Hash Table & N/A & O(1) & O(1) & O(1) & O(n) & W: O(n) with all collisions \\
 Singly Linked List & O(n) & O(n) & O(1) head & O(n) & O(n) & O(1) if you have the node reference \\
+\rowcolor{zebra}
 Doubly Linked List & O(n) & O(n) & O(1) ends & O(1)* & O(n) & *O(1) if node ref known \\
 Stack & O(n) & O(n) & O(1) push & O(1) pop & O(n) & Top access O(1) \\
+\rowcolor{zebra}
 Queue & O(n) & O(n) & O(1) enq & O(1) deq & O(n) & Front access O(1) \\
 Deque & O(1) ends & O(n) & O(1) ends & O(1) ends & O(n) & Both ends O(1) \\
+\rowcolor{zebra}
 BST (balanced) & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Unbalanced: O(n) worst \\
 BST (unbalanced) & O(n) W & O(n) W & O(n) W & O(n) W & O(n) & Degenerate = linked list \\
+\rowcolor{zebra}
 AVL Tree & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Strict balance; fast lookup \\
 Red-Black Tree & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Looser balance; fast insert/delete \\
+\rowcolor{zebra}
 Binary Heap (min/max) & O(1) top & O(n) & O(log n) & O(log n) & O(n) & Build heap: O(n) \\
 Trie & O(m) & O(m) & O(m) & O(m) & O(n*m) & m = key length \\
+\rowcolor{zebra}
 Graph (adj list) & O(V+E) & O(V+E) & O(1) & O(E) & O(V+E) & Sparse graphs \\
 Graph (adj matrix) & O(1) & O(1) edge & O(1) & O(1) & O(V\^{}2) & Dense graphs \\
+\rowcolor{zebra}
 Union-Find & O(\(\alpha\)(n)) & O(\(\alpha\)(n)) & O(\(\alpha\)(n)) & - & O(n) & \(\alpha\) = inverse Ackermann, \(\approx\) O(1) \\
 Segment Tree & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Range queries + point updates \\
+\rowcolor{zebra}
 Fenwick Tree (BIT) & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Simpler than segment tree \\
 LRU Cache & O(1) & O(1) & O(1) & O(1) & O(n) & Hash map + doubly linked list \\
+\rowcolor{zebra}
 Bloom Filter & N/A & O(k) & O(k) & N/A & O(m) & k=hash funcs, probabilistic \\
 \end{longtable}
 
@@ -176,6 +188,7 @@ Append cost analysis (n appends):
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1966}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2826}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -190,8 +203,10 @@ Worst
 \bottomrule\noalign{}
 \endlastfoot
 Access & O(1) & O(1) & O(1) \\
+\rowcolor{zebra}
 Search & O(1) & O(n) & O(n) \\
 Append & O(1) & O(1) & O(n) \\
+\rowcolor{zebra}
 Insert & O(1) & O(n) & O(n) \\
 Delete & O(1) & O(n) & O(n) \\
 \end{longtable}
@@ -284,6 +299,7 @@ String Builder pattern:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2371}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5155}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -296,10 +312,13 @@ Note
 \bottomrule\noalign{}
 \endlastfoot
 Index access & O(1) & \\
+\rowcolor{zebra}
 Slice s{[}i:j{]} & O(j-i) & Creates new string \\
 Concatenate & O(n+m) & Both strings copied \\
+\rowcolor{zebra}
 Find/search & O(n*m) & Naive; KMP/Z gives O(n+m) \\
 Comparison & O(n) & Character by character \\
+\rowcolor{zebra}
 Join & O(n) & One pass \\
 \end{longtable}
 
@@ -397,6 +416,7 @@ Good Hash Function Properties:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3611}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4306}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -409,8 +429,10 @@ Con
 \bottomrule\noalign{}
 \endlastfoot
 Chaining & Simple, works at high load & Extra memory for pointers \\
+\rowcolor{zebra}
 Linear probing & Cache-friendly & Clustering degrades performance \\
 Quadratic probe & Less clustering & May not probe all slots \\
+\rowcolor{zebra}
 Double hashing & Best distribution & Two hash functions needed \\
 \end{longtable}
 
@@ -421,6 +443,7 @@ Double hashing & Best distribution & Two hash functions needed \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4066}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2904}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -433,6 +456,7 @@ Worst
 \bottomrule\noalign{}
 \endlastfoot
 Search & O(1) & O(n) \\
+\rowcolor{zebra}
 Insert & O(1) & O(n) \\
 Delete & O(1) & O(n) \\
 \end{longtable}
@@ -546,6 +570,7 @@ Delete node (singly linked, given reference only, O(n)):
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2820}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2820}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -558,10 +583,13 @@ Doubly LL
 \bottomrule\noalign{}
 \endlastfoot
 Access by index & O(n) & O(n) \\
+\rowcolor{zebra}
 Search & O(n) & O(n) \\
 Insert at head & O(1) & O(1) \\
+\rowcolor{zebra}
 Insert at tail & O(n)/O(1) & O(1) \\
 Insert at middle & O(n) & O(n) \\
+\rowcolor{zebra}
 Delete at head & O(1) & O(1) \\
 Delete by ref & O(n) & O(1) \\
 \end{longtable}
@@ -712,6 +740,7 @@ Deque (collections.deque in Python):
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1139}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3416}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -728,8 +757,10 @@ Monotonic Stack
 \bottomrule\noalign{}
 \endlastfoot
 Push/Enqueue & O(1) & O(1) & O(1) & O(1) amort \\
+\rowcolor{zebra}
 Pop/Dequeue & O(1) & O(1) & O(1) & O(1) amort \\
 Peek (top/front) & O(1) & O(1) & O(1) & O(1) \\
+\rowcolor{zebra}
 Search & O(n) & O(n) & O(n) & O(n) \\
 \end{longtable}
 
@@ -872,6 +903,7 @@ Tree Traversals:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3046}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2829}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -886,8 +918,10 @@ AVL / RB Tree
 \bottomrule\noalign{}
 \endlastfoot
 Search & O(log n) & O(n) & O(log n) \\
+\rowcolor{zebra}
 Insert & O(log n) & O(n) & O(log n) \\
 Delete & O(log n) & O(n) & O(log n) \\
+\rowcolor{zebra}
 Min/Max & O(log n) & O(n) & O(log n) \\
 In-order & O(n) & O(n) & O(n) \\
 \end{longtable}
@@ -1026,6 +1060,7 @@ Build Heap (heapify) from arbitrary array — O(n):
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5238}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4762}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1036,10 +1071,13 @@ Time
 \bottomrule\noalign{}
 \endlastfoot
 Get min/max & O(1) \\
+\rowcolor{zebra}
 Insert & O(log n) \\
 Extract min & O(log n) \\
+\rowcolor{zebra}
 Build heap & O(n) \\
 Search & O(n) \\
+\rowcolor{zebra}
 Heapsort & O(n log n) \\
 \end{longtable}
 
@@ -1185,6 +1223,7 @@ Space: each node uses O(ALPHA) where ALPHA=26 for lowercase
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2260}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2826}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1197,8 +1236,10 @@ Space
 \bottomrule\noalign{}
 \endlastfoot
 Insert & O(m) & O(m) \\
+\rowcolor{zebra}
 Search & O(m) & O(1) \\
 StartsWith & O(m) & O(1) \\
+\rowcolor{zebra}
 Delete & O(m) & O(1) \\
 \end{longtable}
 
@@ -1329,6 +1370,7 @@ Types:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2963}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2840}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1341,12 +1383,16 @@ Adj Matrix
 \bottomrule\noalign{}
 \endlastfoot
 Space & O(V+E) & O(V\(^2\)) \\
+\rowcolor{zebra}
 Add vertex & O(1) & O(V\(^2\)) \\
 Add edge & O(1) & O(1) \\
+\rowcolor{zebra}
 Remove edge & O(E) & O(1) \\
 Check edge (u,v) & O(degree) & O(1) \\
+\rowcolor{zebra}
 Get all neighbors & O(degree) & O(V) \\
 BFS/DFS & O(V+E) & O(V\(^2\)) \\
+\rowcolor{zebra}
 Dijkstra & O((V+E)logV) & O(V\(^2\)logV) \\
 \end{longtable}
 
@@ -1495,6 +1541,7 @@ Visual after several unions:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2949}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4931}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1509,6 +1556,7 @@ Union by Rank
 \bottomrule\noalign{}
 \endlastfoot
 Find & O(n) & O(log n) & O(\(\alpha\)(n)) \(\approx\) O(1) \\
+\rowcolor{zebra}
 Union & O(n) & O(log n) & O(\(\alpha\)(n)) \(\approx\) O(1) \\
 Space & O(n) & O(n) & O(n) \\
 \end{longtable}
@@ -1641,6 +1689,7 @@ LFU Cache (capacity=3):
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1653,6 +1702,7 @@ LFU
 \bottomrule\noalign{}
 \endlastfoot
 get & O(1) & O(1) \\
+\rowcolor{zebra}
 put & O(1) & O(1) \\
 \end{longtable}
 
@@ -1790,6 +1840,7 @@ Fenwick Tree (BIT) for prefix sums:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2641}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2641}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1804,8 +1855,10 @@ Fenwick Tree
 \bottomrule\noalign{}
 \endlastfoot
 Build & O(n) & O(n) & O(n log n) \\
+\rowcolor{zebra}
 Point update & O(1) & O(log n) & O(log n) \\
 Range update & O(n) & O(log n) & O(log n) \\
+\rowcolor{zebra}
 Range query & O(n) & O(log n) & O(log n) \\
 Space & O(n) & O(4n) & O(n) \\
 \end{longtable}
@@ -1923,6 +1976,7 @@ Bloom Filter (m=20 bits, k=3 hash functions):
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2813}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3517}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Op
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1935,6 +1989,7 @@ Space
 \bottomrule\noalign{}
 \endlastfoot
 Insert & O(k) & O(m) \\
+\rowcolor{zebra}
 Query & O(k) & O(1) \\
 Delete & N/A & - \\
 \end{longtable}
@@ -1976,6 +2031,7 @@ Decision table: "I need X \(\rightarrow\) use Y"
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2935}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3370}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Need
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1988,28 +2044,40 @@ Why
 \bottomrule\noalign{}
 \endlastfoot
 O(1) access by index & Array / List & Contiguous memory \\
+\rowcolor{zebra}
 O(1) key-value lookup & Hash Map & Hash function \\
 Ordered key-value, range queries & BST / Sorted Map & In-order traversal \\
+\rowcolor{zebra}
 Get min/max repeatedly & Heap & Root always min/max \\
 Get kth smallest/largest & Heap of size k & O(n log k) \\
+\rowcolor{zebra}
 Prefix search / autocomplete & Trie & Shared prefix compression \\
 LIFO (undo, recursion) & Stack & Push/pop from one end \\
+\rowcolor{zebra}
 FIFO (BFS, scheduling) & Queue / Deque & Enqueue/dequeue O(1) \\
 Sliding window max/min & Monotonic Deque & Maintain monotone order \\
+\rowcolor{zebra}
 Next greater/smaller element & Monotonic Stack & Classic pattern \\
 Connected components & Union-Find & Near-O(1) union/find \\
+\rowcolor{zebra}
 Shortest path (unweighted) & BFS (Queue) & Level-by-level expansion \\
 Shortest path (weighted, non-neg) & Dijkstra (Heap) & Greedy + priority queue \\
+\rowcolor{zebra}
 Shortest path (negative weights) & Bellman-Ford & DP approach \\
 All pairs shortest path & Floyd-Warshall & O(V\(^3\)) DP \\
+\rowcolor{zebra}
 Range sum query + updates & Fenwick Tree / Segment Tree & O(log n) both \\
 Range min/max query + updates & Segment Tree & BIT can\textquotesingle t do min/max \\
+\rowcolor{zebra}
 O(1) LRU eviction & HashMap + DLL & O(1) access + O(1) order \\
 Membership test, space-constrained & Bloom Filter & Probabilistic, tiny space \\
+\rowcolor{zebra}
 Count frequencies & HashMap / Counter & Hash map with integer values \\
 Find duplicates & HashSet or sorting & O(n) with hash, O(n log n) sort \\
+\rowcolor{zebra}
 Merge k sorted sequences & Min-Heap of k elements & O(n log k) \\
 Detect cycle (undirected graph) & Union-Find & Simpler than DFS coloring \\
+\rowcolor{zebra}
 Detect cycle (directed graph) & DFS with in-stack tracking & Union-Find doesn\textquotesingle t work here \\
 Topological ordering & Kahn\textquotesingle s (BFS) or DFS & Works on DAGs only \\
 \end{longtable}
@@ -2023,6 +2091,7 @@ Topological ordering & Kahn\textquotesingle s (BFS) or DFS & Works on DAGs only 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3462}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3718}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Need
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2035,14 +2104,19 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 Dynamic array & \texttt{list} & \texttt{append} O(1) amortized \\
+\rowcolor{zebra}
 Hash map & \texttt{dict} & \texttt{defaultdict(list/int/set)} \\
 Hash set & \texttt{set} & \texttt{add}, \texttt{in} O(1) \\
+\rowcolor{zebra}
 Ordered map (by key) & \texttt{sortedcontainers.SortedList} & Not stdlib; use \texttt{bisect} + list \\
 Min heap & \texttt{heapq} (module) & Negate for max heap \\
+\rowcolor{zebra}
 Queue / Deque & \texttt{collections.deque} & \texttt{appendleft}, \texttt{popleft} O(1) \\
 Counter & \texttt{collections.Counter} & \texttt{most\_common(k)} \\
+\rowcolor{zebra}
 LRU built-in & \texttt{collections.OrderedDict} & \texttt{move\_to\_end}, \texttt{popitem} \\
 Bisect (sorted insert) & \texttt{bisect.bisect\_left/right} & Binary search on sorted list \\
+\rowcolor{zebra}
 Infinity & \texttt{float(\textquotesingle{}inf\textquotesingle{})} & \\
 Char to int & \texttt{ord(\textquotesingle{}a\textquotesingle{})} \(\rightarrow\) 97 & \texttt{chr(97)} \(\rightarrow\) \textquotesingle a\textquotesingle{} \\
 \end{longtable}
@@ -2078,6 +2152,7 @@ Char to int & \texttt{ord(\textquotesingle{}a\textquotesingle{})} \(\rightarrow\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2135}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5492}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Need
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2090,14 +2165,19 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 Dynamic array & \texttt{ArrayList\textless{}T\textgreater{}} & \texttt{add()} O(1) amortized \\
+\rowcolor{zebra}
 Hash map & \texttt{HashMap\textless{}K,V\textgreater{}} & Not ordered \\
 Ordered map (by key) & \texttt{TreeMap\textless{}K,V\textgreater{}} & Red-Black tree, O(log n) ops \\
+\rowcolor{zebra}
 Ordered set & \texttt{TreeSet\textless{}T\textgreater{}} & Red-Black tree \\
 Hash set & \texttt{HashSet\textless{}T\textgreater{}} & \\
+\rowcolor{zebra}
 Linked hash map & \texttt{LinkedHashMap\textless{}K,V\textgreater{}} & Insertion-order iteration (LRU) \\
 Min/Max heap & \texttt{PriorityQueue\textless{}T\textgreater{}} & Min by default; pass \texttt{Comparator.reverseOrder()} for max \\
+\rowcolor{zebra}
 Stack & \texttt{Deque\textless{}T\textgreater{}} as stack & Prefer \texttt{ArrayDeque} over \texttt{Stack} \\
 Queue & \texttt{ArrayDeque\textless{}T\textgreater{}} & Or \texttt{LinkedList\textless{}T\textgreater{}} \\
+\rowcolor{zebra}
 Deque & \texttt{ArrayDeque\textless{}T\textgreater{}} & \\
 \end{longtable}
 
@@ -2132,6 +2212,7 @@ Deque & \texttt{ArrayDeque\textless{}T\textgreater{}} & \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4524}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3095}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Need
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2144,14 +2225,19 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 Dynamic array & \texttt{vector\textless{}T\textgreater{}} & \texttt{push\_back} O(1) amortized \\
+\rowcolor{zebra}
 Hash map & \texttt{unordered\_map\textless{}K,V\textgreater{}} & O(1) avg \\
 Ordered map (by key) & \texttt{map\textless{}K,V\textgreater{}} & Red-Black tree, O(log n) \\
+\rowcolor{zebra}
 Hash set & \texttt{unordered\_set\textless{}T\textgreater{}} & \\
 Ordered set & \texttt{set\textless{}T\textgreater{}} & + \texttt{lower\_bound}, \texttt{upper\_bound} \\
+\rowcolor{zebra}
 Priority queue (max) & \texttt{priority\_queue\textless{}T\textgreater{}} & Max by default \\
 Priority queue (min) & \texttt{priority\_queue\textless{}T,vector\textless{}T\textgreater{},greater\textless{}T\textgreater{}\textgreater{}} & \\
+\rowcolor{zebra}
 Stack & \texttt{stack\textless{}T\textgreater{}} & \\
 Queue & \texttt{queue\textless{}T\textgreater{}} & \\
+\rowcolor{zebra}
 Deque & \texttt{deque\textless{}T\textgreater{}} & \\
 \end{longtable}
 
@@ -2184,6 +2270,7 @@ Deque & \texttt{deque\textless{}T\textgreater{}} & \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2313}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7687}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Data Structure
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2194,18 +2281,25 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 Array & Numbered mailboxes in a row --- access box 42 instantly \\
+\rowcolor{zebra}
 Hash Map & Library card catalog --- look up by title, get shelf location \\
 Linked List & Train cars --- each car knows only the next car \\
+\rowcolor{zebra}
 Stack & Stack of plates --- only access the top \\
 Queue & Queue at a bank --- first in, first served \\
+\rowcolor{zebra}
 Deque & Train that can board/exit from both ends \\
 BST & Phone book --- organized so you can binary search \\
+\rowcolor{zebra}
 Heap & Priority ER room --- most critical patient always treated first \\
 Trie & Autocomplete on your phone --- shared prefix saves space \\
+\rowcolor{zebra}
 Graph & Road map --- cities are nodes, roads are edges \\
 Union-Find & Social groups --- merging friend circles \\
+\rowcolor{zebra}
 Segment Tree & Population pyramid --- sum over any age range quickly \\
 Fenwick Tree & Odometer with clever bit tricks for partial sums \\
+\rowcolor{zebra}
 LRU Cache & Small whiteboard --- erase what was written longest ago for space \\
 Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away regulars \\
 \end{longtable}
@@ -2503,6 +2597,7 @@ A = amortized
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4906}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5094}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2513,20 +2608,28 @@ Structure
 \bottomrule\noalign{}
 \endlastfoot
 Sliding window & Array + two pointers \\
+\rowcolor{zebra}
 Sliding window max/min & Monotonic deque \\
 Next greater element & Monotonic stack \\
+\rowcolor{zebra}
 Level-order traversal & Queue (BFS) \\
 Path/exhaustive search & Stack (DFS) / recursion \\
+\rowcolor{zebra}
 Shortest path (unweighted) & BFS \\
 Shortest path (weighted) & Dijkstra (min-heap) \\
+\rowcolor{zebra}
 Connected components & BFS/DFS or Union-Find \\
 Top K elements & Heap of size K \\
+\rowcolor{zebra}
 Frequency counting & Hash map / Counter \\
 Deduplication & Hash set \\
+\rowcolor{zebra}
 Prefix sum & Fenwick tree / prefix array \\
 Range sum (mutable) & Fenwick tree \\
+\rowcolor{zebra}
 Range min/max (mutable) & Segment tree \\
 Word prefix search & Trie \\
+\rowcolor{zebra}
 Order + O(1) eviction & LRU (HashMap + DLL) \\
 Large-scale membership & Bloom filter \\
 \end{longtable}

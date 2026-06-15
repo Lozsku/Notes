@@ -82,6 +82,7 @@ Deep Learning is a subfield of machine learning that uses \textbf{multi-layered 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4390}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4390}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Era
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -94,8 +95,10 @@ Deep Learning Solution
 \bottomrule\noalign{}
 \endlastfoot
 Pre-1980s & Linear models can\textquotesingle t capture non-linear patterns & Non-linear activations + multiple layers \\
+\rowcolor{zebra}
 1980s--2000s & Shallow nets, vanishing gradients, limited data & Better init, ReLU, more data \\
 2006--2012 & Hand-engineered features dominate & Pre-training, GPUs, AlexNet (2012) breakthrough \\
+\rowcolor{zebra}
 2012--present & Dataset scale + compute & Large-scale training on GPUs/TPUs, transformers \\
 \end{longtable}
 
@@ -335,6 +338,7 @@ softmax(x_i) = e^(x_i) / sum_j(e^(x_j))
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1418}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2568}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Activation
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -353,10 +357,13 @@ Primary Use
 \bottomrule\noalign{}
 \endlastfoot
 Sigmoid & (0,1) & No & Yes (severe) & No & Binary output \\
+\rowcolor{zebra}
 Tanh & (-1,1) & Yes & Yes (mild) & No & RNN hidden states \\
 ReLU & {[}0,\(\infty\)) & No & No (pos side) & Yes & Hidden layers (default) \\
+\rowcolor{zebra}
 Leaky ReLU & (-\(\infty\),\(\infty\)) & No & No & No & When dead neurons occur \\
 GELU & (-\(\infty\),\(\infty\)) & No & No & No & Transformers, modern nets \\
+\rowcolor{zebra}
 Softmax & (0,1), sum=1 & No & N/A & N/A & Multiclass output \\
 \end{longtable}
 
@@ -478,6 +485,7 @@ CE = -sum_c( y_c * log(y_hat_c) )
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3505}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3846}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Cross-Entropy
@@ -489,8 +497,10 @@ MSE
 \bottomrule\noalign{}
 \endlastfoot
 Appropriate for & Classification & Regression \\
+\rowcolor{zebra}
 Gradient behavior & Strong gradient even when very wrong & Weak gradient when output is saturated \\
 Output activation & Softmax/Sigmoid & Linear \\
+\rowcolor{zebra}
 Why CE is better for classification & Log loss aligns with MLE for categorical distributions & Gradients vanish with sigmoid/softmax output when error is large \\
 \end{longtable}
 
@@ -654,6 +664,7 @@ Optimizers determine \textbf{how} gradient information is used to update weights
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4709}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3492}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Schedule
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -666,8 +677,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 Step Decay & LR *= \(\gamma\) every N epochs & Simple, works well \\
+\rowcolor{zebra}
 Cosine Annealing & LR = LR\_min + 0.5*(LR\_max-LR\_min)*(1+cos(\(\pi\)*t/T)) & Transformers, fine-tuning \\
 Warmup + Decay & Linear warmup for K steps, then decay & Large model training (GPT, BERT) \\
+\rowcolor{zebra}
 Cyclic LR & Oscillate between LR\_min and LR\_max & Escape local minima \\
 ReduceLROnPlateau & Reduce LR when metric stops improving & When you don\textquotesingle t know when to decay \\
 \end{longtable}
@@ -683,6 +696,7 @@ ReduceLROnPlateau & Reduce LR when metric stops improving & When you don\textquo
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1127}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.4634}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Optimizer
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -699,8 +713,10 @@ Best For
 \bottomrule\noalign{}
 \endlastfoot
 SGD & No & No & 1x params & Final fine-tuning, convex problems \\
+\rowcolor{zebra}
 SGD+Momentum & No & Yes & 2x params & Vision models (ResNet, etc.) \\
 RMSprop & Yes & No & 2x params & RNNs, non-stationary \\
+\rowcolor{zebra}
 Adam & Yes & Yes & 3x params & Default: most deep learning tasks \\
 AdamW & Yes & Yes & 3x params & Transformers (decouples weight decay) \\
 \end{longtable}
@@ -728,6 +744,7 @@ dL/dW^(1) = dL/da^(L) * (da^(L)/dz^(L)) * ... * (da^(2)/dz^(2)) * (da^(1)/dz^(1)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3555}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5379}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Problem
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -740,10 +757,13 @@ Mechanism
 \bottomrule\noalign{}
 \endlastfoot
 Vanishing & ReLU activation & Derivative = 1 for x \textgreater{} 0, doesn\textquotesingle t shrink \\
+\rowcolor{zebra}
 Vanishing & Residual connections (ResNets) & Gradient highway: \texttt{dL/dW\^{}(l)} gets additive term of 1 \\
 Vanishing & Better initialization & Xavier/He --- keep gradient magnitude stable \\
+\rowcolor{zebra}
 Vanishing & Batch normalization & Normalizes activations, keeps them in active range \\
 Exploding & Gradient clipping & `g = g * (max\_norm / \\
+\rowcolor{zebra}
 Both & LSTM/GRU gating & Additive cell state update instead of multiplicative \\
 \end{longtable}
 
@@ -898,6 +918,7 @@ Normalize \textbf{across the feature dimension} for each sample:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3165}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3418}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 BatchNorm
@@ -909,10 +930,13 @@ LayerNorm
 \bottomrule\noalign{}
 \endlastfoot
 Normalization axis & Across batch, per feature & Across features, per sample \\
+\rowcolor{zebra}
 Batch size dependent & Yes & No \\
 Works for RNNs/Transformers & No & Yes \\
+\rowcolor{zebra}
 Used in & CNNs, MLPs & RNNs, Transformers \\
 Train/inference difference & Yes (running stats) & No \\
+\rowcolor{zebra}
 Acts as regularizer & Yes (batch noise) & Minimal \\
 \end{longtable}
 
@@ -956,6 +980,7 @@ During training, randomly set each neuron\textquotesingle s output to \textbf{ze
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4597}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3763}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Technique
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -968,10 +993,13 @@ When to Use
 \bottomrule\noalign{}
 \endlastfoot
 L2 (Weight Decay) & \texttt{loss\ +=\ λ\ *\ sum(W²)} \(\rightarrow\) pulls weights toward zero & Always, as AdamW \\
+\rowcolor{zebra}
 L1 & `loss += λ * sum( & W \\
 Dropout & Random neuron deactivation & FC layers, Transformers \\
+\rowcolor{zebra}
 Data Augmentation & Random crops, flips, color jitter & Image tasks \\
 Early Stopping & Stop when val loss stops improving & All tasks \\
+\rowcolor{zebra}
 Label Smoothing & \texttt{y\ =\ (1-ε)*y\_onehot\ +\ ε/K} & Classification, prevents overconfidence \\
 Batch Norm & Noise from batch statistics & CNNs \\
 \end{longtable}
@@ -1054,6 +1082,7 @@ CNNs exploit \textbf{spatial structure} --- nearby pixels are correlated. Instea
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.6120}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0878}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Architecture
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1068,10 +1097,13 @@ Params
 \bottomrule\noalign{}
 \endlastfoot
 LeNet-5 & 1998 & Conv-Pool-FC design & \textasciitilde60K \\
+\rowcolor{zebra}
 AlexNet & 2012 & Deep CNN + ReLU + Dropout + GPU & \textasciitilde60M \\
 VGG-16 & 2014 & Uniform 3\(\times\)3 convs, very deep & \textasciitilde138M \\
+\rowcolor{zebra}
 GoogLeNet/Inception & 2014 & Inception modules (multi-scale filters) & \textasciitilde6.8M \\
 ResNet-50 & 2015 & Residual connections \(\rightarrow\) very deep (50-152 layers) & \textasciitilde25M \\
+\rowcolor{zebra}
 EfficientNet & 2019 & Compound scaling (depth, width, resolution) & 5-66M \\
 \end{longtable}
 
@@ -1202,6 +1234,7 @@ Simplified LSTM with two gates instead of three:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1851}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4098}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Vanilla RNN
@@ -1215,10 +1248,13 @@ GRU
 \bottomrule\noalign{}
 \endlastfoot
 Parameters & Fewest & Most & Middle \\
+\rowcolor{zebra}
 Memory length & Short & Long & Long \\
 Training stability & Poor & Good & Good \\
+\rowcolor{zebra}
 Speed & Fastest & Slowest & Middle \\
 Gates & 0 & 3 (i,f,o) & 2 (z,r) \\
+\rowcolor{zebra}
 When to use & Rarely & Long sequences & Long sequences, faster training \\
 \end{longtable}
 
@@ -1270,6 +1306,7 @@ When to use & Rarely & Long sequences & Long sequences, faster training \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1881}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3861}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1284,8 +1321,10 @@ When to Use
 \bottomrule\noalign{}
 \endlastfoot
 Feature extraction & All pre-trained layers & Only new head & Small dataset, very similar domain \\
+\rowcolor{zebra}
 Fine-tuning (shallow) & Early layers & Later layers + head & Medium dataset, somewhat similar domain \\
 Full fine-tuning & Nothing & Entire network & Large dataset or very different domain \\
+\rowcolor{zebra}
 LoRA/PEFT & Most weights & Low-rank adapters & LLM fine-tuning, minimal compute \\
 \end{longtable}
 
@@ -1397,6 +1436,7 @@ Validation loss: 2.5  → Classic overfit
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3120}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6880}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Technique
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1407,12 +1447,16 @@ Effect
 \bottomrule\noalign{}
 \endlastfoot
 More data & Best solution; data augmentation as proxy \\
+\rowcolor{zebra}
 Dropout & Ensemble effect, breaks co-adaptation \\
 Weight decay (L2) & Smaller weights \(\rightarrow\) smoother function \\
+\rowcolor{zebra}
 Early stopping & Stop before model memorizes training set \\
 Batch normalization & Mild regularization via batch noise \\
+\rowcolor{zebra}
 Reduce model capacity & Fewer layers/neurons \\
 Data augmentation & Random transformations \(\rightarrow\) effective more data \\
+\rowcolor{zebra}
 Label smoothing & Prevents overconfident predictions \\
 \end{longtable}
 
@@ -1432,19 +1476,19 @@ Label smoothing & Prevents overconfident predictions \\
 
 \subsection{Single Neuron / Perceptron}\label{single-neuron--perceptron}
 
-\setcodelang{Python}
+\setcodelang{JavaScript}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{    x1 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w1}\OperatorTok{{-}{-}{-}{-}\textbackslash{}}
-                  \OperatorTok{\textbackslash{}}
-\NormalTok{    x2 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w2}\OperatorTok{{-}{-}{-}{-}{-}}\NormalTok{[∑ }\OperatorTok{+}\NormalTok{ b]}\OperatorTok{{-}{-}{-}{-}}\NormalTok{[f(.)]}\OperatorTok{{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ y}
+\NormalTok{    x1 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w1}\OperatorTok{{-}{-}{-}{-}}\NormalTok{\textbackslash{}}
+\NormalTok{                  \textbackslash{}}
+\NormalTok{    x2 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w2}\OperatorTok{{-}{-}{-}{-}{-}}\NormalTok{[∑ }\OperatorTok{+}\NormalTok{ b]}\OperatorTok{{-}{-}{-}{-}}\NormalTok{[}\FunctionTok{f}\NormalTok{(}\OperatorTok{.}\NormalTok{)]}\OperatorTok{{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ y}
                   \OperatorTok{/}
-\NormalTok{    x3 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w3}\OperatorTok{{-}{-}{-}{-}/}
+\NormalTok{    x3 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w3}\OperatorTok{{-}{-}{-}{-}}\SpecialStringTok{/}
 
-\NormalTok{∑ }\OperatorTok{=}\NormalTok{ w1}\OperatorTok{*}\NormalTok{x1 }\OperatorTok{+}\NormalTok{ w2}\OperatorTok{*}\NormalTok{x2 }\OperatorTok{+}\NormalTok{ w3}\OperatorTok{*}\NormalTok{x3 }\OperatorTok{+}\NormalTok{ b   (linear combination)}
-\NormalTok{f }\OperatorTok{=}\NormalTok{ activation function           (non}\OperatorTok{{-}}\NormalTok{linearity)}
-\NormalTok{y }\OperatorTok{=}\NormalTok{ f(∑)                          (neuron output)}
+\NormalTok{∑ }\OperatorTok{=}\NormalTok{ w1}\OperatorTok{*}\NormalTok{x1 }\OperatorTok{+}\NormalTok{ w2}\OperatorTok{*}\NormalTok{x2 }\OperatorTok{+}\NormalTok{ w3}\OperatorTok{*}\NormalTok{x3 }\OperatorTok{+} \FunctionTok{b}\NormalTok{   (linear combination)}
+\NormalTok{f }\OperatorTok{=}\NormalTok{ activation }\KeywordTok{function}\NormalTok{           (non}\OperatorTok{{-}}\NormalTok{linearity)}
+\NormalTok{y }\OperatorTok{=} \FunctionTok{f}\NormalTok{(∑)                          (neuron output)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1594,6 +1638,7 @@ KEY: c_t uses ADDITION (+), not multiplication → gradient highway!
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2970}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3069}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1608,12 +1653,16 @@ Key Technique
 \bottomrule\noalign{}
 \endlastfoot
 Google Photos & Image search/classification & EfficientNet/ViT & CNN pre-trained on JFT-300M \\
+\rowcolor{zebra}
 Netflix & Thumbnail CTR optimization & CNN & Transfer from ImageNet \\
 Amazon Alexa & Wake word detection & Small CNN/RNN & Trained to run on device \\
+\rowcolor{zebra}
 YouTube & Video recommendation & Two-Tower DNN & Embeddings for users and videos \\
 Facebook & Hate speech detection & BERT fine-tuned & Transfer learning \\
+\rowcolor{zebra}
 Tesla & Autopilot vision & Multi-camera CNN & Custom hardware (FSD chip) \\
 Spotify & Song recommendations & Autoencoder + collab filtering & Learned audio embeddings \\
+\rowcolor{zebra}
 OpenAI DALL-E & Image generation & Diffusion + CLIP & Contrastive + generative \\
 \end{longtable}
 
@@ -1625,6 +1674,7 @@ OpenAI DALL-E & Image generation & Diffusion + CLIP & Contrastive + generative \
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1775}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8225}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 DL Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1635,26 +1685,37 @@ Factory Analogy
 \bottomrule\noalign{}
 \endlastfoot
 Input data & Raw materials entering the factory \\
+\rowcolor{zebra}
 Neural network & The entire factory assembly line \\
 Layer & One station on the assembly line (e.g., cutting, welding, painting) \\
+\rowcolor{zebra}
 Weights & The dial settings at each station (speed, temperature, pressure) \\
 Forward pass & The product traveling down the line, being transformed at each station \\
+\rowcolor{zebra}
 Activation function & A station\textquotesingle s go/no-go quality gate --- product passes or gets modified \\
 Loss function & The final Quality Control (QC) inspector\textquotesingle s defect score \\
+\rowcolor{zebra}
 Backpropagation & The foreman walking the line \textbf{backward} from QC, telling each station specifically how its settings caused the defect \\
 Gradient & How much each station\textquotesingle s dials need to change to reduce defects \\
+\rowcolor{zebra}
 Gradient descent & The foreman nudging each dial a small amount in the right direction \\
 Learning rate & How big a nudge the foreman applies (too big = overcompensate; too small = too slow) \\
+\rowcolor{zebra}
 Adam optimizer & A smart foreman who tracks which dials have been moved a lot recently and adjusts nudge size per-dial accordingly \\
 Vanishing gradient & By the time the foreman reaches station 1 (near the start), his feedback has been diluted so many times he can only whisper --- station 1 barely learns \\
+\rowcolor{zebra}
 Residual connections & A direct phone line from QC to every station, so even station 1 gets clear feedback \\
 Dropout & Randomly sending workers home each day so the line can\textquotesingle t over-rely on any one person --- forces robustness \\
+\rowcolor{zebra}
 Batch normalization & Standardizing the product dimensions at each station so later stations don\textquotesingle t have to compensate for upstream variation \\
 CNN & Inspectors using a small magnifying glass that slides across the product surface, looking for defects in each patch --- same inspector logic applied everywhere \\
+\rowcolor{zebra}
 RNN & A line that remembers the last product it processed, using that memory to better process the current one \\
 LSTM & A line with a long-term clipboard (cell state) that records important product history, with explicit "write/erase/read" decisions \\
+\rowcolor{zebra}
 Transfer learning & Hiring an experienced foreman from another factory (pre-trained on a related product) --- retrain only the final stations for your specific product \\
 Overfitting & The line gets so optimized for the specific training products it\textquotesingle s seen that it fails on new, slightly different products \\
+\rowcolor{zebra}
 Embeddings & Each product type gets a detailed spec sheet (dense vector) summarizing its properties for downstream stations \\
 \end{longtable}
 
@@ -1955,6 +2016,7 @@ Transfer learning uses knowledge from a pre-trained model (trained on a large da
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2439}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5552}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Your Data Size
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1967,8 +2029,10 @@ Strategy
 \bottomrule\noalign{}
 \endlastfoot
 Small & Similar & Freeze all, train only head \\
+\rowcolor{zebra}
 Small & Different & Freeze early layers, fine-tune later layers + head \\
 Large & Similar & Fine-tune entire network with small LR \\
+\rowcolor{zebra}
 Large & Different & Full fine-tuning or train from scratch \\
 \end{longtable}
 
@@ -2215,6 +2279,7 @@ Networks with very large learning rates can have many neurons "die" in the first
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3498}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6502}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Quantity
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2225,14 +2290,19 @@ Value
 \bottomrule\noalign{}
 \endlastfoot
 Sigmoid derivative max & 0.25 (at x=0) \\
+\rowcolor{zebra}
 Adam defaults & \(\beta\)1=0.9, \(\beta\)2=0.999, \(\varepsilon\)=1e-8 \\
 Xavier init variance & 2/(n\_in + n\_out) \\
+\rowcolor{zebra}
 He init variance & 2/n\_in \\
 Typical dropout rate & 0.1 - 0.5 \\
+\rowcolor{zebra}
 VGG-16 params & \textasciitilde138M \\
 ResNet-50 params & \textasciitilde25M \\
+\rowcolor{zebra}
 LSTM: gates count & 3 (input, forget, output) \\
 GRU: gates count & 2 (update, reset) \\
+\rowcolor{zebra}
 Softmax temperature & 1.0 default; \textless{} 1 = sharper; \textgreater{} 1 = softer \\
 \end{longtable}
 
@@ -2242,6 +2312,7 @@ Softmax temperature & 1.0 default; \textless{} 1 = sharper; \textgreater{} 1 = s
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3723}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6277}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Situation
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2252,20 +2323,28 @@ Use
 \bottomrule\noalign{}
 \endlastfoot
 Image classification & CNN (ResNet, EfficientNet) \\
+\rowcolor{zebra}
 Sequence-to-sequence (NLP) & Transformer (BERT, GPT) \\
 Time series / sequential & LSTM/GRU or Transformer \\
+\rowcolor{zebra}
 Small dataset, image task & Pre-trained CNN + freeze + new head \\
 Binary output & Sigmoid + BCE loss \\
+\rowcolor{zebra}
 Multiclass output & Softmax + Cross-Entropy \\
 Regression output & Linear + MSE \\
+\rowcolor{zebra}
 Hidden layers (default) & ReLU \\
 Hidden layers (modern arch) & GELU \\
+\rowcolor{zebra}
 CNN training & BatchNorm \\
 Transformer/RNN training & LayerNorm \\
+\rowcolor{zebra}
 Default optimizer & Adam (or AdamW for transformers) \\
 Final accuracy push (vision) & SGD + momentum + cosine schedule \\
+\rowcolor{zebra}
 Prevent overfitting & Dropout, weight decay, data augmentation, early stopping \\
 Training unstable & Gradient clipping, reduce LR, check init \\
+\rowcolor{zebra}
 Gradients vanishing & ReLU, residual connections, BatchNorm, He init \\
 \end{longtable}
 

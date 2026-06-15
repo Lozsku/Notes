@@ -76,6 +76,7 @@
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1105}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4966}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Phase
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -88,10 +89,13 @@ Goal
 \bottomrule\noalign{}
 \endlastfoot
 Clarify requirements & 5 min & Pin scope; avoid building the wrong thing \\
+\rowcolor{zebra}
 Extract entities \& relationships & 5 min & Noun-verb extraction on whiteboard \\
 Sketch class diagram & 5--10 min & Get agreement before coding \\
+\rowcolor{zebra}
 Code core classes + happy path & 20--30 min & Must compile/run \\
 Add edge cases + extensibility & 10 min & Show you think beyond happy path \\
+\rowcolor{zebra}
 Demo driver & 5 min & Prove it works end-to-end \\
 \end{longtable}
 
@@ -166,6 +170,7 @@ From the problem statement: circle \textbf{nouns} \(\rightarrow\) candidate clas
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1876}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8124}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Class
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -176,6 +181,7 @@ Responsibility
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{DLinkedNode} & Doubly-linked list node (key, value, prev, next pointers) \\
+\rowcolor{zebra}
 \texttt{LRUCache} & HashMap + doubly-linked list; exposes \texttt{get}/\texttt{put} \\
 \end{longtable}
 
@@ -394,6 +400,7 @@ Responsibility
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3163}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6837}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Class
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -404,14 +411,19 @@ Responsibility
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{VehicleType} (enum) & MOTORCYCLE, CAR, TRUCK \\
+\rowcolor{zebra}
 \texttt{SpotType} (enum) & MOTORCYCLE, COMPACT, LARGE, ELECTRIC \\
 \texttt{Vehicle} (ABC) & Base vehicle with type + license plate \\
+\rowcolor{zebra}
 \texttt{ParkingSpot} & Individual spot --- type, level, number, occupied flag \\
 \texttt{ParkingLevel} & Collection of spots on one floor; find-spot logic \\
+\rowcolor{zebra}
 \texttt{ParkingLot} & Singleton; owns levels; exposes park/unpark \\
 \texttt{Ticket} & Issued on park; holds spot ref + entry time \\
+\rowcolor{zebra}
 \texttt{PricingStrategy} (ABC) & Strategy interface: \texttt{calculate\_fee(ticket)\ -\textgreater{}\ float} \\
 \texttt{HourlyPricing} & Concrete strategy \\
+\rowcolor{zebra}
 \texttt{FlatRatePricing} & Concrete strategy \\
 \end{longtable}
 
@@ -843,6 +855,7 @@ Moto    Car    Truck
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3329}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6671}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Class
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -853,8 +866,10 @@ Responsibility
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{RateLimitStrategy} (ABC) & Interface: \texttt{is\_allowed(client\_id)\ -\textgreater{}\ bool} \\
+\rowcolor{zebra}
 \texttt{TokenBucketStrategy} & Refill tokens at fixed rate; allow if tokens \textgreater{} 0 \\
 \texttt{FixedWindowStrategy} & Count requests per fixed time window; reset on window roll \\
+\rowcolor{zebra}
 \texttt{SlidingWindowLogStrategy} & Keep timestamped log; count entries in last N seconds \\
 \texttt{RateLimiter} & Context object; delegates to strategy \\
 \end{longtable}
@@ -1142,6 +1157,7 @@ Responsibility
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2851}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7149}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Class
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1152,12 +1168,16 @@ Responsibility
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{User} & Name, id, personal balance map \\
+\rowcolor{zebra}
 \texttt{Group} & Collection of users + expenses \\
 \texttt{Expense} & Amount, payer, participants, split strategy \\
+\rowcolor{zebra}
 \texttt{SplitStrategy} (ABC) & \texttt{compute\_shares(amount,\ participants)\ -\textgreater{}\ dict{[}User,\ float{]}} \\
 \texttt{EqualSplit} & Divide evenly \\
+\rowcolor{zebra}
 \texttt{ExactSplit} & Caller specifies each person\textquotesingle s share \\
 \texttt{PercentSplit} & Caller specifies each person\textquotesingle s percentage \\
+\rowcolor{zebra}
 \texttt{Balance} & Utility: compute net balances + simplify \\
 \end{longtable}
 
@@ -1498,6 +1518,7 @@ Responsibility
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3037}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6963}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Class
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1508,10 +1529,13 @@ Responsibility
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{ElevatorState} (enum) & IDLE, MOVING\_UP, MOVING\_DOWN, MAINTENANCE \\
+\rowcolor{zebra}
 \texttt{Direction} (enum) & UP, DOWN, IDLE \\
 \texttt{Request} & Floor + direction (external) or just floor (internal) \\
+\rowcolor{zebra}
 \texttt{Elevator} & Single car; state machine; queue of floors to serve \\
 \texttt{Scheduler} (ABC) & Assigns external request to an elevator \\
+\rowcolor{zebra}
 \texttt{ScanScheduler} & SCAN/LOOK algorithm implementation \\
 \texttt{ElevatorSystem} & Owns elevators + scheduler; top-level API \\
 \end{longtable}
@@ -1881,6 +1905,7 @@ Responsibility
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2288}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7712}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Class
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1891,10 +1916,13 @@ Responsibility
 \bottomrule\noalign{}
 \endlastfoot
 \texttt{Mark} (enum) & X, O, EMPTY \\
+\rowcolor{zebra}
 \texttt{Board} & Grid state; place/validate mark; check win/draw \\
 \texttt{Player} (ABC) & Name, mark, \texttt{choose\_move(board)\ -\textgreater{}\ (row,\ col)} \\
+\rowcolor{zebra}
 \texttt{HumanPlayer} & Reads from provided input (injectable for testing) \\
 \texttt{RandomAIPlayer} & Picks a random empty cell \\
+\rowcolor{zebra}
 \texttt{WinChecker} & Encapsulates win-detection logic (single responsibility) \\
 \texttt{Game} & Orchestrates turn loop; holds players + board \\
 \end{longtable}
@@ -2230,6 +2258,7 @@ When you get a new problem, run through this in 5 minutes:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1683}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4840}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Need
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2242,12 +2271,16 @@ Example in this file
 \bottomrule\noalign{}
 \endlastfoot
 Swap algorithm at runtime & \textbf{Strategy} & Pricing, Split, Scheduler, Rate Limiter, Player \\
+\rowcolor{zebra}
 Object with lifecycle phases & \textbf{State} & Elevator (IDLE/MOVING/MAINTENANCE) \\
 One global instance & \textbf{Singleton} & ParkingLot, ElevatorSystem \\
+\rowcolor{zebra}
 Create family of objects & \textbf{Factory Method} & VehicleFactory \\
 Fixed algorithm, variable steps & \textbf{Template Method} & Vehicle.allowed\_spot\_types, Game.play \\
+\rowcolor{zebra}
 Undo / replayable actions & \textbf{Command} & Board moves (TicTacToe extension) \\
 Notify many on change & \textbf{Observer} & ElevatorSystem \(\rightarrow\) FloorDisplay \\
+\rowcolor{zebra}
 Wrap object with extra behavior & \textbf{Decorator} & Rate limiter middleware layer \\
 \end{longtable}
 

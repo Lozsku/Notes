@@ -131,6 +131,7 @@ Each real-world pain point birthed a design pattern. Understanding \emph{why} ea
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4093}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5235}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -143,10 +144,13 @@ Key signals they look for
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Google} & Can you design at planetary scale? (Maps, Search, YouTube) & Bigtable/Spanner-style thinking, eventual consistency comfort, data locality, Borg-like resource scheduling \\
+\rowcolor{zebra}
 \textbf{Meta} & Social graph scale (3B+ users), read-heavy feeds, real-time notifications & EdgeRank-style ranking, TAO graph DB, async fanout, infrastructure cost awareness \\
 \textbf{Amazon} & Service-oriented culture, failure isolation, "two-pizza team" ownership & Six-pager thinking, blast radius minimization, DynamoDB/SQS/SNS, operational excellence \\
+\rowcolor{zebra}
 \textbf{Apple} & Privacy, device--cloud sync, iCloud-scale storage & End-to-end encryption architecture, conflict resolution (CRDT), offline-first design \\
 \textbf{Netflix} & Chaos engineering mindset, streaming at scale, global CDN & Hystrix/resilience patterns, Open Connect CDN, A/B experimentation infrastructure \\
+\rowcolor{zebra}
 \textbf{Microsoft} & Azure integration, enterprise reliability SLAs, Azure-native patterns & Multi-tenant isolation, RBAC, hybrid cloud, Teams-scale real-time messaging \\
 \end{longtable}
 
@@ -340,6 +344,7 @@ Vertical:                    Horizontal:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4293}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4209}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Stateless
@@ -351,8 +356,10 @@ Stateful
 \bottomrule\noalign{}
 \endlastfoot
 Definition & Each request contains all needed context & Server stores session state between requests \\
+\rowcolor{zebra}
 Scaling & Trivially horizontal (any server handles any request) & Hard (sticky sessions, session replication) \\
 Failure recovery & Easy (just route elsewhere) & Hard (state is lost) \\
+\rowcolor{zebra}
 Examples & REST APIs, CDN edge nodes & WebSocket connections, game servers, DB connections \\
 \end{longtable}
 
@@ -369,6 +376,7 @@ Examples & REST APIs, CDN edge nodes & WebSocket connections, game servers, DB c
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4154}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3940}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -381,10 +389,13 @@ Best for
 \bottomrule\noalign{}
 \endlastfoot
 Round Robin & Each server gets requests in rotation & Uniform server capacity, stateless requests \\
+\rowcolor{zebra}
 Weighted Round Robin & Servers get proportional share based on capacity & Mixed server hardware \\
 Least Connections & Route to server with fewest active connections & Long-lived connections (WebSockets) \\
+\rowcolor{zebra}
 IP Hash & Hash client IP \(\rightarrow\) sticky routing & Session persistence without external store \\
 Random & Pick random server & Simple, uniform load \\
+\rowcolor{zebra}
 Least Response Time & Route to fastest responding server & Latency-sensitive workloads \\
 \end{longtable}
 
@@ -395,6 +406,7 @@ Least Response Time & Route to fastest responding server & Latency-sensitive wor
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4118}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4265}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 L4 (Transport)
@@ -406,8 +418,10 @@ L7 (Application)
 \bottomrule\noalign{}
 \endlastfoot
 Operates at & TCP/UDP level & HTTP/HTTPS level \\
+\rowcolor{zebra}
 Sees & IP, port, protocol & URLs, headers, cookies, body \\
 Speed & Faster (less processing) & Slower (more processing) \\
+\rowcolor{zebra}
 Flexibility & Less (can\textquotesingle t inspect content) & More (route by URL, A/B test) \\
 Examples & AWS NLB, HAProxy TCP & AWS ALB, Nginx, Envoy \\
 \end{longtable}
@@ -514,6 +528,7 @@ Read:  Cache miss → read from DB → populate cache
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3265}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3980}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Policy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -526,10 +541,13 @@ Best for
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{LRU} (Least Recently Used) & Evict item not accessed longest & General purpose, temporal locality \\
+\rowcolor{zebra}
 \textbf{LFU} (Least Frequently Used) & Evict item accessed least times & Stable "hot" data (popular items stay) \\
 \textbf{MRU} (Most Recently Used) & Evict most recently used item & Scans (last item won\textquotesingle t be needed again) \\
+\rowcolor{zebra}
 \textbf{FIFO} & Evict oldest inserted item & Simple, predictable \\
 \textbf{Random} & Evict random item & Simple approximation of LRU \\
+\rowcolor{zebra}
 \textbf{TTL} & Evict after time-to-live expires & Time-sensitive data \\
 \end{longtable}
 
@@ -588,6 +606,7 @@ User (Tokyo) ──→ Edge Node (Tokyo) ──→ Origin (if miss)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4027}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3733}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Push CDN
@@ -599,8 +618,10 @@ Pull CDN
 \bottomrule\noalign{}
 \endlastfoot
 How content gets to edge & You upload/push to CDN & CDN fetches from origin on first request \\
+\rowcolor{zebra}
 Control & Full control, pre-populate & Automatic, reactive \\
 Storage cost & Higher (must store all content at all edges) & Lower (only popular content cached) \\
+\rowcolor{zebra}
 Staleness & Manual invalidation needed & TTL-based, auto-expire \\
 Best for & Large files known in advance (videos, software) & Unpredictable access patterns, websites \\
 \end{longtable}
@@ -643,6 +664,7 @@ Without sharding:              With sharding:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2144}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3569}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -657,8 +679,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Range-based} & Shard by key range (A-F, G-M, N-Z) & Simple, range queries easy & Hot spots if data not uniformly distributed \\
+\rowcolor{zebra}
 \textbf{Hash-based} & shard = hash(key) \% N & Uniform distribution & Range queries hit all shards, resharding is painful \\
 \textbf{Directory-based} & Lookup table maps key \(\rightarrow\) shard & Flexible, easy to move data & Lookup table becomes bottleneck/SPOF \\
+\rowcolor{zebra}
 \textbf{Geographic} & Shard by user location & Latency, compliance (GDPR) & Cross-geo queries expensive \\
 \end{longtable}
 
@@ -746,6 +770,7 @@ Key k → go clockwise → lands on nearest server
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4471}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3882}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Synchronous
@@ -757,8 +782,10 @@ Asynchronous
 \bottomrule\noalign{}
 \endlastfoot
 Write latency & Higher (wait for replica ACK) & Lower (return after leader write) \\
+\rowcolor{zebra}
 Data loss risk & Zero (if replica fails, write fails) & Non-zero (unflushed writes lost) \\
 Availability & Lower (writes blocked if replica down) & Higher \\
+\rowcolor{zebra}
 Typical use & Financial transactions, critical data & Social feeds, analytics \\
 \end{longtable}
 
@@ -820,6 +847,7 @@ Slowest.               (bounded staleness)      Fastest.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4712}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3022}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -832,10 +860,13 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Linearizability} (Strong) & All ops appear to execute atomically at a single point in time & Single-node DB, Zookeeper \\
+\rowcolor{zebra}
 \textbf{Sequential Consistency} & All ops appear in some sequential order consistent per-process & Older CPUs, some distributed DBs \\
 \textbf{Causal Consistency} & Causally related ops seen in order; concurrent ops may differ & Amazon Dynamo-style \\
+\rowcolor{zebra}
 \textbf{Eventual Consistency} & Given no new writes, all replicas converge eventually & DNS, Cassandra, DynamoDB default \\
 \textbf{Read-your-writes} & You always see your own writes & Session-level guarantee \\
+\rowcolor{zebra}
 \textbf{Monotonic reads} & Once you read a value, you never read an older one & Prevents time-traveling reads \\
 \end{longtable}
 
@@ -846,6 +877,7 @@ Example
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4202}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4605}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 ACID (SQL)
@@ -857,8 +889,10 @@ BASE (NoSQL)
 \bottomrule\noalign{}
 \endlastfoot
 Stands for & Atomicity, Consistency, Isolation, Durability & Basically Available, Soft-state, Eventually consistent \\
+\rowcolor{zebra}
 Consistency & Strong (serializable) & Eventual \\
 Availability & Sacrificed during partition & Maintained \\
+\rowcolor{zebra}
 Performance & Lower throughput & Higher throughput \\
 Use case & Banking, inventory, orders & Social feeds, caches, analytics \\
 \end{longtable}
@@ -898,6 +932,7 @@ Availability
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3135}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4268}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Choice
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -910,6 +945,7 @@ Examples
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{CP} (Consistency + Partition) & Return error rather than stale data & HBase, Zookeeper, MongoDB (default config), Redis Cluster \\
+\rowcolor{zebra}
 \textbf{AP} (Availability + Partition) & Return stale data rather than error & Cassandra, DynamoDB, CouchDB, DNS \\
 \end{longtable}
 
@@ -987,6 +1023,7 @@ Producer ──→ │  (persistent buf) │ ──→ Consumer 3
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3008}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2722}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1001,14 +1038,19 @@ Feature
 \bottomrule\noalign{}
 \endlastfoot
 Type & Distributed log (pub/sub) & Message broker (queue) & Managed queue \\
+\rowcolor{zebra}
 Ordering & Partition-level ordering & FIFO queue variant & FIFO queue variant \\
 Retention & Configurable (days/weeks) & Until consumed & Up to 14 days \\
+\rowcolor{zebra}
 Replay & Yes (seek to offset) & No & No \\
 Throughput & Very high (millions/sec) & High (tens of thousands/sec) & High (managed) \\
+\rowcolor{zebra}
 Consumer model & Pull (consumer controls offset) & Push (broker pushes) & Pull \\
 Routing & Topics + partitions & Flexible routing (exchanges) & Simple queue \\
+\rowcolor{zebra}
 Durability & Persistent (disk) & Persistent or transient & Persistent \\
 Best for & Event streaming, log aggregation, high throughput & Complex routing, RPC patterns, task queues & Serverless, AWS-native, simple queues \\
+\rowcolor{zebra}
 Operations & Complex (Zookeeper, brokers) & Moderate & None (managed) \\
 \end{longtable}
 
@@ -1107,6 +1149,7 @@ Orchestrator → PaymentService → Orchestrator → ShippingService → ...
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3243}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4789}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Monolith
@@ -1118,14 +1161,19 @@ Microservices
 \bottomrule\noalign{}
 \endlastfoot
 Deployment & Single unit & Independent per service \\
+\rowcolor{zebra}
 Scaling & Scale whole app & Scale individual services \\
 Tech stack & Uniform & Polyglot (each service chooses) \\
+\rowcolor{zebra}
 Development & Simpler (one codebase) & Complex (distributed system) \\
 Testing & Easier (unit + integration) & Hard (contract tests, integration) \\
+\rowcolor{zebra}
 Failure isolation & Poor (one bug can crash all) & Good (blast radius contained) \\
 Data management & Shared DB (simpler) & DB per service (complex) \\
+\rowcolor{zebra}
 Latency & No network hops & Network calls between services \\
 Team org & Coupled, coordination needed & Autonomous teams (Conway\textquotesingle s Law) \\
+\rowcolor{zebra}
 When to use & Early stage, small team & Scale, large teams, clear domain boundaries \\
 \end{longtable}
 
@@ -1176,6 +1224,7 @@ When to use & Early stage, small team & Scale, large teams, clear domain boundar
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4333}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Synchronous
@@ -1187,8 +1236,10 @@ Asynchronous
 \bottomrule\noalign{}
 \endlastfoot
 Coupling & Tight (caller waits) & Loose (fire and forget) \\
+\rowcolor{zebra}
 Latency & Direct (low if service is fast) & Added queue latency \\
 Availability & Caller fails if callee fails & Resilient (queue absorbs failure) \\
+\rowcolor{zebra}
 Complexity & Simple & Complex (eventual consistency, DLQ) \\
 Use case & Query for data, need immediate response & Long-running tasks, fan-out, decoupling \\
 \end{longtable}
@@ -1217,6 +1268,7 @@ HALF-OPEN (probe) → success → CLOSED  /  failure → OPEN
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2440}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2828}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Algorithm
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1231,8 +1283,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Token Bucket} & Tokens added at rate r, bucket capacity c. Request consumes token. & Allows bursts up to c. Smooth average. & Complex state \\
+\rowcolor{zebra}
 \textbf{Leaky Bucket} & Requests enter bucket, drain at fixed rate. Overflow dropped. & Smooth, constant output rate & Strict, no burst allowed \\
 \textbf{Fixed Window Counter} & Count requests in fixed time window (e.g., per minute). & Simple & Edge problem: 2x rate possible at window boundary \\
+\rowcolor{zebra}
 \textbf{Sliding Window Log} & Log timestamps of all requests, count in last N seconds. & Accurate, no edge problem & Memory: O(requests) \\
 \textbf{Sliding Window Counter} & Approximate using current + previous window counts, weighted. & Memory efficient, accurate & Approximation \\
 \end{longtable}
@@ -1309,6 +1363,7 @@ Partner API ──────────────────────�
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3977}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4432}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{SQL (Relational)}
@@ -1320,12 +1375,16 @@ Partner API ──────────────────────�
 \bottomrule\noalign{}
 \endlastfoot
 Data model & Tables, rows, columns & Document, key-value, wide-column, graph \\
+\rowcolor{zebra}
 Schema & Fixed, defined upfront & Flexible, schema-less \\
 Transactions & ACID, multi-row & BASE, limited (improving) \\
+\rowcolor{zebra}
 Joins & Yes, powerful & No (denormalize or application-level) \\
 Scaling & Vertical (primarily), read replicas & Horizontal (built-in) \\
+\rowcolor{zebra}
 Query language & SQL (standardized) & Proprietary APIs \\
 Consistency & Strong & Eventual (usually) \\
+\rowcolor{zebra}
 Use cases & E-commerce, banking, ERP & Social feeds, real-time analytics, IoT \\
 Examples & PostgreSQL, MySQL, Oracle & Cassandra, MongoDB, DynamoDB, Redis \\
 \end{longtable}
@@ -1338,6 +1397,7 @@ Examples & PostgreSQL, MySQL, Oracle & Cassandra, MongoDB, DynamoDB, Redis \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3580}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2682}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1352,8 +1412,10 @@ Examples
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Key-Value} & key \(\rightarrow\) value & Caching, sessions, leaderboards & Redis, DynamoDB, Memcached \\
+\rowcolor{zebra}
 \textbf{Document} & key \(\rightarrow\) JSON doc & User profiles, catalogs, CMS & MongoDB, CouchDB, Firestore \\
 \textbf{Wide-Column} & row key \(\rightarrow\) dynamic columns & Time series, IoT, event logs & Cassandra, HBase, BigTable \\
+\rowcolor{zebra}
 \textbf{Graph} & Nodes + edges & Social networks, recommendations, fraud detection & Neo4j, Amazon Neptune \\
 \textbf{Time Series} & Timestamp + metrics & Monitoring, metrics, IoT & InfluxDB, TimescaleDB, Prometheus \\
 \end{longtable}
@@ -1393,6 +1455,7 @@ Not idempotent:  counter++       (increments each call)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2632}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5789}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1405,10 +1468,13 @@ Safe (no side effects)
 \bottomrule\noalign{}
 \endlastfoot
 GET & Yes & Yes \\
+\rowcolor{zebra}
 HEAD & Yes & Yes \\
 PUT & Yes & No \\
+\rowcolor{zebra}
 DELETE & Yes & No \\
 POST & No & No \\
+\rowcolor{zebra}
 PATCH & No & No \\
 \end{longtable}
 
@@ -1828,6 +1894,7 @@ Background refill job: every second, INCRBY tokens up to max
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1294}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8706}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1838,20 +1905,28 @@ Real-Life Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Load Balancer} & The traffic officer at the city\textquotesingle s main junction, waving each car toward the least-busy road so no single lane grinds to a halt \\
+\rowcolor{zebra}
 \textbf{Cache} & The corner shop two streets from your house that stocks the twenty items locals buy every day --- you skip the forty-minute drive to the distant warehouse (the DB) for a pint of milk \\
 \textbf{CDN} & Neighbourhood mini-marts stocked in every district --- nobody drives downtown for everyday goods; the nearest shelf serves you in seconds \\
+\rowcolor{zebra}
 \textbf{Sharding} & Splitting the city into postal districts (North, East, South, West), each served by its own depot; a parcel for the North never touches the South depot \\
 \textbf{Replication} & Copies of the city\textquotesingle s land records kept in every district town hall --- the central hall (leader) stamps every deed first, then branch halls (followers) update their copies so locals can query without crossing town \\
+\rowcolor{zebra}
 \textbf{CAP Theorem} & When the bridge linking the East and West districts collapses (partition), the district bank either closes its West branch rather than risk stale balances (consistency) or keeps the branch open on yesterday\textquotesingle s ledger (availability) --- it cannot do both \\
 \textbf{Circuit Breaker} & The district substation that trips automatically when the grid is overloaded, cutting power to protect the wiring; after a safe interval it resets and reconnects --- rather than letting the whole city burn \\
+\rowcolor{zebra}
 \textbf{Message Queue} & The city\textquotesingle s pneumatic-tube dispatch system: a business drops a sealed canister (message) into the tube; the central sorting office holds it until the right depot (consumer) is ready to collect --- the sender doesn\textquotesingle t wait at the tube \\
 \textbf{Rate Limiting} & The toll booth on the city highway: each driver gets a book of ten toll tokens per day; once the book is empty the barrier stays down, keeping the road from seizing up \\
+\rowcolor{zebra}
 \textbf{Consistent Hashing} & Addresses along the city ring-road: depots are spaced around the loop, and deliveries go to the nearest clockwise depot. Open a new depot and only the handful of deliveries just past it reroute --- the rest of the city carries on unchanged \\
 \textbf{Leader-Follower} & The central city records office (leader) is the only place allowed to register a new deed; district town halls (followers) replicate every entry so residents can look up records locally without queuing downtown \\
+\rowcolor{zebra}
 \textbf{Event-Driven Arch} & The city\textquotesingle s emergency-broadcast loudspeaker: when a water main bursts (event), the broadcast fires once and every crew --- plumbers, traffic wardens, road-repair gangs --- reacts independently without waiting for a dispatcher to call each one \\
 \textbf{Microservices} & The city\textquotesingle s specialist trade streets --- the electricians\textquotesingle{} quarter, the glaziers\textquotesingle{} row, the plumbers\textquotesingle{} lane --- each guild operates its own yard, hires its own workers, and a fire in one yard doesn\textquotesingle t shut down the others \\
+\rowcolor{zebra}
 \textbf{Write-through Cache} & The corner-shop owner who updates the shelf tag (cache) and the stock ledger at the depot (DB) in the same stroke --- both records stay in sync the moment goods arrive \\
 \textbf{Write-back Cache} & The shop assistant who scribbles each sale on a notepad (cache) and submits a tally to the depot ledger (DB) only at end of day --- faster for customers, but a flooded shop loses the day\textquotesingle s notes before they\textquotesingle re filed \\
+\rowcolor{zebra}
 \textbf{Idempotency} & The pedestrian crossing button at a city intersection --- pressing it ten times is identical to pressing it once; the crossing changes when it\textquotesingle s ready, not once per press \\
 \textbf{Eventual Consistency} & The city\textquotesingle s notice-board network: a planning decision is pinned at the central hall first; within hours every district board carries the same notice --- briefly, a resident in the outer suburbs hasn\textquotesingle t seen it yet, but they will \\
 \end{longtable}
@@ -2359,6 +2434,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2755}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7245}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Topic
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2369,18 +2445,25 @@ One-liner
 \bottomrule\noalign{}
 \endlastfoot
 Horizontal scaling & Stateless app tier + external session store \\
+\rowcolor{zebra}
 Load balancing & L4 for TCP, L7 for HTTP routing + A/B \\
 Cache-aside & App manages cache; misses hit DB \\
+\rowcolor{zebra}
 Write-through & Both cache and DB updated on write \\
 LRU eviction & Evict least recently accessed \\
+\rowcolor{zebra}
 CDN & Cache static content geographically near users \\
 Sharding & Partition data across nodes; consistent hashing minimizes resharding \\
+\rowcolor{zebra}
 Replication & Copy data across nodes; sync=safe, async=fast \\
 CAP & Pick 2 of 3; P is mandatory; choose C or A \\
+\rowcolor{zebra}
 Eventual consistency & Replicas converge given no new writes \\
 Idempotency & Safe to retry; use idempotency keys \\
+\rowcolor{zebra}
 Circuit breaker & Fail fast when downstream is unhealthy \\
 Message queue & Decouple, buffer, fan-out; at-least-once + idempotent consumer \\
+\rowcolor{zebra}
 API Gateway & Auth, rate limit, routing, SSL in one place \\
 Rate limiting & Token bucket (burst-friendly) or sliding window (precise) \\
 \end{longtable}
@@ -2391,6 +2474,7 @@ Rate limiting & Token bucket (burst-friendly) or sliding window (precise) \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2865}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7135}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Decision
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2401,14 +2485,19 @@ Rule of Thumb
 \bottomrule\noalign{}
 \endlastfoot
 SQL vs NoSQL & SQL default; NoSQL when horizontal scale or special access pattern needed \\
+\rowcolor{zebra}
 Cache strategy & Cache-aside default; write-through for high consistency; write-back for high write throughput \\
 Sync vs Async & Sync for user-facing responses; async for background work, fan-out, decoupling \\
+\rowcolor{zebra}
 Fan-out on write vs read & Write for low-follower-count users; read for celebrities; hybrid for both \\
 Sharding key choice & High cardinality, uniform distribution, matches access pattern (avoid cross-shard queries) \\
+\rowcolor{zebra}
 Replication sync vs async & Sync for financial data; async for social/analytics \\
 CAP choice & CP for consistency-critical (banking, inventory); AP for availability-critical (social, search) \\
+\rowcolor{zebra}
 Monolith vs microservices & Monolith to start; microservices when teams/services need independent scaling/deployment \\
 REST vs gRPC & REST for public APIs; gRPC for internal microservice communication \\
+\rowcolor{zebra}
 Push vs Pull notifications & Push (FCM/APNs) for mobile; SSE/WebSocket for web real-time \\
 \end{longtable}
 

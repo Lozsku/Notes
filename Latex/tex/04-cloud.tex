@@ -120,6 +120,7 @@ Before containers and cloud:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3013}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6987}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Problem
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -130,10 +131,13 @@ Solution
 \bottomrule\noalign{}
 \endlastfoot
 Works on my machine & Containers (immutable, portable environment) \\
+\rowcolor{zebra}
 Slow provisioning & Cloud APIs + IaC (seconds, not weeks) \\
 Resource waste & Bin-packing orchestration (Kubernetes scheduling) \\
+\rowcolor{zebra}
 Deployment fear & CI/CD + progressive delivery (canary, blue-green) \\
 Observability gap & Metrics, structured logs, distributed traces \\
+\rowcolor{zebra}
 Config drift & GitOps + Infrastructure as Code \\
 \end{longtable}
 
@@ -274,6 +278,7 @@ Containers share the \textbf{host OS kernel} but isolate processes using two Lin
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3375}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4375}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Dimension
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -286,12 +291,16 @@ Virtual Machines
 \bottomrule\noalign{}
 \endlastfoot
 Isolation unit & Process group (NS + cgroup) & Full OS + virtual hardware \\
+\rowcolor{zebra}
 Kernel & Shared with host & Own kernel per VM \\
 Boot time & Milliseconds & Seconds to minutes \\
+\rowcolor{zebra}
 Image size & MBs & GBs \\
 Resource overhead & Near-zero (no guest OS) & High (guest OS + hypervisor) \\
+\rowcolor{zebra}
 Security isolation & Weaker (kernel shared) & Stronger (full isolation) \\
 Portability & Excellent (OCI standard) & Good (VM images are large) \\
+\rowcolor{zebra}
 Density (per host) & 100s of containers & 10s of VMs \\
 Use case & Microservices, CI/CD & Multi-tenant, legacy lift-and-shift \\
 \end{longtable}
@@ -307,6 +316,7 @@ Namespaces partition Linux kernel resources so each container sees its own isola
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3718}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4423}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Namespace
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -319,12 +329,16 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{pid} & Process IDs & PID 1 inside container \(\neq\) PID 1 on host \\
+\rowcolor{zebra}
 \textbf{net} & Network interfaces, routing tables & Container gets its own \texttt{eth0} \\
 \textbf{mnt} & Filesystem mount points & Container\textquotesingle s \texttt{/} is its own root \\
+\rowcolor{zebra}
 \textbf{uts} & Hostname and domain name & \texttt{hostname} inside = "my-container" \\
 \textbf{ipc} & IPC (semaphores, shared mem) & No inter-container IPC by default \\
+\rowcolor{zebra}
 \textbf{user} & User/Group IDs & UID 0 in container \(\neq\) UID 0 on host \\
 \textbf{cgroup} (v2) & cgroup root & Nested cgroup visibility \\
+\rowcolor{zebra}
 \textbf{time} (Linux 5.6+) & System clock & Different clock offset per container \\
 \end{longtable}
 
@@ -490,6 +504,7 @@ Key practices:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4779}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3730}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Network Mode
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -502,8 +517,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{bridge} (default) & Software bridge; containers get IPs in 172.17.0.0/16; NAT to host & Single-host development \\
+\rowcolor{zebra}
 \textbf{host} & Container shares host network namespace & High-performance, port 80 = host port 80 \\
 \textbf{overlay} & Multi-host networking (Swarm/K8s) & Distributed clusters \\
+\rowcolor{zebra}
 \textbf{none} & No networking & Air-gapped processing jobs \\
 \textbf{macvlan} & Container appears as physical NIC on LAN & Network appliances \\
 \end{longtable}
@@ -611,6 +628,7 @@ Use Case
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3820}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6180}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Controller
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -621,10 +639,13 @@ What it manages
 \bottomrule\noalign{}
 \endlastfoot
 ReplicaSet controller & Ensures N pod replicas running \\
+\rowcolor{zebra}
 Deployment controller & Manages ReplicaSets for rolling updates \\
 Node controller & Detects/marks NotReady nodes, evicts pods \\
+\rowcolor{zebra}
 Job controller & Runs pods to completion \\
 Endpoint controller & Populates Endpoints objects for Services \\
+\rowcolor{zebra}
 ServiceAccount controller & Creates default SAs in new namespaces \\
 Namespace controller & Handles namespace deletion cleanup \\
 \end{longtable}
@@ -755,6 +776,7 @@ Stable virtual IP + DNS name in front of a dynamic set of pods (selected by labe
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4403}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3323}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Service Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -767,8 +789,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{ClusterIP} & Virtual IP accessible only within cluster & Internal microservice communication \\
+\rowcolor{zebra}
 \textbf{NodePort} & Exposes service on every node\textquotesingle s IP at static port (30000-32767) & External access in dev/bare-metal \\
 \textbf{LoadBalancer} & Provisions cloud LB; external IP & Production external access on cloud \\
+\rowcolor{zebra}
 \textbf{ExternalName} & CNAME alias to external DNS & Route traffic to external DB \\
 \textbf{Headless} (ClusterIP: None) & Returns pod IPs directly, no VIP & StatefulSets, service discovery by DNS \\
 \end{longtable}
@@ -796,6 +820,7 @@ Internet → LoadBalancer → Ingress Controller → Service → Pods
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1394}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3484}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Resource
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -810,6 +835,7 @@ Encoding
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{ConfigMap} & Non-sensitive config (env vars, config files) & etcd plaintext & None \\
+\rowcolor{zebra}
 \textbf{Secret} & Sensitive data (passwords, tokens, TLS certs) & etcd base64 & base64 (NOT encryption by default!) \\
 \end{longtable}
 
@@ -1063,6 +1089,7 @@ xDS API: Envoy connects to control plane (Istiod) and dynamically receives updat
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2294}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7706}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1073,10 +1100,13 @@ How It Works
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{mTLS} & Istiod issues X.509 certs (SPIFFE IDs); Envoy does TLS handshake transparently \\
+\rowcolor{zebra}
 \textbf{Traffic splitting} & VirtualService: 90\% \(\rightarrow\) v1, 10\% \(\rightarrow\) v2 \\
 \textbf{Circuit breaking} & OutlierDetection: eject pod after N consecutive 5xx errors \\
+\rowcolor{zebra}
 \textbf{Retries} & VirtualService: retry on 5xx, up to 3 attempts \\
 \textbf{Fault injection} & Testing: inject 500ms delay or HTTP 503 to service \\
+\rowcolor{zebra}
 \textbf{Observability} & Envoy emits metrics/traces to Prometheus/Jaeger automatically \\
 \textbf{Ingress Gateway} & Envoy at cluster edge (replaces Ingress for L7) \\
 \end{longtable}
@@ -1182,6 +1212,7 @@ CANARY DEPLOYMENT
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1762}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3921}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1198,8 +1229,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Blue-Green} & Instant (LB flip) & 2\(\times\) infrastructure & Zero & Mission-critical, scheduled maintenance \\
+\rowcolor{zebra}
 \textbf{Canary} & Fast (reduce \%) & \textasciitilde10\% extra & Zero & Risk-sensitive, gradual validation \\
 \textbf{Rolling} & Slow (re-roll) & No extra (in-place) & Zero (if configured) & Default K8s, resource-constrained \\
+\rowcolor{zebra}
 \textbf{Recreate} & N/A & Minimal & Yes! & Dev environments, stateful where overlap forbidden \\
 \end{longtable}
 
@@ -1301,6 +1334,7 @@ terraform destroy  → tear everything down
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3509}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4680}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Dimension
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1313,10 +1347,13 @@ CloudFormation
 \bottomrule\noalign{}
 \endlastfoot
 Cloud support & Multi-cloud & AWS only \\
+\rowcolor{zebra}
 Language & HCL (human-friendly) & JSON/YAML (verbose) \\
 State management & External state file (S3 + lock) & Managed by AWS (no state file to manage) \\
+\rowcolor{zebra}
 Drift detection & \texttt{terraform\ plan} & CloudFormation drift detection \\
 Rollback & Manual (or Terraform Cloud) & Automatic on stack failure \\
+\rowcolor{zebra}
 Ecosystem & Vast module registry & AWS-native, CDK wraps it \\
 CDK equivalent & CDK for Terraform (CDKTF) & AWS CDK (TypeScript/Python \(\rightarrow\) CFN) \\
 \end{longtable}
@@ -1362,6 +1399,7 @@ Configuration management (not primarily resource provisioning). Agentless, SSH-b
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3515}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1803}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pillar
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1376,6 +1414,7 @@ Cost Profile
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Metrics} & Numeric time-series (CPU \%, req/s, error rate) & Alerting, dashboards, SLO tracking & Low (aggregated) \\
+\rowcolor{zebra}
 \textbf{Logs} & Timestamped text/JSON events & Debugging specific errors, audit trails & High (volume = cost) \\
 \textbf{Traces} & End-to-end request path across services with timing & Diagnosing latency, finding bottlenecks & Medium \\
 \end{longtable}
@@ -1524,6 +1563,7 @@ App → Fluentd/Vector/Filebeat → Kafka (buffer) → Elasticsearch/Loki → Ki
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3626}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3963}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Term
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1536,8 +1576,10 @@ Example
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{SLI} (Service Level Indicator) & A metric measuring service behavior & "99th percentile latency of /api/checkout" \\
+\rowcolor{zebra}
 \textbf{SLO} (Service Level Objective) & Target value for an SLI & "p99 latency \textless{} 200ms for 99.9\% of the time over 30 days" \\
 \textbf{SLA} (Service Level Agreement) & Legal contract with customer; penalty for breach & "99.9\% uptime; SLA breach \(\rightarrow\) 10\% service credit" \\
+\rowcolor{zebra}
 \textbf{Error Budget} & Allowed failure before SLO breach & "0.1\% of requests can fail = 43.2 min/month" \\
 \end{longtable}
 
@@ -1563,6 +1605,7 @@ SLA is the external commitment (SLO with teeth)
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2151}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7849}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Service Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1573,8 +1616,10 @@ Good SLI candidates
 \bottomrule\noalign{}
 \endlastfoot
 Web API & Availability (\% 2xx), latency (p50/p99), error rate \\
+\rowcolor{zebra}
 Data pipeline & Freshness (lag), completeness (\% records processed), throughput \\
 Storage & Durability (\% data retained), read latency \\
+\rowcolor{zebra}
 Streaming & Consumer lag, throughput (messages/s) \\
 \end{longtable}
 
@@ -1654,6 +1699,7 @@ Streaming & Consumer lag, throughput (messages/s) \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1512}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1787}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1670,8 +1716,10 @@ Time-to-value
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{IaaS} & High & You manage OS, runtime, scaling & High & Slower \\
+\rowcolor{zebra}
 \textbf{PaaS} & Medium & You manage app + data & Medium & Fast \\
 \textbf{SaaS} & Low & Use as-is & Low & Instant \\
+\rowcolor{zebra}
 \textbf{FaaS} (Serverless) & Minimal & Just write functions & Very Low & Fastest \\
 \end{longtable}
 
@@ -1954,6 +2002,7 @@ Stripe deploys hundreds of times per day. Every production deploy goes through a
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1047}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8953}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1964,20 +2013,28 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 Container & A standard ISO shipping container: same corner fittings, same locking pins, carries anything from bananas to electronics, slots onto any ship, truck, or rail car without modification --- Docker stamps them out, Kubernetes is the port authority that decides where each one goes \\
+\rowcolor{zebra}
 Kubernetes scheduler & The port\textquotesingle s yard planner: when a new container arrives without a berth, the planner checks every quay for spare capacity, weight limits, and hazmat restrictions (affinity/taints), scores the candidates, then writes the berth number on the manifest --- that written assignment is \texttt{nodeName} on the pod spec \\
 Namespaces & Sealed container interiors: containers next to each other on the same ship share the hull (host kernel) but each has its own internal atmosphere, its own manifest ID (PID namespace), its own address label (net namespace), its own locked door (mount namespace) --- neighbours can\textquotesingle t peek inside \\
+\rowcolor{zebra}
 cgroups & The port\textquotesingle s weight-and-power allocation board: each container slot on a vessel is assigned a maximum gross weight and a shore-power amperage cap; exceed the cap and the breaker trips (OOMKill) or the crane throttles the lift speed (CPU throttling) --- one overloaded box cannot capsize the whole ship \\
 OverlayFS / image layers & Stacked pallets inside a container: the bottom pallet is the base OS (read-only), the next is installed dependencies (read-only), the top is your app code; when a container needs to modify a file from a lower pallet, the terminal copies just that item to a new top sheet (copy-on-write) and edits there --- the original pallets stay pristine for every other container sharing them \\
+\rowcolor{zebra}
 etcd & The harbour master\textquotesingle s logbook: every ship, every berth assignment, every container manifest is recorded here using Raft consensus so no single page can go missing; lose the logbook and the port forgets every vessel in the water, every crane allocation, every scheduled departure --- the terminal grinds to a halt \\
 HPA & The terminal\textquotesingle s shift-rostering desk: when crane throughput data shows containers piling up faster than handlers can move them, the roster desk calls in extra gangs (pod replicas); when the quay clears, surplus gangs are stood down --- always targeting the throughput the terminal manager set \\
+\rowcolor{zebra}
 Cluster Autoscaler & The port expansion office: when every berth is full and new ships are queuing at the harbour mouth (pending pods), the office requisitions a new quay section from the landlord (cloud API) and opens it; when half the quays sit empty for long enough, it decommissions a section to cut leasing costs \\
 Service Mesh & Port escorts assigned to every container movement: before any box moves between zones, an escort checks the container\textquotesingle s RFID seal (mTLS identity), logs the checkpoint in the manifest system (distributed trace span), verifies the receiving zone has clearance (authz policy), and shadows the crane lift --- same procedure regardless of which shipping line\textquotesingle s logo is on the box \\
+\rowcolor{zebra}
 Canary deployment & Trialling a new crane model on one berth first: the operations manager routes a single container down the new crane line; if it lands cleanly within tolerances, the rest of the day\textquotesingle s vessels follow; if the new crane drops a box or jams, only that one trial shipment is lost and the old cranes keep running \\
 Blue-Green & Two identical deep-water berths kept in parallel: ships unload at Berth Blue while the operations team fully fits out Berth Green with the new handling equipment; once Green passes inspection, the harbour master flips the gate sign --- all incoming vessels now dock at Green; Blue sits ready for five minutes so any problem means flipping the sign straight back \\
+\rowcolor{zebra}
 Error Budget & The port\textquotesingle s annual slot-delay allowance: the terminal promises carriers that no more than 0.1\% of container movements will miss their time window; every incident eats into that allowance; when the allowance is exhausted the port authority freezes all non-essential crane reconfigurations until the next period resets the clock \\
 SLI/SLO/SLA & Quay throughput gauge (SLI) / the terminal\textquotesingle s internal target of 400 moves per crane-hour (SLO) / the carrier contract that docks the port\textquotesingle s fee by 10\% if the target is missed for the month (SLA) --- the gauge measures, the target disciplines operations, the contract has teeth \\
+\rowcolor{zebra}
 Prometheus pull & The port inspector\textquotesingle s rounds: every 15 seconds the inspector walks to each crane, checks the load-cycle counter, and writes it in the notebook --- the cranes don\textquotesingle t have to radio in; if a crane goes dark the inspector notices immediately because no reading is itself a signal \\
 Distributed trace & The container\textquotesingle s full journey log: the gate scanner stamps arrival time (Span 1), the yard tractor logs pickup (Span 2), the crane logs lift-start and set-down (Span 3), the ship\textquotesingle s computer logs stow position (Span 4); every leg shares the same bill-of-lading number (Trace ID) so investigators can reconstruct the exact path and find where the two-hour delay occurred \\
+\rowcolor{zebra}
 IaC (Terraform) & The terminal\textquotesingle s master construction blueprint: instead of building each berth, crane, and road by hand, the harbour engineer submits the blueprint to the construction system which provisions an identical layout on demand --- \texttt{terraform\ plan} shows which berths will change before a single pile is driven, and the same blueprint can stamp out a second terminal in a different harbour without starting from scratch \\
 \end{longtable}
 
@@ -2265,6 +2322,7 @@ Alternatives:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1804}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8196}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Role
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2275,6 +2333,7 @@ Focus
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{SRE (Google model)} & Define SLOs, manage error budgets, reduce toil with software, on-call for critical services \\
+\rowcolor{zebra}
 \textbf{DevOps} & Culture + practices: break dev/ops silos, automate deployments, shared ownership \\
 \textbf{Platform Engineering} & Build internal developer platforms (IDP) --- golden paths for deploying, observing, and operating services; abstracts K8s complexity from product engineers \\
 \end{longtable}
@@ -2538,6 +2597,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3650}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4726}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2550,28 +2610,40 @@ Interview Quote
 \bottomrule\noalign{}
 \endlastfoot
 Container isolation & Namespaces + cgroups & "Namespace: what you see. cgroup: what you use." \\
+\rowcolor{zebra}
 OverlayFS & CoW; layers are read-only; container layer rw & "Image layers are immutable; changes copy to upper layer" \\
 etcd & Raft consensus; only API server talks to it & "Cluster brain; quorum (n/2+1) required for writes" \\
+\rowcolor{zebra}
 Scheduler & Filter \(\rightarrow\) Score \(\rightarrow\) Bind & "Find viable nodes, rank them, write nodeName" \\
 HPA & Scales replicas based on metrics & "ceil(current \(\times\) currentMetric / targetMetric)" \\
+\rowcolor{zebra}
 VPA & Adjusts resource requests & "Right-size, requires pod restart; conflicts with HPA" \\
 Cluster Autoscaler & Provisions/removes nodes & "Triggered by unschedulable pods; scales down idle nodes" \\
+\rowcolor{zebra}
 K8s Service types & ClusterIP/NodePort/LB/ExternalName & "ClusterIP=internal; LB=cloud external" \\
 Ingress & L7 routing by host/path & "Requires Ingress Controller (nginx, Traefik)" \\
+\rowcolor{zebra}
 Secrets & base64, not encrypted by default & "Enable EncryptionConfiguration; use Vault in prod" \\
 StatefulSet & Stable names/DNS/PVC per pod & "For DBs, Kafka, ZooKeeper --- ordered deploy" \\
+\rowcolor{zebra}
 Service Mesh & Sidecar Envoy; Istiod control plane & "mTLS, retries, traces --- zero code changes in app" \\
 Canary & Real traffic subset; auto-rollback on metrics & "1\%\(\rightarrow\)5\%\(\rightarrow\)25\%\(\rightarrow\)100\%; abort if error rate spikes" \\
+\rowcolor{zebra}
 Blue-Green & Two environments; instant LB flip & "2\(\times\) cost; instant rollback; good for big-bang changes" \\
 Terraform state & JSON file; S3 + DynamoDB lock & "Sensitive data in state; encrypt bucket" \\
+\rowcolor{zebra}
 Prometheus pull & Scrapes /metrics; TSDB; PromQL & "Pull model; Pushgateway for batch jobs" \\
 Counter & Monotonic; use rate() to get rate & "http\_requests\_total --- never subtract" \\
+\rowcolor{zebra}
 Histogram & Configurable buckets; use histogram\_quantile() & "p99 latency; remember to set appropriate buckets" \\
 Distributed trace & TraceID across services; spans with timing & "Where time went; OpenTelemetry for instrumentation" \\
+\rowcolor{zebra}
 SLO & Internal reliability target & "99.9\% = 43.2 min/month budget" \\
 Error Budget & 100\% - SLO & "When exhausted: freeze deploys, fix reliability" \\
+\rowcolor{zebra}
 SLA & External contract with penalties & "Usually lower than SLO; SLO=99.9\%, SLA=99.5\%" \\
 IaaS/PaaS/SaaS & You manage: runtime/app/nothing & "EC2=IaaS, Heroku=PaaS, Gmail=SaaS" \\
+\rowcolor{zebra}
 eBPF & Kernel-level networking, replaces iptables & "Cilium: O(1) lookup, no sidecar needed, L7 in kernel" \\
 GitOps & Git = desired state; ArgoCD syncs cluster & "git revert = rollback; git log = deploy history" \\
 \end{longtable}

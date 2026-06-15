@@ -95,6 +95,7 @@ A \textbf{Large Language Model (LLM)} is a Transformer trained at scale (billion
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3272}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0935}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -109,12 +110,16 @@ Year
 \bottomrule\noalign{}
 \endlastfoot
 BERT-base & 110M & 512 tokens & 2018 \\
+\rowcolor{zebra}
 GPT-2 & 1.5B & 1024 tokens & 2019 \\
 GPT-3 & 175B & 2048 tokens & 2020 \\
+\rowcolor{zebra}
 PaLM & 540B & 2048 tokens & 2022 \\
 GPT-4 (est.) & \textasciitilde1.8T (MoE) & 128K tokens & 2023 \\
+\rowcolor{zebra}
 Llama 3.1 & 405B & 128K tokens & 2024 \\
 Claude 3.5 Sonnet & Unknown & 200K tokens & 2024 \\
+\rowcolor{zebra}
 Gemini 1.5 Pro & Unknown & 1M tokens & 2024 \\
 \end{longtable}
 
@@ -297,6 +302,7 @@ Before a model sees text, it must be converted to discrete tokens (integers).
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2515}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6028}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Unit
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -309,6 +315,7 @@ Problem
 \bottomrule\noalign{}
 \endlastfoot
 Characters & \textasciitilde256 & Sequences too long; no semantic meaning \\
+\rowcolor{zebra}
 Words & 300K+ & Rare words missing; morphology ignored \\
 Subwords & 30K-100K & Sweet spot --- handles OOV, reasonable length \\
 \end{longtable}
@@ -479,6 +486,7 @@ Step-by-step:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1731}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8269}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Dimension
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -489,6 +497,7 @@ Cost
 \bottomrule\noalign{}
 \endlastfoot
 Compute & O(n\(^2\) \(\cdot\) d) per layer --- quadratic in sequence length \\
+\rowcolor{zebra}
 Memory & O(n\(^2\)) for attention matrix --- the KV cache grows with context \\
 \end{longtable}
 
@@ -640,6 +649,7 @@ where μ, σ computed across features (not batch), γ, β are learned
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2376}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3069}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -654,12 +664,16 @@ Encoder-Decoder (T5)
 \bottomrule\noalign{}
 \endlastfoot
 Attention type & Bidirectional & Causal (left-only) & Cross-attention \\
+\rowcolor{zebra}
 Training objective & Masked LM (MLM) & Next-token prediction & Seq2seq (span corruption) \\
 What it sees & Full context & Only past tokens & Encoder: full; Decoder: causal \\
+\rowcolor{zebra}
 Best for & Classification, NER, QA & Generation, chat, code & Translation, summarization \\
 Examples & BERT, RoBERTa, ELECTRA & GPT-2/3/4, Llama, Claude & T5, BART, mT5 \\
+\rowcolor{zebra}
 Embedding quality & Excellent & Good & Good \\
 Generation & Poor (not designed for it) & Excellent & Good \\
+\rowcolor{zebra}
 Parameter efficiency & High for understanding & High for generation & Somewhat redundant for pure gen \\
 \end{longtable}
 
@@ -906,6 +920,7 @@ Fine-tune only a small fraction of parameters:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3098}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4714}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -918,8 +933,10 @@ How
 \bottomrule\noalign{}
 \endlastfoot
 LoRA & \textasciitilde0.1-1\% & Low-rank weight matrices \\
+\rowcolor{zebra}
 QLoRA & \textasciitilde0.1-1\% & LoRA on quantized base model \\
 Adapters & \textasciitilde1-5\% & Small modules between layers \\
+\rowcolor{zebra}
 Prefix tuning & \textasciitilde0.1\% & Learned prefix tokens \\
 Prompt tuning & \textless\textless0.1\% & Soft prompt tokens \\
 \end{longtable}
@@ -1071,6 +1088,7 @@ Result: SFT model — follows instructions but not yet aligned
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4444}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1083,10 +1101,13 @@ DPO
 \bottomrule\noalign{}
 \endlastfoot
 Complexity & High (3 stages, RM + RL) & Low (1 SFT + 1 stage) \\
+\rowcolor{zebra}
 Stability & Tricky (PPO hyperparams) & More stable \\
 Reward model & Required & Not needed \\
+\rowcolor{zebra}
 Performance & State of the art & Competitive with RLHF \\
 Memory & High (4 models at once) & Lower (2 models) \\
+\rowcolor{zebra}
 Reward hacking & Possible & Less likely \\
 Flexibility & Can adjust reward on the fly & Fixed to dataset \\
 \end{longtable}
@@ -1178,6 +1199,7 @@ T > 1:  more uniform/random (creative but less coherent)
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2586}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2909}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Scenario
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1190,6 +1212,7 @@ Top-p (p=0.9)
 \bottomrule\noalign{}
 \endlastfoot
 Peaked distribution (one clear next word) & Keeps 49 garbage options & Correctly uses just top \textasciitilde5 \\
+\rowcolor{zebra}
 Flat distribution (many valid continuations) & May be too restrictive & Correctly samples from \textasciitilde200 \\
 Recommendation & Less adaptive & More principled \\
 \end{longtable}
@@ -1226,6 +1249,7 @@ Running 70B parameter models requires 140GB in FP16 --- doesn\textquotesingle t 
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2867}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2458}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Format
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1242,8 +1266,10 @@ Quality loss
 \bottomrule\noalign{}
 \endlastfoot
 FP32 & 32 & 4B & 280GB & Baseline \\
+\rowcolor{zebra}
 FP16/BF16 & 16 & 2B & 140GB & Minimal \\
 INT8 & 8 & 1B & 70GB & Small \\
+\rowcolor{zebra}
 INT4 & 4 & 0.5B & 35GB & Noticeable \\
 INT2 & 2 & 0.25B & 17.5GB & Significant \\
 \end{longtable}
@@ -1751,6 +1777,7 @@ Used in: Bing Chat, Perplexity, enterprise Q\&A systems
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2098}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7902}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1761,30 +1788,43 @@ Newsroom Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Tokens} & Individual words written on sticky notes across the story board \\
+\rowcolor{zebra}
 \textbf{Self-attention} & Each editor draws colored string from their word to every other word they find relevant \\
 \textbf{Query (Q)} & The question an editor writes on their pad: "Who is the subject here?" \\
+\rowcolor{zebra}
 \textbf{Key (K)} & The label tag each sticky note carries: "I am a person\textquotesingle s name", "I am a verb" \\
 \textbf{Value (V)} & The actual content written on the sticky note that gets passed along \\
+\rowcolor{zebra}
 \textbf{Attention weights} & How thick/bright each string is --- more relevant words get stronger connections \\
 \textbf{Multi-head attention} & Several editors working the board simultaneously, each focused on a different angle: one tracks grammar, one tracks factual consistency, one tracks tone \\
+\rowcolor{zebra}
 \textbf{Positional encoding} & The page number and line number stamped on each sticky note --- without it, "Dog bites man" = "Man bites dog" \\
 \textbf{Residual connections} & Each editor\textquotesingle s draft preserves the previous draft underneath --- changes are additive, not destructive \\
+\rowcolor{zebra}
 \textbf{Layer normalization} & The copy desk\textquotesingle s style guide that standardizes formatting after each pass \\
 \textbf{Transformer layers} & Successive editing passes --- draft 1, draft 2, draft 3 --- each round refines and adds meaning \\
+\rowcolor{zebra}
 \textbf{Feed-forward network} & Each editor privately re-processes their word\textquotesingle s meaning before the next round of attention \\
 \textbf{Pretraining} & The editor spent 20 years reading every newspaper, book, and website ever published \\
+\rowcolor{zebra}
 \textbf{Fine-tuning} & Two weeks of house-style training for \emph{this} publication --- learn the voice, the format, the audience \\
 \textbf{RLHF} & An editor-in-chief sits with the team, rates their drafts, and gives detailed feedback --- the team adjusts \\
+\rowcolor{zebra}
 \textbf{DPO} & Instead of the EIC rating drafts, they provide "prefer A over B" comparisons; the team infers the preference directly \\
 \textbf{Temperature} & How boldly an editor paraphrases --- low temp: safe, literal; high temp: creative, risky \\
+\rowcolor{zebra}
 \textbf{Top-p sampling} & The editor only considers rewordings that, together, cover 90\% of plausible options \\
 \textbf{Context window} & How many sticky notes fit on the editor\textquotesingle s desk at once --- the rest are in a filing cabinet they can\textquotesingle t see \\
+\rowcolor{zebra}
 \textbf{KV cache} & The editor\textquotesingle s running notes on previously read paragraphs --- no need to re-read them \\
 \textbf{Hallucination} & An editor confidently inventing a quote from a source they never actually read \\
+\rowcolor{zebra}
 \textbf{MoE (Mixture of Experts)} & A pool of 100 specialist editors; the routing desk sends each sticky note to the 2 most relevant specialists \\
 \textbf{LoRA} & Teaching an editor just 1\% new habits for this client --- personality stays intact, style adjusts \\
+\rowcolor{zebra}
 \textbf{Quantization} & Compressing detailed editorial notes to shorthand symbols --- faster to read, slight accuracy loss \\
 \textbf{RAG} & Before writing, the editor runs to the library and pulls the three most relevant reference articles \\
+\rowcolor{zebra}
 \textbf{Beam search} & Keeping the top 5 draft directions simultaneously, then picking the best final story \\
 \textbf{Tokenizer} & The editor\textquotesingle s typesetting team that breaks words into standard-sized type blocks \\
 \end{longtable}
@@ -1934,6 +1974,7 @@ RLHF bridges the gap between "good at predicting text" and "good at being a help
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4444}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4028}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Criterion
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1946,8 +1987,10 @@ Choose DPO
 \bottomrule\noalign{}
 \endlastfoot
 Resources & You have large infrastructure & Resource-constrained \\
+\rowcolor{zebra}
 Flexibility & Need to update reward on the fly & Fixed preference dataset \\
 Stability & Can tune PPO carefully & Want stable, simpler training \\
+\rowcolor{zebra}
 Scale & Large team, production system & Research, smaller teams \\
 Performance & Potentially higher ceiling & Competitive in practice \\
 \end{longtable}
@@ -2438,6 +2481,7 @@ They have fundamentally different architectures, objectives, and use cases. Know
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1791}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2388}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 BERT
@@ -2453,10 +2497,13 @@ Llama 3
 \bottomrule\noalign{}
 \endlastfoot
 Type & Encoder-only & Decoder-only & Enc-Dec & Decoder-only \\
+\rowcolor{zebra}
 Attention & Bidirectional & Causal & Cross-attn & Causal + GQA \\
 Pretraining & MLM & CLM & Span corrupt & CLM \\
+\rowcolor{zebra}
 Positional & Learned abs. & Learned abs. & Relative & RoPE \\
 Best for & NLU, embedding & Generation & Seq2seq & Generation, chat \\
+\rowcolor{zebra}
 Normalization & Post-LN & Post-LN & Pre-LN & RMSNorm Pre-LN \\
 \end{longtable}
 
@@ -2469,6 +2516,7 @@ Normalization & Post-LN & Post-LN & Pre-LN & RMSNorm Pre-LN \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2131}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3365}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2485,8 +2533,10 @@ Use case
 \bottomrule\noalign{}
 \endlastfoot
 Full fine-tuning & 100\% & Very high & Best & Large resources, specific task \\
+\rowcolor{zebra}
 LoRA & 0.1-1\% & Low & Near-full & Standard fine-tuning \\
 QLoRA & 0.1-1\% & Very low & Slightly below LoRA & Consumer GPU fine-tuning \\
+\rowcolor{zebra}
 Adapters & 1-5\% & Low-medium & Good & Modular task switching \\
 Prompt tuning & \textless0.1\% & Minimal & Lower & Very limited resources \\
 \end{longtable}
@@ -2500,6 +2550,7 @@ Prompt tuning & \textless0.1\% & Minimal & Lower & Very limited resources \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0950}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2444}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2516,8 +2567,10 @@ Use case
 \bottomrule\noalign{}
 \endlastfoot
 Greedy & Fully & Low (repetitive) & Fastest & Simple extraction \\
+\rowcolor{zebra}
 Beam search (k=5) & Yes & High for structured & Slower & Translation, code \\
 Top-k (k=50) & No & Good & Fast & Chat, creative \\
+\rowcolor{zebra}
 Top-p (p=0.9) & No & Good, adaptive & Fast & General generation \\
 Top-p + temp=0.7 & No & Best creative & Fast & Creative writing \\
 \end{longtable}
@@ -2529,6 +2582,7 @@ Top-p + temp=0.7 & No & Best creative & Fast & Creative writing \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4722}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3194}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 RLHF (PPO)
@@ -2540,10 +2594,13 @@ DPO
 \bottomrule\noalign{}
 \endlastfoot
 Stages & SFT \(\rightarrow\) RM \(\rightarrow\) PPO & SFT \(\rightarrow\) DPO \\
+\rowcolor{zebra}
 Reward model & Explicit, trained & Implicit \\
 Stability & Low (PPO finicky) & High \\
+\rowcolor{zebra}
 Complexity & High & Low \\
 Online/Offline & Online (samples during training) & Offline (fixed dataset) \\
+\rowcolor{zebra}
 Memory (models) & 4 (ref, RM, value, policy) & 2 (ref, policy) \\
 Best when & Production, large team & Research, smaller teams \\
 \end{longtable}
@@ -2581,4 +2638,5 @@ Best when & Production, large team & Research, smaller teams \\
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/aiml-04-tf/01-attention.pdf}{Each query token forms a weighted average over all tokens via softmax(QK$^{\mathsf{T}}$/$\surd$d). Rows sum to 1 — the model learns which context positions matter.}
+\visualfigure{../figures/aiml-04-tf/02-transformer-block.pdf}{A transformer layer = self-attention (mix information across tokens) + a position-wise MLP, each wrapped in a residual connection and LayerNorm. Stack N of them.}
 \end{document}

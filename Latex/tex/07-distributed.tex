@@ -99,6 +99,7 @@ Distributed systems are necessary when a single machine\textquotesingle s limits
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2944}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7056}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Limit
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -109,8 +110,10 @@ Distributed Solution
 \bottomrule\noalign{}
 \endlastfoot
 CPU/memory wall & Horizontal scale-out across many machines \\
+\rowcolor{zebra}
 Storage capacity & Distributed file systems (HDFS, GFS) \\
 Geographic latency & Data replicated to edge / regional DCs \\
+\rowcolor{zebra}
 Fault tolerance & Replicate so no single failure kills the system \\
 Throughput ceiling & Partition (shard) data across nodes \\
 \end{longtable}
@@ -198,6 +201,7 @@ Originally articulated by Peter Deutsch (Sun Microsystems, 1994). Every fallacy 
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2226}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.7432}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 \#
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -210,12 +214,16 @@ Why It Bites You
 \bottomrule\noalign{}
 \endlastfoot
 1 & \textbf{The network is reliable} & Packets get dropped, routers fail, links saturate. TCP retries help but add latency; still doesn\textquotesingle t guarantee delivery at the application layer. \\
+\rowcolor{zebra}
 2 & \textbf{Latency is zero} & Even same-DC calls: \textasciitilde0.5ms. Cross-continent: 150ms+. Synchronous RPC chains multiply latency. One N-hop call = sum of all latencies. \\
 3 & \textbf{Bandwidth is infinite} & Large payloads, bulk transfers, or fan-out can saturate NICs or egress. Protobuf over JSON, streaming over batching often necessary. \\
+\rowcolor{zebra}
 4 & \textbf{The network is secure} & Man-in-the-middle, rogue nodes, spoofing. Requires TLS, mTLS, service identity. Especially critical in multi-tenant clouds. \\
 5 & \textbf{Topology doesn\textquotesingle t change} & Nodes are added, removed, rebalanced. IP addresses change. Service discovery must be dynamic, not static config. \\
+\rowcolor{zebra}
 6 & \textbf{There is one administrator} & Multi-team, multi-cloud, multi-region. Policies conflict. Schema migrations, firewall rules, and ops procedures must be coordinated across orgs. \\
 7 & \textbf{Transport cost is zero} & Serialization, encryption, compression, and network egress all cost CPU and money. Cross-AZ bandwidth is billed. \\
+\rowcolor{zebra}
 8 & \textbf{The network is homogeneous} & Different NIC speeds, MTUs, protocols, OS network stacks. Kubernetes pods, bare metal, VMs, edge nodes --- all in one system. \\
 \end{longtable}
 
@@ -237,6 +245,7 @@ The three properties:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2921}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7079}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -247,6 +256,7 @@ Meaning
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Consistency (C)} & Every read receives the most recent write or an error (linearizability) \\
+\rowcolor{zebra}
 \textbf{Availability (A)} & Every non-failing node returns a response (possibly stale) \\
 \textbf{Partition Tolerance (P)} & The system continues operating despite arbitrary message loss between nodes \\
 \end{longtable}
@@ -291,6 +301,7 @@ Meaning
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2415}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4200}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 System
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -305,10 +316,13 @@ Category
 \bottomrule\noalign{}
 \endlastfoot
 DynamoDB & A & L & PA/EL \\
+\rowcolor{zebra}
 Cassandra & A & L & PA/EL \\
 Spanner & C & C & PC/EC \\
+\rowcolor{zebra}
 MongoDB & C & C & PC/EC \\
 ZooKeeper & C & C & PC/EC \\
+\rowcolor{zebra}
 Cosmos DB & Tunable & Tunable & All categories depending on config \\
 \end{longtable}
 
@@ -326,6 +340,7 @@ From strongest to weakest:
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2276}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2334}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -340,10 +355,13 @@ Examples
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Linearizability (Strong)} & All ops appear instantaneous at some point between call and return. Total order matches real time. & High latency (synchronous coordination) & Spanner, etcd, Zookeeper \\
+\rowcolor{zebra}
 \textbf{Sequential Consistency} & All ops appear in some sequential order consistent with each process\textquotesingle s order. No real-time requirement. & High & Research systems \\
 \textbf{Causal Consistency} & Causally related ops seen in order by all nodes. Concurrent ops may be seen in different orders. & Medium & COPS, MongoDB causal sessions \\
+\rowcolor{zebra}
 \textbf{Read-your-Writes} & After you write X, you always read X (from any node). Others may see stale data. & Low-medium & Session consistency, sticky sessions \\
 \textbf{Monotonic Reads} & If you read value V, you\textquotesingle ll never read a value older than V. & Low & Cassandra with session-level consistency \\
+\rowcolor{zebra}
 \textbf{Monotonic Writes} & Writes from one process are applied in order at all nodes. & Low & Kafka per-partition ordering \\
 \textbf{Eventual Consistency} & Given no new writes, all replicas converge to the same value. No timing guarantee. & Lowest & DynamoDB default, DNS, Cassandra default \\
 \end{longtable}
@@ -444,6 +462,7 @@ Proof: W + R = 4 > N = 3, so overlap of at least 1.
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0741}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.6667}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 R
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -458,8 +477,10 @@ Characteristic
 \bottomrule\noalign{}
 \endlastfoot
 1 & N & N & Write-heavy: slow writes, fast reads \\
+\rowcolor{zebra}
 N & 1 & N & Read-heavy: fast writes, slow reads \\
 (N+1)/2 & (N+1)/2 & N & Balanced (majority quorum) \\
+\rowcolor{zebra}
 1 & 1 & N & No quorum! Fastest but inconsistent \\
 \end{longtable}
 
@@ -597,6 +618,7 @@ Proposer → value is chosen when majority accept
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3133}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4819}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -609,12 +631,16 @@ Paxos (Multi)
 \bottomrule\noalign{}
 \endlastfoot
 Designer & Ongaro \& Ousterhout (2014) & Lamport (1989) \\
+\rowcolor{zebra}
 Designed for & Understandability & Correctness proof \\
 Leader & Explicit, strong & Implicit assumption \\
+\rowcolor{zebra}
 Log holes & Impossible (sequential) & Possible, need gap-fill \\
 Config changes & Joint consensus & Ad-hoc \\
+\rowcolor{zebra}
 Implemented in & etcd, CockroachDB, TiKV & Chubby, Zookeeper (ZAB), Spanner \\
 Understandability & High & Low (Lamport: "choose trivially simple") \\
+\rowcolor{zebra}
 Performance & Comparable & Comparable \\
 \end{longtable}
 
@@ -793,6 +819,7 @@ Phase 2 (Commit):
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2733}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7267}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Problem
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -803,8 +830,10 @@ Description
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Blocking} & If coordinator crashes after Phase 1, participants are stuck holding locks indefinitely \\
+\rowcolor{zebra}
 \textbf{Single point of failure} & Coordinator crash = system halted until coordinator recovers \\
 \textbf{Not partition-tolerant} & Cannot make progress during network partition \\
+\rowcolor{zebra}
 \textbf{Performance} & 2 round trips + synchronous lock holding = high latency \\
 \end{longtable}
 
@@ -842,6 +871,7 @@ Compensating transactions (run on failure):
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2543}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2852}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -856,6 +886,7 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Choreography} & Each service listens to events and acts & Decoupled, no central coordinator & Hard to track flow, debugging complex \\
+\rowcolor{zebra}
 \textbf{Orchestration} & Central saga orchestrator tells each service what to do & Easy to track, clear flow & Orchestrator is a bottleneck/SPOF \\
 \end{longtable}
 
@@ -866,6 +897,7 @@ Cons
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3485}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4091}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -878,10 +910,13 @@ Saga
 \bottomrule\noalign{}
 \endlastfoot
 Consistency & ACID (strong) & Eventually consistent \\
+\rowcolor{zebra}
 Latency & High (sync, locks) & Low (async) \\
 Failure handling & Automatic rollback & Compensating transactions \\
+\rowcolor{zebra}
 Coupling & Tight (all in one TX) & Loose (events/messages) \\
 Use case & Same DB, short TX & Cross-service, long-running \\
+\rowcolor{zebra}
 Blocking & Yes (coordinator crash) & No \\
 \end{longtable}
 
@@ -895,6 +930,7 @@ Blocking & Yes (coordinator crash) & No \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2316}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2886}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Strategy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -909,8 +945,10 @@ Cons
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Single-Leader} & All writes to primary, async/sync replication to replicas & Simple, strong consistency possible & Leader = SPOF, replica lag \\
+\rowcolor{zebra}
 \textbf{Multi-Leader} & Multiple leaders, conflict resolution needed & Geo-distribution, resilient & Write conflicts (last-write-wins, CRDTs, merge) \\
 \textbf{Leaderless (Dynamo)} & Client writes to N nodes directly, quorum & High availability, no leader SPOF & Conflict resolution (vector clocks), stale reads \\
+\rowcolor{zebra}
 \textbf{Chain Replication} & Head accepts writes, passes through chain, tail acknowledges to client & Strong consistency, good throughput & Write latency = chain length, tail is read SPOF \\
 \end{longtable}
 
@@ -1100,6 +1138,7 @@ Load Balancer → Query Registry → Pick instance → Forward
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4238}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3492}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pattern
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1112,8 +1151,10 @@ Use Case
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Cache-Aside (Lazy Loading)} & App checks cache, on miss loads from DB and populates cache & General purpose; stale data possible \\
+\rowcolor{zebra}
 \textbf{Write-Through} & Write to cache AND DB synchronously & Strong consistency; higher write latency \\
 \textbf{Write-Behind (Write-Back)} & Write to cache, async write to DB & High write throughput; risk of data loss \\
+\rowcolor{zebra}
 \textbf{Read-Through} & Cache handles DB reads automatically & Transparent to app; must configure \\
 \textbf{Refresh-Ahead} & Pre-populate cache before expiry & Low miss rate; wastes memory if unused \\
 \end{longtable}
@@ -1147,6 +1188,7 @@ Use Case
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3139}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5830}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Policy
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1159,8 +1201,10 @@ Good for
 \bottomrule\noalign{}
 \endlastfoot
 LRU & Least recently used & General; protects frequently-used items \\
+\rowcolor{zebra}
 LFU & Least frequently used & Protects popular items better than LRU \\
 FIFO & Oldest inserted & Simple; ignores access patterns \\
+\rowcolor{zebra}
 Random & Random item & Surprisingly OK; simple to implement \\
 TTL & Expired items & Time-sensitive data \\
 \end{longtable}
@@ -1200,6 +1244,7 @@ TTL & Expired items & Time-sensitive data \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4048}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4405}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Semantic
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1212,6 +1257,7 @@ Meaning
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{At-most-once} & acks=0, no retry & May lose messages; never duplicates \\
+\rowcolor{zebra}
 \textbf{At-least-once} & acks=all, retry enabled & No loss; may duplicate \\
 \textbf{Exactly-once} & Idempotent producer + transactions & No loss, no duplicates (within Kafka) \\
 \end{longtable}
@@ -1271,6 +1317,7 @@ Server stores (idempotency_key → result) and returns cached result on retry.
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3731}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3881}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1283,8 +1330,10 @@ Exactly-Once
 \bottomrule\noalign{}
 \endlastfoot
 Risk & Duplicate processing & None in theory \\
+\rowcolor{zebra}
 Complexity & Low & High \\
 Performance & Better & Worse (more coordination) \\
+\rowcolor{zebra}
 Best practice & Make consumers idempotent & Only when truly needed \\
 Real-world usage & Most systems & Payment systems, financial \\
 \end{longtable}
@@ -1440,6 +1489,7 @@ Rule: Each partition is consumed by exactly ONE consumer per consumer group
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1938}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2983}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 System
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1456,14 +1506,19 @@ Notes
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{DynamoDB} & AP & Eventual (default), tunable & Consistent hashing & Dynamo paper: vector clocks, sloppy quorum, hinted handoff \\
+\rowcolor{zebra}
 \textbf{Cassandra} & AP & Tunable (ONE to ALL) & Consistent hashing + vnodes & Gossip for membership, LWW for conflict resolution \\
 \textbf{Spanner} & CP & External consistency (linearizable + serializable) & Sharded Paxos & TrueTime API bounds clock uncertainty \\
+\rowcolor{zebra}
 \textbf{ZooKeeper} & CP & Sequential consistency & No (single-leader) & ZAB protocol (Paxos-like), used for coordination/leader election \\
 \textbf{etcd} & CP & Linearizable & No (single-leader, but clustered) & Raft consensus, Kubernetes backing store \\
+\rowcolor{zebra}
 \textbf{HBase} & CP & Strong (via HDFS + ZooKeeper) & Region-based & Built on Hadoop, ZooKeeper for master election \\
 \textbf{MongoDB} & CP (default) & Causal (tunable) & Range-based sharding & Primary-secondary replication, elections on failure \\
+\rowcolor{zebra}
 \textbf{Redis Cluster} & AP & Eventual (async replication) & Hash slots (16384) & Sentinel for HA, Cluster for sharding \\
 \textbf{Kafka} & CP (for partition leadership) & Per-partition order & Log partitioning & ISR-based replication, ZooKeeper \(\rightarrow\) KRaft migration \\
+\rowcolor{zebra}
 \textbf{Memcached} & AP & None (no replication) & Client-side consistent hash & Pure cache, no HA by itself \\
 \end{longtable}
 
@@ -1475,6 +1530,7 @@ Notes
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.0906}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.9094}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1485,16 +1541,22 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{CAP Theorem} & When the road between regions is washed out (partition), the council either halts all decisions until it reopens (consistency) or lets each region rule on its own possibly-stale information (availability) --- it cannot do both at once. \\
+\rowcolor{zebra}
 \textbf{Eventual Consistency} & A decree carried by riders to every village: for a while different villages know different things, but the news eventually reaches all, and the kingdom settles on the same truth. \\
 \textbf{Consistent Hashing} & Granaries arranged around the kingdom\textquotesingle s ring road, each village responsible for the stretch of road after it. When one village abandons its granary, only that stretch is reassigned to the next village --- the rest of the kingdom\textquotesingle s ledgers stay untouched. \\
+\rowcolor{zebra}
 \textbf{Raft Leader Election} & If the chief goes silent, a candidate rides out campaigning village to village; once a majority of village elders pledge support, that candidate is crowned chief for a new reign (the "term number"). Any rival who sees a higher reign number stands down immediately. \\
 \textbf{Quorum} & A decree becomes law only if a majority of village elders vote yes --- even with some elders absent on harvest duty, the decree can still pass as long as more than half of all elders have sealed it. \\
+\rowcolor{zebra}
 \textbf{Vector Clocks} & Each rider\textquotesingle s message notes "I\textquotesingle d heard up to your 3rd decree and the western village\textquotesingle s 2nd." You can tell which decree answered which, and when two villages issued orders without hearing from each other, their clocks reveal the messages as concurrent --- no one can claim one came first. \\
 \textbf{Gossip Protocol} & A rider arrives at one village with news; that village\textquotesingle s own riders carry it to two neighbours next dawn; each of those villages dispatches riders in turn. In a few rounds every corner of the kingdom has heard --- even if some riders never arrive, enough paths exist that the news still spreads. \\
+\rowcolor{zebra}
 \textbf{Saga Pattern} & A multi-village grain trade: Village A ships wheat, Village B grinds it to flour, Village C bakes bread for market. If the miller\textquotesingle s fire burns down mid-agreement, the miller sends word back to cancel the wheat shipment and refund the delivery riders --- each step carries a written undo-scroll so the trade can be unwound cleanly. \\
 \textbf{2PC} & The chief sends a rider to every village asking "are you ready to commit to the harvest levy?" (Phase 1: Prepare). Only when all villages reply "ready" does a second rider ride out saying "commit!" If any village replies "not ready" --- or the chief\textquotesingle s rider is lost mid-journey --- every village holds its grain locked in the storehouse, waiting, unable to trade until the chief\textquotesingle s next decree arrives. \\
+\rowcolor{zebra}
 \textbf{Split Brain} & A flood cuts the kingdom\textquotesingle s roads in two. Both halves believe their regional elder is now chief, both issue decrees, both stamp their own ledgers as authoritative. When the roads reopen, the scribes find two contradictory sets of laws and must painfully reconcile whose decrees count --- or one chief must abdicate. \\
 \textbf{Heartbeat} & Each village elder sends a rider to the chief every dusk carrying only a blank scroll that means "still here." If the chief receives no blank scroll from a village for three dawns running, the council assumes that village has gone dark and dispatches a relief rider to investigate. \\
+\rowcolor{zebra}
 \textbf{Idempotency} & A rider delivers the same levy decree twice because the road was muddy and they feared the first had been lost. A wise village elder stamps the decree\textquotesingle s unique seal number in the ledger: if the seal has already been recorded, the levy is not collected a second time --- the kingdom\textquotesingle s accounts stay sound no matter how many copies arrive. \\
 \end{longtable}
 
@@ -1810,6 +1872,7 @@ True exactly-once delivery at the network layer is \textbf{impossible} in the fa
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3105}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6895}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Mistake
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1820,14 +1883,19 @@ Correction
 \bottomrule\noalign{}
 \endlastfoot
 "CA is a valid CAP choice" & CA is only meaningful on a single machine. Distributed systems must tolerate partitions. Real choice is CP vs AP. \\
+\rowcolor{zebra}
 "Eventual consistency = broken consistency" & Eventual consistency is appropriate and correct for many use cases (DNS, social feeds, analytics). It\textquotesingle s a deliberate trade-off. \\
 Confusing \textbf{linearizability} with \textbf{serializability} & Linearizability: single-operation real-time ordering. Serializability: transaction-level equivalence to serial execution. Spanner has BOTH (strict serializability). \\
+\rowcolor{zebra}
 Saying "Kafka guarantees exactly-once delivery" & Kafka guarantees exactly-once within its own pipeline. End-to-end exactly-once requires idempotent consumers + transactional processing. \\
 "Just use 2PC for distributed transactions" & 2PC blocks on coordinator failure. For microservices, Saga with compensating transactions is more appropriate. \\
+\rowcolor{zebra}
 "Raft is just like Paxos" & Raft is simpler and more understandable. Key differences: strong leader, sequential log (no holes), joint consensus for config changes. \\
 Not mentioning failure scenarios & Always discuss: what happens when a node dies, when network partitions, when the leader crashes. Interviewers want failure mode awareness. \\
+\rowcolor{zebra}
 Treating CAP as binary switches & Tunable consistency (Cassandra) shows it\textquotesingle s a dial, not a switch. Different operations in the same system can have different consistency levels. \\
 "More replicas = more availability" & More replicas also means more nodes to fail during synchronous writes. Must balance replication factor with write latency and failure probability. \\
+\rowcolor{zebra}
 Forgetting clock skew & Always mention that distributed timestamps require care. Lamport clocks, vector clocks, or TrueTime. Never assume clocks are synchronized. \\
 \end{longtable}
 
@@ -2104,4 +2172,5 @@ Exactly-once: complex, within Kafka only → use idempotency keys end-to-end
 \section{Visual Reference}
 \noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
 \visualfigure{../figures/07-distributed/01-cap-theorem.pdf}{When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable.}
+\visualfigure{../figures/07-distributed/02-consistency-spectrum.pdf}{Consistency is a dial, not a switch. Stronger models are easier to reason about but cost availability and latency under partitions — pick per use-case.}
 \end{document}

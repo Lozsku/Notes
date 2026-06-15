@@ -76,6 +76,7 @@ A \textbf{database} is a structured, persistent store of data with controlled ac
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4452}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4024}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Category
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -88,10 +89,13 @@ Examples
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Relational (SQL)} & Tables, rows, columns; schema-on-write; ACID by default & PostgreSQL, MySQL, Oracle, SQLite, SQL Server \\
+\rowcolor{zebra}
 \textbf{Key-Value} & Hash map at scale; fastest reads/writes & Redis, DynamoDB (simple use), Memcached \\
 \textbf{Document} & JSON/BSON documents, flexible schema & MongoDB, Couchbase, Firestore \\
+\rowcolor{zebra}
 \textbf{Column-Family} & Wide rows, optimized for large analytical scans & Cassandra, HBase, Bigtable \\
 \textbf{Graph} & Nodes + edges, relationship traversal & Neo4j, Amazon Neptune \\
+\rowcolor{zebra}
 \textbf{Time-Series} & Optimized for timestamp-indexed sequential writes & InfluxDB, TimescaleDB \\
 \textbf{NewSQL} & SQL semantics + distributed scalability & Google Spanner, CockroachDB, TiDB \\
 \end{longtable}
@@ -132,6 +136,7 @@ Databases solve four fundamental problems:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3145}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6231}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Company
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -144,10 +149,13 @@ Why They Care Deeply
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Amazon} & DynamoDB, Aurora, RDS & DynamoDB is their crown jewel. Every Amazonian must understand KV stores, partitioning, eventual consistency. Aurora reimagines log-structured storage. \\
+\rowcolor{zebra}
 \textbf{Google} & Spanner, Bigtable, Firestore & Spanner achieves global ACID via TrueTime. Bigtable invented the column-family model. Expect Spanner internals questions. \\
 \textbf{Meta} & MySQL (at insane scale), RocksDB, TAO & TAO is a graph KV store for social graph. RocksDB (LSM-tree) underpins dozens of systems. MySQL sharding at 10B+ users. \\
+\rowcolor{zebra}
 \textbf{Microsoft} & Azure SQL, Cosmos DB & Cosmos DB offers 5 tunable consistency levels. Azure SQL is SQL Server cloud-native. \\
 \textbf{Netflix} & Cassandra, EVCache (Memcached) & Cassandra for multi-region, always-available write patterns. EVCache for session/token caching. \\
+\rowcolor{zebra}
 \textbf{Uber} & MySQL \(\rightarrow\) Schemaless \(\rightarrow\) CockroachDB & Uber\textquotesingle s MySQL sharding war stories are famous. Schemaless is a custom document store on top of MySQL. \\
 \end{longtable}
 
@@ -201,6 +209,7 @@ CAP Choices in Practice:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4156}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4545}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -213,10 +222,13 @@ Denormalization
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Goal} & Eliminate data redundancy & Optimize read performance \\
+\rowcolor{zebra}
 \textbf{Storage} & Less (no duplication) & More (intentional duplication) \\
 \textbf{Write cost} & Lower (update one place) & Higher (update multiple places) \\
+\rowcolor{zebra}
 \textbf{Read cost} & Higher (need joins) & Lower (data pre-joined) \\
 \textbf{Anomalies} & Prevented (update/delete/insert) & Possible \\
+\rowcolor{zebra}
 \textbf{Use when} & OLTP, data correctness critical & OLAP, denormalized reports, caching \\
 \end{longtable}
 
@@ -587,6 +599,7 @@ Output:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4691}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Node Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -599,10 +612,13 @@ Cost
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Seq Scan} & Full table scan --- reads every row & O(n), slow for large tables \\
+\rowcolor{zebra}
 \textbf{Index Scan} & Traverse B+tree, fetch rows by pointer & O(log n + k) for k results \\
 \textbf{Index Only Scan} & Answer from index alone, no heap fetch & Fastest --- "covering index" \\
+\rowcolor{zebra}
 \textbf{Bitmap Heap Scan} & Collect row pointers first, then fetch & Good for range queries \\
 \textbf{Nested Loop} & For each row in outer, scan inner & O(n*m) worst case \\
+\rowcolor{zebra}
 \textbf{Hash Join} & Build hash of smaller table, probe it & O(n+m), good for large \\
 \textbf{Merge Join} & Both tables sorted, merge & O(n log n + m log m) \\
 \end{longtable}
@@ -720,6 +736,7 @@ Write path:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3205}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4359}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -732,12 +749,16 @@ LSM-Tree
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Write performance} & Moderate (random I/O) & High (sequential I/O) \\
+\rowcolor{zebra}
 \textbf{Read performance} & High (direct lookup) & Moderate (multi-file check) \\
 \textbf{Range scans} & Excellent (leaf list) & Good (sorted SSTables) \\
+\rowcolor{zebra}
 \textbf{Space usage} & Efficient & Higher (until compaction) \\
 \textbf{Write amplification} & Low & High (compaction rewrites) \\
+\rowcolor{zebra}
 \textbf{Read amplification} & Low (one path) & Higher (check multiple files) \\
 \textbf{Best for} & Read-heavy, OLTP & Write-heavy, time-series, logging \\
+\rowcolor{zebra}
 \textbf{Used by} & PostgreSQL, MySQL, SQLite & Cassandra, RocksDB, LevelDB, HBase \\
 \end{longtable}
 
@@ -852,6 +873,7 @@ With B+Tree index on \texttt{salary}:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4333}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4444}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -864,8 +886,10 @@ Implementation
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Atomicity} & Transaction is all-or-nothing & Rollback log (undo log) on failure \\
+\rowcolor{zebra}
 \textbf{Consistency} & DB goes from one valid state to another & Constraints, triggers, cascades enforced \\
 \textbf{Isolation} & Concurrent transactions don\textquotesingle t interfere & Locks, MVCC \\
+\rowcolor{zebra}
 \textbf{Durability} & Committed transactions survive crashes & WAL (Write-Ahead Log), fsync \\
 \end{longtable}
 
@@ -892,6 +916,7 @@ This is \textbf{the most-asked DB theory question in FAANG interviews.}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1791}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1642}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Isolation Level
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -908,8 +933,10 @@ Lost Update
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Read Uncommitted} & Possible & Possible & Possible & Possible \\
+\rowcolor{zebra}
 \textbf{Read Committed} & \textbf{Prevented} & Possible & Possible & Possible \\
 \textbf{Repeatable Read} & \textbf{Prevented} & \textbf{Prevented} & Possible* & \textbf{Prevented} \\
+\rowcolor{zebra}
 \textbf{Serializable} & \textbf{Prevented} & \textbf{Prevented} & \textbf{Prevented} & \textbf{Prevented} \\
 \end{longtable}
 
@@ -1002,6 +1029,7 @@ T1: SELECT * WHERE salary > 80000 → 6 rows  ← PHANTOM!
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4626}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3774}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Aspect
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1014,10 +1042,13 @@ Optimistic Locking
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Assumption} & Conflicts are frequent & Conflicts are rare \\
+\rowcolor{zebra}
 \textbf{Mechanism} & Lock row at read time (SELECT FOR UPDATE) & Check version/timestamp at commit \\
 \textbf{Blocking} & Yes --- other txs wait & No --- detect conflict at commit \\
+\rowcolor{zebra}
 \textbf{Throughput} & Lower (lock contention) & Higher (no waiting) \\
 \textbf{Best for} & High-contention workloads, financial & Low-contention, read-heavy \\
+\rowcolor{zebra}
 \textbf{Implementation} & \texttt{SELECT\ ...\ FOR\ UPDATE}, \texttt{LOCK\ TABLE} & Version column, compare-and-swap \\
 \end{longtable}
 
@@ -1081,6 +1112,7 @@ T2: LOCK row 2 → waiting for row 1 lock (held by T1)
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2574}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3267}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Lock
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1095,10 +1127,13 @@ Usage
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Shared (S)} & Read lock & S+S compatible; S+X not & SELECT ... LOCK IN SHARE MODE \\
+\rowcolor{zebra}
 \textbf{Exclusive (X)} & Write lock & X incompatible with all & UPDATE, DELETE, SELECT FOR UPDATE \\
 \textbf{Intention Shared (IS)} & Table-level intent & Indicates row-level S lock & Auto-set before row S lock \\
+\rowcolor{zebra}
 \textbf{Intention Exclusive (IX)} & Table-level intent & Indicates row-level X lock & Auto-set before row X lock \\
 \textbf{Gap lock} & Range lock & Prevents phantom inserts & InnoDB Repeatable Read \\
+\rowcolor{zebra}
 \textbf{Next-key lock} & Row + gap & = row lock + gap lock & InnoDB default in RR \\
 \end{longtable}
 
@@ -1236,6 +1271,7 @@ CONSISTENT HASHING:
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2432}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4066}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Use Case
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1248,10 +1284,13 @@ Why
 \bottomrule\noalign{}
 \endlastfoot
 User sessions, caching, leaderboards & \textbf{Redis (KV)} & Sub-ms latency, TTL, sorted sets \\
+\rowcolor{zebra}
 Product catalog, user profiles & \textbf{MongoDB (Document)} & Flexible schema, nested documents \\
 Time-series IoT, metrics & \textbf{Cassandra (Column-Family)} & Write-optimized, time-ordered partition keys \\
+\rowcolor{zebra}
 Social graph traversal & \textbf{Neo4j (Graph)} & Relationship traversal is O(1) per hop \\
 E-commerce orders & \textbf{PostgreSQL (SQL)} & ACID, complex queries, FK integrity \\
+\rowcolor{zebra}
 Analytics/reporting & \textbf{Redshift/BigQuery (OLAP)} & Columnar storage, massive parallel scan \\
 Global low-latency KV & \textbf{DynamoDB} & Managed, auto-scale, single-digit ms \\
 \end{longtable}
@@ -1266,6 +1305,7 @@ Global low-latency KV & \textbf{DynamoDB} & Managed, auto-scale, single-digit ms
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1509}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1824}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Family
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1284,8 +1324,10 @@ Examples
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Key-Value} & hash map & point lookups only & horizontal, trivial & eventual usually & Redis, DynamoDB, Memcached \\
+\rowcolor{zebra}
 \textbf{Document} & JSON tree & field-level queries, secondary indexes & horizontal & configurable & MongoDB, Couchbase, Firestore \\
 \textbf{Column-Family} & sparse table, columns grouped & partition key + sort key & horizontal, excellent & tunable (ONE/QUORUM/ALL) & Cassandra, HBase, Bigtable \\
+\rowcolor{zebra}
 \textbf{Graph} & nodes + edges & traversal, path finding & vertical (harder to shard) & ACID usually & Neo4j, Neptune, JanusGraph \\
 \end{longtable}
 
@@ -1388,6 +1430,7 @@ CREATE TABLE events (
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1283}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8717}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Concept
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1398,24 +1441,34 @@ Analogy
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Index} & The card catalogue at the entrance --- find a book without walking every shelf \\
+\rowcolor{zebra}
 \textbf{B+Tree} & The alphabetised catalogue drawers, with each leaf drawer linked to the next so range browsing is a single sweep across adjacent drawers \\
 \textbf{LSM-Tree} & A returns cart that fills during the day (memtable) and is periodically merged and reshelved in strict order (compaction) --- the cart is fast to drop books onto; the shelving run keeps the stacks sorted \\
+\rowcolor{zebra}
 \textbf{Clustered index} & Books shelved in call-number order --- the shelf layout IS the catalogue; finding call number 823.914 means walking straight to that spot, no detour \\
 \textbf{Non-clustered index} & A subject-card in the catalogue that gives you a call number --- you still have to walk the stacks to pull the physical book off the shelf \\
+\rowcolor{zebra}
 \textbf{MVCC} & Keeping the previous edition on the shelf so current readers aren\textquotesingle t interrupted while the librarian quietly swaps in the new edition behind the desk \\
 \textbf{Transaction} & Checking out a whole reading-list all-or-nothing --- either every book is stamped and in your bag, or none leave the desk \\
+\rowcolor{zebra}
 \textbf{ACID} & Library rules: all books or none leave (atomic); the catalogue stays accurate after every checkout (consistent); two patrons can\textquotesingle t grab the same last copy mid-checkout (isolated); the stamp record survives a power cut (durable) \\
 \textbf{Dirty read} & Peeking at a book the librarian pulled but hasn\textquotesingle t yet decided to add to the collection --- it may go straight back to the supplier \\
+\rowcolor{zebra}
 \textbf{Non-repeatable read} & You note a book is on shelf 4, walk to the café, come back, and it\textquotesingle s gone --- another patron checked it out between your two glances \\
 \textbf{Phantom read} & You count seven books on a topic, step away to photocopy one, return, and now there are eight --- a new donation arrived in between \\
+\rowcolor{zebra}
 \textbf{Deadlock} & Patron A holds the atlas and is waiting for the dictionary; Patron B holds the dictionary and is waiting for the atlas --- neither budges until the librarian intervenes and asks one to put their book down \\
 \textbf{Sharding} & Splitting the collection across buildings by subject --- Sciences in the East Wing, Humanities in the West Wing --- so no single building is overwhelmed \\
+\rowcolor{zebra}
 \textbf{Replication} & Branch libraries holding copies of the most-requested titles --- the main branch updates its master copy and the branches mirror it so local readers are never turned away \\
 \textbf{WAL} & The librarian writes every incoming acquisition in the accession register before touching the shelves --- if a shelf collapses mid-task, the register lets her reconstruct exactly where each book belongs \\
+\rowcolor{zebra}
 \textbf{Pessimistic locking} & Clipping a "Being Used --- Do Not Remove" tag on a book the moment a patron sits down with it, so no one else can grab it from under them \\
 \textbf{Optimistic locking} & No tag on the book while reading; at the checkout desk the librarian checks whether the edition number on the stamp card still matches --- if someone else already updated the record, she hands the book back and asks the patron to start over \\
+\rowcolor{zebra}
 \textbf{Normalization} & One master author-card per person in the catalogue --- every book\textquotesingle s record points to it rather than repeating the author\textquotesingle s biography on every card \\
 \textbf{Denormalization} & Photocopying the author biography onto every book\textquotesingle s catalogue card --- faster to read in one place, but when the author changes address every card must be updated individually \\
+\rowcolor{zebra}
 \textbf{Joins} & Cross-referencing the authors\textquotesingle{} catalogue with the books\textquotesingle{} catalogue --- match each author card to every book card that shares the same author code to build the full picture \\
 \textbf{NoSQL} & A flexible scrapbook section where patrons paste in newspaper clippings, maps, and sticky notes --- no rigid card format required, but you cannot run the same catalogue queries you would on a bound volume \\
 \end{longtable}
@@ -1736,6 +1789,7 @@ Don\textquotesingle t add index when:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1971}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8029}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Optimize For
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1746,6 +1800,7 @@ Strategies
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Read} & More indexes, denormalization, materialized views, caching, read replicas \\
+\rowcolor{zebra}
 \textbf{Write} & Fewer indexes, normalization, batch writes, async writes, LSM-tree storage \\
 \textbf{Both} & CQRS (Command Query Responsibility Segregation) --- separate write/read models \\
 \end{longtable}
@@ -1848,6 +1903,7 @@ Good: partition by user_id hash (even distribution)
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2400}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7600}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Topic
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1858,12 +1914,16 @@ Connection
 \bottomrule\noalign{}
 \endlastfoot
 \textbf{Distributed Systems} & Replication, consensus (Paxos/Raft for leader election), CAP theorem, distributed transactions (2PC/SAGA) \\
+\rowcolor{zebra}
 \textbf{System Design} & Database selection (SQL vs NoSQL), sharding strategy, caching layer (Redis), read replicas, data modeling \\
 \textbf{Operating Systems} & Page cache, fsync, memory-mapped files (mmap), file descriptors, I/O scheduling \\
+\rowcolor{zebra}
 \textbf{Computer Networks} & Client-server protocol (MySQL protocol), connection pooling, TCP for reliability, replication over network \\
 \textbf{Performance Engineering} & Index tuning, query optimization, connection pool sizing, buffer pool tuning, benchmark tools (pgbench, sysbench) \\
+\rowcolor{zebra}
 \textbf{Concurrency} & Locks, MVCC, deadlock detection algorithms, condition variables for lock waits \\
 \textbf{Data Structures} & B+Tree, skip list (Redis sorted sets), hash tables (hash indexes), LSM-tree \\
+\rowcolor{zebra}
 \textbf{Storage} & Sequential vs random I/O, SSD vs HDD impact on LSM vs B+Tree, WAL, page layout \\
 \end{longtable}
 
@@ -1934,6 +1994,7 @@ Connection
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4963}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4467}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Rank
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1946,14 +2007,19 @@ Why Important
 \bottomrule\noalign{}
 \endlastfoot
 1 & Isolation Level \(\times\) Anomaly Matrix & Asked in almost every DB interview \\
+\rowcolor{zebra}
 2 & B+Tree structure and why it\textquotesingle s used & Fundamental to understanding indexes \\
 3 & MVCC & Explains PostgreSQL/MySQL behavior \\
+\rowcolor{zebra}
 4 & Window functions (RANK, ROW\_NUMBER, LAG) & Common SQL coding questions \\
 5 & Clustered vs secondary index & Critical for performance questions \\
+\rowcolor{zebra}
 6 & LSM-Tree vs B+Tree trade-off & Explains Cassandra/RocksDB choices \\
 7 & Sharding strategies & Core system design component \\
+\rowcolor{zebra}
 8 & EXPLAIN / query plan reading & Shows practical DB experience \\
 9 & CAP applied to specific DBs & System design discussion \\
+\rowcolor{zebra}
 10 & When to use SQL vs which NoSQL & Architecture decision questions \\
 \end{longtable}
 
@@ -1963,6 +2029,7 @@ Why Important
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4236}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5764}}@{}}
 \toprule\noalign{}
+\rowcolor{acc!16}
 \begin{minipage}[b]{\linewidth}\raggedright
 Question Type
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1973,18 +2040,25 @@ Quick Answer
 \bottomrule\noalign{}
 \endlastfoot
 Prevent dirty reads? & Read Committed or above \\
+\rowcolor{zebra}
 Prevent phantom reads? & Serializable (or InnoDB RR with gap locks) \\
 Readers block writers? & No in MVCC (PostgreSQL, MySQL InnoDB) \\
+\rowcolor{zebra}
 Range scan data structure? & B+Tree (leaf linked list) \\
 Write-heavy storage? & LSM-Tree (Cassandra, RocksDB) \\
+\rowcolor{zebra}
 Delete + keep lowest ID? & DELETE WHERE id NOT IN (SELECT MIN(id) ... GROUP BY ...) \\
 Top N per group? & ROW\_NUMBER() OVER (PARTITION BY ... ORDER BY ...) \\
+\rowcolor{zebra}
 Even shard distribution? & Hash partitioning \\
 Resharding with minimal data movement? & Consistent hashing \\
+\rowcolor{zebra}
 Global ACID + distributed? & Google Spanner, CockroachDB \\
 Session/cache store? & Redis \\
+\rowcolor{zebra}
 Time-ordered events at scale? & Cassandra with time-based clustering key \\
 Social graph traversal? & Graph DB (Neo4j, Neptune) \\
+\rowcolor{zebra}
 Deadlock resolution? & DB kills victim; application retries \\
 Index not used by planner? & Check selectivity, stale stats, OR conditions, functions on column \\
 \end{longtable}
