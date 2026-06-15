@@ -63,13 +63,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Core Algorithms \& Complexity Analysis}\label{core-algorithms--complexity-analysis}
-
 \begin{quote}
 Interview-ready reference: first principles, Python snippets, comparison tables, and cheat sheets.
 \end{quote}
 
-\subsection{Overview}\label{overview}
+\section{Overview}\label{overview}
 
 Algorithmic thinking is the foundation of every coding interview. You are not just expected to solve problems --- you are expected to \textbf{reason about efficiency}, identify optimal approaches, and communicate trade-offs clearly. This file covers the complete algorithmic toolkit needed for top-tier software engineering interviews.
 
@@ -90,9 +88,9 @@ Algorithmic thinking is the foundation of every coding interview. You are not ju
 
 \textbf{Core skill loop:} Recognize \(\rightarrow\) Design \(\rightarrow\) Analyze \(\rightarrow\) Implement \(\rightarrow\) Verify \(\rightarrow\) Optimize
 
-\subsection{Complexity Analysis}\label{complexity-analysis}
+\section{Complexity Analysis}\label{complexity-analysis}
 
-\subsubsection{Big-O / Big-Theta / Big-Omega}\label{big-o--big-theta--big-omega}
+\subsection{Big-O / Big-Theta / Big-Omega}\label{big-o--big-theta--big-omega}
 
 Complexity notation describes \textbf{how resource usage scales with input size}, not actual runtime.
 
@@ -121,6 +119,8 @@ O(f(n)) & Big-O (upper bound) & Algorithm runs in \textbf{at most} f(n) steps (w
 
 \textbf{Complexity hierarchy (slowest to fastest growth):}
 
+\setcodelang{}
+
 \begin{verbatim}
 O(1) < O(log n) < O(√n) < O(n) < O(n log n) < O(n²) < O(n³) < O(2ⁿ) < O(n!)
 \end{verbatim}
@@ -147,7 +147,7 @@ O(1) < O(log n) < O(√n) < O(n) < O(n log n) < O(n²) < O(n³) < O(2ⁿ) < O(n!
   O(m\(\cdot\)n) for 2D DP problems
 \end{itemize}
 
-\subsubsection{Amortized Analysis}\label{amortized-analysis}
+\subsection{Amortized Analysis}\label{amortized-analysis}
 
 Amortized analysis gives the \textbf{average cost per operation over a sequence}, even if individual operations are expensive.
 
@@ -184,7 +184,7 @@ Amortized analysis gives the \textbf{average cost per operation over a sequence}
   Fibonacci heap decrease-key: O(1) amortized
 \end{itemize}
 
-\subsubsection{Computing Time \& Space Complexity}\label{computing-time--space-complexity}
+\subsection{Computing Time \& Space Complexity}\label{computing-time--space-complexity}
 
 \textbf{Time complexity rules:}
 
@@ -200,6 +200,8 @@ Amortized analysis gives the \textbf{average cost per operation over a sequence}
 \item
   \textbf{Recursion:} Use recurrence relations or Master Theorem
 \end{enumerate}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -240,6 +242,8 @@ Amortized analysis gives the \textbf{average cost per operation over a sequence}
   \textbf{Auxiliary space} = space excluding input
 \end{itemize}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# O(1) space — no extra allocation}
@@ -263,9 +267,11 @@ Amortized analysis gives the \textbf{average cost per operation over a sequence}
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Recursion Tree \& Master Theorem}\label{recursion-tree--master-theorem}
+\subsection{Recursion Tree \& Master Theorem}\label{recursion-tree--master-theorem}
 
 \textbf{Recursion tree method:} Draw the tree of recursive calls, compute cost at each level, sum all levels.
+
+\setcodelang{}
 
 \begin{verbatim}
 T(n) = 2T(n/2) + n    (merge sort)
@@ -359,7 +365,7 @@ T(n) = 3T(n/3) + n & 3 & 3 & 1 & n = \(\Theta\)(n¹) & 2 & \(\Theta\)(n log n) \
   For T(n) = T(n\(-\)1) + 1 \(\rightarrow\) n recursive calls \(\rightarrow\) O(n)
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Input Size \(\rightarrow\) Acceptable Complexity}{Input Size \textbackslash rightarrow Acceptable Complexity}}\label{input-size-rightarrow-acceptable-complexity}
+\subsection{\texorpdfstring{Input Size \(\rightarrow\) Acceptable Complexity}{Input Size \textbackslash rightarrow Acceptable Complexity}}\label{input-size-rightarrow-acceptable-complexity}
 
 Use this table to instantly identify which algorithms are feasible given constraints.
 
@@ -392,15 +398,17 @@ n \textgreater{} 10\^{}8 & O(log n) or O(1) & Binary search, math formulas \\
 
 \textbf{Rule of thumb:} Modern computers do \textasciitilde10\^{}8 simple operations/second. Design accordingly.
 
-\subsection{Algorithms}\label{algorithms}
+\section{Algorithms}\label{algorithms}
 
-\subsubsection{Sorting}\label{sorting}
+\subsection{Sorting}\label{sorting}
 
-\paragraph{Comparison-Based Sorts}\label{comparison-based-sorts}
+\subsubsection{Comparison-Based Sorts}\label{comparison-based-sorts}
 
 Comparison sorts have a theoretical lower bound of \textbf{\(\Omega\)(n log n)} --- you cannot do better with only comparison operations.
 
 \textbf{Merge Sort}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -431,6 +439,8 @@ Comparison sorts have a theoretical lower bound of \textbf{\(\Omega\)(n log n)} 
 \textbf{Drawback:} O(n) extra space; cache-unfriendly for large arrays.
 
 \textbf{Quick Sort}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -489,6 +499,8 @@ Comparison sorts have a theoretical lower bound of \textbf{\(\Omega\)(n log n)} 
 
 \textbf{Heap Sort}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ heap\_sort(arr):}
@@ -517,6 +529,8 @@ Comparison sorts have a theoretical lower bound of \textbf{\(\Omega\)(n log n)} 
 
 \textbf{Insertion Sort}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ insertion\_sort(arr):}
@@ -536,11 +550,13 @@ Comparison sorts have a theoretical lower bound of \textbf{\(\Omega\)(n log n)} 
 \textbf{When to use:} Small arrays (n \textless{} 20), nearly-sorted data, online algorithms (elements arrive one by one).
 \textbf{Stability:} Yes.
 
-\paragraph{Non-Comparison Sorts}\label{non-comparison-sorts}
+\subsubsection{Non-Comparison Sorts}\label{non-comparison-sorts}
 
 Non-comparison sorts break the O(n log n) barrier by exploiting structure of keys.
 
 \textbf{Counting Sort}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -563,6 +579,8 @@ Non-comparison sorts break the O(n log n) barrier by exploiting structure of key
 \textbf{When to use:} Keys are integers in a known small range. Useless if k \textgreater\textgreater{} n.
 
 \textbf{Radix Sort}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -596,6 +614,8 @@ Non-comparison sorts break the O(n log n) barrier by exploiting structure of key
 
 \textbf{Bucket Sort}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ bucket\_sort(arr, num\_buckets}\OperatorTok{=}\DecValTok{10}\NormalTok{):}
@@ -618,7 +638,7 @@ Non-comparison sorts break the O(n log n) barrier by exploiting structure of key
 \textbf{Complexity:} O(n + k) average when data is uniformly distributed; O(n\(^2\)) worst case if all elements land in one bucket.
 \textbf{When to use:} Floating-point numbers in a known range, uniformly distributed data.
 
-\paragraph{Sorting Comparison Table}\label{sorting-comparison-table}
+\subsubsection{Sorting Comparison Table}\label{sorting-comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1395}}
@@ -686,9 +706,11 @@ Tim Sort & O(n) & O(n log n) & O(n log n) & O(n) & Yes & Python\textquotesingle 
   \textbf{Linked lists:} Merge sort (no random access needed)
 \end{itemize}
 
-\subsubsection{Searching}\label{searching}
+\subsection{Searching}\label{searching}
 
-\paragraph{Linear Search}\label{linear-search}
+\subsubsection{Linear Search}\label{linear-search}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -702,9 +724,11 @@ Tim Sort & O(n) & O(n log n) & O(n log n) & O(n) & Yes & Python\textquotesingle 
 
 O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
 
-\paragraph{Binary Search}\label{binary-search}
+\subsubsection{Binary Search}\label{binary-search}
 
 \textbf{Standard binary search:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -723,6 +747,8 @@ O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
 \end{Shaded}
 
 \textbf{First occurrence of target:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -744,6 +770,8 @@ O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
 
 \textbf{Last occurrence of target:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ last\_occurrence(arr, target):}
@@ -763,6 +791,8 @@ O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
 \end{Shaded}
 
 \textbf{Lower bound (first index where arr{[}i{]} \textgreater= target):}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -785,6 +815,8 @@ O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
 \end{Shaded}
 
 \textbf{Binary search on rotated sorted array:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -814,6 +846,8 @@ O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
 
 The most powerful binary search pattern: instead of searching an array, search for the \textbf{answer itself}.
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Example: Koko eating bananas — find minimum eating speed}
@@ -840,7 +874,7 @@ The most powerful binary search pattern: instead of searching an array, search f
 
 \textbf{Binary search mental model:} Maintain an invariant --- the answer is always in {[}lo, hi{]}. Shrink the range by half each iteration. When lo == hi, that\textquotesingle s the answer.
 
-\subsubsection{Graph Algorithms}\label{graph-algorithms}
+\subsection{Graph Algorithms}\label{graph-algorithms}
 
 Graphs: G = (V, E) where V = vertices (nodes), E = edges.
 
@@ -854,7 +888,9 @@ Graphs: G = (V, E) where V = vertices (nodes), E = edges.
   \textbf{Adjacency matrix:} \texttt{graph{[}u{]}{[}v{]}\ =\ weight} --- O(V\(^2\)) space, O(1) edge lookup, efficient for dense graphs
 \end{itemize}
 
-\paragraph{BFS (Breadth-First Search)}\label{bfs-breadth-first-search}
+\subsubsection{BFS (Breadth-First Search)}\label{bfs-breadth-first-search}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -899,7 +935,9 @@ Graphs: G = (V, E) where V = vertices (nodes), E = edges.
 \textbf{Use when:} Shortest path in unweighted graph, level-order traversal, connected components, bipartite check.
 \textbf{Key property:} Visits nodes in order of distance from source --- guarantees shortest path in unweighted graphs.
 
-\paragraph{DFS (Depth-First Search)}\label{dfs-depth-first-search}
+\subsubsection{DFS (Depth-First Search)}\label{dfs-depth-first-search}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -932,11 +970,13 @@ Graphs: G = (V, E) where V = vertices (nodes), E = edges.
 \textbf{Use when:} Cycle detection, topological sort, connected components, path existence, flood fill.
 \textbf{Key property:} Explores as deep as possible before backtracking.
 
-\paragraph{Topological Sort}\label{topological-sort}
+\subsubsection{Topological Sort}\label{topological-sort}
 
 Valid only for \textbf{Directed Acyclic Graphs (DAGs)}.
 
 \textbf{Kahn\textquotesingle s Algorithm (BFS-based):}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -971,6 +1011,8 @@ Valid only for \textbf{Directed Acyclic Graphs (DAGs)}.
 \end{Shaded}
 
 \textbf{DFS-based topological sort:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1015,9 +1057,11 @@ Valid only for \textbf{Directed Acyclic Graphs (DAGs)}.
 
 \textbf{Use cases:} Build systems (Makefile), course prerequisites, task scheduling, dependency resolution.
 
-\paragraph{Dijkstra\textquotesingle s Algorithm}\label{dijkstras-algorithm}
+\subsubsection{Dijkstra\textquotesingle s Algorithm}\label{dijkstras-algorithm}
 
 Shortest path from single source; \textbf{requires non-negative edge weights}.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1073,9 +1117,11 @@ Shortest path from single source; \textbf{requires non-negative edge weights}.
 \textbf{When to use:} Single-source shortest path, non-negative weights.
 \textbf{Does NOT work with negative edges} --- use Bellman-Ford instead.
 
-\paragraph{Bellman-Ford Algorithm}\label{bellman-ford-algorithm}
+\subsubsection{Bellman-Ford Algorithm}\label{bellman-ford-algorithm}
 
 Shortest path from single source; \textbf{handles negative edge weights}; detects negative cycles.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1110,9 +1156,11 @@ Shortest path from single source; \textbf{handles negative edge weights}; detect
 \textbf{When to use:} Negative edge weights, detecting negative cycles (e.g., currency arbitrage).
 \textbf{Guaranteed correct after V\(-\)1 iterations} because any shortest path visits at most V\(-\)1 edges (in a graph with no negative cycles).
 
-\paragraph{Floyd-Warshall Algorithm}\label{floyd-warshall-algorithm}
+\subsubsection{Floyd-Warshall Algorithm}\label{floyd-warshall-algorithm}
 
 All-pairs shortest paths; handles negative edges; detects negative cycles.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1143,7 +1191,7 @@ All-pairs shortest paths; handles negative edges; detects negative cycles.
 \textbf{Complexity:} O(V\(^3\)) time, O(V\(^2\)) space.
 \textbf{When to use:} All-pairs shortest paths, transitive closure, detecting negative cycles.
 
-\paragraph{Graph Algorithm Comparison Table}\label{graph-algorithm-comparison-table}
+\subsubsection{Graph Algorithm Comparison Table}\label{graph-algorithm-comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1171}}
@@ -1177,11 +1225,13 @@ BFS & No (unit weights only) & No & Single source & O(V+E) & Optimal for unweigh
 DAG Shortest Path & Yes (DAG only) & N/A & Single source & O(V+E) & Topo sort + relax; fastest for DAGs \\
 \end{longtable}
 
-\paragraph{Minimum Spanning Tree (MST)}\label{minimum-spanning-tree-mst}
+\subsubsection{Minimum Spanning Tree (MST)}\label{minimum-spanning-tree-mst}
 
 MST of a connected weighted undirected graph: a spanning tree with minimum total edge weight.
 
 \textbf{Kruskal\textquotesingle s Algorithm:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1225,6 +1275,8 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 
 \textbf{Prim\textquotesingle s Algorithm:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{import}\NormalTok{ heapq}
@@ -1261,7 +1313,9 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 \textbar{} Best for \textbar{} Sparse graphs \textbar{} Dense graphs \textbar{}
 \textbar{} Data structure \textbar{} Union-Find \textbar{} Priority queue \textbar{}
 
-\paragraph{Union-Find (Disjoint Set Union)}\label{union-find-disjoint-set-union}
+\subsubsection{Union-Find (Disjoint Set Union)}\label{union-find-disjoint-set-union}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1296,9 +1350,11 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 \textbf{Amortized complexity:} O(\(\alpha\)(n)) per operation where \(\alpha\) is inverse Ackermann --- effectively O(1).
 \textbf{Use for:} Cycle detection, Kruskal\textquotesingle s MST, connected components, dynamic connectivity.
 
-\paragraph{Cycle Detection}\label{cycle-detection}
+\subsubsection{Cycle Detection}\label{cycle-detection}
 
 \textbf{Undirected graph --- Union-Find:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1312,6 +1368,8 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 \end{Shaded}
 
 \textbf{Undirected graph --- DFS (coloring):}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1334,6 +1392,8 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 
 \textbf{Directed graph --- DFS with 3-color:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ has\_cycle\_directed(graph, n):}
@@ -1352,7 +1412,9 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 
 \textbf{Key difference:} In undirected graphs, visiting a neighbor (other than parent) that\textquotesingle s already visited = cycle. In directed graphs, visiting a GRAY (currently-being-processed) node = cycle (back edge).
 
-\paragraph{Connected Components}\label{connected-components}
+\subsubsection{Connected Components}\label{connected-components}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1374,7 +1436,9 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Bipartite Check}\label{bipartite-check}
+\subsubsection{Bipartite Check}\label{bipartite-check}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1400,11 +1464,11 @@ MST of a connected weighted undirected graph: a spanning tree with minimum total
 
 \textbf{A graph is bipartite iff it has no odd-length cycles.} Two-color with BFS; if conflict found, not bipartite.
 
-\subsubsection{Dynamic Programming}\label{dynamic-programming}
+\subsection{Dynamic Programming}\label{dynamic-programming}
 
 DP solves problems by \textbf{breaking them into overlapping subproblems} and storing results to avoid recomputation.
 
-\paragraph{Memoization vs Tabulation}\label{memoization-vs-tabulation}
+\subsubsection{Memoization vs Tabulation}\label{memoization-vs-tabulation}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1528}}
@@ -1428,6 +1492,8 @@ Complexity & Same asymptotically & Often faster constants \\
 Ease & Easier to implement & Better for optimization \\
 When to use & Not all subproblems needed & All subproblems computed \\
 \end{longtable}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1456,7 +1522,7 @@ When to use & Not all subproblems needed & All subproblems computed \\
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{How to Identify DP Problems}\label{how-to-identify-dp-problems}
+\subsubsection{How to Identify DP Problems}\label{how-to-identify-dp-problems}
 
 \textbf{DP applies when:}
 
@@ -1502,11 +1568,13 @@ When to use & Not all subproblems needed & All subproblems computed \\
   Answer --- which state(s) give the final answer?
 \end{enumerate}
 
-\paragraph{Classic DP Families}\label{classic-dp-families}
+\subsubsection{Classic DP Families}\label{classic-dp-families}
 
 \textbf{0/1 Knapsack:}
 Items with weight and value; capacity W; each item used at most once.
 Recurrence: \texttt{dp{[}i{]}{[}w{]}\ =\ max(dp{[}i-1{]}{[}w{]},\ dp{[}i-1{]}{[}w-weight{[}i{]}{]}\ +\ value{[}i{]})}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1532,6 +1600,8 @@ Recurrence: \texttt{dp{[}i{]}{[}w{]}\ =\ max(dp{[}i-1{]}{[}w{]},\ dp{[}i-1{]}{[}
 
 \textbf{Unbounded Knapsack (items can be reused):}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ knapsack\_unbounded(weights, values, W):}
@@ -1547,6 +1617,8 @@ Recurrence: \texttt{dp{[}i{]}{[}w{]}\ =\ max(dp{[}i-1{]}{[}w{]},\ dp{[}i-1{]}{[}
 \textbf{Coin Change (minimum coins):}
 Recurrence: \texttt{dp{[}amount{]}\ =\ min(dp{[}amount\ -\ coin{]}\ +\ 1)\ for\ each\ coin}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ coin\_change(coins, amount):}
@@ -1561,6 +1633,8 @@ Recurrence: \texttt{dp{[}amount{]}\ =\ min(dp{[}amount\ -\ coin{]}\ +\ 1)\ for\ 
 \end{Shaded}
 
 \textbf{Coin Change (number of ways):}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1584,6 +1658,8 @@ Recurrence:
 \item
   Else: \texttt{dp{[}i{]}{[}j{]}\ =\ max(dp{[}i-1{]}{[}j{]},\ dp{[}i{]}{[}j-1{]})}
 \end{itemize}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1612,6 +1688,8 @@ Recurrence:
   Else: \texttt{dp{[}i{]}{[}j{]}\ =\ 1\ +\ min(dp{[}i-1{]}{[}j{]},\ dp{[}i{]}{[}j-1{]},\ dp{[}i-1{]}{[}j-1{]})}
 \end{itemize}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ edit\_distance(s1, s2):}
@@ -1632,6 +1710,8 @@ Recurrence:
 \end{Shaded}
 
 \textbf{Longest Increasing Subsequence (LIS):}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1663,6 +1743,8 @@ Recurrence:
 \textbf{Matrix Chain Multiplication (Interval DP):}
 Recurrence: \texttt{dp{[}i{]}{[}j{]}\ =\ min\ over\ k\ of\ (dp{[}i{]}{[}k{]}\ +\ dp{[}k+1{]}{[}j{]}\ +\ dims{[}i-1{]}*dims{[}k{]}*dims{[}j{]})}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ matrix\_chain(dims):}
@@ -1680,6 +1762,8 @@ Recurrence: \texttt{dp{[}i{]}{[}j{]}\ =\ min\ over\ k\ of\ (dp{[}i{]}{[}k{]}\ +\
 \end{Shaded}
 
 \textbf{Matrix Paths (unique paths, min cost path):}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1705,6 +1789,8 @@ Recurrence: \texttt{dp{[}i{]}{[}j{]}\ =\ min\ over\ k\ of\ (dp{[}i{]}{[}k{]}\ +\
 
 \textbf{DP on Trees:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ tree\_dp\_max\_independent\_set(adj, n):}
@@ -1728,6 +1814,8 @@ Recurrence: \texttt{dp{[}i{]}{[}j{]}\ =\ min\ over\ k\ of\ (dp{[}i{]}{[}k{]}\ +\
 
 \textbf{Bitmask DP (Travelling Salesman):}
 State: \texttt{dp{[}mask{]}{[}i{]}} = minimum cost to visit all cities in \texttt{mask}, ending at city \texttt{i}.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1764,11 +1852,11 @@ State: \texttt{dp{[}mask{]}{[}i{]}} = minimum cost to visit all cities in \textt
   \textbf{Space optimization:} 2D DP can often become 1D; 1D can become O(1) if only adjacent states needed
 \end{itemize}
 
-\subsubsection{Greedy Algorithms}\label{greedy-algorithms}
+\subsection{Greedy Algorithms}\label{greedy-algorithms}
 
 Greedy algorithms make the \textbf{locally optimal choice at each step} hoping to reach a global optimum.
 
-\paragraph{When Greedy Works}\label{when-greedy-works}
+\subsubsection{When Greedy Works}\label{when-greedy-works}
 
 Greedy is correct when two conditions hold:
 
@@ -1783,11 +1871,13 @@ Greedy is correct when two conditions hold:
 
 \textbf{Exchange argument:} Standard proof technique. Assume greedy is not optimal. Show that any optimal solution can be transformed (by swapping) to match greedy without increasing cost --- contradiction.
 
-\paragraph{Classic Greedy Problems}\label{classic-greedy-problems}
+\subsubsection{Classic Greedy Problems}\label{classic-greedy-problems}
 
 \textbf{Activity Selection (Interval Scheduling):}
 Select maximum number of non-overlapping intervals.
 Strategy: Sort by end time; always pick the activity that finishes earliest.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1807,6 +1897,8 @@ Strategy: Sort by end time; always pick the activity that finishes earliest.
 
 \textbf{Fractional Knapsack:} (unlike 0/1 knapsack, greedy works here)
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ fractional\_knapsack(weights, values, W):}
@@ -1823,6 +1915,8 @@ Strategy: Sort by end time; always pick the activity that finishes earliest.
 
 \textbf{Jump Game:} Can you reach the end of an array where each element is max jump length?
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ can\_jump(nums):}
@@ -1838,6 +1932,8 @@ Strategy: Sort by end time; always pick the activity that finishes earliest.
 Strategy: Sort by profit descending; greedily assign tasks to latest available slot.
 
 \textbf{Gas Station:} Find starting station to complete circular tour.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1858,9 +1954,11 @@ Strategy: Sort by profit descending; greedily assign tasks to latest available s
 
 \textbf{Greedy vs DP:} Greedy is O(n log n) or O(n); DP is O(n\(^2\)) or worse. \textbf{Prefer greedy when provably correct} (exchange argument or known greedy structure). DP is the safe fallback.
 
-\subsubsection{Recursion \& Backtracking}\label{recursion--backtracking}
+\subsection{Recursion \& Backtracking}\label{recursion--backtracking}
 
-\paragraph{Recursion Template}\label{recursion-template}
+\subsubsection{Recursion Template}\label{recursion-template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1879,9 +1977,11 @@ Strategy: Sort by profit descending; greedily assign tasks to latest available s
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Backtracking Framework}\label{backtracking-framework}
+\subsubsection{Backtracking Framework}\label{backtracking-framework}
 
 Backtracking = DFS on the decision tree with \textbf{pruning} to avoid exploring invalid paths.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1954,11 +2054,11 @@ Backtracking = DFS on the decision tree with \textbf{pruning} to avoid exploring
 
 \textbf{Backtracking is NOT DP:} Backtracking explores all possibilities with pruning; DP stores subproblem results to avoid recomputation. Backtracking problems don\textquotesingle t have overlapping subproblems.
 
-\subsubsection{Bit Manipulation}\label{bit-manipulation}
+\subsection{Bit Manipulation}\label{bit-manipulation}
 
 Computers operate on binary; bit tricks exploit this for O(1) operations.
 
-\paragraph{Core Operations}\label{core-operations}
+\subsubsection{Core Operations}\label{core-operations}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2619}}
@@ -1986,7 +2086,9 @@ Check power of 2 & \texttt{n\ \textgreater{}\ 0\ and\ (n\ \&\ (n-1))\ ==\ 0} & T
 Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or \texttt{n.bit\_count()} & Hamming weight \\
 \end{longtable}
 
-\paragraph{Key XOR Tricks}\label{key-xor-tricks}
+\subsubsection{Key XOR Tricks}\label{key-xor-tricks}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2023,7 +2125,9 @@ Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Bitmask DP}\label{bitmask-dp}
+\subsubsection{Bitmask DP}\label{bitmask-dp}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2053,7 +2157,9 @@ Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Bit Tricks Summary}\label{bit-tricks-summary}
+\subsubsection{Bit Tricks Summary}\label{bit-tricks-summary}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2080,9 +2186,11 @@ Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Number Theory / Math}\label{number-theory--math}
+\subsection{Number Theory / Math}\label{number-theory--math}
 
-\paragraph{GCD and LCM}\label{gcd-and-lcm}
+\subsubsection{GCD and LCM}\label{gcd-and-lcm}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2108,6 +2216,8 @@ Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or
 
 \textbf{Extended Euclidean Algorithm:} Finds x, y such that a\(\cdot\)x + b\(\cdot\)y = gcd(a, b):
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ extended\_gcd(a, b):}
@@ -2118,9 +2228,11 @@ Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Sieve of Eratosthenes}\label{sieve-of-eratosthenes}
+\subsubsection{Sieve of Eratosthenes}\label{sieve-of-eratosthenes}
 
 Find all primes up to n in O(n log log n):
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2146,9 +2258,11 @@ Find all primes up to n in O(n log log n):
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Modular Arithmetic}\label{modular-arithmetic}
+\subsubsection{Modular Arithmetic}\label{modular-arithmetic}
 
 For large number problems where answer is \texttt{mod\ 10\^{}9\ +\ 7}:
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2187,9 +2301,11 @@ For large number problems where answer is \texttt{mod\ 10\^{}9\ +\ 7}:
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Fast Exponentiation (Binary Exponentiation)}\label{fast-exponentiation-binary-exponentiation}
+\subsubsection{Fast Exponentiation (Binary Exponentiation)}\label{fast-exponentiation-binary-exponentiation}
 
 Compute a\^{}b in O(log b):
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2210,7 +2326,9 @@ Compute a\^{}b in O(log b):
 
 \textbf{Key idea:} a\^{}13 = a\^{}(1101 in binary) = a\^{}8 \(\cdot\) a\^{}4 \(\cdot\) a\^{}1. Square the base repeatedly, multiply result when bit is 1.
 
-\paragraph{Prime Factorization}\label{prime-factorization}
+\subsubsection{Prime Factorization}\label{prime-factorization}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2229,7 +2347,7 @@ Compute a\^{}b in O(log b):
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Useful Math Facts}\label{useful-math-facts}
+\subsubsection{Useful Math Facts}\label{useful-math-facts}
 
 \begin{itemize}
 \tightlist
@@ -2247,7 +2365,7 @@ Compute a\^{}b in O(log b):
   \textbf{Stars and bars:} Distribute n identical items into k bins: C(n+k-1, k-1)
 \end{itemize}
 
-\subsection{Algorithm Selection Cheat Table}\label{algorithm-selection-cheat-table}
+\section{Algorithm Selection Cheat Table}\label{algorithm-selection-cheat-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2991}}
@@ -2295,7 +2413,7 @@ Multiple choices at each step & Combinatorial search & Backtracking + pruning & 
 Maximize non-overlapping intervals & Interval scheduling & Greedy (sort by end time) & O(n log n) \\
 \end{longtable}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3239}}
@@ -2331,9 +2449,9 @@ Hash Table & Lockers with assigned numbers --- direct access by computing the lo
 Heap & Hospital triage --- the most critical patient always treated next \\
 \end{longtable}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Complexity Analysis}\label{complexity-analysis-1}
+\subsection{Complexity Analysis}\label{complexity-analysis-1}
 
 \begin{itemize}
 \tightlist
@@ -2347,7 +2465,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   What is the space complexity of BFS vs DFS? (BFS: O(V) for queue; DFS: O(V) for stack/recursion depth)
 \end{itemize}
 
-\subsubsection{Sorting}\label{sorting-1}
+\subsection{Sorting}\label{sorting-1}
 
 \begin{itemize}
 \tightlist
@@ -2361,7 +2479,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   Merge two sorted arrays in-place
 \end{itemize}
 
-\subsubsection{Binary Search}\label{binary-search-1}
+\subsection{Binary Search}\label{binary-search-1}
 
 \begin{itemize}
 \tightlist
@@ -2377,7 +2495,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   Find peak element (LeetCode 162 --- binary search on unsorted array!)
 \end{itemize}
 
-\subsubsection{Graphs}\label{graphs}
+\subsection{Graphs}\label{graphs}
 
 \begin{itemize}
 \tightlist
@@ -2403,7 +2521,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   Critical connections / bridges (Tarjan\textquotesingle s algorithm)
 \end{itemize}
 
-\subsubsection{Dynamic Programming}\label{dynamic-programming-1}
+\subsection{Dynamic Programming}\label{dynamic-programming-1}
 
 \begin{itemize}
 \tightlist
@@ -2433,7 +2551,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   Partition equal subset sum (subset sum DP)
 \end{itemize}
 
-\subsubsection{Backtracking}\label{backtracking}
+\subsection{Backtracking}\label{backtracking}
 
 \begin{itemize}
 \tightlist
@@ -2449,7 +2567,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   Word search in grid (LeetCode 79)
 \end{itemize}
 
-\subsubsection{Greedy}\label{greedy}
+\subsection{Greedy}\label{greedy}
 
 \begin{itemize}
 \tightlist
@@ -2465,9 +2583,9 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   Minimum number of arrows to burst balloons (LeetCode 452)
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
-\subsubsection{Complexity Analysis Mistakes}\label{complexity-analysis-mistakes}
+\subsection{Complexity Analysis Mistakes}\label{complexity-analysis-mistakes}
 
 \begin{itemize}
 \tightlist
@@ -2483,7 +2601,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   \textbf{Misapplying Master Theorem} --- forgetting to check regularity condition for Case 3
 \end{itemize}
 
-\subsubsection{Graph Algorithm Mistakes}\label{graph-algorithm-mistakes}
+\subsection{Graph Algorithm Mistakes}\label{graph-algorithm-mistakes}
 
 \begin{itemize}
 \tightlist
@@ -2501,7 +2619,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   \textbf{Not initializing all distances to infinity} --- leaving 0 causes wrong Dijkstra results
 \end{itemize}
 
-\subsubsection{Sorting Mistakes}\label{sorting-mistakes}
+\subsection{Sorting Mistakes}\label{sorting-mistakes}
 
 \begin{itemize}
 \tightlist
@@ -2515,7 +2633,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   \textbf{Forgetting in-place constraint} --- using merge sort when O(1) space needed
 \end{itemize}
 
-\subsubsection{Dynamic Programming Mistakes}\label{dynamic-programming-mistakes}
+\subsection{Dynamic Programming Mistakes}\label{dynamic-programming-mistakes}
 
 \begin{itemize}
 \tightlist
@@ -2533,7 +2651,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   \textbf{Forgetting to return correct cell} --- computing dp{[}n{]}{[}m{]} when answer is in dp{[}n-1{]}{[}m-1{]}
 \end{itemize}
 
-\subsubsection{Binary Search Mistakes}\label{binary-search-mistakes}
+\subsection{Binary Search Mistakes}\label{binary-search-mistakes}
 
 \begin{itemize}
 \tightlist
@@ -2547,7 +2665,7 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   \textbf{Wrong convergence} --- \texttt{lower\_bound} needs \texttt{hi\ =\ len(arr)}, not \texttt{len(arr)\ -\ 1}
 \end{itemize}
 
-\subsubsection{General Interview Mistakes}\label{general-interview-mistakes}
+\subsection{General Interview Mistakes}\label{general-interview-mistakes}
 
 \begin{itemize}
 \tightlist
@@ -2563,9 +2681,9 @@ Heap & Hospital triage --- the most critical patient always treated next \\
   \textbf{Over-engineering} --- writing complex code when a simple O(n\(^2\)) is acceptable for given n
 \end{itemize}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{Must-Know Complexities}\label{must-know-complexities}
+\subsection{Must-Know Complexities}\label{must-know-complexities}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2973}}
@@ -2608,7 +2726,7 @@ GCD & - & O(log(min(a,b))) \\
 Fast Exponentiation & - & O(log n) \\
 \end{longtable}
 
-\subsubsection{Algorithm Triggers (What to Think When You See...)}\label{algorithm-triggers-what-to-think-when-you-see}
+\subsection{Algorithm Triggers (What to Think When You See...)}\label{algorithm-triggers-what-to-think-when-you-see}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4595}}
@@ -2652,7 +2770,7 @@ Minimum spanning tree & Kruskal (sparse) / Prim (dense) \\
 "Repeated subproblems visible" & Memoize it \(\rightarrow\) DP \\
 \end{longtable}
 
-\subsubsection{Golden Rules}\label{golden-rules}
+\subsection{Golden Rules}\label{golden-rules}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

@@ -63,19 +63,17 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Transformers \& Large Language Models}\label{transformers--large-language-models}
-
 \begin{quote}
 The Transformer replaced recurrence with attention, and that single architectural decision unlocked the scaling laws that produced GPT-4, Claude, Gemini, and every frontier AI system in production today.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 A \textbf{Transformer} is a neural network architecture built entirely on attention mechanisms --- no recurrence, no convolution. Introduced by Vaswani et al. in 2017 ("Attention Is All You Need"), it processes entire sequences in parallel, allowing massive parallelism on modern GPUs/TPUs.
 
 A \textbf{Large Language Model (LLM)} is a Transformer trained at scale (billions of parameters, trillions of tokens) to model the probability distribution of text. The emergent result is a system that can reason, code, translate, summarize, answer questions, and engage in open-ended dialogue.
 
-\subsubsection{What makes them special}\label{what-makes-them-special}
+\subsection{What makes them special}\label{what-makes-them-special}
 
 \begin{itemize}
 \tightlist
@@ -89,7 +87,7 @@ A \textbf{Large Language Model (LLM)} is a Transformer trained at scale (billion
   \textbf{Transfer learning}: pretrain once on internet-scale data, fine-tune cheaply for any task
 \end{itemize}
 
-\subsubsection{Key numbers to know}\label{key-numbers-to-know}
+\subsection{Key numbers to know}\label{key-numbers-to-know}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3455}}
@@ -120,11 +118,13 @@ Claude 3.5 Sonnet & Unknown & 200K tokens & 2024 \\
 Gemini 1.5 Pro & Unknown & 1M tokens & 2024 \\
 \end{longtable}
 
-\subsection{\texorpdfstring{Why It Exists (the path from RNNs \(\rightarrow\) "Attention Is All You Need" \(\rightarrow\) GPT scale)}{Why It Exists (the path from RNNs \textbackslash rightarrow "Attention Is All You Need" \textbackslash rightarrow GPT scale)}}\label{why-it-exists-the-path-from-rnns-rightarrow-attention-is-all-you-need-rightarrow-gpt-scale}
+\section{\texorpdfstring{Why It Exists (the path from RNNs \(\rightarrow\) "Attention Is All You Need" \(\rightarrow\) GPT scale)}{Why It Exists (the path from RNNs \textbackslash rightarrow "Attention Is All You Need" \textbackslash rightarrow GPT scale)}}\label{why-it-exists-the-path-from-rnns-rightarrow-attention-is-all-you-need-rightarrow-gpt-scale}
 
-\subsubsection{The problem with RNNs and LSTMs}\label{the-problem-with-rnns-and-lstms}
+\subsection{The problem with RNNs and LSTMs}\label{the-problem-with-rnns-and-lstms}
 
 Before Transformers, sequence modeling relied on \textbf{Recurrent Neural Networks (RNNs)} and their improved variant \textbf{LSTMs} (Long Short-Term Memory):
+
+\setcodelang{}
 
 \begin{verbatim}
 RNN: h_t = tanh(W_h * h_{t-1} + W_x * x_t + b)
@@ -149,17 +149,21 @@ Hidden: [h1] → [h2] → [h3] → [h4] → [h5]
   \textbf{Long-range forgetting}: "The cat, which sat on the mat, was..." \(\rightarrow\) by the time you reach "was", the model has weakened signal from "cat"
 \end{enumerate}
 
-\subsubsection{Seq2Seq + Bahdanau Attention (2014-2015) --- the precursor}\label{seq2seq--bahdanau-attention-2014-2015--the-precursor}
+\subsection{Seq2Seq + Bahdanau Attention (2014-2015) --- the precursor}\label{seq2seq--bahdanau-attention-2014-2015--the-precursor}
 
 Bahdanau et al. added an \textbf{attention mechanism} to seq2seq models: the decoder, when generating token t, could look back at ALL encoder hidden states and form a weighted sum. This was a breakthrough --- but attention was still bolted onto recurrent models.
 
-\begin{verbatim}
-Attention score: e_{ij} = alignment(s_{i-1}, h_j)
-                α_{ij} = softmax(e_{ij})
-Context vector: c_i = Σ_j α_{ij} * h_j
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{"Attention Is All You Need" (2017) --- the revolution}\label{attention-is-all-you-need-2017--the-revolution}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Attention score: e\_\{ij\} }\OperatorTok{=}\NormalTok{ alignment(s\_\{i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{\}, h\_j)}
+\NormalTok{                α\_\{ij\} }\OperatorTok{=}\NormalTok{ softmax(e\_\{ij\})}
+\NormalTok{Context vector: c\_i }\OperatorTok{=}\NormalTok{ Σ\_j α\_\{ij\} }\OperatorTok{*}\NormalTok{ h\_j}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{"Attention Is All You Need" (2017) --- the revolution}\label{attention-is-all-you-need-2017--the-revolution}
 
 Vaswani et al. asked: \textbf{what if we use ONLY attention and remove recurrence entirely?}
 
@@ -181,7 +185,9 @@ Result: the Transformer.
   Scales cleanly with more compute
 \end{itemize}
 
-\subsubsection{The GPT arc (2018-present)}\label{the-gpt-arc-2018-present}
+\subsection{The GPT arc (2018-present)}\label{the-gpt-arc-2018-present}
+
+\setcodelang{}
 
 \begin{verbatim}
 2018: GPT-1    (117M params)  → pretraining + fine-tuning works
@@ -196,9 +202,9 @@ Result: the Transformer.
 
 \textbf{The key realization}: the pretraining objective (predict next token) is an \emph{extremely} rich self-supervised signal. Given enough data and compute, models develop internal representations of grammar, facts, reasoning, code, and more --- without any labeled data.
 
-\subsection{Why FAANG \& AI Labs Care}\label{why-faang--ai-labs-care}
+\section{Why FAANG \& AI Labs Care}\label{why-faang--ai-labs-care}
 
-\subsubsection{OpenAI}\label{openai}
+\subsection{OpenAI}\label{openai}
 
 \begin{itemize}
 \tightlist
@@ -210,7 +216,7 @@ Result: the Transformer.
   Interview focus: attention internals, training at scale, alignment
 \end{itemize}
 
-\subsubsection{Anthropic}\label{anthropic}
+\subsection{Anthropic}\label{anthropic}
 
 \begin{itemize}
 \tightlist
@@ -224,7 +230,7 @@ Result: the Transformer.
   Interview focus: RLHF vs DPO, safety, interpretability, scaling
 \end{itemize}
 
-\subsubsection{Google DeepMind}\label{google-deepmind}
+\subsection{Google DeepMind}\label{google-deepmind}
 
 \begin{itemize}
 \tightlist
@@ -238,7 +244,7 @@ Result: the Transformer.
   Interview focus: distributed training (TP/PP/DP), TPU design, efficient inference
 \end{itemize}
 
-\subsubsection{Meta AI}\label{meta-ai}
+\subsection{Meta AI}\label{meta-ai}
 
 \begin{itemize}
 \tightlist
@@ -252,7 +258,7 @@ Result: the Transformer.
   Interview focus: open source ecosystem, PEFT methods, inference optimization
 \end{itemize}
 
-\subsubsection{Microsoft}\label{microsoft}
+\subsection{Microsoft}\label{microsoft}
 
 \begin{itemize}
 \tightlist
@@ -264,7 +270,7 @@ Result: the Transformer.
   Interview focus: serving LLMs at scale, LoRA, product integration
 \end{itemize}
 
-\subsubsection{Amazon (AWS)}\label{amazon-aws}
+\subsection{Amazon (AWS)}\label{amazon-aws}
 
 \begin{itemize}
 \tightlist
@@ -278,13 +284,13 @@ Result: the Transformer.
 
 \textbf{Bottom line}: every major tech company\textquotesingle s AI strategy depends on Transformers. Understanding them deeply is table stakes for any AI/ML role at FAANG level.
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Tokenization}\label{tokenization}
+\subsection{Tokenization}\label{tokenization}
 
 Before a model sees text, it must be converted to discrete tokens (integers).
 
-\paragraph{Why not characters or words?}\label{why-not-characters-or-words}
+\subsubsection{Why not characters or words?}\label{why-not-characters-or-words}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1458}}
@@ -307,7 +313,7 @@ Words & 300K+ & Rare words missing; morphology ignored \\
 Subwords & 30K-100K & Sweet spot --- handles OOV, reasonable length \\
 \end{longtable}
 
-\paragraph{Byte-Pair Encoding (BPE)}\label{byte-pair-encoding-bpe}
+\subsubsection{Byte-Pair Encoding (BPE)}\label{byte-pair-encoding-bpe}
 
 The dominant approach (GPT family, RoBERTa):
 
@@ -324,6 +330,8 @@ The dominant approach (GPT family, RoBERTa):
   Repeat until vocabulary size reached
 \end{enumerate}
 
+\setcodelang{}
+
 \begin{verbatim}
 Corpus: "low lower lowest"
 
@@ -337,19 +345,21 @@ Step 3: "lower" is frequent → merge: low , lower , low e s t
 \textbf{Result}: common words become single tokens; rare words split into meaningful pieces.
 \texttt{"ChatGPT"} \(\rightarrow\) \texttt{{[}"Chat",\ "G",\ "PT"{]}} (approximately)
 
-\paragraph{WordPiece (BERT)}\label{wordpiece-bert}
+\subsubsection{WordPiece (BERT)}\label{wordpiece-bert}
 
 Similar to BPE but maximizes likelihood instead of frequency. Uses \texttt{\#\#} prefix for continuation pieces: \texttt{"playing"} \(\rightarrow\) \texttt{{[}"play",\ "\#\#ing"{]}}
 
-\paragraph{SentencePiece (T5, Llama)}\label{sentencepiece-t5-llama}
+\subsubsection{SentencePiece (T5, Llama)}\label{sentencepiece-t5-llama}
 
 Language-agnostic, treats input as raw bytes/unicode. No pre-tokenization required. Supports unigram language model or BPE.
 
 \textbf{Key interview point}: tokenization affects everything --- cost (you pay per token), context window utilization, and model behavior on numbers/code. Numbers are often split digit-by-digit: \texttt{"12345"} \(\rightarrow\) \texttt{{[}"1",\ "2",\ "3",\ "4",\ "5"{]}} --- this is why LLMs struggle with arithmetic.
 
-\subsubsection{Embeddings}\label{embeddings}
+\subsection{Embeddings}\label{embeddings}
 
 After tokenization, each token ID is mapped to a dense vector via a learned \textbf{embedding matrix} E \(\in\) \(\mathbb{R}\)\^{}\{V\(\times\)d\_model\}.
+
+\setcodelang{}
 
 \begin{verbatim}
 Token: "cat" → ID: 5023
@@ -370,21 +380,25 @@ Embedding: E[5023] = [0.23, -0.14, 0.87, ..., 0.02]  # d_model dimensions
   Input to the Transformer is: token embeddings + positional encodings
 \end{itemize}
 
-\subsubsection{Self-Attention --- The Core Mechanism}\label{self-attention--the-core-mechanism}
+\subsection{Self-Attention --- The Core Mechanism}\label{self-attention--the-core-mechanism}
 
 \textbf{The fundamental idea}: for each token, compute a weighted sum of all token representations, where weights reflect relevance.
 
-\paragraph{Query, Key, Value (Q, K, V)}\label{query-key-value-q-k-v}
+\subsubsection{Query, Key, Value (Q, K, V)}\label{query-key-value-q-k-v}
 
 Every token produces three vectors via learned linear projections:
 
-\begin{verbatim}
-Q = X W_Q    (Query:  "What am I looking for?")
-K = X W_K    (Key:    "What do I offer/label myself as?")
-V = X W_V    (Value:  "What is my actual content?")
+\setcodelang{Python}
 
-Where X ∈ ℝ^{n×d_model}, W_Q, W_K, W_V ∈ ℝ^{d_model×d_k}
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Q }\OperatorTok{=}\NormalTok{ X W\_Q    (Query:  }\StringTok{"What am I looking for?"}\NormalTok{)}
+\NormalTok{K }\OperatorTok{=}\NormalTok{ X W\_K    (Key:    }\StringTok{"What do I offer/label myself as?"}\NormalTok{)}
+\NormalTok{V }\OperatorTok{=}\NormalTok{ X W\_V    (Value:  }\StringTok{"What is my actual content?"}\NormalTok{)}
+
+\NormalTok{Where X ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{n×d\_model\}, W\_Q, W\_K, W\_V ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{d\_model×d\_k\}}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Intuition (from the newsroom analogy):}
 
@@ -398,7 +412,9 @@ Where X ∈ ℝ^{n×d_model}, W_Q, W_K, W_V ∈ ℝ^{d_model×d_k}
   \textbf{V (Value)}: each word\textquotesingle s actual content (the word\textquotesingle s semantic meaning to pass along)
 \end{itemize}
 
-\paragraph{Scaled Dot-Product Attention}\label{scaled-dot-product-attention}
+\subsubsection{Scaled Dot-Product Attention}\label{scaled-dot-product-attention}
+
+\setcodelang{}
 
 \begin{verbatim}
                           QK^T
@@ -408,22 +424,28 @@ Attention(Q, K, V) = softmax(------) V
 
 Step-by-step:
 
-\begin{verbatim}
-Step 1: Compute raw scores (compatibility between each query and all keys)
-        scores = Q · K^T          shape: (n_tokens × n_tokens)
+\setcodelang{Python}
 
-Step 2: Scale to prevent softmax saturation
-        scores = scores / sqrt(d_k)
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Step }\DecValTok{1}\NormalTok{: Compute raw scores (compatibility between each query }\KeywordTok{and} \BuiltInTok{all}\NormalTok{ keys)}
+\NormalTok{        scores }\OperatorTok{=}\NormalTok{ Q · K}\OperatorTok{\^{}}\NormalTok{T          shape: (n\_tokens × n\_tokens)}
 
-Step 3: Apply softmax to get attention weights (probabilities)
-        weights = softmax(scores)   shape: (n_tokens × n_tokens)
-        # Each row sums to 1.0
+\NormalTok{Step }\DecValTok{2}\NormalTok{: Scale to prevent softmax saturation}
+\NormalTok{        scores }\OperatorTok{=}\NormalTok{ scores }\OperatorTok{/}\NormalTok{ sqrt(d\_k)}
 
-Step 4: Weighted sum of values
-        output = weights · V        shape: (n_tokens × d_k)
-\end{verbatim}
+\NormalTok{Step }\DecValTok{3}\NormalTok{: Apply softmax to get attention weights (probabilities)}
+\NormalTok{        weights }\OperatorTok{=}\NormalTok{ softmax(scores)   shape: (n\_tokens × n\_tokens)}
+        \CommentTok{\# Each row sums to 1.0}
+
+\NormalTok{Step }\DecValTok{4}\NormalTok{: Weighted }\BuiltInTok{sum}\NormalTok{ of values}
+\NormalTok{        output }\OperatorTok{=}\NormalTok{ weights · V        shape: (n\_tokens × d\_k)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Why \(\surd\)d\_k scaling?} Without it, for large d\_k, dot products grow large in magnitude, pushing softmax into saturation regions where gradients vanish. Dividing by \(\surd\)d\_k keeps the variance of the dot product \textasciitilde1.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -451,7 +473,7 @@ Step 4: Weighted sum of values
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Attention Complexity}\label{attention-complexity}
+\subsubsection{Attention Complexity}\label{attention-complexity}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1731}}
@@ -472,17 +494,21 @@ Memory & O(n\(^2\)) for attention matrix --- the KV cache grows with context \\
 
 This quadratic bottleneck is why long context is hard and why Flash Attention, linear attention, and sparse attention matter.
 
-\subsubsection{Multi-Head Attention}\label{multi-head-attention}
+\subsection{Multi-Head Attention}\label{multi-head-attention}
 
 Run self-attention h times in parallel, each with different learned projections:
 
-\begin{verbatim}
-head_i = Attention(Q W_Q^i, K W_K^i, V W_V^i)
+\setcodelang{Python}
 
-MultiHead(Q, K, V) = Concat(head_1, ..., head_h) W_O
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{head\_i }\OperatorTok{=}\NormalTok{ Attention(Q W\_Q}\OperatorTok{\^{}}\NormalTok{i, K W\_K}\OperatorTok{\^{}}\NormalTok{i, V W\_V}\OperatorTok{\^{}}\NormalTok{i)}
 
-where W_Q^i ∈ ℝ^{d_model×d_k}, d_k = d_model / h
-\end{verbatim}
+\NormalTok{MultiHead(Q, K, V) }\OperatorTok{=}\NormalTok{ Concat(head\_1, ..., head\_h) W\_O}
+
+\NormalTok{where W\_Q}\OperatorTok{\^{}}\NormalTok{i ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{d\_model×d\_k\}, d\_k }\OperatorTok{=}\NormalTok{ d\_model }\OperatorTok{/}\NormalTok{ h}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Why multiple heads?}
 
@@ -504,11 +530,13 @@ where W_Q^i ∈ ℝ^{d_model×d_k}, d_k = d_model / h
 
 \textbf{Key numbers}: GPT-3 uses h=96 heads, d\_model=12288, d\_k=128 per head.
 
-\subsubsection{Positional Encoding}\label{positional-encoding}
+\subsection{Positional Encoding}\label{positional-encoding}
 
 Attention is \textbf{permutation-invariant} --- without position information, "dog bites man" = "man bites dog". We inject position information by adding positional encodings to token embeddings.
 
-\paragraph{Sinusoidal (original Transformer)}\label{sinusoidal-original-transformer}
+\subsubsection{Sinusoidal (original Transformer)}\label{sinusoidal-original-transformer}
+
+\setcodelang{}
 
 \begin{verbatim}
 PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
@@ -525,21 +553,23 @@ PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
   Generalizes to sequences longer than training length (theoretically)
 \end{itemize}
 
-\paragraph{Learned Absolute Positional Embeddings (GPT-2, BERT)}\label{learned-absolute-positional-embeddings-gpt-2-bert}
+\subsubsection{Learned Absolute Positional Embeddings (GPT-2, BERT)}\label{learned-absolute-positional-embeddings-gpt-2-bert}
 
 Simply learn a vector for each position 0..max\_len. Simple but doesn\textquotesingle t extrapolate.
 
-\paragraph{Rotary Positional Embedding (RoPE) --- Llama, GPT-NeoX}\label{rotary-positional-embedding-rope--llama-gpt-neox}
+\subsubsection{Rotary Positional Embedding (RoPE) --- Llama, GPT-NeoX}\label{rotary-positional-embedding-rope--llama-gpt-neox}
 
 Encodes position by rotating Q and K vectors. Relative position naturally falls out of the dot product. Better length generalization.
 
-\paragraph{ALiBi (PaLM, BLOOM)}\label{alibi-palm-bloom}
+\subsubsection{ALiBi (PaLM, BLOOM)}\label{alibi-palm-bloom}
 
 Add a linear bias to attention scores based on distance: score -= m * \textbar i - j\textbar. Simple, extrapolates well, no learned parameters.
 
-\subsubsection{The Full Transformer Block}\label{the-full-transformer-block}
+\subsection{The Full Transformer Block}\label{the-full-transformer-block}
 
-\paragraph{Encoder Block}\label{encoder-block}
+\subsubsection{Encoder Block}\label{encoder-block}
+
+\setcodelang{}
 
 \begin{verbatim}
 Input X
@@ -557,6 +587,8 @@ Output
 
 \textbf{Feed-Forward Network (FFN):}
 
+\setcodelang{}
+
 \begin{verbatim}
 FFN(x) = max(0, x W_1 + b_1) W_2 + b_2
 
@@ -566,7 +598,9 @@ Typical: d_model=512 → d_ff=2048 → d_model=512
 
 In modern models, often uses GELU or SwiGLU activation instead of ReLU.
 
-\paragraph{Layer Normalization}\label{layer-normalization}
+\subsubsection{Layer Normalization}\label{layer-normalization}
+
+\setcodelang{}
 
 \begin{verbatim}
 LayerNorm(x) = γ * (x - μ) / (σ + ε) + β
@@ -578,11 +612,15 @@ where μ, σ computed across features (not batch), γ, β are learned
 
 \textbf{Pre-LN vs Post-LN}: original Transformer uses Post-LN (after residual). Modern models use Pre-LN (before sublayer) --- more stable training for deep models.
 
-\paragraph{Residual Connections}\label{residual-connections}
+\subsubsection{Residual Connections}\label{residual-connections}
 
-\begin{verbatim}
-output = LayerNorm(x + Sublayer(x))
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{output }\OperatorTok{=}\NormalTok{ LayerNorm(x }\OperatorTok{+}\NormalTok{ Sublayer(x))}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -594,7 +632,7 @@ output = LayerNorm(x + Sublayer(x))
   Without residuals, 96-layer Transformers would be untrainable
 \end{itemize}
 
-\subsubsection{Encoder-Only vs Decoder-Only vs Encoder-Decoder}\label{encoder-only-vs-decoder-only-vs-encoder-decoder}
+\subsection{Encoder-Only vs Decoder-Only vs Encoder-Decoder}\label{encoder-only-vs-decoder-only-vs-encoder-decoder}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1980}}
@@ -639,11 +677,13 @@ Parameter efficiency & High for understanding & High for generation & Somewhat r
   Inference is natural: just keep generating
 \end{itemize}
 
-\subsubsection{Pretraining Objectives}\label{pretraining-objectives}
+\subsection{Pretraining Objectives}\label{pretraining-objectives}
 
-\paragraph{Causal Language Modeling (CLM) --- GPT family}\label{causal-language-modeling-clm--gpt-family}
+\subsubsection{Causal Language Modeling (CLM) --- GPT family}\label{causal-language-modeling-clm--gpt-family}
 
 Predict the next token given all previous tokens:
+
+\setcodelang{}
 
 \begin{verbatim}
 L_CLM = -Σ_t log P(x_t | x_1, ..., x_{t-1})
@@ -661,9 +701,11 @@ L_CLM = -Σ_t log P(x_t | x_1, ..., x_{t-1})
   Generation is natural: sample from P(x\_t \textbar{} x\_\{\textless t\}) autoregressively
 \end{itemize}
 
-\paragraph{Masked Language Modeling (MLM) --- BERT}\label{masked-language-modeling-mlm--bert}
+\subsubsection{Masked Language Modeling (MLM) --- BERT}\label{masked-language-modeling-mlm--bert}
 
 Randomly mask 15\% of tokens, predict the masked tokens:
+
+\setcodelang{}
 
 \begin{verbatim}
 "The cat [MASK] on the mat"  →  predict "sat"
@@ -679,9 +721,11 @@ L_MLM = -Σ_{masked t} log P(x_t | x_{1..n, t≠masked})
   Weaker generative model (not trained to generate sequences autoregressively)
 \end{itemize}
 
-\paragraph{Span Corruption (T5)}\label{span-corruption-t5}
+\subsubsection{Span Corruption (T5)}\label{span-corruption-t5}
 
 Mask contiguous spans of tokens, predict the entire span:
+
+\setcodelang{}
 
 \begin{verbatim}
 Input:  "The cat <X> the mat <Y> quickly"
@@ -690,11 +734,13 @@ Target: "<X> sat on <Y> moved"
 
 Bridges MLM and CLM --- good for seq2seq tasks.
 
-\subsubsection{Scaling Laws \& Emergent Abilities}\label{scaling-laws--emergent-abilities}
+\subsection{Scaling Laws \& Emergent Abilities}\label{scaling-laws--emergent-abilities}
 
-\paragraph{Chinchilla Scaling Laws (Hoffmann et al., 2022)}\label{chinchilla-scaling-laws-hoffmann-et-al-2022}
+\subsubsection{Chinchilla Scaling Laws (Hoffmann et al., 2022)}\label{chinchilla-scaling-laws-hoffmann-et-al-2022}
 
 The optimal number of training tokens is \textbf{\textasciitilde20\(\times\) the number of parameters}:
+
+\setcodelang{}
 
 \begin{verbatim}
 N_opt ∝ C^0.5  (optimal parameters given compute budget C)
@@ -705,17 +751,21 @@ Rule of thumb: D_opt ≈ 20 × N_opt
 
 \textbf{Implication}: GPT-3 (175B params, 300B tokens) was undertrained. Chinchilla (70B params, 1.4T tokens) outperformed it. Llama uses this insight.
 
-\paragraph{Power Law Scaling}\label{power-law-scaling}
+\subsubsection{Power Law Scaling}\label{power-law-scaling}
 
-\begin{verbatim}
-Loss ∝ (1/N)^α + (1/D)^β + L_∞
+\setcodelang{Python}
 
-where N = model size, D = dataset size, α ≈ β ≈ 0.5
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Loss ∝ (}\DecValTok{1}\OperatorTok{/}\NormalTok{N)}\OperatorTok{\^{}}\NormalTok{α }\OperatorTok{+}\NormalTok{ (}\DecValTok{1}\OperatorTok{/}\NormalTok{D)}\OperatorTok{\^{}}\NormalTok{β }\OperatorTok{+}\NormalTok{ L\_∞}
+
+\NormalTok{where N }\OperatorTok{=}\NormalTok{ model size, D }\OperatorTok{=}\NormalTok{ dataset size, α ≈ β ≈ }\FloatTok{0.5}
+\end{Highlighting}
+\end{Shaded}
 
 Each decade of compute reduces loss predictably --- no diminishing returns (so far).
 
-\paragraph{Emergent Abilities}\label{emergent-abilities}
+\subsubsection{Emergent Abilities}\label{emergent-abilities}
 
 Some capabilities appear suddenly above a threshold model size:
 
@@ -733,9 +783,9 @@ Some capabilities appear suddenly above a threshold model size:
 
 \textbf{Controversy}: Some argue emergence is an artifact of metrics (using non-linear/discontinuous eval metrics). Gradual improvement in underlying probabilities manifests as sudden capability jumps.
 
-\subsubsection{Context Window \& KV Cache}\label{context-window--kv-cache}
+\subsection{Context Window \& KV Cache}\label{context-window--kv-cache}
 
-\paragraph{Context Window}\label{context-window}
+\subsubsection{Context Window}\label{context-window}
 
 The maximum number of tokens the model can attend to simultaneously:
 
@@ -765,9 +815,11 @@ The maximum number of tokens the model can attend to simultaneously:
   Models may not actually use distant context effectively ("lost in the middle" problem)
 \end{itemize}
 
-\paragraph{KV Cache}\label{kv-cache}
+\subsubsection{KV Cache}\label{kv-cache}
 
 During inference (generation), we avoid recomputing K and V for previous tokens:
+
+\setcodelang{}
 
 \begin{verbatim}
 Without KV cache (step t):
@@ -782,13 +834,17 @@ With KV cache (step t):
 
 \textbf{KV cache memory formula:}
 
-\begin{verbatim}
-Memory = 2 × n_layers × n_heads × d_head × seq_len × bytes_per_element
-       = 2 × L × H × d_k × T × dtype_bytes
+\setcodelang{Python}
 
-For Llama 2 70B with 128K context in FP16:
-  = 2 × 80 × 64 × 128 × 131072 × 2 bytes ≈ 320GB just for KV cache!
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Memory }\OperatorTok{=} \DecValTok{2}\NormalTok{ × n\_layers × n\_heads × d\_head × seq\_len × bytes\_per\_element}
+       \OperatorTok{=} \DecValTok{2}\NormalTok{ × L × H × d\_k × T × dtype\_bytes}
+
+\NormalTok{For Llama }\DecValTok{2} \DecValTok{70}\ErrorTok{B} \ControlFlowTok{with} \DecValTok{128}\ErrorTok{K}\NormalTok{ context }\KeywordTok{in}\NormalTok{ FP16:}
+  \OperatorTok{=} \DecValTok{2}\NormalTok{ × }\DecValTok{80}\NormalTok{ × }\DecValTok{64}\NormalTok{ × }\DecValTok{128}\NormalTok{ × }\DecValTok{131072}\NormalTok{ × }\DecValTok{2} \BuiltInTok{bytes}\NormalTok{ ≈ }\DecValTok{320}\ErrorTok{GB}\NormalTok{ just }\ControlFlowTok{for}\NormalTok{ KV cache}\OperatorTok{!}
+\end{Highlighting}
+\end{Shaded}
 
 This is why long context is expensive and why techniques like:
 
@@ -802,9 +858,9 @@ This is why long context is expensive and why techniques like:
   \textbf{PagedAttention} (vLLM): page KV cache like OS virtual memory
 \end{itemize}
 
-\subsubsection{Fine-Tuning}\label{fine-tuning}
+\subsection{Fine-Tuning}\label{fine-tuning}
 
-\paragraph{Full Fine-Tuning}\label{full-fine-tuning}
+\subsubsection{Full Fine-Tuning}\label{full-fine-tuning}
 
 Update all parameters on task-specific data:
 
@@ -820,9 +876,11 @@ Update all parameters on task-specific data:
   Used when you have lots of task data and resources
 \end{itemize}
 
-\paragraph{Instruction Tuning}\label{instruction-tuning}
+\subsubsection{Instruction Tuning}\label{instruction-tuning}
 
 Fine-tune on (instruction, response) pairs to follow human directions:
+
+\setcodelang{}
 
 \begin{verbatim}
 Prompt:  "Summarize this article in 3 bullet points: [article]"
@@ -839,7 +897,7 @@ Target:  "• Key point 1\n• Key point 2\n• Key point 3"
   Usually followed by RLHF for alignment
 \end{itemize}
 
-\paragraph{PEFT: Parameter-Efficient Fine-Tuning}\label{peft-parameter-efficient-fine-tuning}
+\subsubsection{PEFT: Parameter-Efficient Fine-Tuning}\label{peft-parameter-efficient-fine-tuning}
 
 Fine-tune only a small fraction of parameters:
 
@@ -866,21 +924,25 @@ Prefix tuning & \textasciitilde0.1\% & Learned prefix tokens \\
 Prompt tuning & \textless\textless0.1\% & Soft prompt tokens \\
 \end{longtable}
 
-\paragraph{LoRA (Low-Rank Adaptation)}\label{lora-low-rank-adaptation}
+\subsubsection{LoRA (Low-Rank Adaptation)}\label{lora-low-rank-adaptation}
 
 \textbf{Key insight}: weight updates during fine-tuning lie in a low-rank subspace.
 
 Instead of updating W \(\in\) \(\mathbb{R}\)\^{}\{d\(\times\)k\} directly, parameterize the update as:
 
-\begin{verbatim}
-W_new = W_pretrained + ΔW = W_pretrained + B·A
+\setcodelang{Python}
 
-where B ∈ ℝ^{d×r}, A ∈ ℝ^{r×k}, rank r << min(d, k)
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{W\_new }\OperatorTok{=}\NormalTok{ W\_pretrained }\OperatorTok{+}\NormalTok{ ΔW }\OperatorTok{=}\NormalTok{ W\_pretrained }\OperatorTok{+}\NormalTok{ B·A}
 
-Typical: d=4096, k=4096, r=8 or 16
-Original params: 4096² = 16.7M
-LoRA params:     4096×8 + 8×4096 = 65K  (99.6% reduction!)
-\end{verbatim}
+\NormalTok{where B ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{d×r\}, A ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{r×k\}, rank r }\OperatorTok{\textless{}\textless{}} \BuiltInTok{min}\NormalTok{(d, k)}
+
+\NormalTok{Typical: d}\OperatorTok{=}\DecValTok{4096}\NormalTok{, k}\OperatorTok{=}\DecValTok{4096}\NormalTok{, r}\OperatorTok{=}\DecValTok{8} \KeywordTok{or} \DecValTok{16}
+\NormalTok{Original params: }\DecValTok{4096}\ErrorTok{²} \OperatorTok{=} \FloatTok{16.7}\ErrorTok{M}
+\NormalTok{LoRA params:     }\DecValTok{4096}\NormalTok{×}\DecValTok{8} \OperatorTok{+} \DecValTok{8}\NormalTok{×}\DecValTok{4096} \OperatorTok{=} \DecValTok{65}\ErrorTok{K}\NormalTok{  (}\FloatTok{99.6}\OperatorTok{\%}\NormalTok{ reduction}\OperatorTok{!}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Training:}
 
@@ -900,9 +962,9 @@ LoRA params:     4096×8 + 8×4096 = 65K  (99.6% reduction!)
 
 \textbf{QLoRA}: Quantize the base model to 4-bit (reducing memory 4-8x), then apply LoRA adapters in 16-bit. Enables fine-tuning 65B models on a single A100 80GB.
 
-\subsubsection{Alignment: RLHF, Reward Models, PPO, DPO}\label{alignment-rlhf-reward-models-ppo-dpo}
+\subsection{Alignment: RLHF, Reward Models, PPO, DPO}\label{alignment-rlhf-reward-models-ppo-dpo}
 
-\paragraph{The Alignment Problem}\label{the-alignment-problem}
+\subsubsection{The Alignment Problem}\label{the-alignment-problem}
 
 A language model pretrained on internet text will:
 
@@ -920,11 +982,13 @@ A language model pretrained on internet text will:
 
 We need to align model behavior with human preferences.
 
-\paragraph{RLHF Pipeline (Reinforcement Learning from Human Feedback)}\label{rlhf-pipeline-reinforcement-learning-from-human-feedback}
+\subsubsection{RLHF Pipeline (Reinforcement Learning from Human Feedback)}\label{rlhf-pipeline-reinforcement-learning-from-human-feedback}
 
 Three stages:
 
 \textbf{Stage 1: Supervised Fine-Tuning (SFT)}
+
+\setcodelang{}
 
 \begin{verbatim}
 Human writes ideal responses → fine-tune model on these
@@ -932,6 +996,8 @@ Result: SFT model — follows instructions but not yet aligned
 \end{verbatim}
 
 \textbf{Stage 2: Reward Model (RM) Training}
+
+\setcodelang{}
 
 \begin{verbatim}
 - Show human raters K responses to a prompt
@@ -942,6 +1008,8 @@ Result: SFT model — follows instructions but not yet aligned
 
 \textbf{Stage 3: PPO (Proximal Policy Optimization)}
 
+\setcodelang{}
+
 \begin{verbatim}
 - Use RM as reward signal to optimize the language model
 - Constraint: KL divergence from SFT model (don't drift too far)
@@ -949,13 +1017,17 @@ Result: SFT model — follows instructions but not yet aligned
 - PPO clip: prevents too-large policy updates
 \end{verbatim}
 
-\begin{verbatim}
-PPO objective:
-L_PPO = E[min(r_t(θ)·A_t, clip(r_t(θ), 1-ε, 1+ε)·A_t)] - β·KL
+\setcodelang{Python}
 
-where r_t(θ) = π_θ(a|s) / π_θ_old(a|s)  (probability ratio)
-      A_t = advantage (reward - baseline)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PPO objective:}
+\NormalTok{L\_PPO }\OperatorTok{=}\NormalTok{ E[}\BuiltInTok{min}\NormalTok{(r\_t(θ)·A\_t, clip(r\_t(θ), }\DecValTok{1}\OperatorTok{{-}}\NormalTok{ε, }\DecValTok{1}\OperatorTok{+}\NormalTok{ε)·A\_t)] }\OperatorTok{{-}}\NormalTok{ β·KL}
+
+\NormalTok{where r\_t(θ) }\OperatorTok{=}\NormalTok{ π\_θ(a}\OperatorTok{|}\NormalTok{s) }\OperatorTok{/}\NormalTok{ π\_θ\_old(a}\OperatorTok{|}\NormalTok{s)  (probability ratio)}
+\NormalTok{      A\_t }\OperatorTok{=}\NormalTok{ advantage (reward }\OperatorTok{{-}}\NormalTok{ baseline)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{RLHF challenges:}
 
@@ -971,22 +1043,26 @@ where r_t(θ) = π_θ(a|s) / π_θ_old(a|s)  (probability ratio)
   Reward model can be wrong
 \end{itemize}
 
-\paragraph{DPO (Direct Preference Optimization)}\label{dpo-direct-preference-optimization}
+\subsubsection{DPO (Direct Preference Optimization)}\label{dpo-direct-preference-optimization}
 
 \textbf{Key insight}: skip the explicit reward model. Directly optimize on preference data.
 
-\begin{verbatim}
-DPO Loss:
-L_DPO(θ) = -E_{(x,y_w,y_l)} [
-    log σ(β · log(π_θ(y_w|x)/π_ref(y_w|x))
-           - β · log(π_θ(y_l|x)/π_ref(y_l|x)))
-]
+\setcodelang{Python}
 
-where y_w = preferred (winner) response
-      y_l = rejected (loser) response
-      π_ref = reference policy (SFT model, frozen)
-      β = temperature controlling KL penalty
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DPO Loss:}
+\NormalTok{L\_DPO(θ) }\OperatorTok{=} \OperatorTok{{-}}\NormalTok{E\_\{(x,y\_w,y\_l)\} [}
+\NormalTok{    log σ(β · log(π\_θ(y\_w}\OperatorTok{|}\NormalTok{x)}\OperatorTok{/}\NormalTok{π\_ref(y\_w}\OperatorTok{|}\NormalTok{x))}
+           \OperatorTok{{-}}\NormalTok{ β · log(π\_θ(y\_l}\OperatorTok{|}\NormalTok{x)}\OperatorTok{/}\NormalTok{π\_ref(y\_l}\OperatorTok{|}\NormalTok{x)))}
+\NormalTok{]}
+
+\NormalTok{where y\_w }\OperatorTok{=}\NormalTok{ preferred (winner) response}
+\NormalTok{      y\_l }\OperatorTok{=}\NormalTok{ rejected (loser) response}
+\NormalTok{      π\_ref }\OperatorTok{=}\NormalTok{ reference policy (SFT model, frozen)}
+\NormalTok{      β }\OperatorTok{=}\NormalTok{ temperature controlling KL penalty}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{DPO vs RLHF comparison:}
 
@@ -1017,21 +1093,27 @@ Flexibility & Can adjust reward on the fly & Fixed to dataset \\
 
 \textbf{DPO intuition}: implicitly defines a reward model as log ratio of policy to reference. The optimal policy that maximizes this reward under KL constraint has a closed form --- DPO directly optimizes it.
 
-\subsubsection{Decoding / Inference}\label{decoding--inference}
+\subsection{Decoding / Inference}\label{decoding--inference}
 
 Given a trained model, how do we generate text?
 
-\paragraph{Greedy Decoding}\label{greedy-decoding}
+\subsubsection{Greedy Decoding}\label{greedy-decoding}
 
-\begin{verbatim}
-x_t = argmax P(x_t | x_{<t})
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x\_t }\OperatorTok{=}\NormalTok{ argmax P(x\_t }\OperatorTok{|}\NormalTok{ x\_\{}\OperatorTok{\textless{}}\NormalTok{t\})}
+\end{Highlighting}
+\end{Shaded}
 
 Always pick the highest-probability token. Fast but repetitive and suboptimal.
 
-\paragraph{Beam Search}\label{beam-search}
+\subsubsection{Beam Search}\label{beam-search}
 
 Maintain k (beam width) hypothesis sequences:
+
+\setcodelang{}
 
 \begin{verbatim}
 At each step:
@@ -1050,7 +1132,9 @@ At each step:
   Length normalization needed: score / \textbar sequence\textbar\^{}\(\alpha\)
 \end{itemize}
 
-\paragraph{Temperature Sampling}\label{temperature-sampling}
+\subsubsection{Temperature Sampling}\label{temperature-sampling}
+
+\setcodelang{}
 
 \begin{verbatim}
 P_scaled(x) = softmax(logits / T)
@@ -1060,26 +1144,34 @@ T = 1:  original model distribution
 T > 1:  more uniform/random (creative but less coherent)
 \end{verbatim}
 
-\paragraph{Top-k Sampling}\label{top-k-sampling}
+\subsubsection{Top-k Sampling}\label{top-k-sampling}
 
-\begin{verbatim}
-Sample from top k tokens only (renormalize the k probabilities)
+\setcodelang{Python}
 
-Typical: k = 40-200
-Problem: k may be too large when distribution is flat, too small when peaked
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Sample }\ImportTok{from}\NormalTok{ top k tokens only (renormalize the k probabilities)}
 
-\paragraph{Top-p / Nucleus Sampling (Holtzman et al., 2020)}\label{top-p--nucleus-sampling-holtzman-et-al-2020}
+\NormalTok{Typical: k }\OperatorTok{=} \DecValTok{40}\OperatorTok{{-}}\DecValTok{200}
+\NormalTok{Problem: k may be too large when distribution }\KeywordTok{is}\NormalTok{ flat, too small when peaked}
+\end{Highlighting}
+\end{Shaded}
 
-\begin{verbatim}
-Find smallest set S where Σ_{x ∈ S} P(x) ≥ p
-Sample from S (renormalized)
+\subsubsection{Top-p / Nucleus Sampling (Holtzman et al., 2020)}\label{top-p--nucleus-sampling-holtzman-et-al-2020}
 
-Typical: p = 0.9 or 0.95
-Advantage: dynamically adapts to distribution shape
-\end{verbatim}
+\setcodelang{Python}
 
-\paragraph{Top-k vs Top-p Comparison}\label{top-k-vs-top-p-comparison}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Find smallest }\BuiltInTok{set}\NormalTok{ S where Σ\_\{x ∈ S\} P(x) ≥ p}
+\NormalTok{Sample }\ImportTok{from}\NormalTok{ S (renormalized)}
+
+\NormalTok{Typical: p }\OperatorTok{=} \FloatTok{0.9} \KeywordTok{or} \FloatTok{0.95}
+\NormalTok{Advantage: dynamically adapts to distribution shape}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Top-k vs Top-p Comparison}\label{top-k-vs-top-p-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4504}}
@@ -1102,24 +1194,28 @@ Flat distribution (many valid continuations) & May be too restrictive & Correctl
 Recommendation & Less adaptive & More principled \\
 \end{longtable}
 
-\paragraph{Repetition Penalty}\label{repetition-penalty}
+\subsubsection{Repetition Penalty}\label{repetition-penalty}
 
-\begin{verbatim}
-P_penalized(x) = P(x) / penalty  if x appeared recently
-                 P(x)             otherwise
+\setcodelang{Python}
 
-Typical: penalty = 1.1 to 1.3
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P\_penalized(x) }\OperatorTok{=}\NormalTok{ P(x) }\OperatorTok{/}\NormalTok{ penalty  }\ControlFlowTok{if}\NormalTok{ x appeared recently}
+\NormalTok{                 P(x)             otherwise}
 
-\paragraph{Min-p Sampling (newer)}\label{min-p-sampling-newer}
+\NormalTok{Typical: penalty }\OperatorTok{=} \FloatTok{1.1}\NormalTok{ to }\FloatTok{1.3}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Min-p Sampling (newer)}\label{min-p-sampling-newer}
 
 Only sample from tokens with P(x) \textgreater{} min\_p \(\times\) P(x\_max). Cleaner than top-k.
 
-\paragraph{Speculative Decoding (inference acceleration)}\label{speculative-decoding-inference-acceleration}
+\subsubsection{Speculative Decoding (inference acceleration)}\label{speculative-decoding-inference-acceleration}
 
 Use a small fast draft model to propose k tokens, then use the large model to verify all k in parallel (one forward pass). Accept tokens where they agree. \textasciitilde3x speedup for free.
 
-\subsubsection{Quantization}\label{quantization}
+\subsection{Quantization}\label{quantization}
 
 Running 70B parameter models requires 140GB in FP16 --- doesn\textquotesingle t fit on commodity hardware. Quantization reduces precision:
 
@@ -1152,7 +1248,7 @@ INT4 & 4 & 0.5B & 35GB & Noticeable \\
 INT2 & 2 & 0.25B & 17.5GB & Significant \\
 \end{longtable}
 
-\paragraph{GPTQ (Post-Training Quantization)}\label{gptq-post-training-quantization}
+\subsubsection{GPTQ (Post-Training Quantization)}\label{gptq-post-training-quantization}
 
 \begin{itemize}
 \tightlist
@@ -1166,7 +1262,7 @@ INT2 & 2 & 0.25B & 17.5GB & Significant \\
   Used for: running Llama 70B on a single RTX 4090
 \end{itemize}
 
-\paragraph{AWQ (Activation-aware Weight Quantization)}\label{awq-activation-aware-weight-quantization}
+\subsubsection{AWQ (Activation-aware Weight Quantization)}\label{awq-activation-aware-weight-quantization}
 
 \begin{itemize}
 \tightlist
@@ -1178,7 +1274,7 @@ INT2 & 2 & 0.25B & 17.5GB & Significant \\
   Better than GPTQ in practice for extreme quantization
 \end{itemize}
 
-\paragraph{GGUF / llama.cpp}\label{gguf--llamacpp}
+\subsubsection{GGUF / llama.cpp}\label{gguf--llamacpp}
 
 \begin{itemize}
 \tightlist
@@ -1192,18 +1288,22 @@ INT2 & 2 & 0.25B & 17.5GB & Significant \\
 
 \textbf{Key interview point}: quantization is essential for inference economics. A 4-bit quantized model can run at 25-50\% the cost of FP16 with 5-15\% quality degradation.
 
-\subsubsection{Mixture of Experts (MoE)}\label{mixture-of-experts-moe}
+\subsection{Mixture of Experts (MoE)}\label{mixture-of-experts-moe}
 
 Instead of using all parameters for every token, use a \textbf{gating network} to route each token to a subset of "expert" feed-forward layers:
 
-\begin{verbatim}
-Standard FFN: y = FFN(x)   [all params used]
+\setcodelang{Python}
 
-MoE FFN:
-  gates = softmax(W_gate · x)         # routing weights
-  top-K experts selected
-  y = Σ_{i in top-K} gates_i · FFN_i(x)   # weighted sum
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Standard FFN: y }\OperatorTok{=}\NormalTok{ FFN(x)   [}\BuiltInTok{all}\NormalTok{ params used]}
+
+\NormalTok{MoE FFN:}
+\NormalTok{  gates }\OperatorTok{=}\NormalTok{ softmax(W\_gate · x)         }\CommentTok{\# routing weights}
+\NormalTok{  top}\OperatorTok{{-}}\NormalTok{K experts selected}
+\NormalTok{  y }\OperatorTok{=}\NormalTok{ Σ\_\{i }\KeywordTok{in}\NormalTok{ top}\OperatorTok{{-}}\NormalTok{K\} gates\_i · FFN\_i(x)   }\CommentTok{\# weighted sum}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Key metrics:}
 
@@ -1257,11 +1357,11 @@ MoE FFN:
   Grok-1 (314B total, 86B active)
 \end{itemize}
 
-\subsubsection{Hallucination --- Why It Happens}\label{hallucination--why-it-happens}
+\subsection{Hallucination --- Why It Happens}\label{hallucination--why-it-happens}
 
 \textbf{Hallucination}: the model generates text that is factually incorrect, fabricated, or not grounded in reality, but does so confidently.
 
-\paragraph{Root causes}\label{root-causes}
+\subsubsection{Root causes}\label{root-causes}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1279,7 +1379,7 @@ MoE FFN:
   \textbf{RLHF pressure}: reward models may prefer confident-sounding answers \(\rightarrow\) model learns to sound confident even when uncertain.
 \end{enumerate}
 
-\paragraph{Why it\textquotesingle s fundamental (not a bug to fix)}\label{why-its-fundamental-not-a-bug-to-fix}
+\subsubsection{Why it\textquotesingle s fundamental (not a bug to fix)}\label{why-its-fundamental-not-a-bug-to-fix}
 
 \begin{itemize}
 \tightlist
@@ -1291,7 +1391,7 @@ MoE FFN:
   Calibration: we want P(model confident) \(\approx\) P(model correct), currently poorly calibrated
 \end{itemize}
 
-\paragraph{Mitigation strategies}\label{mitigation-strategies}
+\subsubsection{Mitigation strategies}\label{mitigation-strategies}
 
 \begin{itemize}
 \tightlist
@@ -1309,9 +1409,11 @@ MoE FFN:
   \textbf{Tool use}: let model call APIs/databases instead of generating facts
 \end{itemize}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{Scaled Dot-Product Attention}\label{scaled-dot-product-attention-1}
+\subsection{Scaled Dot-Product Attention}\label{scaled-dot-product-attention-1}
+
+\setcodelang{}
 
 \begin{verbatim}
          ┌─────────────────────────────────────────────────────┐
@@ -1336,7 +1438,9 @@ MoE FFN:
 Attention(Q,K,V) = softmax( Q·Kᵀ / √d_k ) · V
 \end{verbatim}
 
-\subsubsection{Multi-Head Attention}\label{multi-head-attention-1}
+\subsection{Multi-Head Attention}\label{multi-head-attention-1}
+
+\setcodelang{}
 
 \begin{verbatim}
 Input X  ──────────────────────────────────────────────────────────►
@@ -1356,7 +1460,9 @@ Input X  ───────────────────────�
                            Output
 \end{verbatim}
 
-\subsubsection{Full Transformer Encoder Stack}\label{full-transformer-encoder-stack}
+\subsection{Full Transformer Encoder Stack}\label{full-transformer-encoder-stack}
+
+\setcodelang{}
 
 \begin{verbatim}
 Input Tokens
@@ -1386,7 +1492,9 @@ Token Embeddings + Positional Encodings
 Encoder Output (contextual embeddings for all positions)
 \end{verbatim}
 
-\subsubsection{Full Transformer Decoder Stack (Encoder-Decoder)}\label{full-transformer-decoder-stack-encoder-decoder}
+\subsection{Full Transformer Decoder Stack (Encoder-Decoder)}\label{full-transformer-decoder-stack-encoder-decoder}
+
+\setcodelang{}
 
 \begin{verbatim}
 Target Tokens (shifted right)
@@ -1423,7 +1531,9 @@ Token Embeddings + Positional Encodings
 Linear + Softmax → Probability over vocabulary
 \end{verbatim}
 
-\subsubsection{Decoder-Only GPT Block (most modern LLMs)}\label{decoder-only-gpt-block-most-modern-llms}
+\subsection{Decoder-Only GPT Block (most modern LLMs)}\label{decoder-only-gpt-block-most-modern-llms}
+
+\setcodelang{}
 
 \begin{verbatim}
 Input Tokens
@@ -1472,7 +1582,9 @@ Softmax → Sample next token
 Append token, repeat →
 \end{verbatim}
 
-\subsubsection{Positional Encoding Visualization}\label{positional-encoding-visualization}
+\subsection{Positional Encoding Visualization}\label{positional-encoding-visualization}
+
+\setcodelang{}
 
 \begin{verbatim}
 Position  Dim 0    Dim 1    Dim 2    Dim 3
@@ -1485,7 +1597,9 @@ Low-frequency dims capture large-scale position structure
 High-frequency dims capture fine-grained position
 \end{verbatim}
 
-\subsubsection{RLHF Pipeline}\label{rlhf-pipeline}
+\subsection{RLHF Pipeline}\label{rlhf-pipeline}
+
+\setcodelang{}
 
 \begin{verbatim}
 STAGE 1: Supervised Fine-Tuning (SFT)
@@ -1521,7 +1635,9 @@ Prompt ──► RL Policy (π_θ) ──► Response
 RESULT: Helpful, Harmless, Honest model (HHH)
 \end{verbatim}
 
-\subsubsection{Tokenization Example}\label{tokenization-example}
+\subsection{Tokenization Example}\label{tokenization-example}
+
+\setcodelang{}
 
 \begin{verbatim}
 Input text:  "ChatGPT is transformative!"
@@ -1540,9 +1656,9 @@ Note: space before "is" included in token " is"
 Note: punctuation is separate token
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
-\subsubsection{ChatGPT / GPT-4 (OpenAI)}\label{chatgpt--gpt-4-openai}
+\subsection{ChatGPT / GPT-4 (OpenAI)}\label{chatgpt--gpt-4-openai}
 
 \begin{itemize}
 \tightlist
@@ -1558,7 +1674,7 @@ Note: punctuation is separate token
   \textbf{Impact}: 100M users in 60 days, \$1B+ ARR
 \end{itemize}
 
-\subsubsection{GitHub Copilot (Microsoft/OpenAI)}\label{github-copilot-microsoftopenai}
+\subsection{GitHub Copilot (Microsoft/OpenAI)}\label{github-copilot-microsoftopenai}
 
 \begin{itemize}
 \tightlist
@@ -1572,7 +1688,9 @@ Note: punctuation is separate token
   \$19/month, millions of developers \(\rightarrow\) \textasciitilde30\% of Copilot-written code accepted
 \end{itemize}
 
-\subsubsection{Retrieval-Augmented Generation (RAG)}\label{retrieval-augmented-generation-rag}
+\subsection{Retrieval-Augmented Generation (RAG)}\label{retrieval-augmented-generation-rag}
+
+\setcodelang{}
 
 \begin{verbatim}
 User query ──► Embedding model ──► Vector search over document store
@@ -1587,7 +1705,7 @@ User query ──► Embedding model ──► Vector search over document store
 
 Used in: Bing Chat, Perplexity, enterprise Q\&A systems
 
-\subsubsection{Google Search / AI Overviews}\label{google-search--ai-overviews}
+\subsection{Google Search / AI Overviews}\label{google-search--ai-overviews}
 
 \begin{itemize}
 \tightlist
@@ -1599,7 +1717,7 @@ Used in: Bing Chat, Perplexity, enterprise Q\&A systems
   8.5B searches/day --- even small improvements matter enormously
 \end{itemize}
 
-\subsubsection{Claude (Anthropic)}\label{claude-anthropic}
+\subsection{Claude (Anthropic)}\label{claude-anthropic}
 
 \begin{itemize}
 \tightlist
@@ -1611,7 +1729,7 @@ Used in: Bing Chat, Perplexity, enterprise Q\&A systems
   Computer Use: multimodal model that can control a computer
 \end{itemize}
 
-\subsubsection{Llama (Meta AI)}\label{llama-meta-ai}
+\subsection{Llama (Meta AI)}\label{llama-meta-ai}
 
 \begin{itemize}
 \tightlist
@@ -1625,7 +1743,7 @@ Used in: Bing Chat, Perplexity, enterprise Q\&A systems
   Powers Meta AI on WhatsApp, Instagram, Facebook
 \end{itemize}
 
-\subsection{Real-Life Analogies --- The Busy Newsroom}\label{real-life-analogies--the-busy-newsroom}
+\section{Real-Life Analogies --- The Busy Newsroom}\label{real-life-analogies--the-busy-newsroom}
 
 \emph{Imagine a newsroom where editors collaboratively read and rewrite a breaking story. Every element of Transformer LLMs maps naturally to this setting.}
 
@@ -1671,9 +1789,9 @@ Newsroom Analogy
 \textbf{Tokenizer} & The editor\textquotesingle s typesetting team that breaks words into standard-sized type blocks \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{QKV --- "Ask, Label, Content"}\label{qkv--ask-label-content}
+\subsection{QKV --- "Ask, Label, Content"}\label{qkv--ask-label-content}
 
 \begin{itemize}
 \tightlist
@@ -1685,11 +1803,11 @@ Newsroom Analogy
   \textbf{V}alue = \textbf{Content}: what does this token actually contribute?
 \end{itemize}
 
-\subsubsection{"Scale to Prevent Flat Softmax"}\label{scale-to-prevent-flat-softmax}
+\subsection{"Scale to Prevent Flat Softmax"}\label{scale-to-prevent-flat-softmax}
 
 The scaling factor \(\surd\)d\_k prevents attention scores from growing too large \(\rightarrow\) softmax saturation \(\rightarrow\) vanishing gradients. Remember: \textbf{large scores \(\rightarrow\) flat gradients \(\rightarrow\) stuck training}.
 
-\subsubsection{BERT vs GPT --- "Understand vs Generate"}\label{bert-vs-gpt--understand-vs-generate}
+\subsection{BERT vs GPT --- "Understand vs Generate"}\label{bert-vs-gpt--understand-vs-generate}
 
 \begin{itemize}
 \tightlist
@@ -1699,11 +1817,11 @@ The scaling factor \(\surd\)d\_k prevents attention scores from growing too larg
   \textbf{G}PT = \textbf{G}enerator = always looks \textbf{l}eft (causal masking)
 \end{itemize}
 
-\subsubsection{LoRA = "Frozen Elephant, Tiny Tail"}\label{lora--frozen-elephant-tiny-tail}
+\subsection{LoRA = "Frozen Elephant, Tiny Tail"}\label{lora--frozen-elephant-tiny-tail}
 
 The pretrained model (elephant) is frozen. You only train a tiny adapter (tail). The elephant still runs the circus; you just teach it a few new tricks.
 
-\subsubsection{\texorpdfstring{RLHF stages --- "SFT \(\rightarrow\) RM \(\rightarrow\) PPO"}{RLHF stages --- "SFT \textbackslash rightarrow RM \textbackslash rightarrow PPO"}}\label{rlhf-stages--sft-rightarrow-rm-rightarrow-ppo}
+\subsection{\texorpdfstring{RLHF stages --- "SFT \(\rightarrow\) RM \(\rightarrow\) PPO"}{RLHF stages --- "SFT \textbackslash rightarrow RM \textbackslash rightarrow PPO"}}\label{rlhf-stages--sft-rightarrow-rm-rightarrow-ppo}
 
 \textbf{S}oft \textbf{R}obot \textbf{P}retty
 
@@ -1717,19 +1835,19 @@ The pretrained model (elephant) is frozen. You only train a tiny adapter (tail).
   \textbf{P}PO: reinforce the pretty behaviors
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Scaling laws --- "Compute = Parameters \(\times\) Tokens"}{Scaling laws --- "Compute = Parameters \textbackslash times Tokens"}}\label{scaling-laws--compute--parameters-times-tokens}
+\subsection{\texorpdfstring{Scaling laws --- "Compute = Parameters \(\times\) Tokens"}{Scaling laws --- "Compute = Parameters \textbackslash times Tokens"}}\label{scaling-laws--compute--parameters-times-tokens}
 
 Chinchilla says: \textbf{N \(\times\) 20 = D} (optimal tokens \(\approx\) 20\(\times\) params). If you have a 10B model, train on 200B tokens. If you trained on less, you left performance on the table.
 
-\subsubsection{\texorpdfstring{Hallucination --- "Fluent \(\neq\) Factual"}{Hallucination --- "Fluent \textbackslash neq Factual"}}\label{hallucination--fluent-neq-factual}
+\subsection{\texorpdfstring{Hallucination --- "Fluent \(\neq\) Factual"}{Hallucination --- "Fluent \textbackslash neq Factual"}}\label{hallucination--fluent-neq-factual}
 
 The model is trained to predict the next token, not to be correct. \textbf{It\textquotesingle s a distribution over text, not a database of facts.}
 
-\subsubsection{Attention complexity --- "N-squared nightmare"}\label{attention-complexity--n-squared-nightmare}
+\subsection{Attention complexity --- "N-squared nightmare"}\label{attention-complexity--n-squared-nightmare}
 
 Attention is O(n\(^2\)) in sequence length. Double the context \(\rightarrow\) quadruple the compute. This is why GPT-3 used 2K context and getting to 1M context required years of research.
 
-\subsubsection{Temperature extremes}\label{temperature-extremes}
+\subsection{Temperature extremes}\label{temperature-extremes}
 
 \begin{itemize}
 \tightlist
@@ -1743,18 +1861,20 @@ Attention is O(n\(^2\)) in sequence length. Double the context \(\rightarrow\) q
   \textbf{T = 0.7} = typical creative use; \textbf{T = 0.0} = factual/deterministic
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Decoding methods --- "Greedy \(\rightarrow\) Beam \(\rightarrow\) Sample"}{Decoding methods --- "Greedy \textbackslash rightarrow Beam \textbackslash rightarrow Sample"}}\label{decoding-methods--greedy-rightarrow-beam-rightarrow-sample}
+\subsection{\texorpdfstring{Decoding methods --- "Greedy \(\rightarrow\) Beam \(\rightarrow\) Sample"}{Decoding methods --- "Greedy \textbackslash rightarrow Beam \textbackslash rightarrow Sample"}}\label{decoding-methods--greedy-rightarrow-beam-rightarrow-sample}
 
 More creativity from left to right:
+
+\setcodelang{}
 
 \begin{verbatim}
 Greedy < Beam Search < Top-k < Top-p (nucleus) < High Temperature
 [deterministic]                                    [creative/random]
 \end{verbatim}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: Explain self-attention from first principles}\label{q1-explain-self-attention-from-first-principles}
+\subsection{Q1: Explain self-attention from first principles}\label{q1-explain-self-attention-from-first-principles}
 
 \textbf{Model Answer:}
 
@@ -1770,7 +1890,7 @@ The \texttt{Q·Kᵀ} gives an n\(\times\)n matrix of raw compatibilities. We div
 
 \textbf{Follow-up}: Why is it called "self" attention? \(\rightarrow\) Q, K, V all come from the SAME input sequence (vs cross-attention where Q comes from the decoder and K/V from the encoder).
 
-\subsubsection{\texorpdfstring{Q2: Why do we scale by \(\surd\)d\_k?}{Q2: Why do we scale by \textbackslash surdd\_k?}}\label{q2-why-do-we-scale-by-surdd_k}
+\subsection{\texorpdfstring{Q2: Why do we scale by \(\surd\)d\_k?}{Q2: Why do we scale by \textbackslash surdd\_k?}}\label{q2-why-do-we-scale-by-surdd_k}
 
 \textbf{Model Answer:}
 
@@ -1782,7 +1902,7 @@ Dividing by \(\surd\)d\_k normalizes dot products to std\textasciitilde1, keepin
 
 \textbf{Interviewers love this because} it shows you understand the math, not just the formula.
 
-\subsubsection{Q3: What is RLHF and why is it needed?}\label{q3-what-is-rlhf-and-why-is-it-needed}
+\subsection{Q3: What is RLHF and why is it needed?}\label{q3-what-is-rlhf-and-why-is-it-needed}
 
 \textbf{Model Answer:}
 
@@ -1805,7 +1925,7 @@ RLHF bridges the gap between "good at predicting text" and "good at being a help
 
 \textbf{Follow-up}: What\textquotesingle s the main failure mode? \(\rightarrow\) \textbf{Reward hacking}: the policy learns to generate responses that fool the reward model without being actually better. Solution: KL penalty, better RM, iterative RLHF.
 
-\subsubsection{Q4: RLHF vs DPO --- when would you choose each?}\label{q4-rlhf-vs-dpo--when-would-you-choose-each}
+\subsection{Q4: RLHF vs DPO --- when would you choose each?}\label{q4-rlhf-vs-dpo--when-would-you-choose-each}
 
 \textbf{Model Answer:}
 
@@ -1836,7 +1956,7 @@ Performance & Potentially higher ceiling & Competitive in practice \\
 
 \textbf{When DPO fails}: when the preference data doesn\textquotesingle t cover the distribution the policy explores. RLHF with online data collection can handle this; DPO is an offline algorithm.
 
-\subsubsection{Q5: What is LoRA and why does it work?}\label{q5-what-is-lora-and-why-does-it-work}
+\subsection{Q5: What is LoRA and why does it work?}\label{q5-what-is-lora-and-why-does-it-work}
 
 \textbf{Model Answer:}
 
@@ -1844,9 +1964,13 @@ LoRA (Low-Rank Adaptation) fine-tunes LLMs by adding low-rank decompositions to 
 
 For weight matrix W \(\in\) \(\mathbb{R}\)\^{}\{d\(\times\)k\}, the update \(\Delta\)W is parameterized as:
 
-\begin{verbatim}
-ΔW = B · A    where B ∈ ℝ^{d×r}, A ∈ ℝ^{r×k}, r << min(d,k)
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ΔW }\OperatorTok{=}\NormalTok{ B · A    where B ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{d×r\}, A ∈ ℝ}\OperatorTok{\^{}}\NormalTok{\{r×k\}, r }\OperatorTok{\textless{}\textless{}} \BuiltInTok{min}\NormalTok{(d,k)}
+\end{Highlighting}
+\end{Shaded}
 
 W\_pretrained is \textbf{frozen}; only A and B are trained.
 
@@ -1868,7 +1992,7 @@ W\_pretrained is \textbf{frozen}; only A and B are trained.
 
 \textbf{QLoRA extension}: quantize W\_pretrained to 4-bit (saving 4\(\times\) memory), keep A and B in 16-bit. Enables fine-tuning 65B models on a single A100.
 
-\subsubsection{Q6: What is the KV cache and why does it matter?}\label{q6-what-is-the-kv-cache-and-why-does-it-matter}
+\subsection{Q6: What is the KV cache and why does it matter?}\label{q6-what-is-the-kv-cache-and-why-does-it-matter}
 
 \textbf{Model Answer:}
 
@@ -1900,17 +2024,23 @@ This often exceeds GPU memory per request. Solutions:
 
 \textbf{Interview point}: KV cache is a key driver of inference cost and a critical consideration in production serving.
 
-\subsubsection{Q7: What are scaling laws? What\textquotesingle s the Chinchilla finding?}\label{q7-what-are-scaling-laws-whats-the-chinchilla-finding}
+\subsection{Q7: What are scaling laws? What\textquotesingle s the Chinchilla finding?}\label{q7-what-are-scaling-laws-whats-the-chinchilla-finding}
 
 \textbf{Model Answer:}
 
 Scaling laws (Kaplan et al., 2020 originally) show that LLM performance scales as a power law with model size N, dataset size D, and compute C:
 
-\begin{verbatim}
-Loss ∝ N^{-α} + D^{-β} + L_∞
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Loss ∝ N}\OperatorTok{\^{}}\NormalTok{\{}\OperatorTok{{-}}\NormalTok{α\} }\OperatorTok{+}\NormalTok{ D}\OperatorTok{\^{}}\NormalTok{\{}\OperatorTok{{-}}\NormalTok{β\} }\OperatorTok{+}\NormalTok{ L\_∞}
+\end{Highlighting}
+\end{Shaded}
 
 The \textbf{Chinchilla finding} (Hoffmann et al., 2022): given a fixed compute budget, you should equally scale N and D. The optimal ratio is:
+
+\setcodelang{}
 
 \begin{verbatim}
 D_opt ≈ 20 × N_opt
@@ -1930,9 +2060,11 @@ This means GPT-3 (175B params, 300B tokens) was \textbf{model-overfit} --- under
   Training beyond Chinchilla optimal can still improve if you care about inference cost (pay once for training, many times for inference)
 \end{itemize}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{1. KV Cache Economics at Scale}\label{1-kv-cache-economics-at-scale}
+\subsection{1. KV Cache Economics at Scale}\label{1-kv-cache-economics-at-scale}
+
+\setcodelang{}
 
 \begin{verbatim}
 Per-request cost breakdown (GPT-4 scale estimate):
@@ -1947,7 +2079,7 @@ At long contexts (128K):
 
 \textbf{Business impact}: context length costs money. A 128K context request may cost 100\(\times\) a 1K request. This is why per-token pricing matters more than per-request pricing.
 
-\subsubsection{2. Context Length Scaling --- What\textquotesingle s Hard}\label{2-context-length-scaling--whats-hard}
+\subsection{2. Context Length Scaling --- What\textquotesingle s Hard}\label{2-context-length-scaling--whats-hard}
 
 \begin{itemize}
 \tightlist
@@ -1961,7 +2093,7 @@ At long contexts (128K):
   \textbf{Memory}: Flash Attention solves GPU memory for training (recompute instead of store attention matrices) but KV cache still needed for inference
 \end{itemize}
 
-\subsubsection{3. MoE Routing Decisions}\label{3-moe-routing-decisions}
+\subsection{3. MoE Routing Decisions}\label{3-moe-routing-decisions}
 
 Key design choices in MoE:
 
@@ -1979,7 +2111,7 @@ Key design choices in MoE:
 
 \textbf{Why MoE is interesting for future scaling}: you can increase total parameters (and thus capacity) without proportionally increasing FLOPs per token. The cost of MoE is communication overhead in distributed settings and memory to hold all experts.
 
-\subsubsection{4. Why Hallucination Is Fundamental (Not a Bug)}\label{4-why-hallucination-is-fundamental-not-a-bug}
+\subsection{4. Why Hallucination Is Fundamental (Not a Bug)}\label{4-why-hallucination-is-fundamental-not-a-bug}
 
 The deeper point: \textbf{language models are not knowledge bases}. They are functions that map contexts to probability distributions over next tokens. Factuality requires:
 
@@ -2000,29 +2132,33 @@ RAG helps but doesn\textquotesingle t fully solve it: the model can still misrea
 
 The fundamental solution may require a paradigm shift: \textbf{verification systems, formal knowledge bases, or models explicitly trained to express uncertainty} rather than pure generative modeling.
 
-\subsubsection{5. Inference Economics --- Practical Constraints}\label{5-inference-economics--practical-constraints}
+\subsection{5. Inference Economics --- Practical Constraints}\label{5-inference-economics--practical-constraints}
 
-\begin{verbatim}
-Batch size considerations:
-  - Prefill phase: large batch = high GPU utilization (compute-bound)
-  - Decode phase: batch size limited by KV cache memory (memory-bound)
-  - Optimal: prefill in large batches, decode with continuous batching
+\setcodelang{Python}
 
-Throughput vs latency tradeoff:
-  - High throughput: maximize tokens/second (batch many requests)
-  - Low latency: minimize time-to-first-token + per-token latency
-  - Speculative decoding can improve both for the right use cases
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Batch size considerations:}
+  \OperatorTok{{-}}\NormalTok{ Prefill phase: large batch }\OperatorTok{=}\NormalTok{ high GPU utilization (compute}\OperatorTok{{-}}\NormalTok{bound)}
+  \OperatorTok{{-}}\NormalTok{ Decode phase: batch size limited by KV cache memory (memory}\OperatorTok{{-}}\NormalTok{bound)}
+  \OperatorTok{{-}}\NormalTok{ Optimal: prefill }\KeywordTok{in}\NormalTok{ large batches, decode }\ControlFlowTok{with}\NormalTok{ continuous batching}
 
-Cost structure (approximate 2024 prices):
-  - A100 80GB: ~$2-3/hour on cloud
-  - 70B model in FP16: needs 2×A100 for inference
-  - At 1000 tokens/s throughput: ~$0.002-0.003 per 1K tokens
-  - GPT-4o pricing: $5/M input, $15/M output
-\end{verbatim}
+\NormalTok{Throughput vs latency tradeoff:}
+  \OperatorTok{{-}}\NormalTok{ High throughput: maximize tokens}\OperatorTok{/}\NormalTok{second (batch many requests)}
+  \OperatorTok{{-}}\NormalTok{ Low latency: minimize time}\OperatorTok{{-}}\NormalTok{to}\OperatorTok{{-}}\NormalTok{first}\OperatorTok{{-}}\NormalTok{token }\OperatorTok{+}\NormalTok{ per}\OperatorTok{{-}}\NormalTok{token latency}
+  \OperatorTok{{-}}\NormalTok{ Speculative decoding can improve both }\ControlFlowTok{for}\NormalTok{ the right use cases}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\NormalTok{Cost structure (approximate }\DecValTok{2024}\NormalTok{ prices):}
+  \OperatorTok{{-}}\NormalTok{ A100 }\DecValTok{80}\ErrorTok{GB}\NormalTok{: }\OperatorTok{\textasciitilde{}}\NormalTok{$}\DecValTok{2}\OperatorTok{{-}}\DecValTok{3}\OperatorTok{/}\NormalTok{hour on cloud}
+  \OperatorTok{{-}} \DecValTok{70}\ErrorTok{B}\NormalTok{ model }\KeywordTok{in}\NormalTok{ FP16: needs }\DecValTok{2}\NormalTok{×A100 }\ControlFlowTok{for}\NormalTok{ inference}
+  \OperatorTok{{-}}\NormalTok{ At }\DecValTok{1000}\NormalTok{ tokens}\OperatorTok{/}\NormalTok{s throughput: }\OperatorTok{\textasciitilde{}}\NormalTok{$}\FloatTok{0.002}\OperatorTok{{-}}\FloatTok{0.003}\NormalTok{ per }\DecValTok{1}\ErrorTok{K}\NormalTok{ tokens}
+  \OperatorTok{{-}}\NormalTok{ GPT}\OperatorTok{{-}}\DecValTok{4}\ErrorTok{o}\NormalTok{ pricing: $}\DecValTok{5}\OperatorTok{/}\NormalTok{M }\BuiltInTok{input}\NormalTok{, $}\DecValTok{15}\OperatorTok{/}\NormalTok{M output}
+\end{Highlighting}
+\end{Shaded}
 
-\subsubsection{1. Confusing attention types}\label{1-confusing-attention-types}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\subsection{1. Confusing attention types}\label{1-confusing-attention-types}
 
 \begin{itemize}
 \tightlist
@@ -2032,7 +2168,7 @@ Cost structure (approximate 2024 prices):
   "GPT uses cross-attention between encoder and decoder" --- WRONG. GPT is decoder-only, no encoder, no cross-attention.
 \end{itemize}
 
-\subsubsection{2. Getting the scaling formula wrong}\label{2-getting-the-scaling-formula-wrong}
+\subsection{2. Getting the scaling formula wrong}\label{2-getting-the-scaling-formula-wrong}
 
 \begin{itemize}
 \tightlist
@@ -2040,7 +2176,7 @@ Cost structure (approximate 2024 prices):
   Saying "bigger model always better" --- WRONG. Chinchilla: you need 20\(\times\) more tokens than parameters. An undertrained big model loses to a well-trained small model.
 \end{itemize}
 
-\subsubsection{3. Misunderstanding LoRA rank}\label{3-misunderstanding-lora-rank}
+\subsection{3. Misunderstanding LoRA rank}\label{3-misunderstanding-lora-rank}
 
 \begin{itemize}
 \tightlist
@@ -2050,7 +2186,7 @@ Cost structure (approximate 2024 prices):
   Forgetting B is initialized to zero so \(\Delta\)W=0 at the start.
 \end{itemize}
 
-\subsubsection{4. Confusing temperature and top-p}\label{4-confusing-temperature-and-top-p}
+\subsection{4. Confusing temperature and top-p}\label{4-confusing-temperature-and-top-p}
 
 \begin{itemize}
 \tightlist
@@ -2060,33 +2196,33 @@ Cost structure (approximate 2024 prices):
   Not knowing that temperature and top-p are often used together.
 \end{itemize}
 
-\subsubsection{\texorpdfstring{5. The "why \(\surd\)d\_k" blank}{5. The "why \textbackslash surdd\_k" blank}}\label{5-the-why-surdd_k-blank}
+\subsection{\texorpdfstring{5. The "why \(\surd\)d\_k" blank}{5. The "why \textbackslash surdd\_k" blank}}\label{5-the-why-surdd_k-blank}
 
 This is a litmus test question. Many candidates know the formula but can\textquotesingle t explain the reasoning. Know: variance of dot product grows with d\_k \(\rightarrow\) softmax saturation \(\rightarrow\) gradient vanishing.
 
-\subsubsection{6. Misexplaining RLHF as "supervised learning on human-written text"}\label{6-misexplaining-rlhf-as-supervised-learning-on-human-written-text}
+\subsection{6. Misexplaining RLHF as "supervised learning on human-written text"}\label{6-misexplaining-rlhf-as-supervised-learning-on-human-written-text}
 
 RLHF Stage 1 (SFT) IS supervised learning. But Stage 3 (PPO) is RL --- the model generates outputs, gets scored, and updates via policy gradient. Candidates conflate SFT and RLHF.
 
-\subsubsection{7. Not knowing what KV cache means for memory}\label{7-not-knowing-what-kv-cache-means-for-memory}
+\subsection{7. Not knowing what KV cache means for memory}\label{7-not-knowing-what-kv-cache-means-for-memory}
 
 Saying "long context is fine, just increase context length" without knowing the memory cost. At 128K tokens, KV cache can be 320GB+ for a 70B model.
 
-\subsubsection{8. Claiming "hallucination is a data quality problem"}\label{8-claiming-hallucination-is-a-data-quality-problem}
+\subsection{8. Claiming "hallucination is a data quality problem"}\label{8-claiming-hallucination-is-a-data-quality-problem}
 
 It\textquotesingle s partly that, but more fundamentally: the training objective (next-token prediction) doesn\textquotesingle t optimize for factuality. Even a model trained on perfect data will hallucinate because it generates statistically plausible completions, not verified facts.
 
-\subsubsection{9. Forgetting the residual connections}\label{9-forgetting-the-residual-connections}
+\subsection{9. Forgetting the residual connections}\label{9-forgetting-the-residual-connections}
 
 When asked to describe the Transformer block, many candidates say "attention \(\rightarrow\) FFN" and omit Add \& Norm. Residuals are critical for training deep networks.
 
-\subsubsection{10. Treating BERT and GPT as interchangeable}\label{10-treating-bert-and-gpt-as-interchangeable}
+\subsection{10. Treating BERT and GPT as interchangeable}\label{10-treating-bert-and-gpt-as-interchangeable}
 
 They have fundamentally different architectures, objectives, and use cases. Knowing when to use each (and that most modern LLMs use decoder-only) matters.
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{Deep Learning (03-deep-learning.md)}\label{deep-learning-03-deep-learningmd}
+\subsection{Deep Learning (03-deep-learning.md)}\label{deep-learning-03-deep-learningmd}
 
 \begin{itemize}
 \tightlist
@@ -2100,7 +2236,7 @@ They have fundamentally different architectures, objectives, and use cases. Know
   Mixture of Experts extends the MLP/FFN concept
 \end{itemize}
 
-\subsubsection{LLM Applications / RAG}\label{llm-applications--rag}
+\subsection{LLM Applications / RAG}\label{llm-applications--rag}
 
 \begin{itemize}
 \tightlist
@@ -2114,7 +2250,7 @@ They have fundamentally different architectures, objectives, and use cases. Know
   Chunking strategies matter: how to split documents for embedding
 \end{itemize}
 
-\subsubsection{MLOps (production deployment)}\label{mlops-production-deployment}
+\subsection{MLOps (production deployment)}\label{mlops-production-deployment}
 
 \begin{itemize}
 \tightlist
@@ -2130,7 +2266,7 @@ They have fundamentally different architectures, objectives, and use cases. Know
   A/B testing: hard because outputs are open-ended text
 \end{itemize}
 
-\subsubsection{System Design}\label{system-design}
+\subsection{System Design}\label{system-design}
 
 \begin{itemize}
 \tightlist
@@ -2146,9 +2282,9 @@ They have fundamentally different architectures, objectives, and use cases. Know
   Cost optimization: smaller models for simple tasks, big models for complex
 \end{itemize}
 
-\subsection{FAANG / AI-Lab Interview Tips}\label{faang--ai-lab-interview-tips}
+\section{FAANG / AI-Lab Interview Tips}\label{faang--ai-lab-interview-tips}
 
-\subsubsection{Know the levels}\label{know-the-levels}
+\subsection{Know the levels}\label{know-the-levels}
 
 \begin{itemize}
 \tightlist
@@ -2162,7 +2298,7 @@ They have fundamentally different architectures, objectives, and use cases. Know
   \textbf{Research roles}: mechanistic interpretability, novel architecture proposals, theoretical understanding
 \end{itemize}
 
-\subsubsection{What top labs actually ask}\label{what-top-labs-actually-ask}
+\subsection{What top labs actually ask}\label{what-top-labs-actually-ask}
 
 \textbf{OpenAI}: Self-attention derivation from scratch (whiteboard coding), RLHF reward hacking mitigations, how you\textquotesingle d scale pretraining to 10T parameters
 
@@ -2174,7 +2310,9 @@ They have fundamentally different architectures, objectives, and use cases. Know
 
 \textbf{Microsoft}: LoRA for enterprise fine-tuning, cost optimization for Azure serving, integration with Office 365
 
-\subsubsection{Coding questions you should be able to implement}\label{coding-questions-you-should-be-able-to-implement}
+\subsection{Coding questions you should be able to implement}\label{coding-questions-you-should-be-able-to-implement}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2209,7 +2347,7 @@ They have fundamentally different architectures, objectives, and use cases. Know
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Communication tips}\label{communication-tips}
+\subsection{Communication tips}\label{communication-tips}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2226,9 +2364,9 @@ They have fundamentally different architectures, objectives, and use cases. Know
   \textbf{Honest about uncertainty}: better to say "I believe it\textquotesingle s X but let me think through the math" than to confidently state something wrong
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2265,29 +2403,33 @@ They have fundamentally different architectures, objectives, and use cases. Know
   \textbf{Quantization}: INT8/INT4 reduces model size and inference cost with acceptable quality loss
 \end{enumerate}
 
-\subsubsection{Key Formulas}\label{key-formulas}
+\subsection{Key Formulas}\label{key-formulas}
 
-\begin{verbatim}
-Self-Attention:     Attn(Q,K,V) = softmax(QKᵀ/√d_k) · V
+\setcodelang{Python}
 
-Multi-Head:         MH(Q,K,V) = Concat(head_1,...,head_h) · W_O
-                    head_i = Attn(QW_Qi, KW_Ki, VW_Vi)
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Self}\OperatorTok{{-}}\NormalTok{Attention:     Attn(Q,K,V) }\OperatorTok{=}\NormalTok{ softmax(QKᵀ}\OperatorTok{/}\NormalTok{√d\_k) · V}
 
-Positional:         PE(pos,2i)   = sin(pos/10000^{2i/d})
-                    PE(pos,2i+1) = cos(pos/10000^{2i/d})
+\NormalTok{Multi}\OperatorTok{{-}}\NormalTok{Head:         MH(Q,K,V) }\OperatorTok{=}\NormalTok{ Concat(head\_1,...,head\_h) · W\_O}
+\NormalTok{                    head\_i }\OperatorTok{=}\NormalTok{ Attn(QW\_Qi, KW\_Ki, VW\_Vi)}
 
-Chinchilla:         D_opt ≈ 20 × N_opt
+\NormalTok{Positional:         PE(pos,}\DecValTok{2}\ErrorTok{i}\NormalTok{)   }\OperatorTok{=}\NormalTok{ sin(pos}\OperatorTok{/}\DecValTok{10000}\OperatorTok{\^{}}\NormalTok{\{}\DecValTok{2}\ErrorTok{i}\OperatorTok{/}\NormalTok{d\})}
+\NormalTok{                    PE(pos,}\DecValTok{2}\ErrorTok{i}\OperatorTok{+}\DecValTok{1}\NormalTok{) }\OperatorTok{=}\NormalTok{ cos(pos}\OperatorTok{/}\DecValTok{10000}\OperatorTok{\^{}}\NormalTok{\{}\DecValTok{2}\ErrorTok{i}\OperatorTok{/}\NormalTok{d\})}
 
-LoRA:               ΔW = B·A,  B∈ℝ^{d×r}, A∈ℝ^{r×k}, r<<min(d,k)
+\NormalTok{Chinchilla:         D\_opt ≈ }\DecValTok{20}\NormalTok{ × N\_opt}
 
-DPO loss:           -E[log σ(β·log(π(y_w)/π_ref(y_w)) - β·log(π(y_l)/π_ref(y_l)))]
+\NormalTok{LoRA:               ΔW }\OperatorTok{=}\NormalTok{ B·A,  B∈ℝ}\OperatorTok{\^{}}\NormalTok{\{d×r\}, A∈ℝ}\OperatorTok{\^{}}\NormalTok{\{r×k\}, r}\OperatorTok{\textless{}\textless{}}\BuiltInTok{min}\NormalTok{(d,k)}
 
-Temperature:        P_T(x) = softmax(logits/T)
+\NormalTok{DPO loss:           }\OperatorTok{{-}}\NormalTok{E[log σ(β·log(π(y\_w)}\OperatorTok{/}\NormalTok{π\_ref(y\_w)) }\OperatorTok{{-}}\NormalTok{ β·log(π(y\_l)}\OperatorTok{/}\NormalTok{π\_ref(y\_l)))]}
 
-KV cache mem:       2 × L × H × d_k × T × dtype_bytes
-\end{verbatim}
+\NormalTok{Temperature:        P\_T(x) }\OperatorTok{=}\NormalTok{ softmax(logits}\OperatorTok{/}\NormalTok{T)}
 
-\subsubsection{Architecture Comparison Cheat Sheet}\label{architecture-comparison-cheat-sheet}
+\NormalTok{KV cache mem:       }\DecValTok{2}\NormalTok{ × L × H × d\_k × T × dtype\_bytes}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Architecture Comparison Cheat Sheet}\label{architecture-comparison-cheat-sheet}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1940}}
@@ -2318,7 +2460,7 @@ Best for & NLU, embedding & Generation & Seq2seq & Generation, chat \\
 Normalization & Post-LN & Post-LN & Pre-LN & RMSNorm Pre-LN \\
 \end{longtable}
 
-\subsubsection{Fine-Tuning Comparison}\label{fine-tuning-comparison}
+\subsection{Fine-Tuning Comparison}\label{fine-tuning-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1795}}
@@ -2349,7 +2491,7 @@ Adapters & 1-5\% & Low-medium & Good & Modular task switching \\
 Prompt tuning & \textless0.1\% & Minimal & Lower & Very limited resources \\
 \end{longtable}
 
-\subsubsection{Decoding Method Comparison}\label{decoding-method-comparison}
+\subsection{Decoding Method Comparison}\label{decoding-method-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2308}}
@@ -2380,7 +2522,7 @@ Top-p (p=0.9) & No & Good, adaptive & Fast & General generation \\
 Top-p + temp=0.7 & No & Best creative & Fast & Creative writing \\
 \end{longtable}
 
-\subsubsection{RLHF vs DPO Comparison}\label{rlhf-vs-dpo-comparison}
+\subsection{RLHF vs DPO Comparison}\label{rlhf-vs-dpo-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2083}}
@@ -2406,7 +2548,7 @@ Memory (models) & 4 (ref, RM, value, policy) & 2 (ref, policy) \\
 Best when & Production, large team & Research, smaller teams \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts (ranked by interview frequency)}\label{most-important-concepts-ranked-by-interview-frequency}
+\subsection{Most Important Concepts (ranked by interview frequency)}\label{most-important-concepts-ranked-by-interview-frequency}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

@@ -63,15 +63,13 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Machine-Coding / LLD --- Fully Worked \& Coded Solutions}\label{machine-coding--lld--fully-worked--coded-solutions}
-
 \begin{quote}
 \textbf{How to use this file:} Each \texttt{\#\#} section is a self-contained LLD problem. Read Requirements + Class Diagram first, then study the code. Run any block directly with \texttt{python3}. The closing sections distill the cross-cutting patterns for rapid revision.
 \end{quote}
 
-\subsection{The Machine-Coding Approach}\label{the-machine-coding-approach}
+\section{The Machine-Coding Approach}\label{the-machine-coding-approach}
 
-\subsubsection{Time-box strategy (45--90 min round)}\label{time-box-strategy-4590-min-round}
+\subsection{Time-box strategy (45--90 min round)}\label{time-box-strategy-4590-min-round}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3929}}
@@ -97,7 +95,7 @@ Add edge cases + extensibility & 10 min & Show you think beyond happy path \\
 Demo driver & 5 min & Prove it works end-to-end \\
 \end{longtable}
 
-\subsubsection{What interviewers grade (roughly in priority order)}\label{what-interviewers-grade-roughly-in-priority-order}
+\subsection{What interviewers grade (roughly in priority order)}\label{what-interviewers-grade-roughly-in-priority-order}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -114,7 +112,7 @@ Demo driver & 5 min & Prove it works end-to-end \\
   \textbf{Design patterns named} --- shows vocabulary; don\textquotesingle t force patterns but do name what you use.
 \end{enumerate}
 
-\subsubsection{What to deprioritize under time pressure}\label{what-to-deprioritize-under-time-pressure}
+\subsection{What to deprioritize under time pressure}\label{what-to-deprioritize-under-time-pressure}
 
 \begin{itemize}
 \tightlist
@@ -128,13 +126,13 @@ Demo driver & 5 min & Prove it works end-to-end \\
   Over-engineering: 3-layer factory + abstract-factory combos for a 45-min round are a red flag.
 \end{itemize}
 
-\subsubsection{The noun-verb extraction recipe}\label{the-noun-verb-extraction-recipe}
+\subsection{The noun-verb extraction recipe}\label{the-noun-verb-extraction-recipe}
 
 From the problem statement: circle \textbf{nouns} \(\rightarrow\) candidate classes; underline \textbf{verbs} \(\rightarrow\) candidate methods. Then prune: nouns that are just attributes (e.g. "name", "price") become fields, not classes.
 
-\subsection{1. LRU Cache (+ LFU Variant Note)}\label{1-lru-cache--lfu-variant-note}
+\section{1. LRU Cache (+ LFU Variant Note)}\label{1-lru-cache--lfu-variant-note}
 
-\subsubsection{Requirements}\label{requirements}
+\subsection{Requirements}\label{requirements}
 
 \textbf{Functional}
 
@@ -162,7 +160,7 @@ From the problem statement: circle \textbf{nouns} \(\rightarrow\) candidate clas
   On \texttt{put} of existing key, update value and recency? (Yes.)
 \end{itemize}
 
-\subsubsection{Core entities / classes}\label{core-entities--classes}
+\subsection{Core entities / classes}\label{core-entities--classes}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1876}}
@@ -181,25 +179,29 @@ Responsibility
 \texttt{LRUCache} & HashMap + doubly-linked list; exposes \texttt{get}/\texttt{put} \\
 \end{longtable}
 
-\subsubsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml}
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml}
 
-\begin{verbatim}
-+------------------+          +-------------------+
-|   DLinkedNode    |          |    LRUCache       |
-+------------------+          +-------------------+
-| key: int         |  1    *  | capacity: int     |
-| value: int       |<-------->| cache: dict       |
-| prev: DLinkedNode|          | head: DLinkedNode |
-| next: DLinkedNode|          | tail: DLinkedNode |
-+------------------+          +-------------------+
-                              | get(key) -> int   |
-                              | put(key, val)     |
-                              | _remove(node)     |
-                              | _add_to_front(n)  |
-                              +-------------------+
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{Design patterns used}\label{design-patterns-used}
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{   DLinkedNode    }\OperatorTok{|}          \OperatorTok{|}\NormalTok{    LRUCache       }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{ key: }\BuiltInTok{int}         \OperatorTok{|}  \DecValTok{1}    \OperatorTok{*}  \OperatorTok{|}\NormalTok{ capacity: }\BuiltInTok{int}     \OperatorTok{|}
+\OperatorTok{|}\NormalTok{ value: }\BuiltInTok{int}       \OperatorTok{|\textless{}{-}{-}{-}{-}{-}{-}{-}{-}\textgreater{}|}\NormalTok{ cache: }\BuiltInTok{dict}       \OperatorTok{|}
+\OperatorTok{|}\NormalTok{ prev: DLinkedNode}\OperatorTok{|}          \OperatorTok{|}\NormalTok{ head: DLinkedNode }\OperatorTok{|}
+\OperatorTok{|} \BuiltInTok{next}\NormalTok{: DLinkedNode}\OperatorTok{|}          \OperatorTok{|}\NormalTok{ tail: DLinkedNode }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                              \OperatorTok{|}\NormalTok{ get(key) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{int}   \OperatorTok{|}
+                              \OperatorTok{|}\NormalTok{ put(key, val)     }\OperatorTok{|}
+                              \OperatorTok{|}\NormalTok{ \_remove(node)     }\OperatorTok{|}
+                              \OperatorTok{|}\NormalTok{ \_add\_to\_front(n)  }\OperatorTok{|}
+                              \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Design patterns used}\label{design-patterns-used}
 
 \begin{itemize}
 \tightlist
@@ -209,7 +211,9 @@ Responsibility
   Mention: for thread-safety you\textquotesingle d wrap with a \texttt{threading.Lock} or use \texttt{collections.OrderedDict} (which Python\textquotesingle s stdlib provides for a simpler implementation, but interviewers want the manual version to test understanding).
 \end{itemize}
 
-\subsubsection{Full code}\label{full-code}
+\subsection{Full code}\label{full-code}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -332,7 +336,7 @@ Responsibility
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Extensibility discussion}\label{extensibility-discussion}
+\subsection{Extensibility discussion}\label{extensibility-discussion}
 
 \begin{itemize}
 \tightlist
@@ -346,9 +350,9 @@ Responsibility
 
 \textbf{Interview takeaway: The sentinel head/tail trick is the key insight. Without sentinels you need \texttt{if\ node.prev} null-checks everywhere --- messy and error-prone. Name it explicitly.}
 
-\subsection{2. Parking Lot}\label{2-parking-lot}
+\section{2. Parking Lot}\label{2-parking-lot}
 
-\subsubsection{Requirements}\label{requirements-1}
+\subsection{Requirements}\label{requirements-1}
 
 \textbf{Functional}
 
@@ -384,7 +388,7 @@ Responsibility
   Thread-safety for concurrent \texttt{park} calls? (Mention lock per level; skip for now.)
 \end{itemize}
 
-\subsubsection{Core entities / classes}\label{core-entities--classes-1}
+\subsection{Core entities / classes}\label{core-entities--classes-1}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3163}}
@@ -411,7 +415,9 @@ Responsibility
 \texttt{FlatRatePricing} & Concrete strategy \\
 \end{longtable}
 
-\subsubsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-1}
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-1}
+
+\setcodelang{}
 
 \begin{verbatim}
                         +-------------------+
@@ -460,7 +466,7 @@ Responsibility
 Moto    Car    Truck
 \end{verbatim}
 
-\subsubsection{Design patterns used}\label{design-patterns-used-1}
+\subsection{Design patterns used}\label{design-patterns-used-1}
 
 \begin{itemize}
 \tightlist
@@ -474,7 +480,9 @@ Moto    Car    Truck
   \textbf{Template Method} --- \texttt{Vehicle} defines \texttt{allowed\_spot\_types()} as an abstract method; each subclass overrides it.
 \end{itemize}
 
-\subsubsection{Full code}\label{full-code-1}
+\subsection{Full code}\label{full-code-1}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -779,7 +787,7 @@ Moto    Car    Truck
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Extensibility discussion}\label{extensibility-discussion-1}
+\subsection{Extensibility discussion}\label{extensibility-discussion-1}
 
 \begin{itemize}
 \tightlist
@@ -795,9 +803,9 @@ Moto    Car    Truck
 
 \textbf{Interview takeaway: Always name the Strategy pattern for pricing --- it\textquotesingle s the most common follow-up ("what if pricing changes on weekends?"). The answer is: new class, zero changes to existing code.}
 
-\subsection{3. Rate Limiter}\label{3-rate-limiter}
+\section{3. Rate Limiter}\label{3-rate-limiter}
 
-\subsubsection{Requirements}\label{requirements-2}
+\subsection{Requirements}\label{requirements-2}
 
 \textbf{Functional}
 
@@ -829,7 +837,7 @@ Moto    Car    Truck
   Thread-safe? (Yes, per-client locks.)
 \end{itemize}
 
-\subsubsection{Core entities / classes}\label{core-entities--classes-2}
+\subsection{Core entities / classes}\label{core-entities--classes-2}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3329}}
@@ -851,27 +859,31 @@ Responsibility
 \texttt{RateLimiter} & Context object; delegates to strategy \\
 \end{longtable}
 
-\subsubsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-2}
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-2}
 
-\begin{verbatim}
-+----------------------+
-|     RateLimiter      |
-+----------------------+
-| strategy: RateLimitStrategy
-+----------------------+
-| allow(client_id)->bool|
-+----------+-----------+
-           |
-           | uses
-+----------v-----------+       <<ABC>>
-| RateLimitStrategy    |<-----------------------+
-+----------------------+                        |
-| is_allowed(cid)->bool|          +-------------+-------------+
-+----------------------+          |             |             |
-                          TokenBucket   FixedWindow   SlidingWindowLog
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{Design patterns used}\label{design-patterns-used-2}
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{     RateLimiter      }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{ strategy: RateLimitStrategy}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{ allow(client\_id)}\OperatorTok{{-}\textgreater{}}\BuiltInTok{bool}\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+           \OperatorTok{|}
+           \OperatorTok{|}\NormalTok{ uses}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}\NormalTok{v}\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{\textless{}\textless{}}\NormalTok{ABC}\OperatorTok{\textgreater{}\textgreater{}}
+\OperatorTok{|}\NormalTok{ RateLimitStrategy    }\OperatorTok{|\textless{}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}                        \OperatorTok{|}
+\OperatorTok{|}\NormalTok{ is\_allowed(cid)}\OperatorTok{{-}\textgreater{}}\BuiltInTok{bool}\OperatorTok{|}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{|}             \OperatorTok{|}             \OperatorTok{|}
+\NormalTok{                          TokenBucket   FixedWindow   SlidingWindowLog}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Design patterns used}\label{design-patterns-used-2}
 
 \begin{itemize}
 \tightlist
@@ -881,7 +893,9 @@ Responsibility
   \textbf{Factory / constructor injection} --- \texttt{RateLimiter(strategy=TokenBucketStrategy(...))}.
 \end{itemize}
 
-\subsubsection{Full code}\label{full-code-2}
+\subsection{Full code}\label{full-code-2}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1072,7 +1086,7 @@ Responsibility
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Extensibility discussion}\label{extensibility-discussion-2}
+\subsection{Extensibility discussion}\label{extensibility-discussion-2}
 
 \begin{itemize}
 \tightlist
@@ -1088,9 +1102,9 @@ Responsibility
 
 \textbf{Interview takeaway: Know the trade-offs: Token Bucket allows bursts; Fixed Window has boundary-burst weakness; Sliding Window Log is most accurate but costs O(limit) memory per client. Sliding Window Counter (hybrid) is the production sweet spot.}
 
-\subsection{4. Splitwise / Expense Sharing}\label{4-splitwise--expense-sharing}
+\section{4. Splitwise / Expense Sharing}\label{4-splitwise--expense-sharing}
 
-\subsubsection{Requirements}\label{requirements-3}
+\subsection{Requirements}\label{requirements-3}
 
 \textbf{Functional}
 
@@ -1122,7 +1136,7 @@ Responsibility
   Persistence? (In-memory; mention DB extension.)
 \end{itemize}
 
-\subsubsection{Core entities / classes}\label{core-entities--classes-3}
+\subsection{Core entities / classes}\label{core-entities--classes-3}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2851}}
@@ -1147,26 +1161,30 @@ Responsibility
 \texttt{Balance} & Utility: compute net balances + simplify \\
 \end{longtable}
 
-\subsubsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-3}
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-3}
 
-\begin{verbatim}
-+----------+       +----------+       +------------+
-|  User    |       |  Group   |       |  Expense   |
-+----------+       +----------+       +------------+
-| id: str  |<----->| users    |<------| amount     |
-| name: str|       | expenses |       | payer: User|
-+----------+       +----------+       | split: Split
-                                      +-----+------+
-                                            | uses
-                              <<ABC>>  +----v------+
-                         +-----------+|SplitStrat |
-                         |  Equal    |+-----------+
-                         |  Exact    || compute() |
-                         |  Percent  |+-----------+
-                         +-----------+
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{Design patterns used}\label{design-patterns-used-3}
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{  User    }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  Group   }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  Expense   }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|} \BuiltInTok{id}\NormalTok{: }\BuiltInTok{str}  \OperatorTok{|\textless{}{-}{-}{-}{-}{-}\textgreater{}|}\NormalTok{ users    }\OperatorTok{|\textless{}{-}{-}{-}{-}{-}{-}|}\NormalTok{ amount     }\OperatorTok{|}
+\OperatorTok{|}\NormalTok{ name: }\BuiltInTok{str}\OperatorTok{|}       \OperatorTok{|}\NormalTok{ expenses }\OperatorTok{|}       \OperatorTok{|}\NormalTok{ payer: User}\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{|}\NormalTok{ split: Split}
+                                      \OperatorTok{+{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+}
+                                            \OperatorTok{|}\NormalTok{ uses}
+                              \OperatorTok{\textless{}\textless{}}\NormalTok{ABC}\OperatorTok{\textgreater{}\textgreater{}}  \OperatorTok{+{-}{-}{-}{-}}\NormalTok{v}\OperatorTok{{-}{-}{-}{-}{-}{-}+}
+                         \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+|}\NormalTok{SplitStrat }\OperatorTok{|}
+                         \OperatorTok{|}\NormalTok{  Equal    }\OperatorTok{|+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                         \OperatorTok{|}\NormalTok{  Exact    }\OperatorTok{||}\NormalTok{ compute() }\OperatorTok{|}
+                         \OperatorTok{|}\NormalTok{  Percent  }\OperatorTok{|+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                         \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Design patterns used}\label{design-patterns-used-3}
 
 \begin{itemize}
 \tightlist
@@ -1176,7 +1194,9 @@ Responsibility
   \textbf{Domain Model} --- \texttt{User}, \texttt{Group}, \texttt{Expense} map directly to business entities.
 \end{itemize}
 
-\subsubsection{Full code}\label{full-code-3}
+\subsection{Full code}\label{full-code-3}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1420,7 +1440,7 @@ Responsibility
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Extensibility discussion}\label{extensibility-discussion-3}
+\subsection{Extensibility discussion}\label{extensibility-discussion-3}
 
 \begin{itemize}
 \tightlist
@@ -1436,9 +1456,9 @@ Responsibility
 
 \textbf{Interview takeaway: The debt-simplification algorithm is a classic greedy: compute net positions, then greedily match biggest creditor with biggest debtor. It\textquotesingle s O(N log N) and minimizes the number of transactions (though not necessarily the amounts).}
 
-\subsection{5. Elevator System}\label{5-elevator-system}
+\section{5. Elevator System}\label{5-elevator-system}
 
-\subsubsection{Requirements}\label{requirements-4}
+\subsection{Requirements}\label{requirements-4}
 
 \textbf{Functional}
 
@@ -1472,7 +1492,7 @@ Responsibility
   Real-time simulation or just state transitions? (State transitions.)
 \end{itemize}
 
-\subsubsection{Core entities / classes}\label{core-entities--classes-4}
+\subsection{Core entities / classes}\label{core-entities--classes-4}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3037}}
@@ -1496,7 +1516,9 @@ Responsibility
 \texttt{ElevatorSystem} & Owns elevators + scheduler; top-level API \\
 \end{longtable}
 
-\subsubsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-4}
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-4}
+
+\setcodelang{}
 
 \begin{verbatim}
 +---------------------+
@@ -1522,7 +1544,7 @@ Responsibility
                         +------------+
 \end{verbatim}
 
-\subsubsection{Design patterns used}\label{design-patterns-used-4}
+\subsection{Design patterns used}\label{design-patterns-used-4}
 
 \begin{itemize}
 \tightlist
@@ -1534,7 +1556,9 @@ Responsibility
   \textbf{Observer} (mention) --- In production, elevators would publish state-change events; floors would subscribe to update displays.
 \end{itemize}
 
-\subsubsection{Full code}\label{full-code-4}
+\subsection{Full code}\label{full-code-4}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1799,7 +1823,7 @@ Responsibility
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Extensibility discussion}\label{extensibility-discussion-4}
+\subsection{Extensibility discussion}\label{extensibility-discussion-4}
 
 \begin{itemize}
 \tightlist
@@ -1815,9 +1839,9 @@ Responsibility
 
 \textbf{Interview takeaway: The SCAN algorithm (also called "elevator algorithm") is exactly how real elevator schedulers work --- it\textquotesingle s the same algorithm used by disk schedulers. Name it. The state machine with direction + two queues (up/down) is the key implementation insight.}
 
-\subsection{6. Tic-Tac-Toe (Clean OO Board Game)}\label{6-tic-tac-toe-clean-oo-board-game}
+\section{6. Tic-Tac-Toe (Clean OO Board Game)}\label{6-tic-tac-toe-clean-oo-board-game}
 
-\subsubsection{Requirements}\label{requirements-5}
+\subsection{Requirements}\label{requirements-5}
 
 \textbf{Functional}
 
@@ -1851,7 +1875,7 @@ Responsibility
   Replay / undo moves? (Out of scope; mention Command pattern for undo.)
 \end{itemize}
 
-\subsubsection{Core entities / classes}\label{core-entities--classes-5}
+\subsection{Core entities / classes}\label{core-entities--classes-5}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2288}}
@@ -1875,7 +1899,9 @@ Responsibility
 \texttt{Game} & Orchestrates turn loop; holds players + board \\
 \end{longtable}
 
-\subsubsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-5}
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-5}
+
+\setcodelang{}
 
 \begin{verbatim}
         +----------+
@@ -1910,7 +1936,7 @@ Responsibility
 HumanPlayer    RandomAIPlayer
 \end{verbatim}
 
-\subsubsection{Design patterns used}\label{design-patterns-used-5}
+\subsection{Design patterns used}\label{design-patterns-used-5}
 
 \begin{itemize}
 \tightlist
@@ -1924,7 +1950,9 @@ HumanPlayer    RandomAIPlayer
   \textbf{Command} (mention) --- For undo, wrap each move in a \texttt{Command} object with \texttt{execute}/\texttt{undo}.
 \end{itemize}
 
-\subsubsection{Full code}\label{full-code-5}
+\subsection{Full code}\label{full-code-5}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2152,7 +2180,7 @@ HumanPlayer    RandomAIPlayer
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Extensibility discussion}\label{extensibility-discussion-5}
+\subsection{Extensibility discussion}\label{extensibility-discussion-5}
 
 \begin{itemize}
 \tightlist
@@ -2170,9 +2198,9 @@ HumanPlayer    RandomAIPlayer
 
 \textbf{Interview takeaway: The WinChecker separation is a key OOP point --- "Board manages state; WinChecker evaluates it." This satisfies SRP and makes unit testing trivial. Always mention the injectable moves iterator for testing HumanPlayer without stdin.}
 
-\subsection{Common Patterns Across LLD Problems}\label{common-patterns-across-lld-problems}
+\section{Common Patterns Across LLD Problems}\label{common-patterns-across-lld-problems}
 
-\subsubsection{Entity-extraction checklist}\label{entity-extraction-checklist}
+\subsection{Entity-extraction checklist}\label{entity-extraction-checklist}
 
 When you get a new problem, run through this in 5 minutes:
 
@@ -2195,7 +2223,7 @@ When you get a new problem, run through this in 5 minutes:
   \textbf{Find the family:} Vehicles, Players, Strategies \(\rightarrow\) Factory + ABC.
 \end{enumerate}
 
-\subsubsection{Which pattern fits which need}\label{which-pattern-fits-which-need}
+\subsection{Which pattern fits which need}\label{which-pattern-fits-which-need}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3477}}
@@ -2223,7 +2251,9 @@ Notify many on change & \textbf{Observer} & ElevatorSystem \(\rightarrow\) Floor
 Wrap object with extra behavior & \textbf{Decorator} & Rate limiter middleware layer \\
 \end{longtable}
 
-\subsubsection{Revision cheat sheet}\label{revision-cheat-sheet}
+\subsection{Revision cheat sheet}\label{revision-cheat-sheet}
+
+\setcodelang{}
 
 \begin{verbatim}
 LRU Cache        → HashMap + DLinkedList + sentinel head/tail
@@ -2234,7 +2264,7 @@ Elevator         → State machine + Strategy(scheduler) + SCAN algorithm
 Tic-Tac-Toe      → Strategy(player) + SRP (Board vs WinChecker)
 \end{verbatim}
 
-\subsubsection{The five questions interviewers ask at the end}\label{the-five-questions-interviewers-ask-at-the-end}
+\subsection{The five questions interviewers ask at the end}\label{the-five-questions-interviewers-ask-at-the-end}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

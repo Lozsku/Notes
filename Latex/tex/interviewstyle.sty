@@ -78,10 +78,10 @@
 }
 
 % ---------- section styling ----------
-\titleformat{\section}
+\titleformat{\section}[block]
   {\needspace{3\baselineskip}\headingfont\Large\bfseries\color{ink}}
-  {\colorbox{acc}{\color{white}\rule[-2pt]{0pt}{14pt}\,\thesection\,}}{0.6em}{}
-  [\vspace{-0.4em}{\color{acc}\titlerule[2pt]}\vspace{-0.2em}{\color{rule}\titlerule[0.6pt]}]
+  {\colorbox{acc}{\color{white}\strut\,\thesection\,}}{0.6em}{}
+  [{\vspace{3pt}{\color{acc}\titlerule[1.8pt]}\vspace{0.4pt}{\color{rule}\titlerule[0.6pt]}}]
 \titleformat{\subsection}
   {\needspace{2.5\baselineskip}\headingfont\large\bfseries\color{acc}}
   {\thesubsection}{0.6em}{}
@@ -125,6 +125,9 @@
 \definecolor{macyel}{HTML}{ffbd2e}
 \definecolor{macgrn}{HTML}{27c93f}
 \definecolor{macdim}{HTML}{8b95ad}
+% current code language label (set per-block by the codelang.lua filter)
+\gdef\currentcodelang{}
+\newcommand{\setcodelang}[1]{\gdef\currentcodelang{#1}}
 \newtcolorbox{codecard}{
   enhanced, breakable,
   colback=codbgsafe, colframe=codbgsafe,
@@ -137,8 +140,10 @@
       \fill[macred] ([xshift=13pt,yshift=-8pt]frame.north west) circle(2.7pt);%
       \fill[macyel] ([xshift=25pt,yshift=-8pt]frame.north west) circle(2.7pt);%
       \fill[macgrn] ([xshift=37pt,yshift=-8pt]frame.north west) circle(2.7pt);%
-      \node[anchor=north,yshift=-3.4pt,font=\sffamily\bfseries\fontsize{6.4}{6.4}\selectfont,
-            text=macdim] at ([yshift=0pt]frame.north) {\faTerminal\ \ source};%
+      \node[anchor=north east,xshift=-11pt,yshift=-3.6pt,
+            font=\sffamily\bfseries\fontsize{7}{7}\selectfont,text=macdim]
+        at (frame.north east) {\ifx\currentcodelang\empty\faTerminal\else
+            \faCode~~\currentcodelang\fi};%
     \end{tcbclipinterior}},
 }
 
@@ -245,7 +250,7 @@
 
 % nicer TOC
 \renewcommand{\contentsname}{\headingfont In This Edition}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \titlecontents{section}[2.6em]{\addvspace{4pt}\headingfont\bfseries\color{ink}}
   {\contentslabel[\color{acc}\thecontentslabel]{2.2em}}{}
   {\hfill\color{ink2}\thecontentspage}[\vspace{1pt}]

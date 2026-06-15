@@ -14,7 +14,46 @@
 \providecommand{\pandocbounded}[1]{#1}
 
 % syntax-highlighting macros emitted by pandoc (skylighting)
-
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
 
 \begin{document}
 
@@ -24,15 +63,13 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{System Design --- Interview Mastery Guide}\label{system-design--interview-mastery-guide}
-
 \begin{quote}
 \textbf{Highest-signal topic for senior loops.} Every FAANG design round tests the same core skills:
 decompose ambiguity, reason about scale, articulate trade-offs, defend decisions under pressure.
 This guide builds that capability from first principles.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 System design is the discipline of defining the \textbf{architecture, components, interfaces, and data flows} of a large-scale distributed software system to satisfy functional and non-functional requirements.
 
@@ -58,13 +95,15 @@ Unlike coding interviews (which have a single correct answer), design interviews
 
 \textbf{First-principles mental model:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Requirements → Constraints → Trade-offs → Architecture
 \end{verbatim}
 
 Every design decision is a trade-off. There is no "best" architecture --- only architectures that are best \emph{for a given set of constraints}.
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 The internet changed everything. In the 1970s--90s, software ran on a single machine. As usage grew:
 
@@ -85,7 +124,7 @@ The internet changed everything. In the 1970s--90s, software ran on a single mac
 
 Each real-world pain point birthed a design pattern. Understanding \emph{why} each pattern exists helps you apply it correctly and explain it convincingly.
 
-\subsection{Why FAANG Cares (be specific per company)}\label{why-faang-cares-be-specific-per-company}
+\section{Why FAANG Cares (be specific per company)}\label{why-faang-cares-be-specific-per-company}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0672}}
@@ -113,13 +152,13 @@ Key signals they look for
 
 \textbf{Universal FAANG signal:} Can you identify bottlenecks \emph{before} being asked? Can you quantify trade-offs numerically? Do you think about failure modes proactively?
 
-\subsection{The System Design Interview Framework}\label{the-system-design-interview-framework}
+\section{The System Design Interview Framework}\label{the-system-design-interview-framework}
 
 \begin{quote}
 \textbf{Use this exact playbook in every design round. Stick to the sequence.}
 \end{quote}
 
-\subsubsection{Step 1: Clarify Requirements (3--5 min)}\label{step-1-clarify-requirements-35-min}
+\subsection{Step 1: Clarify Requirements (3--5 min)}\label{step-1-clarify-requirements-35-min}
 
 Never assume. Ask:
 
@@ -161,9 +200,11 @@ Never assume. Ask:
 
 \textbf{Candidate phrase:} \emph{"Before I dive in, let me make sure I understand the requirements. I\textquotesingle ll ask a few questions --- stop me if I\textquotesingle m going too deep."}
 
-\subsubsection{Step 2: Capacity Estimation (3--5 min)}\label{step-2-capacity-estimation-35-min}
+\subsection{Step 2: Capacity Estimation (3--5 min)}\label{step-2-capacity-estimation-35-min}
 
 Back-of-envelope. Show your work. Round aggressively.
+
+\setcodelang{}
 
 \begin{verbatim}
 Example: Twitter
@@ -177,9 +218,11 @@ Example: Twitter
 
 \textbf{Always estimate:} QPS (read + write), storage/year, bandwidth, memory for cache.
 
-\subsubsection{Step 3: Define the API (2--3 min)}\label{step-3-define-the-api-23-min}
+\subsection{Step 3: Define the API (2--3 min)}\label{step-3-define-the-api-23-min}
 
 Sketch the core REST/RPC endpoints:
+
+\setcodelang{}
 
 \begin{verbatim}
 POST   /tweets            → create tweet
@@ -190,9 +233,11 @@ GET    /user/{userId}     → get user profile
 
 This forces you to crystallize exactly what the system does and surfaces data model decisions early.
 
-\subsubsection{Step 4: Data Model (3--5 min)}\label{step-4-data-model-35-min}
+\subsection{Step 4: Data Model (3--5 min)}\label{step-4-data-model-35-min}
 
 Choose SQL vs NoSQL. Define key entities and relationships.
+
+\setcodelang{}
 
 \begin{verbatim}
 User:    user_id (PK), username, email, created_at
@@ -203,9 +248,11 @@ Feed:    user_id, tweet_id, score, created_at  ← for pre-computed feeds
 
 Explain \emph{why} each field exists and what queries drive the schema.
 
-\subsubsection{Step 5: High-Level Architecture (5--8 min)}\label{step-5-high-level-architecture-58-min}
+\subsection{Step 5: High-Level Architecture (5--8 min)}\label{step-5-high-level-architecture-58-min}
 
 Draw the major components and data flows. Always include:
+
+\setcodelang{}
 
 \begin{verbatim}
 Client → CDN → API Gateway → Load Balancer → App Servers → Cache → DB
@@ -215,7 +262,7 @@ Client → CDN → API Gateway → Load Balancer → App Servers → Cache → D
 
 Name each component and explain its role. Don\textquotesingle t over-engineer at this stage.
 
-\subsubsection{Step 6: Deep Dive (10--15 min)}\label{step-6-deep-dive-1015-min}
+\subsection{Step 6: Deep Dive (10--15 min)}\label{step-6-deep-dive-1015-min}
 
 Pick 2--3 of the hardest sub-problems and go deep. Let the interviewer guide you, but have opinions:
 
@@ -227,7 +274,7 @@ Pick 2--3 of the hardest sub-problems and go deep. Let the interviewer guide you
   Common deep-dives: fan-out on write vs read, cache invalidation, sharding strategy, consistency guarantees.
 \end{itemize}
 
-\subsubsection{Step 7: Identify Bottlenecks \& Scale (3--5 min)}\label{step-7-identify-bottlenecks--scale-35-min}
+\subsection{Step 7: Identify Bottlenecks \& Scale (3--5 min)}\label{step-7-identify-bottlenecks--scale-35-min}
 
 Proactively find your own system\textquotesingle s weaknesses:
 
@@ -245,9 +292,9 @@ Proactively find your own system\textquotesingle s weaknesses:
 
 \textbf{Candidate phrase:} \emph{"Now let me stress-test my own design. Here are the three places I\textquotesingle d worry about at scale..."}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Scalability}\label{scalability}
+\subsection{Scalability}\label{scalability}
 
 \textbf{Definition:} Ability to handle increased load by adding resources.
 
@@ -270,6 +317,8 @@ Proactively find your own system\textquotesingle s weaknesses:
 \item
   Cons: Requires stateless application tier, data distribution complexity
 \end{itemize}
+
+\setcodelang{}
 
 \begin{verbatim}
 Vertical:                    Horizontal:
@@ -309,7 +358,7 @@ Examples & REST APIs, CDN edge nodes & WebSocket connections, game servers, DB c
 
 \textbf{Key insight:} Make your application tier \textbf{stateless} by moving state to an external store (cache, DB). This is what makes horizontal scaling work.
 
-\subsubsection{Load Balancing}\label{load-balancing}
+\subsection{Load Balancing}\label{load-balancing}
 
 \textbf{Definition:} Distribute incoming traffic across multiple servers to avoid overloading any single one.
 
@@ -367,15 +416,17 @@ Examples & AWS NLB, HAProxy TCP & AWS ALB, Nginx, Envoy \\
 
 \textbf{Interview takeaway:} \textbf{Use L7 LB for HTTP microservices (route by path/header). L4 for raw TCP (databases, game servers). Always have \(\geq\)2 LB instances for HA.}
 
-\subsubsection{Caching}\label{caching}
+\subsection{Caching}\label{caching}
 
 \textbf{Definition:} Store frequently accessed data in fast storage (memory) to reduce latency and backend load.
 
 \textbf{Why cache?} Memory access: \textasciitilde100ns. Disk: \textasciitilde10ms. Network DB query: \textasciitilde1-10ms. Cache hit: \textasciitilde0.5ms local, \textasciitilde1ms Redis.
 
-\paragraph{Caching Strategies}\label{caching-strategies}
+\subsubsection{Caching Strategies}\label{caching-strategies}
 
 \textbf{1. Cache-Aside (Lazy Loading)}
+
+\setcodelang{}
 
 \begin{verbatim}
 Read:                              Write:
@@ -398,6 +449,8 @@ App returns data
 
 \textbf{2. Write-Through}
 
+\setcodelang{}
+
 \begin{verbatim}
 Write:                             Read:
 App writes to cache                Check cache → hit → return
@@ -417,6 +470,8 @@ Return success
 
 \textbf{3. Write-Back (Write-Behind)}
 
+\setcodelang{}
+
 \begin{verbatim}
 Write:                             Background:
 App writes to cache                Cache async flushes to DB
@@ -435,6 +490,8 @@ Return success immediately         (batched writes)
 
 \textbf{4. Write-Around}
 
+\setcodelang{}
+
 \begin{verbatim}
 Write: App writes directly to DB (bypasses cache)
 Read:  Cache miss → read from DB → populate cache
@@ -450,7 +507,7 @@ Read:  Cache miss → read from DB → populate cache
   \textbf{Use when:} Data written once, rarely read back soon (file uploads, logs)
 \end{itemize}
 
-\paragraph{Cache Eviction Policies}\label{cache-eviction-policies}
+\subsubsection{Cache Eviction Policies}\label{cache-eviction-policies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2755}}
@@ -478,7 +535,7 @@ Best for
 
 \textbf{LRU Implementation:} Doubly-linked list + HashMap. O(1) get and put. Classic interview question.
 
-\paragraph{Cache Invalidation}\label{cache-invalidation}
+\subsubsection{Cache Invalidation}\label{cache-invalidation}
 
 The hardest problem in caching. Three strategies:
 
@@ -507,9 +564,11 @@ The hardest problem in caching. Three strategies:
 
 \textbf{Interview takeaway:} \textbf{Cache-aside is the most common pattern. Always discuss TTL strategy and cache invalidation --- interviewers love this. Know LRU vs LFU trade-offs.}
 
-\subsubsection{CDNs (Content Delivery Networks)}\label{cdns-content-delivery-networks}
+\subsection{CDNs (Content Delivery Networks)}\label{cdns-content-delivery-networks}
 
 \textbf{Definition:} Geographically distributed network of servers (edge nodes/PoPs) that cache and serve content close to end users.
+
+\setcodelang{}
 
 \begin{verbatim}
 Without CDN:                    With CDN:
@@ -562,9 +621,11 @@ Best for & Large files known in advance (videos, software) & Unpredictable acces
 
 \textbf{Interview takeaway:} \textbf{CDN = first line of defense for scale. Serve all static assets via CDN. For dynamic content, push DB-query results to CDN with short TTLs. Always mention CDN early in a design.}
 
-\subsubsection{Sharding (Horizontal Partitioning)}\label{sharding-horizontal-partitioning}
+\subsection{Sharding (Horizontal Partitioning)}\label{sharding-horizontal-partitioning}
 
 \textbf{Definition:} Split a large dataset across multiple database nodes, each holding a subset of the data.
+
+\setcodelang{}
 
 \begin{verbatim}
 Without sharding:              With sharding:
@@ -603,6 +664,8 @@ Cons
 
 \textbf{Consistent Hashing:} Solves the resharding problem of hash-based sharding.
 
+\setcodelang{}
+
 \begin{verbatim}
 Normal hashing: shard = hash(key) % N
   → If N changes: almost ALL keys reassigned (massive rebalancing)
@@ -612,6 +675,8 @@ Consistent hashing:
   → Each key assigned to the nearest server clockwise
   → When a server is added/removed: only (K/N) keys move
 \end{verbatim}
+
+\setcodelang{}
 
 \begin{verbatim}
             Ring (0 → 2^32)
@@ -645,11 +710,13 @@ Key k → go clockwise → lands on nearest server
 
 \textbf{Interview takeaway:} \textbf{Sharding is the last resort after read replicas, caching, and indexing. Use consistent hashing to avoid resharding pain. Know the hot-spot problem and mitigation (add shard for celebrity, use virtual nodes).}
 
-\subsubsection{Replication}\label{replication}
+\subsection{Replication}\label{replication}
 
 \textbf{Definition:} Maintain copies of the same data on multiple machines for redundancy and read scaling.
 
-\paragraph{Leader-Follower (Primary-Replica)}\label{leader-follower-primary-replica}
+\subsubsection{Leader-Follower (Primary-Replica)}\label{leader-follower-primary-replica}
+
+\setcodelang{}
 
 \begin{verbatim}
          Writes                      Reads (can be sent to followers)
@@ -695,7 +762,9 @@ Availability & Lower (writes blocked if replica down) & Higher \\
 Typical use & Financial transactions, critical data & Social feeds, analytics \\
 \end{longtable}
 
-\paragraph{Leader-Leader (Multi-Primary / Active-Active)}\label{leader-leader-multi-primary--active-active}
+\subsubsection{Leader-Leader (Multi-Primary / Active-Active)}\label{leader-leader-multi-primary--active-active}
+
+\setcodelang{}
 
 \begin{verbatim}
     ┌──────────┐ ←── sync ──→ ┌──────────┐
@@ -731,9 +800,11 @@ Typical use & Financial transactions, critical data & Social feeds, analytics \\
   Accept eventual consistency
 \end{itemize}
 
-\subsubsection{Consistency Models}\label{consistency-models}
+\subsection{Consistency Models}\label{consistency-models}
 
 \textbf{Definition:} Rules that define what values are valid to return for reads after writes.
+
+\setcodelang{}
 
 \begin{verbatim}
 Strong ────────────────────────────────────────────────► Eventual
@@ -792,7 +863,7 @@ Performance & Lower throughput & Higher throughput \\
 Use case & Banking, inventory, orders & Social feeds, caches, analytics \\
 \end{longtable}
 
-\subsubsection{CAP Theorem}\label{cap-theorem}
+\subsection{CAP Theorem}\label{cap-theorem}
 
 \textbf{Statement:} A distributed system can guarantee at most \textbf{two} of these three properties simultaneously:
 
@@ -807,6 +878,8 @@ Use case & Banking, inventory, orders & Social feeds, caches, analytics \\
 \end{itemize}
 
 \textbf{Key insight:} Network partitions \emph{will} happen in any real distributed system. Therefore, you \emph{must} tolerate partitions. The real choice is \textbf{CP vs AP}:
+
+\setcodelang{}
 
 \begin{verbatim}
          Consistency
@@ -854,9 +927,11 @@ Examples
 
 \textbf{Interview takeaway:} \textbf{"P is always required. The real choice is CP vs AP. Pick based on business need: banking = CP, social feed = AP. Always mention PACELC for senior roles."}
 
-\subsubsection{Message Queues}\label{message-queues}
+\subsection{Message Queues}\label{message-queues}
 
 \textbf{Definition:} Middleware that decouples producers (senders) and consumers (receivers) via an async buffer.
+
+\setcodelang{}
 
 \begin{verbatim}
 Producer ──→ ┌───────────────────┐ ──→ Consumer 1
@@ -904,7 +979,7 @@ Producer ──→ │  (persistent buf) │ ──→ Consumer 3
   \textbf{Exactly-once:} Delivered exactly once \(\rightarrow\) hardest, expensive, often approximated
 \end{itemize}
 
-\paragraph{Kafka vs RabbitMQ vs SQS}\label{kafka-vs-rabbitmq-vs-sqs}
+\subsubsection{Kafka vs RabbitMQ vs SQS}\label{kafka-vs-rabbitmq-vs-sqs}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1030}}
@@ -939,6 +1014,8 @@ Operations & Complex (Zookeeper, brokers) & Moderate & None (managed) \\
 
 \textbf{Kafka deep dive:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Topic: "user-events"
   Partition 0: [msg1, msg3, msg5, ...]  → Consumer Group A, Consumer 1
@@ -951,9 +1028,11 @@ Multiple consumer groups can independently consume the same topic.
 
 \textbf{Kafka use cases:} Event sourcing, change data capture (CDC), log aggregation, stream processing, activity tracking.
 
-\subsubsection{Event-Driven Architecture}\label{event-driven-architecture}
+\subsection{Event-Driven Architecture}\label{event-driven-architecture}
 
 \textbf{Definition:} System where components communicate by emitting and reacting to events rather than direct calls.
+
+\setcodelang{}
 
 \begin{verbatim}
 Traditional (Request/Response):           Event-Driven:
@@ -985,6 +1064,8 @@ Traditional (Request/Response):           Event-Driven:
 
 \textbf{CQRS (Command Query Responsibility Segregation):} Separate read and write models.
 
+\setcodelang{}
+
 \begin{verbatim}
 Write Path:                          Read Path:
 Command → Write Service → DB         Query → Read Service → Read-optimized Store
@@ -1004,6 +1085,8 @@ Command → Write Service → DB         Query → Read Service → Read-optimiz
 
 \textbf{Saga Pattern:} Manage distributed transactions across microservices via events.
 
+\setcodelang{}
+
 \begin{verbatim}
 Choreography Saga:
 OrderService ─[OrderCreated]→ PaymentService ─[PaymentCompleted]→ ShippingService
@@ -1013,11 +1096,11 @@ Orchestration Saga:
 Orchestrator → PaymentService → Orchestrator → ShippingService → ...
 \end{verbatim}
 
-\subsubsection{Microservices}\label{microservices}
+\subsection{Microservices}\label{microservices}
 
 \textbf{Definition:} Architectural style where an application is built as a suite of small, independently deployable services, each owning its data and communicating via APIs.
 
-\paragraph{Monolith vs Microservices}\label{monolith-vs-microservices}
+\subsubsection{Monolith vs Microservices}\label{monolith-vs-microservices}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1969}}
@@ -1060,7 +1143,7 @@ When to use & Early stage, small team & Scale, large teams, clear domain boundar
   \textbf{Shared database:} Multiple services share same DB \(\rightarrow\) coupling through data
 \end{itemize}
 
-\paragraph{Service Communication}\label{service-communication}
+\subsubsection{Service Communication}\label{service-communication}
 
 \textbf{Synchronous:}
 
@@ -1114,13 +1197,15 @@ Use case & Query for data, need immediate response & Long-running tasks, fan-out
 
 \textbf{Circuit Breaker Pattern:} Prevent cascading failures.
 
+\setcodelang{}
+
 \begin{verbatim}
 CLOSED (normal) → fails exceed threshold → OPEN (reject requests) →
                                           timeout expires →
 HALF-OPEN (probe) → success → CLOSED  /  failure → OPEN
 \end{verbatim}
 
-\subsubsection{Rate Limiting}\label{rate-limiting}
+\subsection{Rate Limiting}\label{rate-limiting}
 
 \textbf{Definition:} Control the rate of requests to prevent abuse, ensure fair use, and protect system resources.
 
@@ -1168,9 +1253,11 @@ Cons
 
 \textbf{Redis implementation:} \texttt{INCR\ key} + \texttt{EXPIRE\ key\ 60} \(\rightarrow\) atomic counter per user per minute.
 
-\subsubsection{API Gateway}\label{api-gateway}
+\subsection{API Gateway}\label{api-gateway}
 
 \textbf{Definition:} Single entry point for all client requests. Handles cross-cutting concerns.
+
+\setcodelang{}
 
 \begin{verbatim}
 Mobile ─────────────────────────────────────────────────────┐
@@ -1215,7 +1302,7 @@ Partner API ──────────────────────�
 
 \textbf{Examples:} AWS API Gateway, Kong, Nginx, Envoy, Traefik
 
-\subsubsection{Database Choice: SQL vs NoSQL}\label{database-choice-sql-vs-nosql}
+\subsection{Database Choice: SQL vs NoSQL}\label{database-choice-sql-vs-nosql}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1591}}
@@ -1273,9 +1360,11 @@ Examples
 
 \textbf{Interview takeaway:} \textbf{Start with SQL. Use NoSQL when you need: horizontal scale, flexible schema, specific access patterns SQL handles poorly (graph traversal, time series). Don\textquotesingle t use NoSQL "because it\textquotesingle s faster" --- profile first.}
 
-\subsubsection{Idempotency}\label{idempotency}
+\subsection{Idempotency}\label{idempotency}
 
 \textbf{Definition:} An operation is idempotent if applying it multiple times has the same effect as applying it once.
+
+\setcodelang{}
 
 \begin{verbatim}
 Idempotent:      PUT /users/123  { name: "Alice" }  → same result each time
@@ -1323,9 +1412,11 @@ POST & No & No \\
 PATCH & No & No \\
 \end{longtable}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{Typical Scalable Web Architecture}\label{typical-scalable-web-architecture}
+\subsection{Typical Scalable Web Architecture}\label{typical-scalable-web-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -1383,7 +1474,9 @@ PATCH & No & No \\
                └────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{Sharding Architecture}\label{sharding-architecture}
+\subsection{Sharding Architecture}\label{sharding-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 Application Layer
@@ -1399,7 +1492,9 @@ Application Layer
                                       └──────────┘
 \end{verbatim}
 
-\subsubsection{Leader-Follower Replication}\label{leader-follower-replication}
+\subsection{Leader-Follower Replication}\label{leader-follower-replication}
+
+\setcodelang{}
 
 \begin{verbatim}
                 WRITES                          READS
@@ -1413,7 +1508,9 @@ Application Layer
          Failover: Follower1 elected Leader if Primary fails
 \end{verbatim}
 
-\subsubsection{Caching Patterns}\label{caching-patterns}
+\subsection{Caching Patterns}\label{caching-patterns}
+
+\setcodelang{}
 
 \begin{verbatim}
 CACHE-ASIDE:                    WRITE-THROUGH:
@@ -1425,7 +1522,9 @@ Write: App→Cache (async→DB)     Write: App→DB (bypass cache)
 Risk: data loss on cache crash  Read: App→Cache(miss)→DB→Cache
 \end{verbatim}
 
-\subsubsection{Message Queue Flow}\label{message-queue-flow}
+\subsection{Message Queue Flow}\label{message-queue-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
                                     ┌─────────────────────────────┐
@@ -1445,9 +1544,11 @@ Order Service                       │       Message Queue          │
     │                              ACK after processing → message deleted
 \end{verbatim}
 
-\subsection{Back-of-Envelope Estimation Cheatsheet}\label{back-of-envelope-estimation-cheatsheet}
+\section{Back-of-Envelope Estimation Cheatsheet}\label{back-of-envelope-estimation-cheatsheet}
 
-\subsubsection{Latency Numbers Every Programmer Should Know}\label{latency-numbers-every-programmer-should-know}
+\subsection{Latency Numbers Every Programmer Should Know}\label{latency-numbers-every-programmer-should-know}
+
+\setcodelang{}
 
 \begin{verbatim}
 Operation                              Latency         Notes
@@ -1483,7 +1584,9 @@ Send packet CA → Netherlands → CA 150,000,000   ns (150 ms)
   \textbf{Cache hit (\textasciitilde0.5ms) vs DB query (\textasciitilde1-10ms) = 2-20x difference}
 \end{itemize}
 
-\subsubsection{Powers of 2}\label{powers-of-2}
+\subsection{Powers of 2}\label{powers-of-2}
+
+\setcodelang{}
 
 \begin{verbatim}
 Power   Exact Value    Approx    Storage name
@@ -1496,23 +1599,29 @@ Power   Exact Value    Approx    Storage name
 50                     1 quadrillion 1 PB
 \end{verbatim}
 
-\subsubsection{QPS / Storage Estimation Reference}\label{qps--storage-estimation-reference}
+\subsection{QPS / Storage Estimation Reference}\label{qps--storage-estimation-reference}
 
-\begin{verbatim}
-Time conversions (memorize):
-  1 day    = 86,400 seconds ≈ 10^5 seconds
-  1 month  = 2.5M seconds
-  1 year   = 32M seconds ≈ 3×10^7
+\setcodelang{Python}
 
-QPS estimation formula:
-  QPS = (Users × Actions per User per Day) / 86,400
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Time conversions (memorize):}
+  \DecValTok{1}\NormalTok{ day    }\OperatorTok{=} \DecValTok{86}\NormalTok{,}\DecValTok{400}\NormalTok{ seconds ≈ }\DecValTok{10}\OperatorTok{\^{}}\DecValTok{5}\NormalTok{ seconds}
+  \DecValTok{1}\NormalTok{ month  }\OperatorTok{=} \FloatTok{2.5}\ErrorTok{M}\NormalTok{ seconds}
+  \DecValTok{1}\NormalTok{ year   }\OperatorTok{=} \DecValTok{32}\ErrorTok{M}\NormalTok{ seconds ≈ }\DecValTok{3}\NormalTok{×}\DecValTok{10}\OperatorTok{\^{}}\DecValTok{7}
 
-Storage estimation formula:
-  Storage/day = writes/sec × bytes/write × 86,400
-  Storage/year = Storage/day × 365
-\end{verbatim}
+\NormalTok{QPS estimation formula:}
+\NormalTok{  QPS }\OperatorTok{=}\NormalTok{ (Users × Actions per User per Day) }\OperatorTok{/} \DecValTok{86}\NormalTok{,}\DecValTok{400}
 
-\subsubsection{Common System Scale Reference}\label{common-system-scale-reference}
+\NormalTok{Storage estimation formula:}
+\NormalTok{  Storage}\OperatorTok{/}\NormalTok{day }\OperatorTok{=}\NormalTok{ writes}\OperatorTok{/}\NormalTok{sec × }\BuiltInTok{bytes}\OperatorTok{/}\NormalTok{write × }\DecValTok{86}\NormalTok{,}\DecValTok{400}
+\NormalTok{  Storage}\OperatorTok{/}\NormalTok{year }\OperatorTok{=}\NormalTok{ Storage}\OperatorTok{/}\NormalTok{day × }\DecValTok{365}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Common System Scale Reference}\label{common-system-scale-reference}
+
+\setcodelang{}
 
 \begin{verbatim}
 System                DAU      Peak QPS    Storage/day
@@ -1525,24 +1634,30 @@ Uber (peak)           5M trips ~100K read  ~10GB
 Netflix               200M     ~500K read  ~1PB (content stored)
 \end{verbatim}
 
-\subsubsection{Bandwidth Math}\label{bandwidth-math}
+\subsection{Bandwidth Math}\label{bandwidth-math}
 
-\begin{verbatim}
-Network bandwidth:
-  1 Gbps  = 125 MB/s
-  10 Gbps = 1.25 GB/s
+\setcodelang{Python}
 
-SSD sequential: ~500 MB/s – 3 GB/s
-Memory sequential: ~10-50 GB/s
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Network bandwidth:}
+  \DecValTok{1}\NormalTok{ Gbps  }\OperatorTok{=} \DecValTok{125}\NormalTok{ MB}\OperatorTok{/}\NormalTok{s}
+  \DecValTok{10}\NormalTok{ Gbps }\OperatorTok{=} \FloatTok{1.25}\NormalTok{ GB}\OperatorTok{/}\NormalTok{s}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\NormalTok{SSD sequential: }\OperatorTok{\textasciitilde{}}\DecValTok{500}\NormalTok{ MB}\OperatorTok{/}\NormalTok{s – }\DecValTok{3}\NormalTok{ GB}\OperatorTok{/}\NormalTok{s}
+\NormalTok{Memory sequential: }\OperatorTok{\textasciitilde{}}\DecValTok{10}\OperatorTok{{-}}\DecValTok{50}\NormalTok{ GB}\OperatorTok{/}\NormalTok{s}
+\end{Highlighting}
+\end{Shaded}
 
-\subsubsection{Design TinyURL}\label{design-tinyurl}
+\section{Real-World Examples}\label{real-world-examples}
+
+\subsection{Design TinyURL}\label{design-tinyurl}
 
 \textbf{Core features:} Shorten URLs, redirect on click, optional custom alias, analytics.
 
 \textbf{Estimation:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Write: 100M URLs/day → ~1,200/sec
@@ -1552,12 +1667,16 @@ Storage: 100M × 500 bytes = 50 GB/day
 
 \textbf{API:}
 
+\setcodelang{}
+
 \begin{verbatim}
 POST /shorten  { long_url, custom_alias? } → { short_url }
 GET  /{code}   → 302 redirect to long_url
 \end{verbatim}
 
 \textbf{Data model:}
+
+\setcodelang{}
 
 \begin{verbatim}
 URLs table:
@@ -1583,6 +1702,8 @@ URLs table:
 
 \textbf{Architecture:}
 
+\setcodelang{}
+
 \begin{verbatim}
 User → API Gateway → App Servers → Cache (Redis: code→URL)
                                  ↓ (miss)
@@ -1593,7 +1714,7 @@ User → API Gateway → App Servers → Cache (Redis: code→URL)
 
 \textbf{Interview deep-dives:} Custom domains, expiry, analytics (click count, geo), abuse prevention (block malicious URLs).
 
-\subsubsection{Design a News Feed (Instagram/Twitter)}\label{design-a-news-feed-instagramtwitter}
+\subsection{Design a News Feed (Instagram/Twitter)}\label{design-a-news-feed-instagramtwitter}
 
 \textbf{Core features:} Post content, follow users, see home feed (posts from followed users, reverse-chron or ranked).
 
@@ -1602,6 +1723,8 @@ User → API Gateway → App Servers → Cache (Redis: code→URL)
 \textbf{Two approaches to feed generation:}
 
 \textbf{Fan-out on Write (Push model):}
+
+\setcodelang{}
 
 \begin{verbatim}
 User posts → App Server → for each follower → write tweet to follower's feed cache
@@ -1618,6 +1741,8 @@ User posts → App Server → for each follower → write tweet to follower's fe
 \end{itemize}
 
 \textbf{Fan-out on Read (Pull model):}
+
+\setcodelang{}
 
 \begin{verbatim}
 User requests feed → App Server → get following list → merge N timelines → sort → return
@@ -1659,9 +1784,11 @@ User requests feed → App Server → get following list → merge N timelines �
   Diversity (avoid same-author runs)
 \end{itemize}
 
-\subsubsection{Design a Rate Limiter}\label{design-a-rate-limiter}
+\subsection{Design a Rate Limiter}\label{design-a-rate-limiter}
 
 \textbf{Token bucket in Redis:}
+
+\setcodelang{}
 
 \begin{verbatim}
 GET user:123:tokens  → current tokens
@@ -1676,20 +1803,24 @@ Background refill job: every second, INCRBY tokens up to max
 
 \textbf{Sliding window in Redis:}
 
-\begin{verbatim}
-key = "ratelimit:user:123"
-now = current_timestamp_ms
-window = 60000  # 1 minute
+\setcodelang{Python}
 
-ZREMRANGEBYSCORE key 0 (now - window)     # remove old entries
-ZADD key now now                           # add current request
-count = ZCARD key
-EXPIRE key window/1000
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{key }\OperatorTok{=} \StringTok{"ratelimit:user:123"}
+\NormalTok{now }\OperatorTok{=}\NormalTok{ current\_timestamp\_ms}
+\NormalTok{window }\OperatorTok{=} \DecValTok{60000}  \CommentTok{\# 1 minute}
 
-If count > limit: reject
-\end{verbatim}
+\NormalTok{ZREMRANGEBYSCORE key }\DecValTok{0}\NormalTok{ (now }\OperatorTok{{-}}\NormalTok{ window)     }\CommentTok{\# remove old entries}
+\NormalTok{ZADD key now now                           }\CommentTok{\# add current request}
+\NormalTok{count }\OperatorTok{=}\NormalTok{ ZCARD key}
+\NormalTok{EXPIRE key window}\OperatorTok{/}\DecValTok{1000}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\NormalTok{If count }\OperatorTok{\textgreater{}}\NormalTok{ limit: reject}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One growing city --- every concept is a road, a shop, or a depot in the same metropolis.}
 
@@ -1725,7 +1856,7 @@ Real-Life Analogy
 \textbf{Eventual Consistency} & The city\textquotesingle s notice-board network: a planning decision is pinned at the central hall first; within hours every district board carries the same notice --- briefly, a resident in the outer suburbs hasn\textquotesingle t seen it yet, but they will \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
 \textbf{CAP Theorem:} "\textbf{C}onsistency is \textbf{A}lways \textbf{P}artial in distributed systems" --- you must pick between C and A when P happens.
 
@@ -1777,9 +1908,9 @@ Real-Life Analogy
 
 \textbf{Message queue choices:} "\textbf{K}afka for \textbf{K}ilo-messages-per-second streaming; \textbf{R}abbitMQ for \textbf{R}outing complexity; \textbf{S}QS for \textbf{S}erverless simplicity."
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{1. Design a URL Shortener (TinyURL / bit.ly)}\label{1-design-a-url-shortener-tinyurl--bitly}
+\subsection{1. Design a URL Shortener (TinyURL / bit.ly)}\label{1-design-a-url-shortener-tinyurl--bitly}
 
 \textbf{Approach:} Hash vs counter, Base62 encoding, DB schema, redirect (301 vs 302), analytics, expiry, custom aliases.
 
@@ -1795,7 +1926,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} Rate limiting per user, analytics dashboard, abuse detection, multi-DC.
 
-\subsubsection{2. Design Twitter / Social Media Feed}\label{2-design-twitter--social-media-feed}
+\subsection{2. Design Twitter / Social Media Feed}\label{2-design-twitter--social-media-feed}
 
 \textbf{Approach:} Fan-out on write vs read, hybrid model for celebrities, feed ranking, post storage, media CDN.
 
@@ -1803,7 +1934,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} Real-time updates (WebSocket/SSE), trending topics, notification system, search.
 
-\subsubsection{3. Design a Chat System (WhatsApp / Slack)}\label{3-design-a-chat-system-whatsapp--slack}
+\subsection{3. Design a Chat System (WhatsApp / Slack)}\label{3-design-a-chat-system-whatsapp--slack}
 
 \textbf{Approach:} WebSocket for real-time bidirectional; message storage (Cassandra: write-heavy, time-ordered); delivery receipts; online presence; group chat fan-out.
 
@@ -1811,7 +1942,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} End-to-end encryption, media sharing, message search, read receipts at scale.
 
-\subsubsection{4. Design YouTube / Video Streaming}\label{4-design-youtube--video-streaming}
+\subsection{4. Design YouTube / Video Streaming}\label{4-design-youtube--video-streaming}
 
 \textbf{Approach:} Video upload pipeline (chunked upload \(\rightarrow\) encoding workers \(\rightarrow\) CDN); streaming (HLS/DASH adaptive bitrate); metadata DB; recommendation system.
 
@@ -1819,7 +1950,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} Live streaming, comments, subscription notifications, copyright detection.
 
-\subsubsection{5. Design Uber / Ride-Sharing}\label{5-design-uber--ride-sharing}
+\subsection{5. Design Uber / Ride-Sharing}\label{5-design-uber--ride-sharing}
 
 \textbf{Approach:} Real-time driver location (WebSocket, update every 4s); geospatial index (geohash/quadtree); matching algorithm; surge pricing; trip state machine.
 
@@ -1827,7 +1958,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} ETA calculation, route optimization, driver-side vs rider-side consistency, payment processing.
 
-\subsubsection{6. Design a Rate Limiter}\label{6-design-a-rate-limiter}
+\subsection{6. Design a Rate Limiter}\label{6-design-a-rate-limiter}
 
 \textbf{Approach:} Token bucket vs sliding window; Redis atomic operations; per-user / per-IP / per-API-key; distributed rate limiting across multiple API servers.
 
@@ -1835,7 +1966,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} Rate limit headers (X-RateLimit-Remaining), different limits per tier, bypass for internal services.
 
-\subsubsection{7. Design a Distributed Cache (Redis)}\label{7-design-a-distributed-cache-redis}
+\subsection{7. Design a Distributed Cache (Redis)}\label{7-design-a-distributed-cache-redis}
 
 \textbf{Approach:} Cache cluster (sharding via consistent hashing); eviction policies; replication for HA; persistence options (AOF vs RDB); pub/sub for invalidation.
 
@@ -1843,7 +1974,7 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} Cache stampede prevention, multi-region cache consistency, Redis Sentinel vs Cluster.
 
-\subsubsection{8. Design a Search System (type-ahead / full-text)}\label{8-design-a-search-system-type-ahead--full-text}
+\subsection{8. Design a Search System (type-ahead / full-text)}\label{8-design-a-search-system-type-ahead--full-text}
 
 \textbf{Approach:} Trie for autocomplete (in-memory or stored); Elasticsearch for full-text; inverted index; ranking (TF-IDF, BM25, ML re-ranking); real-time indexing pipeline.
 
@@ -1851,9 +1982,9 @@ Real-Life Analogy
 
 \textbf{Follow-ups:} Personalized results, spell correction, synonyms, content freshness.
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{Trade-offs Senior Engineers Must Articulate}\label{trade-offs-senior-engineers-must-articulate}
+\subsection{Trade-offs Senior Engineers Must Articulate}\label{trade-offs-senior-engineers-must-articulate}
 
 \textbf{Consistency vs Availability:}
 
@@ -1873,7 +2004,7 @@ Real-Life Analogy
 "We denormalize the author name into the post object to avoid a JOIN on every feed read. The cost is: on author name change, we must update every post. Since name changes are rare and feed reads are billions/day, this trade-off is worth it."
 \end{quote}
 
-\subsubsection{Failure Modes}\label{failure-modes}
+\subsection{Failure Modes}\label{failure-modes}
 
 \textbf{Cascading failures:} Service A calls Service B, which is slow \(\rightarrow\) A\textquotesingle s thread pool fills waiting \(\rightarrow\) A becomes slow \(\rightarrow\) upstream C fills up \(\rightarrow\) full outage.
 
@@ -1907,7 +2038,7 @@ Real-Life Analogy
   \textbf{Solution:} Logical clocks (Lamport clocks), vector clocks, Google TrueTime (atomic + GPS clocks with bounded uncertainty)
 \end{itemize}
 
-\subsubsection{Back-Pressure}\label{back-pressure}
+\subsection{Back-Pressure}\label{back-pressure}
 
 \textbf{Problem:} Producers emit faster than consumers can process \(\rightarrow\) queue grows unbounded \(\rightarrow\) OOM crash.
 
@@ -1930,7 +2061,7 @@ Real-Life Analogy
 
 \textbf{In Kafka:} Monitor consumer lag. Alert when lag \textgreater{} threshold. Auto-scale consumer group.
 
-\subsubsection{Write Amplification in Social Systems}\label{write-amplification-in-social-systems}
+\subsection{Write Amplification in Social Systems}\label{write-amplification-in-social-systems}
 
 \textbf{The math:} 100M users follow 200 people. When a celebrity (10M followers) posts:
 
@@ -1955,7 +2086,7 @@ Real-Life Analogy
   Tiered storage: hot followers in Redis, cold followers in Cassandra
 \end{enumerate}
 
-\subsubsection{Observability at Scale}\label{observability-at-scale}
+\subsection{Observability at Scale}\label{observability-at-scale}
 
 \textbf{Three pillars:}
 
@@ -1983,65 +2114,65 @@ Real-Life Analogy
 
 \textbf{Error budget:} If SLO = 99.9\% availability \(\rightarrow\) 43.8 min/month downtime budget. Spend it on risky deploys.
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
-\subsubsection{1. Jumping to solution before requirements}\label{1-jumping-to-solution-before-requirements}
+\subsection{1. Jumping to solution before requirements}\label{1-jumping-to-solution-before-requirements}
 
 \textbf{Wrong:} "OK so we\textquotesingle ll use Kafka and Cassandra and microservices---"
 \textbf{Right:} "Before I design anything, let me make sure I understand the scale and requirements. Can I ask a few questions?"
 
-\subsubsection{2. Over-engineering from the start}\label{2-over-engineering-from-the-start}
+\subsection{2. Over-engineering from the start}\label{2-over-engineering-from-the-start}
 
 \textbf{Wrong:} Proposing 15 microservices, multi-region, event sourcing + CQRS for a URL shortener.
 \textbf{Right:} Start simple (monolith + single DB), then scale only the bottlenecks you identify.
 
-\subsubsection{3. Not doing capacity estimation}\label{3-not-doing-capacity-estimation}
+\subsection{3. Not doing capacity estimation}\label{3-not-doing-capacity-estimation}
 
 \textbf{Wrong:} "We\textquotesingle ll just add more servers if needed."
 \textbf{Right:} "At 100M DAU with 10 requests each = 1M RPM = \textasciitilde17K QPS. We need \textasciitilde17 servers at 1K QPS each, plus 3x for redundancy and headroom."
 
-\subsubsection{4. Being vague about trade-offs}\label{4-being-vague-about-trade-offs}
+\subsection{4. Being vague about trade-offs}\label{4-being-vague-about-trade-offs}
 
 \textbf{Wrong:} "We\textquotesingle ll use caching to make it faster."
 \textbf{Right:} "We\textquotesingle ll use Redis with cache-aside pattern. The trade-off is: writes update DB first, so cache may serve stale data for up to 5 minutes (our TTL). This is acceptable for user profiles but not for inventory."
 
-\subsubsection{5. Forgetting failure modes}\label{5-forgetting-failure-modes}
+\subsection{5. Forgetting failure modes}\label{5-forgetting-failure-modes}
 
 \textbf{Wrong:} Designing the happy path only.
 \textbf{Right:} After high-level design: "Now let me stress-test this. What happens if the cache fails? If the primary DB goes down? If the message queue gets backed up?"
 
-\subsubsection{6. Wrong database choice}\label{6-wrong-database-choice}
+\subsection{6. Wrong database choice}\label{6-wrong-database-choice}
 
 \textbf{Wrong:} "Let\textquotesingle s use MongoDB because it\textquotesingle s NoSQL and more scalable." (Cargo-culting)
 \textbf{Right:} "Given we have complex queries with joins, strong consistency requirements for transactions, and our team knows SQL --- PostgreSQL is the right choice. If we hit read scale limits, we\textquotesingle ll add read replicas. Sharding would come much later."
 
-\subsubsection{7. Not handling the "celebrity problem"}\label{7-not-handling-the-celebrity-problem}
+\subsection{7. Not handling the "celebrity problem"}\label{7-not-handling-the-celebrity-problem}
 
 \textbf{Wrong:} Designing fan-out-on-write without acknowledging write amplification for popular users.
 \textbf{Right:} "For the 1\% of users with \textgreater10K followers, we\textquotesingle ll use fan-out-on-read and inject their posts at query time."
 
-\subsubsection{8. Ignoring network partitions}\label{8-ignoring-network-partitions}
+\subsection{8. Ignoring network partitions}\label{8-ignoring-network-partitions}
 
 \textbf{Wrong:} Assuming the network is always reliable.
 \textbf{Right:} "Given network partitions will happen, we have to choose CP or AP. For this payment system, we choose CP --- we\textquotesingle d rather return an error than process a payment on stale data."
 
-\subsubsection{9. Not communicating clearly}\label{9-not-communicating-clearly}
+\subsection{9. Not communicating clearly}\label{9-not-communicating-clearly}
 
 \textbf{Wrong:} Silent thinking for 3 minutes.
 \textbf{Right:} Think out loud continuously: "I\textquotesingle m considering two approaches here: X and Y. X has this trade-off, Y has this trade-off. Given our consistency requirement, I\textquotesingle ll go with Y."
 
-\subsubsection{10. Forgetting about data at rest}\label{10-forgetting-about-data-at-rest}
+\subsection{10. Forgetting about data at rest}\label{10-forgetting-about-data-at-rest}
 
 \textbf{Wrong:} Only modeling the API and compute.
 \textbf{Right:} "Let me also model the data. What\textquotesingle s the schema? How do we handle indexing? What\textquotesingle s our backup strategy? How do we handle schema migrations?"
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{Distributed Systems}\label{distributed-systems}
+\subsection{Distributed Systems}\label{distributed-systems}
 
 System design \emph{is} distributed systems applied. CAP theorem, consensus (Raft/Paxos), vector clocks, CRDTs --- all foundational. A distributed system must handle: network partitions, clock skew, node failures, Byzantine failures (in blockchain-style systems).
 
-\subsubsection{Databases}\label{databases}
+\subsection{Databases}\label{databases}
 
 \begin{itemize}
 \tightlist
@@ -2055,7 +2186,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   Write-ahead logging (WAL) --- enables crash recovery and replication
 \end{itemize}
 
-\subsubsection{Computer Networks}\label{computer-networks}
+\subsection{Computer Networks}\label{computer-networks}
 
 \begin{itemize}
 \tightlist
@@ -2069,7 +2200,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   DNS TTL \(\rightarrow\) how long before a failed-over IP propagates
 \end{itemize}
 
-\subsubsection{Cloud / Infrastructure}\label{cloud--infrastructure}
+\subsection{Cloud / Infrastructure}\label{cloud--infrastructure}
 
 \begin{itemize}
 \tightlist
@@ -2083,7 +2214,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   Multi-region: active-active or active-passive for DR and global latency
 \end{itemize}
 
-\subsubsection{Performance Engineering}\label{performance-engineering}
+\subsection{Performance Engineering}\label{performance-engineering}
 
 \begin{itemize}
 \tightlist
@@ -2097,7 +2228,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   Working set size vs available memory \(\rightarrow\) cache hit rate prediction
 \end{itemize}
 
-\subsubsection{Security}\label{security}
+\subsection{Security}\label{security}
 
 \begin{itemize}
 \tightlist
@@ -2111,9 +2242,9 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   Secrets management: never hardcode credentials \(\rightarrow\) Vault, AWS Secrets Manager
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
-\subsubsection{Before the Interview}\label{before-the-interview}
+\subsection{Before the Interview}\label{before-the-interview}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2130,7 +2261,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   \textbf{Read actual engineering blogs:} Uber Engineering, Airbnb Tech, Netflix TechBlog, AWS Architecture Blog
 \end{enumerate}
 
-\subsubsection{During the Interview}\label{during-the-interview}
+\subsection{During the Interview}\label{during-the-interview}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2153,7 +2284,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   \textbf{Ask for feedback} --- "Is there a specific area you\textquotesingle d like me to go deeper on?"
 \end{enumerate}
 
-\subsubsection{Red flags interviewers look for:}\label{red-flags-interviewers-look-for}
+\subsection{Red flags interviewers look for:}\label{red-flags-interviewers-look-for}
 
 \begin{itemize}
 \tightlist
@@ -2173,7 +2304,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   Passive, not leading the conversation
 \end{itemize}
 
-\subsubsection{Green flags that signal senior-level thinking:}\label{green-flags-that-signal-senior-level-thinking}
+\subsection{Green flags that signal senior-level thinking:}\label{green-flags-that-signal-senior-level-thinking}
 
 \begin{itemize}
 \tightlist
@@ -2191,9 +2322,9 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   Brings up failure scenarios and how to handle them
 \end{itemize}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \textbf{System design = Requirements + Scale Estimation + API + Data Model + Architecture + Trade-offs}
 
@@ -2222,7 +2353,7 @@ System design \emph{is} distributed systems applied. CAP theorem, consensus (Raf
   \textbf{Senior signals:} Failure modes, back-pressure, hot spots, observability, trade-off articulation
 \end{enumerate}
 
-\subsubsection{Key Points}\label{key-points}
+\subsection{Key Points}\label{key-points}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2755}}
@@ -2254,7 +2385,7 @@ API Gateway & Auth, rate limit, routing, SSL in one place \\
 Rate limiting & Token bucket (burst-friendly) or sliding window (precise) \\
 \end{longtable}
 
-\subsubsection{Cheat-Sheet Table: The Most Important Decisions}\label{cheat-sheet-table-the-most-important-decisions}
+\subsection{Cheat-Sheet Table: The Most Important Decisions}\label{cheat-sheet-table-the-most-important-decisions}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2865}}
@@ -2281,7 +2412,7 @@ REST vs gRPC & REST for public APIs; gRPC for internal microservice communicatio
 Push vs Pull notifications & Push (FCM/APNs) for mobile; SSE/WebSocket for web real-time \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts (Rank-ordered by interview frequency)}\label{most-important-concepts-rank-ordered-by-interview-frequency}
+\subsection{Most Important Concepts (Rank-ordered by interview frequency)}\label{most-important-concepts-rank-ordered-by-interview-frequency}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

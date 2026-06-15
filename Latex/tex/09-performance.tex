@@ -63,13 +63,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{09 --- Performance Engineering}\label{09--performance-engineering}
-
 \begin{quote}
 \textbf{Goal:} Understand how to measure, diagnose, and fix performance problems at every level of the stack. FAANG interviews test whether you think in first principles, not tricks.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 Performance Engineering is the disciplined practice of ensuring a system meets its \textbf{speed, resource, and scalability targets} under realistic conditions. It spans:
 
@@ -91,7 +89,7 @@ Performance Engineering is the disciplined practice of ensuring a system meets i
 
 The central discipline: \textbf{measure first, optimize second.} Performance work without measurement is guesswork.
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 Computers have profound asymmetries in speed:
 
@@ -118,7 +116,7 @@ That is a \textbf{500 million\(\times\) gap.} Software that ignores these asymme
   \textbf{Meet SLOs} --- users and contracts demand specific latency/availability targets
 \end{enumerate}
 
-\subsection{Why FAANG Cares (be specific)}\label{why-faang-cares-be-specific}
+\section{Why FAANG Cares (be specific)}\label{why-faang-cares-be-specific}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0861}}
@@ -145,9 +143,9 @@ Lesson
 
 \textbf{FAANG interview reality:} You will be asked "your service degraded 10\(\times\), how do you debug it?" They want: measure \(\rightarrow\) profile \(\rightarrow\) isolate \(\rightarrow\) fix \(\rightarrow\) verify. Never guess. Never optimize without data.
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Latency vs Throughput vs Bandwidth}\label{latency-vs-throughput-vs-bandwidth}
+\subsection{Latency vs Throughput vs Bandwidth}\label{latency-vs-throughput-vs-bandwidth}
 
 These three terms are \textbf{not interchangeable} --- a classic interview trap.
 
@@ -179,15 +177,19 @@ Key insight: \textbf{You can have high throughput with high latency} (batch pipe
 
 \textbf{The relationship via Little\textquotesingle s Law (preview):}
 
-\begin{verbatim}
-Throughput = Concurrency / Latency
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Throughput }\OperatorTok{=}\NormalTok{ Concurrency }\OperatorTok{/}\NormalTok{ Latency}
+\end{Highlighting}
+\end{Shaded}
 
 To double throughput: either halve latency, or double concurrency (up to the bottleneck).
 
 \textbf{Interview takeaway: Always clarify which metric matters. Real-time user-facing = latency. Batch = throughput. Both = SLO-driven tradeoff.}
 
-\subsubsection{Percentiles --- p50, p90, p99, p99.9}\label{percentiles--p50-p90-p99-p999}
+\subsection{Percentiles --- p50, p90, p99, p99.9}\label{percentiles--p50-p90-p99-p999}
 
 Averages lie. A system averaging 10 ms response time might have:
 
@@ -219,31 +221,41 @@ Those slow 10\% are real users having bad experiences.
   \textbf{p99.99 (p9999):} 1 in 10,000 requests. Relevant at FAANG scale.
 \end{itemize}
 
-\begin{verbatim}
-Latency
-  |
-  |      *
-  |      **
-  |     ****
-  |   *******
-  | **********   *
-  |**************  *  *   *
-  +-------------------------------> Percentile
-  p0   p50   p90 p95 p99 p999
+\setcodelang{Python}
 
- "The tail" = the right side of this distribution
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Latency}
+  \OperatorTok{|}
+  \OperatorTok{|}      \OperatorTok{*}
+  \OperatorTok{|}      \OperatorTok{**}
+  \OperatorTok{|}     \OperatorTok{****}
+  \OperatorTok{|}   \OperatorTok{*******}
+  \OperatorTok{|} \OperatorTok{**********}   \OperatorTok{*}
+  \OperatorTok{|**************}  \OperatorTok{*}  \OperatorTok{*}   \OperatorTok{*}
+  \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ Percentile}
+\NormalTok{  p0   p50   p90 p95 p99 p999}
+
+ \CommentTok{"The tail"} \OperatorTok{=}\NormalTok{ the right side of this distribution}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Why tail latency matters at scale (Google\textquotesingle s insight):}
 
 If a request fans out to N backends, the overall latency is the \textbf{maximum} of the N individual latencies:
 
-\begin{verbatim}
-P(all N < x) = P(one < x)^N
-=> P(max > x) = 1 - (1 - P(one > x))^N
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P(}\BuiltInTok{all}\NormalTok{ N }\OperatorTok{\textless{}}\NormalTok{ x) }\OperatorTok{=}\NormalTok{ P(one }\OperatorTok{\textless{}}\NormalTok{ x)}\OperatorTok{\^{}}\NormalTok{N}
+\OperatorTok{=\textgreater{}}\NormalTok{ P(}\BuiltInTok{max} \OperatorTok{\textgreater{}}\NormalTok{ x) }\OperatorTok{=} \DecValTok{1} \OperatorTok{{-}}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ P(one }\OperatorTok{\textgreater{}}\NormalTok{ x))}\OperatorTok{\^{}}\NormalTok{N}
+\end{Highlighting}
+\end{Shaded}
 
 With N=100 backends, each at 99th percentile = 1\% slow:
+
+\setcodelang{}
 
 \begin{verbatim}
 P(at least one slow) = 1 - (0.99)^100 ≈ 63%
@@ -255,11 +267,11 @@ P(at least one slow) = 1 - (0.99)^100 ≈ 63%
 
 \textbf{Interview takeaway: Never measure only p50. SLOs must be defined on p99 or p99.9 for user-facing systems.}
 
-\subsubsection{Profiling}\label{profiling}
+\subsection{Profiling}\label{profiling}
 
 Profiling is the act of \textbf{measuring where a program spends time or allocates memory} --- empirically, not by guessing.
 
-\paragraph{CPU Profiling}\label{cpu-profiling}
+\subsubsection{CPU Profiling}\label{cpu-profiling}
 
 \textbf{Sampling profiler:} Interrupts the program every N milliseconds, records the call stack. Low overhead (\textasciitilde1-5\%). Tools: \texttt{perf} (Linux), \texttt{py-spy} (Python), \texttt{async-profiler} (JVM), \texttt{pprof} (Go), Instruments (macOS).
 
@@ -277,7 +289,7 @@ Profiling is the act of \textbf{measuring where a program spends time or allocat
   \textbf{Hot loops} --- loops that execute millions of times
 \end{itemize}
 
-\paragraph{Memory Profiling}\label{memory-profiling}
+\subsubsection{Memory Profiling}\label{memory-profiling}
 
 Tracks allocations: which code path allocates how many bytes, and whether they are freed.
 
@@ -285,9 +297,11 @@ Tools: Valgrind/Massif (C/C++), jemalloc heap profiler, JVM heap dumps, \texttt{
 
 \textbf{Heap dump analysis:} Take a snapshot of all live objects. Group by type and trace to GC roots. The shortest path from a GC root to an object is the \textbf{retention path} --- why it has not been collected.
 
-\paragraph{Flame Graphs}\label{flame-graphs}
+\subsubsection{Flame Graphs}\label{flame-graphs}
 
 Invented by Brendan Gregg. Visualizes sampling profiler output:
+
+\setcodelang{}
 
 \begin{verbatim}
  ┌──────────────────────────────────────────────────┐
@@ -308,7 +322,7 @@ Invented by Brendan Gregg. Visualizes sampling profiler output:
 
 \textbf{Interview takeaway: Flame graphs collapse identical stacks, making hot paths visually obvious. Learn to read them.}
 
-\subsubsection{Bottleneck Analysis --- CPU vs Memory vs I/O vs Network Bound}\label{bottleneck-analysis--cpu-vs-memory-vs-io-vs-network-bound}
+\subsection{Bottleneck Analysis --- CPU vs Memory vs I/O vs Network Bound}\label{bottleneck-analysis--cpu-vs-memory-vs-io-vs-network-bound}
 
 Every system has \textbf{one binding constraint} at any moment (Theory of Constraints). Finding it before optimizing is critical.
 
@@ -355,7 +369,7 @@ Fix
   Check thread count and lock contention
 \end{enumerate}
 
-\subsubsection{Memory Leaks}\label{memory-leaks}
+\subsection{Memory Leaks}\label{memory-leaks}
 
 A \textbf{memory leak} is a bug where allocated memory is never freed (in GC languages: references are held longer than needed, preventing collection).
 
@@ -410,6 +424,8 @@ A \textbf{memory leak} is a bug where allocated memory is never freed (in GC lan
 
 \textbf{Detection pattern (Python):}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{import}\NormalTok{ tracemalloc}
@@ -424,11 +440,13 @@ A \textbf{memory leak} is a bug where allocated memory is never freed (in GC lan
 
 \textbf{Interview takeaway: In GC languages, "leak" means a reference is kept alive. The GC cannot collect what is still reachable. Always ask: what is the retention path?}
 
-\subsubsection{Caching Strategies}\label{caching-strategies}
+\subsection{Caching Strategies}\label{caching-strategies}
 
 Caching trades \textbf{memory (and staleness risk) for latency}. Understanding cache placement and eviction is critical.
 
-\paragraph{Cache Placement Levels}\label{cache-placement-levels}
+\subsubsection{Cache Placement Levels}\label{cache-placement-levels}
+
+\setcodelang{}
 
 \begin{verbatim}
 Request → [CDN Cache] → [Load Balancer] → [App Server]
@@ -442,7 +460,7 @@ Request → [CDN Cache] → [Load Balancer] → [App Server]
 
 Each layer reduces load on the next. Cache hit at CDN = zero application server load.
 
-\paragraph{Cache Eviction Policies}\label{cache-eviction-policies}
+\subsubsection{Cache Eviction Policies}\label{cache-eviction-policies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2867}}
@@ -467,7 +485,7 @@ Best For
 \textbf{TTL-based} & Evict after a time-to-live expires & Cache invalidation via expiry \\
 \end{longtable}
 
-\paragraph{Cache Consistency Problems}\label{cache-consistency-problems}
+\subsubsection{Cache Consistency Problems}\label{cache-consistency-problems}
 
 \begin{itemize}
 \tightlist
@@ -479,7 +497,7 @@ Best For
   \textbf{Cold start:} Cache is empty after restart. Fix: pre-warming from DB, lazy-loading with graceful degradation.
 \end{itemize}
 
-\paragraph{Read vs Write Strategies}\label{read-vs-write-strategies}
+\subsubsection{Read vs Write Strategies}\label{read-vs-write-strategies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1609}}
@@ -511,11 +529,13 @@ Use Case
 
 \textbf{Interview takeaway: Cache-aside is default. Write-through for strong consistency. Write-behind for write-heavy workloads. Always consider what happens on cache failure.}
 
-\subsubsection{GC Tuning}\label{gc-tuning}
+\subsection{GC Tuning}\label{gc-tuning}
 
 Garbage collectors stop-the-world (STW) or run concurrently to reclaim memory. Poor GC tuning is a \textbf{major source of latency spikes} in Java services.
 
 \textbf{Java GC generations:}
+
+\setcodelang{}
 
 \begin{verbatim}
   Young Gen (Eden + Survivors)  |  Old Gen (Tenured)  | Metaspace
@@ -565,7 +585,7 @@ Garbage collectors stop-the-world (STW) or run concurrently to reclaim memory. P
   Profile allocations with async-profiler allocation profiling mode
 \end{enumerate}
 
-\subsubsection{Latency Optimization Techniques}\label{latency-optimization-techniques}
+\subsection{Latency Optimization Techniques}\label{latency-optimization-techniques}
 
 \textbf{Batching:} Group multiple small operations into one larger operation. Amortizes per-operation overhead (syscall cost, network RTT, DB commit overhead).
 
@@ -581,7 +601,7 @@ Garbage collectors stop-the-world (STW) or run concurrently to reclaim memory. P
 
 \textbf{Protocol selection:} REST (HTTP/1.1) \textless{} gRPC (HTTP/2 + Protobuf) \textless{} raw TCP with custom binary protocol in terms of overhead.
 
-\subsubsection{Throughput Optimization Techniques}\label{throughput-optimization-techniques}
+\subsection{Throughput Optimization Techniques}\label{throughput-optimization-techniques}
 
 \textbf{Horizontal scaling:} Add more instances. Effective only if the bottleneck is stateless compute.
 
@@ -605,37 +625,45 @@ Garbage collectors stop-the-world (STW) or run concurrently to reclaim memory. P
 
 \textbf{Sharding:} Partition data horizontally across nodes. Each shard handles a subset. Scales write throughput. Trade-off: cross-shard queries are expensive.
 
-\subsection{Key Laws \& Methods}\label{key-laws--methods}
+\section{Key Laws \& Methods}\label{key-laws--methods}
 
-\subsubsection{Amdahl\textquotesingle s Law}\label{amdahls-law}
+\subsection{Amdahl\textquotesingle s Law}\label{amdahls-law}
 
 Defines the \textbf{theoretical maximum speedup} from parallelizing a program.
 
-\begin{verbatim}
-S(N) = 1 / [(1 - P) + P/N]
+\setcodelang{Python}
 
-Where:
-  S(N) = speedup with N processors
-  P    = fraction of program that is parallelizable
-  N    = number of processors
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{S(N) }\OperatorTok{=} \DecValTok{1} \OperatorTok{/}\NormalTok{ [(}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ P) }\OperatorTok{+}\NormalTok{ P}\OperatorTok{/}\NormalTok{N]}
+
+\NormalTok{Where:}
+\NormalTok{  S(N) }\OperatorTok{=}\NormalTok{ speedup }\ControlFlowTok{with}\NormalTok{ N processors}
+\NormalTok{  P    }\OperatorTok{=}\NormalTok{ fraction of program that }\KeywordTok{is}\NormalTok{ parallelizable}
+\NormalTok{  N    }\OperatorTok{=}\NormalTok{ number of processors}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Intuition:}
 
-\begin{verbatim}
-  Speedup
-    |
- 16x|                          ___________  (P=0.95 asymptote = 20x)
-    |                    ______
-  8x|              ______
-    |         _____
-  4x|    _____
-    |____
-  2x|
-    |
-  1x+----+----+----+----+-------> N (processors)
-        2    4    8   16   ∞
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{  Speedup}
+    \OperatorTok{|}
+ \DecValTok{16}\ErrorTok{x}\OperatorTok{|}\NormalTok{                          \_\_\_\_\_\_\_\_\_\_\_  (P}\OperatorTok{=}\FloatTok{0.95}\NormalTok{ asymptote }\OperatorTok{=} \DecValTok{20}\ErrorTok{x}\NormalTok{)}
+    \OperatorTok{|}\NormalTok{                    \_\_\_\_\_\_}
+  \DecValTok{8}\ErrorTok{x}\OperatorTok{|}\NormalTok{              \_\_\_\_\_\_}
+    \OperatorTok{|}\NormalTok{         \_\_\_\_\_}
+  \DecValTok{4}\ErrorTok{x}\OperatorTok{|}\NormalTok{    \_\_\_\_\_}
+    \OperatorTok{|}\NormalTok{\_\_\_\_}
+  \DecValTok{2}\ErrorTok{x}\OperatorTok{|}
+    \OperatorTok{|}
+  \DecValTok{1}\ErrorTok{x}\OperatorTok{+{-}{-}{-}{-}+{-}{-}{-}{-}+{-}{-}{-}{-}+{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ N (processors)}
+        \DecValTok{2}    \DecValTok{4}    \DecValTok{8}   \DecValTok{16}\NormalTok{   ∞}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Critical insight:} If 5\% of your code is serial (P=0.95), maximum speedup is \textbf{20\(\times\), no matter how many CPUs you add.}
 
@@ -643,20 +671,26 @@ Where:
 
 \textbf{Interview takeaway: Amdahl\textquotesingle s Law tells you to eliminate serial bottlenecks before throwing more hardware at a problem.}
 
-\subsubsection{Little\textquotesingle s Law}\label{littles-law}
+\subsection{Little\textquotesingle s Law}\label{littles-law}
 
 From queuing theory. Relates three fundamental quantities:
 
-\begin{verbatim}
-L = λ × W
+\setcodelang{Python}
 
-Where:
-  L = average number of items in the system (concurrency)
-  λ = average arrival rate (throughput)
-  W = average time an item spends in the system (latency)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{L }\OperatorTok{=}\NormalTok{ λ × W}
+
+\NormalTok{Where:}
+\NormalTok{  L }\OperatorTok{=}\NormalTok{ average number of items }\KeywordTok{in}\NormalTok{ the system (concurrency)}
+\NormalTok{  λ }\OperatorTok{=}\NormalTok{ average arrival rate (throughput)}
+\NormalTok{  W }\OperatorTok{=}\NormalTok{ average time an item spends }\KeywordTok{in}\NormalTok{ the system (latency)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Rearranged:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Throughput (λ) = Concurrency (L) / Latency (W)
@@ -686,15 +720,19 @@ If latency doubles to 200ms but concurrency stays at 10:
 
 \textbf{Interview takeaway: Little\textquotesingle s Law is the master equation of capacity planning. If latency goes up and you do not add concurrency, throughput falls.}
 
-\subsubsection{USE Method (Brendan Gregg)}\label{use-method-brendan-gregg}
+\subsection{USE Method (Brendan Gregg)}\label{use-method-brendan-gregg}
 
 For every \textbf{resource} in the system, check three things:
 
-\begin{verbatim}
-USE = Utilization + Saturation + Errors
+\setcodelang{Python}
 
-Resource examples: CPU, memory, disk, network, mutex
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{USE }\OperatorTok{=}\NormalTok{ Utilization }\OperatorTok{+}\NormalTok{ Saturation }\OperatorTok{+}\NormalTok{ Errors}
+
+\NormalTok{Resource examples: CPU, memory, disk, network, mutex}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1005}}
@@ -732,25 +770,33 @@ Example
 
 \textbf{When to use USE:} Infrastructure monitoring, capacity planning, diagnosing a slow system at the hardware/OS level.
 
-\begin{verbatim}
-USE Checklist (abbreviated):
-  CPU:     util=mpstat, sat=vmstat r-col, errors=dmesg MCE
-  Memory:  util=free, sat=vmstat si/so (swap), errors=dmesg ECC
-  Network: util=sar -n DEV (%util), sat=netstat overruns, errors=netstat -s
-  Disk:    util=iostat %util, sat=iostat await, errors=smartctl
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{RED Method (Tom Wilkie / Weaveworks)}\label{red-method-tom-wilkie--weaveworks}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{USE Checklist (abbreviated):}
+\NormalTok{  CPU:     util}\OperatorTok{=}\NormalTok{mpstat, sat}\OperatorTok{=}\NormalTok{vmstat r}\OperatorTok{{-}}\NormalTok{col, errors}\OperatorTok{=}\NormalTok{dmesg MCE}
+\NormalTok{  Memory:  util}\OperatorTok{=}\NormalTok{free, sat}\OperatorTok{=}\NormalTok{vmstat si}\OperatorTok{/}\NormalTok{so (swap), errors}\OperatorTok{=}\NormalTok{dmesg ECC}
+\NormalTok{  Network: util}\OperatorTok{=}\NormalTok{sar }\OperatorTok{{-}}\NormalTok{n DEV (}\OperatorTok{\%}\NormalTok{util), sat}\OperatorTok{=}\NormalTok{netstat overruns, errors}\OperatorTok{=}\NormalTok{netstat }\OperatorTok{{-}}\NormalTok{s}
+\NormalTok{  Disk:    util}\OperatorTok{=}\NormalTok{iostat }\OperatorTok{\%}\NormalTok{util, sat}\OperatorTok{=}\NormalTok{iostat }\ControlFlowTok{await}\NormalTok{, errors}\OperatorTok{=}\NormalTok{smartctl}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{RED Method (Tom Wilkie / Weaveworks)}\label{red-method-tom-wilkie--weaveworks}
 
 For every \textbf{service/microservice}, check:
 
-\begin{verbatim}
-RED = Rate + Errors + Duration
+\setcodelang{Python}
 
-Rate     = requests per second (throughput)
-Errors   = number/rate of failed requests
-Duration = distribution of request latencies (p50, p99)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RED }\OperatorTok{=}\NormalTok{ Rate }\OperatorTok{+}\NormalTok{ Errors }\OperatorTok{+}\NormalTok{ Duration}
+
+\NormalTok{Rate     }\OperatorTok{=}\NormalTok{ requests per second (throughput)}
+\NormalTok{Errors   }\OperatorTok{=}\NormalTok{ number}\OperatorTok{/}\NormalTok{rate of failed requests}
+\NormalTok{Duration }\OperatorTok{=}\NormalTok{ distribution of request latencies (p50, p99)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{When to use RED:} Application-level monitoring, microservices dashboards, SLO definition.
 
@@ -778,7 +824,9 @@ Focus
 
 \textbf{Interview takeaway: USE tells you where hardware is constrained. RED tells you what users experience. Use both at different layers.}
 
-\subsubsection{The Memory Hierarchy (Latency Numbers Every Engineer Should Know)}\label{the-memory-hierarchy-latency-numbers-every-engineer-should-know}
+\subsection{The Memory Hierarchy (Latency Numbers Every Engineer Should Know)}\label{the-memory-hierarchy-latency-numbers-every-engineer-should-know}
+
+\setcodelang{}
 
 \begin{verbatim}
 Memory Hierarchy — Latency & Capacity (approximate, 2024):
@@ -822,9 +870,11 @@ HDD   [10,000,000 ns = 10 ms]
 
 \textbf{Interview takeaway: The fastest algorithmic optimization is often just making memory access patterns sequential (cache-friendly). An O(n\(^2\)) algorithm with perfect cache behavior can beat O(n log n) with poor cache behavior for small N.}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{Memory Hierarchy with Latency Numbers}\label{memory-hierarchy-with-latency-numbers}
+\subsection{Memory Hierarchy with Latency Numbers}\label{memory-hierarchy-with-latency-numbers}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────┐
@@ -856,7 +906,9 @@ HDD   [10,000,000 ns = 10 ms]
                     └────────────────────┘
 \end{verbatim}
 
-\subsubsection{Flame Graph Sketch}\label{flame-graph-sketch}
+\subsection{Flame Graph Sketch}\label{flame-graph-sketch}
+
+\setcodelang{}
 
 \begin{verbatim}
   Flame Graph (CPU profiler output — wider = more CPU time)
@@ -877,7 +929,9 @@ HDD   [10,000,000 ns = 10 ms]
   3. Narrow towers = short functions that call many children
 \end{verbatim}
 
-\subsubsection{Latency Percentile Distribution}\label{latency-percentile-distribution}
+\subsection{Latency Percentile Distribution}\label{latency-percentile-distribution}
+
+\setcodelang{}
 
 \begin{verbatim}
   Latency Distribution for a Web Service:
@@ -905,7 +959,9 @@ HDD   [10,000,000 ns = 10 ms]
   because at 1M requests/day, 1000 users hit 2-second latency.
 \end{verbatim}
 
-\subsubsection{Where Bottlenecks Hide in a Request Path}\label{where-bottlenecks-hide-in-a-request-path}
+\subsection{Where Bottlenecks Hide in a Request Path}\label{where-bottlenecks-hide-in-a-request-path}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client → DNS → CDN → Load Balancer → App Server → Cache → Database
@@ -925,9 +981,11 @@ Checklist for each hop:
   ③ Drill into that hop with profiling
 \end{verbatim}
 
-\subsection{The Performance Investigation Workflow}\label{the-performance-investigation-workflow}
+\section{The Performance Investigation Workflow}\label{the-performance-investigation-workflow}
 
 The \textbf{scientific method} applied to performance:
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────┐
@@ -981,11 +1039,13 @@ The \textbf{scientific method} applied to performance:
   Run steady-state load test AND spike tests
 \end{itemize}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
-\subsubsection{Example 1: N+1 Query Problem (DB latency)}\label{example-1-n1-query-problem-db-latency}
+\subsection{Example 1: N+1 Query Problem (DB latency)}\label{example-1-n1-query-problem-db-latency}
 
 \textbf{Scenario:} A REST API that lists users and their orders. Naively coded:
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1002,6 +1062,8 @@ For 1,000 users: \textbf{1,001 DB round-trips.} At 1ms each = 1 second latency.
 
 \textbf{Fix:} JOIN or batch load:
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{users }\OperatorTok{=}\NormalTok{ db.query(}\StringTok{"SELECT u.*, o.* FROM users u LEFT JOIN orders o ON u.id = o.user\_id"}\NormalTok{)}
@@ -1011,7 +1073,7 @@ For 1,000 users: \textbf{1,001 DB round-trips.} At 1ms each = 1 second latency.
 
 \textbf{Interview takeaway: N+1 is the most common performance bug in web apps. Always check SQL logs during profiling.}
 
-\subsubsection{Example 2: Thread Pool Exhaustion (throughput collapse)}\label{example-2-thread-pool-exhaustion-throughput-collapse}
+\subsection{Example 2: Thread Pool Exhaustion (throughput collapse)}\label{example-2-thread-pool-exhaustion-throughput-collapse}
 
 \textbf{Scenario:} Tomcat with default 200 threads. Upstream DB starts responding slowly (100ms \(\rightarrow\) 500ms). Each thread now held 5\(\times\) longer. Little\textquotesingle s Law:
 
@@ -1038,7 +1100,7 @@ For 1,000 users: \textbf{1,001 DB round-trips.} At 1ms each = 1 second latency.
   Increase thread pool (buys time but burns more memory) --- palliative
 \end{enumerate}
 
-\subsubsection{Example 3: Cache Stampede at Black Friday}\label{example-3-cache-stampede-at-black-friday}
+\subsection{Example 3: Cache Stampede at Black Friday}\label{example-3-cache-stampede-at-black-friday}
 
 \textbf{Scenario:} E-commerce site. Product catalog is cached with 60-second TTL. At 00:00 Black Friday, millions of users hit the site simultaneously. Cache expired at 23:59. All requests miss cache, hit DB simultaneously. DB is overwhelmed and falls over.
 
@@ -1054,9 +1116,11 @@ For 1,000 users: \textbf{1,001 DB round-trips.} At 1ms each = 1 second latency.
 
 Or: \textbf{mutex lock on first miss} --- one thread fetches from DB, others wait and then read from cache.
 
-\subsubsection{Example 4: False Sharing in Multithreaded Counter}\label{example-4-false-sharing-in-multithreaded-counter}
+\subsection{Example 4: False Sharing in Multithreaded Counter}\label{example-4-false-sharing-in-multithreaded-counter}
 
 \textbf{Scenario:} 4-thread counter updates:
+
+\setcodelang{C}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1073,6 +1137,8 @@ Threads 0-3 each update their own counter, but because all four share a cache li
 
 \textbf{Fix:} Pad to 64 bytes:
 
+\setcodelang{C}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{struct}\NormalTok{ Counter }\OperatorTok{\{}
@@ -1082,7 +1148,7 @@ Threads 0-3 each update their own counter, but because all four share a cache li
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One highway --- every concept is a lane, a car, or a chokepoint in the same traffic system.}
 
@@ -1123,7 +1189,7 @@ Analogy
 \textbf{Batching} & A single bus carrying fifty passengers down the highway instead of fifty separate cars, each making the same trip one at a time --- one toll payment, one lane slot, one fuel stop, fifty commuters delivered \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
 \textbf{USE = "Utilization, Saturation, Errors" \(\rightarrow\) "Uncle Sam\textquotesingle s Equipment"}
 (Every resource must be checked for all three)
@@ -1197,9 +1263,9 @@ Analogy
 
 \textbf{Bottleneck types \(\rightarrow\) "CPU, MEM, IO, NET, LOCK" \(\rightarrow\) "Can My I/O Never Lock?"}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{\texorpdfstring{Q1: "Your service got 10\(\times\) slower overnight. How do you debug it?"}{Q1: "Your service got 10\textbackslash times slower overnight. How do you debug it?"}}\label{q1-your-service-got-10times-slower-overnight-how-do-you-debug-it}
+\subsection{\texorpdfstring{Q1: "Your service got 10\(\times\) slower overnight. How do you debug it?"}{Q1: "Your service got 10\textbackslash times slower overnight. How do you debug it?"}}\label{q1-your-service-got-10times-slower-overnight-how-do-you-debug-it}
 
 \textbf{Model Answer:}
 
@@ -1251,7 +1317,7 @@ Step 5 --- \textbf{Fix one thing, re-measure, confirm improvement.}
 \textbf{Follow-up:} "What if you can\textquotesingle t reproduce it in staging?"
 \(\rightarrow\) Use dark launch / shadow traffic, or add production instrumentation (low-overhead async sampling), or correlate with production metrics spikes.
 
-\subsubsection{Q2: "How would you design a caching layer for a social media feed?"}\label{q2-how-would-you-design-a-caching-layer-for-a-social-media-feed}
+\subsection{Q2: "How would you design a caching layer for a social media feed?"}\label{q2-how-would-you-design-a-caching-layer-for-a-social-media-feed}
 
 \textbf{Model Answer:}
 
@@ -1288,7 +1354,7 @@ Hot key problem: Celebrity with 100M followers. Posting invalidates 100M cache k
 \textbf{Follow-up:} "How do you handle cache invalidation?"
 \(\rightarrow\) Event-driven: when a post is deleted, publish to Kafka, consumers invalidate relevant cache keys. Or: TTL-based eventual consistency (simpler, slightly stale).
 
-\subsubsection{Q3: "Explain Amdahl\textquotesingle s Law and when it applies."}\label{q3-explain-amdahls-law-and-when-it-applies}
+\subsection{Q3: "Explain Amdahl\textquotesingle s Law and when it applies."}\label{q3-explain-amdahls-law-and-when-it-applies}
 
 \textbf{Model Answer:}
 
@@ -1303,7 +1369,7 @@ Example: If your distributed system has a single-threaded coordinator that recei
 \textbf{Follow-up:} "What is Gustafson\textquotesingle s Law?"
 \(\rightarrow\) Amdahl\textquotesingle s Law assumes fixed problem size. Gustafson\textquotesingle s Law observes that in practice, as we add more compute, we solve bigger problems. The serial fraction stays constant in absolute terms but shrinks as a fraction of total work. Relevant for HPC/ML training.
 
-\subsubsection{Q4: "What is tail latency and how do you reduce it?"}\label{q4-what-is-tail-latency-and-how-do-you-reduce-it}
+\subsection{Q4: "What is tail latency and how do you reduce it?"}\label{q4-what-is-tail-latency-and-how-do-you-reduce-it}
 
 \textbf{Model Answer:}
 
@@ -1353,7 +1419,7 @@ Tail latency is the latency at high percentiles (p99, p99.9). It matters because
   \textbf{Load shedding:} Drop low-priority requests under load to protect latency for high-priority ones.
 \end{enumerate}
 
-\subsubsection{Q5: "How do you use profiling tools on a Java service in production?"}\label{q5-how-do-you-use-profiling-tools-on-a-java-service-in-production}
+\subsection{Q5: "How do you use profiling tools on a Java service in production?"}\label{q5-how-do-you-use-profiling-tools-on-a-java-service-in-production}
 
 \textbf{Model Answer:}
 
@@ -1364,6 +1430,8 @@ Low-overhead options for production:
 \tightlist
 \item
   \textbf{async-profiler:} Sampling profiler using AsyncGetCallTrace. \textasciitilde1-3\% overhead. Can profile CPU, allocations, lock contention. Output: flame graphs.
+
+  \setcodelang{}
 
 \begin{verbatim}
 ./profiler.sh -d 30 -f /tmp/flame.html <pid>
@@ -1395,9 +1463,9 @@ Never use instrumentation profilers in production --- they add too much overhead
   Fix: remove unnecessary references, use weak references for caches, implement eviction
 \end{enumerate}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{Tail Latency and Service Meshes}\label{tail-latency-and-service-meshes}
+\subsection{Tail Latency and Service Meshes}\label{tail-latency-and-service-meshes}
 
 At FAANG scale, every downstream call must have:
 
@@ -1409,13 +1477,17 @@ At FAANG scale, every downstream call must have:
   \textbf{Context propagation:} Trace IDs, deadlines, and priority levels flow through headers (W3C Trace Context, gRPC deadlines).
 \end{itemize}
 
-\subsubsection{Capacity Planning}\label{capacity-planning}
+\subsection{Capacity Planning}\label{capacity-planning}
 
 Use Little\textquotesingle s Law to calculate required concurrency:
 
-\begin{verbatim}
-Required servers = (Target throughput × SLO latency) / (1 server's target throughput × SLO latency)
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Required servers }\OperatorTok{=}\NormalTok{ (Target throughput × SLO latency) }\OperatorTok{/}\NormalTok{ (}\DecValTok{1}\NormalTok{ server}\StringTok{\textquotesingle{}s target throughput × SLO latency)}
+\end{Highlighting}
+\end{Shaded}
 
 Example: Target 100,000 req/s at p99 \textless{} 100ms. Each server can handle 500 req/s at \textless10ms.
 
@@ -1431,7 +1503,7 @@ Example: Target 100,000 req/s at p99 \textless{} 100ms. Each server can handle 5
 
 \textbf{Cost optimization:} Spot/preemptible instances (70\% cheaper) for batch workloads. Reserved instances for steady-state. On-demand for peaks.
 
-\subsubsection{Trade-offs in Performance Work}\label{trade-offs-in-performance-work}
+\subsection{Trade-offs in Performance Work}\label{trade-offs-in-performance-work}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1592}}
@@ -1456,7 +1528,7 @@ Async processing & Response before work done & Higher throughput; harder error h
 Caching & Stale data risk & Much lower latency, reduced backend load \\
 \end{longtable}
 
-\subsubsection{The Performance vs Reliability Trade-off}\label{the-performance-vs-reliability-trade-off}
+\subsection{The Performance vs Reliability Trade-off}\label{the-performance-vs-reliability-trade-off}
 
 \textbf{Fast path vs slow path:}
 
@@ -1470,7 +1542,7 @@ Caching & Stale data risk & Much lower latency, reduced backend load \\
 
 \textbf{Circuit breakers:} When a downstream service degrades, a circuit breaker trips and returns a fast fallback response, protecting the caller from cascading latency. Library: Hystrix (deprecated), Resilience4j.
 
-\subsubsection{Database Performance at Scale}\label{database-performance-at-scale}
+\subsection{Database Performance at Scale}\label{database-performance-at-scale}
 
 \begin{itemize}
 \tightlist
@@ -1484,7 +1556,7 @@ Caching & Stale data risk & Much lower latency, reduced backend load \\
   \textbf{Query optimization hierarchy:} Index (cheapest) \(\rightarrow\) query rewrite \(\rightarrow\) schema change \(\rightarrow\) partitioning \(\rightarrow\) sharding (most expensive)
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1510,7 +1582,7 @@ Caching & Stale data risk & Much lower latency, reduced backend load \\
   \textbf{Proposing premature optimization.} Suggesting micro-optimizations (bit manipulation, loop unrolling) before architectural issues (N+1 queries, missing indexes) are fixed.
 \end{enumerate}
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1752}}
@@ -1534,7 +1606,7 @@ Connection
 \textbf{Algorithms \& Data Structures} & Cache-oblivious algorithms. B-trees are cache-friendly for disk (large nodes match disk pages). Hash maps have poor cache behavior due to random access. Sorted arrays enable binary search with good cache behavior. \\
 \end{longtable}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1560,9 +1632,9 @@ Connection
   \textbf{Flame graphs.} If asked to read a flame graph or profiler output, always identify the widest bar at the top --- that is where to focus first.
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 Performance engineering = measure \(\rightarrow\) profile \(\rightarrow\) bottleneck \(\rightarrow\) fix \(\rightarrow\) verify. Never guess. The three key metrics are \textbf{latency} (time per request), \textbf{throughput} (requests per second), and \textbf{bandwidth} (channel capacity).
 
@@ -1598,7 +1670,7 @@ Performance engineering = measure \(\rightarrow\) profile \(\rightarrow\) bottle
 
 \textbf{Profiling:} Sampling profiler (low overhead, flame graphs) for CPU. Heap dump + allocation profiler for memory. Always profile in a representative environment.
 
-\subsubsection{Key Points}\label{key-points}
+\subsection{Key Points}\label{key-points}
 
 \begin{itemize}
 \tightlist
@@ -1624,7 +1696,7 @@ Performance engineering = measure \(\rightarrow\) profile \(\rightarrow\) bottle
   \textbf{Latency numbers} --- know them by heart; they appear in system design interviews constantly
 \end{itemize}
 
-\subsubsection{Cheat Sheet Table}\label{cheat-sheet-table}
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1501}}
@@ -1658,7 +1730,7 @@ Hedged requests & \textasciitilde5\% extra load & Cuts tail latency dramatically
 Connection pool & Reuse TCP connections & DB: \textasciitilde100-300 max connections \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts}\label{most-important-concepts}
+\subsection{Most Important Concepts}\label{most-important-concepts}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

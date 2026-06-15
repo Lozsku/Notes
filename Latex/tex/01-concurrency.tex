@@ -63,17 +63,17 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Concurrency \& Multithreading --- FAANG Interview Master Notes}\label{concurrency--multithreading--faang-interview-master-notes}
-
 \begin{quote}
 \textbf{How to use this file:} Read top-to-bottom for deep understanding. Jump to §9 (Interview Questions) + §14 (Cheat Sheet) for last-minute revision.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 \textbf{Concurrency} is the ability of a system to deal with multiple tasks at the same time --- tasks make \emph{progress} simultaneously, but not necessarily \emph{execute} at the same instant.
 
 \textbf{Parallelism} is actual simultaneous execution on multiple CPU cores.
+
+\setcodelang{}
 
 \begin{verbatim}
 Concurrency (1 core):         Parallelism (2 cores):
@@ -111,6 +111,8 @@ A \textbf{thread} is the smallest unit of CPU scheduling --- it shares the proce
 
 A \textbf{process} is an isolated address space; OS-level container for threads.
 
+\setcodelang{}
+
 \begin{verbatim}
 Process
 ├── Shared: Heap, Code, File Descriptors, Global Variables
@@ -119,15 +121,17 @@ Process
 └── Thread 3: Stack, Registers, PC
 \end{verbatim}
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
-\subsubsection{The Hardware Reality}\label{the-hardware-reality}
+\subsection{The Hardware Reality}\label{the-hardware-reality}
 
 Modern CPUs stopped getting faster clock speeds around 2004 (the "Power Wall"). Instead, they grew more cores. A program that uses only one thread leaves 7 of 8 cores idle. Concurrency is the answer to: \emph{how do we exploit all this hardware?}
 
-\subsubsection{The Latency Reality}\label{the-latency-reality}
+\subsection{The Latency Reality}\label{the-latency-reality}
 
 I/O (disk, network, DB) is 10,000--1,000,000x slower than CPU. A server that waits synchronously for each DB query handles 1 req/s instead of 10,000 req/s. Concurrency lets the CPU work on other requests while one is waiting on I/O.
+
+\setcodelang{}
 
 \begin{verbatim}
 Without concurrency:
@@ -140,7 +144,7 @@ Request 2:          [CPU work]---[WAIT]---[CPU work]
                     ↑ overlap here — same total time, 2x throughput
 \end{verbatim}
 
-\subsubsection{Timeline of Need}\label{timeline-of-need}
+\subsection{Timeline of Need}\label{timeline-of-need}
 
 \begin{itemize}
 \tightlist
@@ -156,7 +160,7 @@ Request 2:          [CPU work]---[WAIT]---[CPU work]
   \textbf{Today}: GPUs, async runtimes, lock-free data structures
 \end{itemize}
 
-\subsection{Why FAANG Cares}\label{why-faang-cares}
+\section{Why FAANG Cares}\label{why-faang-cares}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1188}}
@@ -193,13 +197,15 @@ Where Concurrency Is Critical
   It reveals depth of understanding of OS, memory models, and hardware
 \end{enumerate}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Threads vs Processes}\label{threads-vs-processes}
+\subsection{Threads vs Processes}\label{threads-vs-processes}
 
 \textbf{Process:} OS-level isolation. Memory, file handles, and address space are separate. Context switch is expensive (\textasciitilde1--10 µs, requires kernel mode switch, TLB flush).
 
 \textbf{Thread:} Lightweight. Shares process memory. Context switch is cheaper (\textasciitilde100 ns). Communication via shared memory (fast but dangerous). Communication between processes requires IPC (pipes, sockets, shared memory with explicit mapping).
+
+\setcodelang{}
 
 \begin{verbatim}
 Thread Creation Cost:         Process Creation Cost:
@@ -213,9 +219,11 @@ Thread Creation Cost:         Process Creation Cost:
 
 \textbf{When to use threads:} Shared state needed, performance-critical (same process, shared cache), I/O overlap within one task. Example: Java web server handling requests.
 
-\subsubsection{Synchronization}\label{synchronization}
+\subsection{Synchronization}\label{synchronization}
 
 \textbf{The core problem:} Multiple threads accessing shared mutable state without coordination leads to incorrect results.
+
+\setcodelang{}
 
 \begin{verbatim}
 Thread 1: READ counter (= 0)
@@ -231,14 +239,18 @@ This is a \textbf{race condition} --- outcome depends on thread scheduling order
 
 Synchronization mechanisms ranked by cost (cheap \(\rightarrow\) expensive):
 
+\setcodelang{}
+
 \begin{verbatim}
 Atomic ops (CAS)  →  Spinlock  →  Mutex  →  Semaphore  →  Monitor
    ~1 ns               ~10 ns      ~25 ns      ~50 ns       ~100 ns
 \end{verbatim}
 
-\subsubsection{Mutex (Mutual Exclusion Lock)}\label{mutex-mutual-exclusion-lock}
+\subsection{Mutex (Mutual Exclusion Lock)}\label{mutex-mutual-exclusion-lock}
 
 A mutex is a binary lock: one thread holds it, all others block (sleep) until it\textquotesingle s released.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -259,6 +271,8 @@ A mutex is a binary lock: one thread holds it, all others block (sleep) until it
 \CommentTok{\# counter is guaranteed to be 1000}
 \end{Highlighting}
 \end{Shaded}
+
+\setcodelang{C++}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -287,7 +301,7 @@ A mutex is a binary lock: one thread holds it, all others block (sleep) until it
 
 \textbf{Interview trap:} What happens if you forget to release a mutex? \(\rightarrow\) All other threads block forever (deadlock). Always use RAII or try/finally.
 
-\subsubsection{Semaphore}\label{semaphore}
+\subsection{Semaphore}\label{semaphore}
 
 A semaphore is a counter (initialized to N) with two operations:
 
@@ -299,10 +313,14 @@ A semaphore is a counter (initialized to N) with two operations:
   \textbf{signal() / V() / release():} Increment counter. Wake one blocked thread if any.
 \end{itemize}
 
-\begin{verbatim}
-Binary Semaphore (N=1):  behaves like mutex BUT no ownership
-Counting Semaphore (N=k): allows k threads to enter simultaneously
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Binary Semaphore (N}\OperatorTok{=}\DecValTok{1}\NormalTok{):  behaves like mutex BUT no ownership}
+\NormalTok{Counting Semaphore (N}\OperatorTok{=}\NormalTok{k): allows k threads to enter simultaneously}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Use cases:}
 
@@ -315,6 +333,8 @@ Counting Semaphore (N=k): allows k threads to enter simultaneously
 \item
   \textbf{Unlike mutex:} Any thread can signal (not just the acquirer) --- useful for producer/consumer
 \end{itemize}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -332,7 +352,7 @@ Counting Semaphore (N=k): allows k threads to enter simultaneously
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Race Conditions}\label{race-conditions}
+\subsection{Race Conditions}\label{race-conditions}
 
 A race condition occurs when program correctness depends on the relative timing or ordering of concurrent operations.
 
@@ -361,6 +381,8 @@ A race condition occurs when program correctness depends on the relative timing 
   \textbf{Check-Then-Act race:} \texttt{if\ (file\ doesn\textquotesingle{}t\ exist)\ create\ file} --- window between check and act
 \end{itemize}
 
+\setcodelang{Java}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// Classic TOCTOU (Time of Check to Time of Use) race:}
@@ -377,15 +399,19 @@ A race condition occurs when program correctness depends on the relative timing 
 
 \textbf{Heisenbugs:} Race conditions that disappear when you add logging/debugging (because the act of observing changes timing). Classic in multi-threaded bugs.
 
-\subsubsection{Deadlock}\label{deadlock}
+\subsection{Deadlock}\label{deadlock}
 
 \textbf{Definition:} Two or more threads permanently block each other, each waiting for a resource held by another.
+
+\setcodelang{}
 
 \begin{verbatim}
 Thread 1:  holds Lock A, waiting for Lock B
 Thread 2:  holds Lock B, waiting for Lock A
            ↑ circular dependency — both block forever
 \end{verbatim}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -405,7 +431,7 @@ Thread 2:  holds Lock B, waiting for Lock A
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{The 4 Coffman Conditions (ALL must hold for deadlock)}\label{the-4-coffman-conditions-all-must-hold-for-deadlock}
+\subsubsection{The 4 Coffman Conditions (ALL must hold for deadlock)}\label{the-4-coffman-conditions-all-must-hold-for-deadlock}
 
 \textbf{MHNC} --- Mutual exclusion, Hold-and-wait, No preemption, Circular wait
 
@@ -444,6 +470,8 @@ Prevention Strategy
   \textbf{Deadlock detection:} Build a wait-for graph; detect cycles (Java thread dumps, database lock monitors)
 \end{enumerate}
 
+\setcodelang{Java}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// Lock ordering fix:}
@@ -457,9 +485,11 @@ Prevention Strategy
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Livelock \& Starvation}\label{livelock--starvation}
+\subsection{Livelock \& Starvation}\label{livelock--starvation}
 
 \textbf{Livelock:} Threads are not blocked but keep changing state in response to each other without making progress. Like two people in a hallway stepping left and right to avoid each other.
+
+\setcodelang{}
 
 \begin{verbatim}
 Thread 1: detects conflict → backs off → tries again
@@ -473,21 +503,27 @@ Thread 2: detects conflict → backs off → tries again
 
 \textbf{Fix:} Fair queuing --- FIFO ordering for lock acquisition. Java\textquotesingle s \texttt{ReentrantLock(true)} (fair mode) guarantees FIFO.
 
-\subsubsection{Atomic Operations \& CAS}\label{atomic-operations--cas}
+\subsection{Atomic Operations \& CAS}\label{atomic-operations--cas}
 
 \textbf{Atomic operation:} Indivisible read-modify-write. Guaranteed by hardware to complete without interruption.
 
 \textbf{Compare-And-Swap (CAS):} The building block of lock-free programming.
 
-\begin{verbatim}
-CAS(memory_location, expected_value, new_value):
-    if *memory_location == expected_value:
-        *memory_location = new_value
-        return true  (success)
-    else:
-        return false (someone else changed it)
-    // ALL OF THIS IS ONE ATOMIC HARDWARE INSTRUCTION (CMPXCHG on x86)
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{CAS(memory\_location, expected\_value, new\_value):}
+    \ControlFlowTok{if} \OperatorTok{*}\NormalTok{memory\_location }\OperatorTok{==}\NormalTok{ expected\_value:}
+        \OperatorTok{*}\NormalTok{memory\_location }\OperatorTok{=}\NormalTok{ new\_value}
+        \ControlFlowTok{return}\NormalTok{ true  (success)}
+    \ControlFlowTok{else}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ false (someone }\ControlFlowTok{else}\NormalTok{ changed it)}
+    \OperatorTok{//}\NormalTok{ ALL OF THIS IS ONE ATOMIC HARDWARE INSTRUCTION (CMPXCHG on x86)}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -516,9 +552,11 @@ CAS(memory_location, expected_value, new_value):
   \textbf{Wait-free:} Every thread makes progress in bounded steps (stronger guarantee)
 \end{itemize}
 
-\subsubsection{Memory Visibility \& volatile}\label{memory-visibility--volatile}
+\subsection{Memory Visibility \& volatile}\label{memory-visibility--volatile}
 
 \textbf{The hidden problem:} On modern CPUs, each core has its own cache. Thread 1 writes \texttt{x\ =\ 1} to its cache; Thread 2 on another core reads \texttt{x} from its cache and sees \texttt{0}. This is a \textbf{memory visibility} problem, not just a race condition.
+
+\setcodelang{}
 
 \begin{verbatim}
 Core 0 Cache: x = 1    Core 1 Cache: x = 0    RAM: x = 0 (stale)
@@ -526,6 +564,8 @@ Core 0 Cache: x = 1    Core 1 Cache: x = 0    RAM: x = 0 (stale)
 \end{verbatim}
 
 \textbf{CPU memory reordering:} CPUs and compilers reorder instructions for performance. What you write in code is not necessarily executed in that order.
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -545,6 +585,8 @@ Core 0 Cache: x = 1    Core 1 Cache: x = 0    RAM: x = 0 (stale)
 \item
   \textbf{Ordering (Java):} Prevents reordering around volatile access (happens-before guarantee)
 \end{enumerate}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -577,9 +619,11 @@ Core 0 Cache: x = 1    Core 1 Cache: x = 0    RAM: x = 0 (stale)
   Thread join \(\rightarrow\) actions in joined thread
 \end{itemize}
 
-\subsubsection{Spinlock}\label{spinlock}
+\subsection{Spinlock}\label{spinlock}
 
 A spinlock is a lock where the waiting thread \textbf{busy-waits} (spins in a loop) instead of sleeping.
+
+\setcodelang{C++}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -623,13 +667,19 @@ Use in kernel & Yes (interrupts can\textquotesingle t sleep) & Yes \\
 
 \textbf{Rule of thumb:} Spinlock wins if critical section is shorter than a context switch (\textasciitilde1 µs). Otherwise, mutex wins.
 
-\subsubsection{Condition Variables}\label{condition-variables}
+\subsection{Condition Variables}\label{condition-variables}
 
 Condition variables let threads wait for a specific condition to become true, releasing the associated mutex while waiting.
 
-\begin{verbatim}
-Monitor pattern = Mutex + Condition Variable
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Monitor pattern }\OperatorTok{=}\NormalTok{ Mutex }\OperatorTok{+}\NormalTok{ Condition Variable}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -671,7 +721,7 @@ Monitor pattern = Mutex + Condition Variable
 
 \textbf{Critical: Always use \texttt{while} (not \texttt{if}) when checking condition after await.} Spurious wakeups (thread wakes without being signaled --- real OS phenomenon) and multiple waiters can cause the condition to be false again by the time you execute.
 
-\subsubsection{Producer-Consumer Problem}\label{producer-consumer-problem}
+\subsection{Producer-Consumer Problem}\label{producer-consumer-problem}
 
 Classic synchronization problem. Bounded buffer shared between producers (add items) and consumers (remove items).
 
@@ -687,6 +737,8 @@ Classic synchronization problem. Bounded buffer shared between producers (add it
 \item
   Only one thread accesses buffer at a time
 \end{enumerate}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -735,7 +787,7 @@ Classic synchronization problem. Bounded buffer shared between producers (add it
   Consumer: \texttt{full.acquire()} THEN \texttt{mutex.acquire()}
 \end{itemize}
 
-\subsubsection{Reader-Writer Problem}\label{reader-writer-problem}
+\subsection{Reader-Writer Problem}\label{reader-writer-problem}
 
 Multiple readers can read simultaneously (no conflict). Writers need exclusive access.
 
@@ -748,6 +800,8 @@ Multiple readers can read simultaneously (no conflict). Writers need exclusive a
 \item
   \textbf{Writer priority:} New readers wait if a writer is waiting. Fairer.
 \end{itemize}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -774,6 +828,8 @@ Multiple readers can read simultaneously (no conflict). Writers need exclusive a
 
 \textbf{State machine:}
 
+\setcodelang{}
+
 \begin{verbatim}
 State: UNLOCKED
   → readLock()  → READING (multiple readers OK)
@@ -792,9 +848,11 @@ State: WRITING
 
 \textbf{Interview insight:} ReadWriteLock only wins when reads are dominant (\textgreater90\%). With heavy writes, the overhead of tracking readers/writers makes it slower than a plain mutex.
 
-\subsubsection{Thread Pools}\label{thread-pools}
+\subsection{Thread Pools}\label{thread-pools}
 
 Creating threads is expensive. Thread pools maintain a set of pre-created worker threads that pick up tasks from a queue.
+
+\setcodelang{}
 
 \begin{verbatim}
                     ┌─────────────────────────┐
@@ -808,6 +866,8 @@ Submitted tasks →   │    Task Queue (bounded) │
 \end{verbatim}
 
 \textbf{ThreadPoolExecutor parameters (Java):}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -838,15 +898,19 @@ Submitted tasks →   │    Task Queue (bounded) │
 
 \textbf{Pool sizing formula:}
 
+\setcodelang{}
+
 \begin{verbatim}
 CPU-bound tasks:   threads ≈ CPU_cores + 1 (extra for occasional blocking)
 I/O-bound tasks:   threads ≈ CPU_cores × (1 + wait_time/compute_time)
 Example: 8 cores, 90% I/O wait → 8 × (1 + 9) = 80 threads
 \end{verbatim}
 
-\subsubsection{False Sharing}\label{false-sharing}
+\subsection{False Sharing}\label{false-sharing}
 
 Two threads modify different variables that happen to sit in the \textbf{same cache line} (64 bytes on x86). Each core\textquotesingle s write invalidates the other core\textquotesingle s cache line, causing constant cache misses --- as slow as sharing a variable, but no actual sharing.
+
+\setcodelang{}
 
 \begin{verbatim}
 Cache line (64 bytes):
@@ -857,6 +921,8 @@ Cache line (64 bytes):
      → Thread 2 must reload from memory
      → thrashing even though they access different variables!
 \end{verbatim}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -872,9 +938,11 @@ Cache line (64 bytes):
 
 \textbf{LMAX Disruptor} --- high-performance ring buffer --- was designed specifically to eliminate false sharing.
 
-\subsubsection{Python GIL (Global Interpreter Lock)}\label{python-gil-global-interpreter-lock}
+\subsection{Python GIL (Global Interpreter Lock)}\label{python-gil-global-interpreter-lock}
 
 CPython (the standard Python interpreter) has a global mutex --- the GIL --- that only allows one thread to execute Python bytecode at a time.
+
+\setcodelang{}
 
 \begin{verbatim}
 Thread 1: [Python bytecode]─┐
@@ -893,6 +961,8 @@ Thread 3: [C extension]────── (bypasses GIL — can run in parallel!
 \item
   For CPU parallelism: use \texttt{multiprocessing} (separate processes, each with own GIL) or C extensions (NumPy, TensorFlow bypass the GIL)
 \end{itemize}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -913,20 +983,26 @@ Thread 3: [C extension]────── (bypasses GIL — can run in parallel!
 
 \textbf{Python 3.13+:} "No-GIL" build (PEP 703) is in experimental phase, using fine-grained per-object locking instead.
 
-\subsubsection{Async vs Threads}\label{async-vs-threads}
+\subsection{Async vs Threads}\label{async-vs-threads}
 
 Both deal with concurrency, but with different execution models.
 
-\begin{verbatim}
-Threads:                              Async (coroutines):
-OS schedules preemptively             Cooperative — yields explicitly
-Each thread has own stack (MB)        One stack shared, tiny frames (KB)
-Context switch: OS interrupt          Context switch: await keyword
-Good for: CPU-bound, blocking C libs  Good for: I/O-bound, many connections
+\setcodelang{Python}
 
-Node.js/Python asyncio = 1 thread, event loop, callbacks/coroutines
-Java Virtual Threads (Project Loom) = async benefits with thread API
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Threads:                              Async (coroutines):}
+\NormalTok{OS schedules preemptively             Cooperative — yields explicitly}
+\NormalTok{Each thread has own stack (MB)        One stack shared, tiny frames (KB)}
+\NormalTok{Context switch: OS interrupt          Context switch: }\ControlFlowTok{await}\NormalTok{ keyword}
+\NormalTok{Good }\ControlFlowTok{for}\NormalTok{: CPU}\OperatorTok{{-}}\NormalTok{bound, blocking C libs  Good }\ControlFlowTok{for}\NormalTok{: I}\OperatorTok{/}\NormalTok{O}\OperatorTok{{-}}\NormalTok{bound, many connections}
+
+\NormalTok{Node.js}\OperatorTok{/}\NormalTok{Python asyncio }\OperatorTok{=} \DecValTok{1}\NormalTok{ thread, event loop, callbacks}\OperatorTok{/}\NormalTok{coroutines}
+\NormalTok{Java Virtual Threads (Project Loom) }\OperatorTok{=} \ControlFlowTok{async}\NormalTok{ benefits }\ControlFlowTok{with}\NormalTok{ thread API}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -946,6 +1022,8 @@ Java Virtual Threads (Project Loom) = async benefits with thread API
 
 \textbf{The fundamental difference:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Threads: preemptive multitasking — OS can switch anytime
 Async:   cooperative multitasking — switch only at await points
@@ -953,9 +1031,11 @@ Async:   cooperative multitasking — switch only at await points
          → but: long-running sync code blocks the entire event loop
 \end{verbatim}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{Thread Lifecycle}\label{thread-lifecycle}
+\subsection{Thread Lifecycle}\label{thread-lifecycle}
+
+\setcodelang{}
 
 \begin{verbatim}
                     new Thread()
@@ -981,7 +1061,9 @@ Async:   cooperative multitasking — switch only at await points
                     [TERMINATED]
 \end{verbatim}
 
-\subsubsection{Mutex vs Semaphore vs Monitor}\label{mutex-vs-semaphore-vs-monitor}
+\subsection{Mutex vs Semaphore vs Monitor}\label{mutex-vs-semaphore-vs-monitor}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────┬──────────────────────┬────────────────────────────┐
@@ -1001,7 +1083,9 @@ Monitor = Object/Class with:
   Java's synchronized methods/blocks = Monitor
 \end{verbatim}
 
-\subsubsection{Deadlock Detection: Wait-For Graph}\label{deadlock-detection-wait-for-graph}
+\subsection{Deadlock Detection: Wait-For Graph}\label{deadlock-detection-wait-for-graph}
+
+\setcodelang{}
 
 \begin{verbatim}
 T1 ──waits──► T2
@@ -1012,7 +1096,9 @@ T1 ──waits──► T2
 Cycle T1→T2→T3→T1 = DEADLOCK
 \end{verbatim}
 
-\subsubsection{Lock Ordering to Prevent Deadlock}\label{lock-ordering-to-prevent-deadlock}
+\subsection{Lock Ordering to Prevent Deadlock}\label{lock-ordering-to-prevent-deadlock}
+
+\setcodelang{}
 
 \begin{verbatim}
 Global lock order: L1 < L2 < L3 < L4
@@ -1024,18 +1110,24 @@ Thread C needs L2, L3:   acquire L2 → acquire L3 → release L3 → release L2
 No circular dependency possible — all follow same ordering
 \end{verbatim}
 
-\subsubsection{CAS Operation Internals}\label{cas-operation-internals}
+\subsection{CAS Operation Internals}\label{cas-operation-internals}
 
-\begin{verbatim}
-CMPXCHG instruction (x86):
-1. Read value from memory address
-2. Compare with expected
-3. If equal: write new value, return true
-4. If not equal: return false (read actual value)
-Steps 1-4 are ATOMIC — cannot be interrupted by another CPU
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{Memory Model: Visibility Issue}\label{memory-model-visibility-issue}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{CMPXCHG instruction (x86):}
+\FloatTok{1.}\NormalTok{ Read value }\ImportTok{from}\NormalTok{ memory address}
+\FloatTok{2.}\NormalTok{ Compare }\ControlFlowTok{with}\NormalTok{ expected}
+\FloatTok{3.}\NormalTok{ If equal: write new value, }\ControlFlowTok{return}\NormalTok{ true}
+\FloatTok{4.}\NormalTok{ If }\KeywordTok{not}\NormalTok{ equal: }\ControlFlowTok{return}\NormalTok{ false (read actual value)}
+\NormalTok{Steps }\DecValTok{1}\OperatorTok{{-}}\DecValTok{4}\NormalTok{ are ATOMIC — cannot be interrupted by another CPU}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Memory Model: Visibility Issue}\label{memory-model-visibility-issue}
+
+\setcodelang{}
 
 \begin{verbatim}
 Multi-core CPU:
@@ -1054,7 +1146,9 @@ volatile/memory fence forces:
 - Read: invalidate local cache, read from RAM
 \end{verbatim}
 
-\subsubsection{Thread Pool Flow}\label{thread-pool-flow}
+\subsection{Thread Pool Flow}\label{thread-pool-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client threads
@@ -1072,33 +1166,33 @@ Client threads
                                   [Rejection Policy]
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
-\subsubsection{Google: Bigtable Tablet Server}\label{google-bigtable-tablet-server}
+\subsection{Google: Bigtable Tablet Server}\label{google-bigtable-tablet-server}
 
 Bigtable tablet servers use read-write locks to protect tablet metadata. Multiple reads (serving queries) proceed concurrently; mutations (compactions, splits) acquire write lock exclusively. This allows high read throughput while ensuring consistency during structural changes.
 
-\subsubsection{Meta: Folly\textquotesingle s Concurrency Primitives}\label{meta-follys-concurrency-primitives}
+\subsection{Meta: Folly\textquotesingle s Concurrency Primitives}\label{meta-follys-concurrency-primitives}
 
 Meta\textquotesingle s open-source Folly library (\texttt{folly::Synchronized\textless{}T\textgreater{}}) wraps any data structure with a mutex automatically. Their \texttt{SharedMutex} is a high-performance reader-writer lock used in Thrift servers where millions of RPC calls read configuration but writes are rare.
 
-\subsubsection{Amazon DynamoDB: Lock-Free Data Structures}\label{amazon-dynamodb-lock-free-data-structures}
+\subsection{Amazon DynamoDB: Lock-Free Data Structures}\label{amazon-dynamodb-lock-free-data-structures}
 
 DynamoDB uses lock-free concurrent skip lists for its in-memory data structures. CAS operations handle concurrent inserts/deletes without traditional locking, achieving high throughput at low latency for partition-local operations.
 
-\subsubsection{Uber: Atomic Counters for Surge Pricing}\label{uber-atomic-counters-for-surge-pricing}
+\subsection{Uber: Atomic Counters for Surge Pricing}\label{uber-atomic-counters-for-surge-pricing}
 
 Uber\textquotesingle s surge pricing uses \texttt{AtomicLong} counters to track active trips per geohash cell. When a driver completes a trip, \texttt{decrementAndGet()} happens atomically across multiple dispatch servers using CAS --- no locks needed for this critical counting operation.
 
-\subsubsection{Linux Kernel: RCU (Read-Copy-Update)}\label{linux-kernel-rcu-read-copy-update}
+\subsection{Linux Kernel: RCU (Read-Copy-Update)}\label{linux-kernel-rcu-read-copy-update}
 
 RCU is an extreme read-write lock optimization: readers never lock at all (zero overhead). Writers make a copy, update it, then atomically swap the pointer. Old copy is freed when no readers reference it. Used in Linux networking, file system paths --- thousands of reads per microsecond.
 
-\subsubsection{Java\textquotesingle s ConcurrentHashMap}\label{javas-concurrenthashmap}
+\subsection{Java\textquotesingle s ConcurrentHashMap}\label{javas-concurrenthashmap}
 
 Pre-Java 8: one lock per segment (16 segments = 16-way parallelism). Java 8+: CAS for \texttt{put} when bucket is empty; per-bucket \texttt{synchronized} when needed. Readers never block. This gives near-linear scalability with thread count for most workloads.
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One kitchen, one brigade --- every concept is a cook, a tool, or a station in the same busy restaurant.}
 
@@ -1136,9 +1230,9 @@ Analogy --- \emph{the restaurant kitchen}
 \textbf{Async/Await} & One waiter working ten tables --- takes the next order while the kitchen cooks the last, never idle \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{\texorpdfstring{Deadlock 4 Conditions: \textbf{"MHNC"} (Make Him Never Circulate)}{Deadlock 4 Conditions: "MHNC" (Make Him Never Circulate)}}\label{deadlock-4-conditions-mhnc-make-him-never-circulate}
+\subsection{\texorpdfstring{Deadlock 4 Conditions: \textbf{"MHNC"} (Make Him Never Circulate)}{Deadlock 4 Conditions: "MHNC" (Make Him Never Circulate)}}\label{deadlock-4-conditions-mhnc-make-him-never-circulate}
 
 \begin{itemize}
 \tightlist
@@ -1166,7 +1260,7 @@ Analogy --- \emph{the restaurant kitchen}
   Break C: \textbf{LOCK ORDERING} --- most practical solution in software
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Semaphore P/V: \textbf{"P = Post office, V = Vacate"}}{Semaphore P/V: "P = Post office, V = Vacate"}}\label{semaphore-pv-p--post-office-v--vacate}
+\subsection{\texorpdfstring{Semaphore P/V: \textbf{"P = Post office, V = Vacate"}}{Semaphore P/V: "P = Post office, V = Vacate"}}\label{semaphore-pv-p--post-office-v--vacate}
 
 \begin{itemize}
 \tightlist
@@ -1176,7 +1270,7 @@ Analogy --- \emph{the restaurant kitchen}
   \textbf{V} (verhogen/increment) = release, signal \(\rightarrow\) "VACATE the window, next!"
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Thread States: \textbf{"NEW RABBIT WAITS BUSILY THEN DIES"}}{Thread States: "NEW RABBIT WAITS BUSILY THEN DIES"}}\label{thread-states-new-rabbit-waits-busily-then-dies}
+\subsection{\texorpdfstring{Thread States: \textbf{"NEW RABBIT WAITS BUSILY THEN DIES"}}{Thread States: "NEW RABBIT WAITS BUSILY THEN DIES"}}\label{thread-states-new-rabbit-waits-busily-then-dies}
 
 \begin{itemize}
 \tightlist
@@ -1184,7 +1278,7 @@ Analogy --- \emph{the restaurant kitchen}
   NEW \(\rightarrow\) RUNNABLE \(\rightarrow\) WAITING/TIMED\_WAITING/BLOCKED \(\rightarrow\) TERMINATED
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Happens-Before Rules (Java): \textbf{"SLVJ"} --- Start, Lock, Volatile, Join}{Happens-Before Rules (Java): "SLVJ" --- Start, Lock, Volatile, Join}}\label{happens-before-rules-java-slvj--start-lock-volatile-join}
+\subsection{\texorpdfstring{Happens-Before Rules (Java): \textbf{"SLVJ"} --- Start, Lock, Volatile, Join}{Happens-Before Rules (Java): "SLVJ" --- Start, Lock, Volatile, Join}}\label{happens-before-rules-java-slvj--start-lock-volatile-join}
 
 \begin{itemize}
 \tightlist
@@ -1198,7 +1292,7 @@ Analogy --- \emph{the restaurant kitchen}
   \textbf{J}oin: thread actions happen-before join() returns
 \end{itemize}
 
-\subsubsection{\texorpdfstring{CAS vs Lock: \textbf{"CAS for counters, Lock for compounds"}}{CAS vs Lock: "CAS for counters, Lock for compounds"}}\label{cas-vs-lock-cas-for-counters-lock-for-compounds}
+\subsection{\texorpdfstring{CAS vs Lock: \textbf{"CAS for counters, Lock for compounds"}}{CAS vs Lock: "CAS for counters, Lock for compounds"}}\label{cas-vs-lock-cas-for-counters-lock-for-compounds}
 
 \begin{itemize}
 \tightlist
@@ -1208,7 +1302,7 @@ Analogy --- \emph{the restaurant kitchen}
   Multiple variables must change together \(\rightarrow\) Lock
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Pool Sizing: \textbf{"I/O = Cores \(\times\) 10, CPU = Cores + 1"}}{Pool Sizing: "I/O = Cores \textbackslash times 10, CPU = Cores + 1"}}\label{pool-sizing-io--cores-times-10-cpu--cores--1}
+\subsection{\texorpdfstring{Pool Sizing: \textbf{"I/O = Cores \(\times\) 10, CPU = Cores + 1"}}{Pool Sizing: "I/O = Cores \textbackslash times 10, CPU = Cores + 1"}}\label{pool-sizing-io--cores-times-10-cpu--cores--1}
 
 \begin{itemize}
 \tightlist
@@ -1220,7 +1314,7 @@ Analogy --- \emph{the restaurant kitchen}
   Mixed: measure and tune with load testing
 \end{itemize}
 
-\subsubsection{\texorpdfstring{False Sharing Fix: \textbf{"Pad to 64"}}{False Sharing Fix: "Pad to 64"}}\label{false-sharing-fix-pad-to-64}
+\subsection{\texorpdfstring{False Sharing Fix: \textbf{"Pad to 64"}}{False Sharing Fix: "Pad to 64"}}\label{false-sharing-fix-pad-to-64}
 
 \begin{itemize}
 \tightlist
@@ -1230,7 +1324,7 @@ Analogy --- \emph{the restaurant kitchen}
   Pad hot variables so they don\textquotesingle t share a cache line
 \end{itemize}
 
-\subsubsection{volatile vs synchronized:}\label{volatile-vs-synchronized}
+\subsection{volatile vs synchronized:}\label{volatile-vs-synchronized}
 
 \begin{itemize}
 \tightlist
@@ -1240,7 +1334,7 @@ Analogy --- \emph{the restaurant kitchen}
   \textbf{synchronized:} visibility + ordering + atomicity for critical section
 \end{itemize}
 
-\subsubsection{\texorpdfstring{Memory model mental model: \textbf{"Write \(\rightarrow\) Fence \(\rightarrow\) Read"}}{Memory model mental model: "Write \textbackslash rightarrow Fence \textbackslash rightarrow Read"}}\label{memory-model-mental-model-write-rightarrow-fence-rightarrow-read}
+\subsection{\texorpdfstring{Memory model mental model: \textbf{"Write \(\rightarrow\) Fence \(\rightarrow\) Read"}}{Memory model mental model: "Write \textbackslash rightarrow Fence \textbackslash rightarrow Read"}}\label{memory-model-mental-model-write-rightarrow-fence-rightarrow-read}
 
 \begin{itemize}
 \tightlist
@@ -1250,9 +1344,9 @@ Analogy --- \emph{the restaurant kitchen}
   volatile read = acquire fence (all subsequent reads see previous writes)
 \end{itemize}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: What is a race condition? How do you prevent it?}\label{q1-what-is-a-race-condition-how-do-you-prevent-it}
+\subsection{Q1: What is a race condition? How do you prevent it?}\label{q1-what-is-a-race-condition-how-do-you-prevent-it}
 
 \textbf{Model answer:} A race condition occurs when program output depends on relative thread scheduling. Prevents: identify shared mutable state, protect with mutex/synchronized, or use lock-free atomics, or eliminate sharing (immutability, thread-local storage).
 
@@ -1266,7 +1360,7 @@ Analogy --- \emph{the restaurant kitchen}
   "Can you have a race condition with a single CPU?" \(\rightarrow\) Yes, due to context switches between instructions
 \end{itemize}
 
-\subsubsection{Q2: Explain the four conditions for deadlock and how to prevent each.}\label{q2-explain-the-four-conditions-for-deadlock-and-how-to-prevent-each}
+\subsection{Q2: Explain the four conditions for deadlock and how to prevent each.}\label{q2-explain-the-four-conditions-for-deadlock-and-how-to-prevent-each}
 
 \textbf{Model answer:} MHNC --- Mutual Exclusion, Hold-and-Wait, No Preemption, Circular Wait. Prevention: lock ordering (breaks circular wait), acquire all locks at once (breaks hold-and-wait), tryLock with timeout (breaks no-preemption).
 
@@ -1280,7 +1374,7 @@ Analogy --- \emph{the restaurant kitchen}
   "What\textquotesingle s the difference between deadlock prevention and avoidance?" \(\rightarrow\) Prevention breaks a condition; avoidance (Banker\textquotesingle s algorithm) dynamically refuses unsafe states
 \end{itemize}
 
-\subsubsection{Q3: Implement producer-consumer with two semaphores.}\label{q3-implement-producer-consumer-with-two-semaphores}
+\subsection{Q3: Implement producer-consumer with two semaphores.}\label{q3-implement-producer-consumer-with-two-semaphores}
 
 \textbf{Model answer:} (See code in §Producer-Consumer section above)
 
@@ -1308,7 +1402,7 @@ Analogy --- \emph{the restaurant kitchen}
   "How would you implement this without semaphores?" \(\rightarrow\) Mutex + condition variables (as in Java example)
 \end{itemize}
 
-\subsubsection{Q4: What is the difference between a mutex and a semaphore?}\label{q4-what-is-the-difference-between-a-mutex-and-a-semaphore}
+\subsection{Q4: What is the difference between a mutex and a semaphore?}\label{q4-what-is-the-difference-between-a-mutex-and-a-semaphore}
 
 \textbf{Model answer:}
 
@@ -1322,39 +1416,41 @@ Analogy --- \emph{the restaurant kitchen}
 
 \textbf{Follow-up:} "Can you implement a mutex with a semaphore?" \(\rightarrow\) Yes, binary semaphore with convention that only acquirer calls signal. But you lose deadlock detection and priority inheritance benefits.
 
-\subsubsection{Q5: Explain Compare-And-Swap and the ABA problem.}\label{q5-explain-compare-and-swap-and-the-aba-problem}
+\subsection{Q5: Explain Compare-And-Swap and the ABA problem.}\label{q5-explain-compare-and-swap-and-the-aba-problem}
 
 \textbf{Model answer:} CAS atomically: reads value, compares to expected, writes new value if match, returns success/fail. Single hardware instruction (CMPXCHG). ABA: value changed A\(\rightarrow\)B\(\rightarrow\)A between your read and CAS --- CAS succeeds thinking nothing changed. Fix: add version counter (\texttt{AtomicStampedReference}).
 
 \textbf{Follow-up:} "Where would ABA actually cause a bug?" \(\rightarrow\) Lock-free linked list: node removed, memory freed, new node allocated at same address. CAS sees same pointer, thinks old node still there \(\rightarrow\) use-after-free or corruption.
 
-\subsubsection{Q6: What is false sharing and how do you fix it?}\label{q6-what-is-false-sharing-and-how-do-you-fix-it}
+\subsection{Q6: What is false sharing and how do you fix it?}\label{q6-what-is-false-sharing-and-how-do-you-fix-it}
 
 \textbf{Model answer:} Two threads write to different variables sharing a 64-byte cache line. Each write invalidates the other core\textquotesingle s cache line, causing cache misses even though the data is logically independent. Fix: pad struct so hot variables occupy their own cache line.
 
 \textbf{Follow-up:} "How do you detect false sharing?" \(\rightarrow\) \texttt{perf\ stat\ -e\ cache-misses} on Linux, Intel VTune "false sharing" analysis. Look for high L1/L2 cache miss rates with no logical sharing.
 
-\subsubsection{Q7: What is the Python GIL and when does it matter?}\label{q7-what-is-the-python-gil-and-when-does-it-matter}
+\subsection{Q7: What is the Python GIL and when does it matter?}\label{q7-what-is-the-python-gil-and-when-does-it-matter}
 
 \textbf{Model answer:} Global Interpreter Lock --- CPython mutex preventing multiple native threads from executing Python bytecode simultaneously. Matters for CPU-bound parallelism (threads don\textquotesingle t help). Doesn\textquotesingle t matter for I/O-bound concurrency (GIL released during I/O, threads work fine). Fix for CPU-bound: \texttt{multiprocessing}, C extensions, or PyPy.
 
 \textbf{Follow-up:} "Is the GIL being removed?" \(\rightarrow\) Python 3.13 experimental no-GIL build (PEP 703). Not default yet. Uses per-object reference counting with atomic ops instead.
 
-\subsubsection{Q8: Explain volatile in Java. When is it sufficient?}\label{q8-explain-volatile-in-java-when-is-it-sufficient}
+\subsection{Q8: Explain volatile in Java. When is it sufficient?}\label{q8-explain-volatile-in-java-when-is-it-sufficient}
 
 \textbf{Model answer:} Volatile ensures visibility (writes immediately visible to other threads via memory barrier) and ordering (prevents reordering around the volatile access). Sufficient for: flag variables, single-variable state published once. NOT sufficient for: \texttt{counter++} (read-modify-write is not atomic). Use \texttt{AtomicInteger} for that.
 
 \textbf{Follow-up:} "What\textquotesingle s the difference between volatile and synchronized?" \(\rightarrow\) synchronized adds atomicity for compound actions + mutual exclusion. volatile is lighter but no mutual exclusion.
 
-\subsubsection{Q9: How does Java\textquotesingle s ReadWriteLock work, and when would you not use it?}\label{q9-how-does-javas-readwritelock-work-and-when-would-you-not-use-it}
+\subsection{Q9: How does Java\textquotesingle s ReadWriteLock work, and when would you not use it?}\label{q9-how-does-javas-readwritelock-work-and-when-would-you-not-use-it}
 
 \textbf{Model answer:} Allows multiple concurrent readers OR one exclusive writer. Writer blocks when readers active; readers block when writer active. Avoids when: write-heavy workloads (overhead \textgreater{} benefit), very short critical sections (overhead of tracking readers), when you need upgrade from read to write lock (causes deadlock --- not supported).
 
 \textbf{Follow-up:} "What\textquotesingle s StampedLock?" \(\rightarrow\) Java 8 addition. Adds optimistic reading: try a read without lock, check stamp at end; if stamp changed, fall back to real read lock. Even better read throughput when conflicts rare.
 
-\subsubsection{Q10: Design a thread-safe singleton in Java.}\label{q10-design-a-thread-safe-singleton-in-java}
+\subsection{Q10: Design a thread-safe singleton in Java.}\label{q10-design-a-thread-safe-singleton-in-java}
 
 \textbf{Model answer (multiple approaches):}
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1391,11 +1487,13 @@ Analogy --- \emph{the restaurant kitchen}
 
 \textbf{Why volatile in DCL?} Without volatile, another thread may see partially constructed object (constructor writes reordered to after \texttt{instance\ =\ new\ Singleton()} write).
 
-\subsubsection{\texorpdfstring{Q11: What is a condition variable and why use \texttt{while} instead of \texttt{if}?}{Q11: What is a condition variable and why use while instead of if?}}\label{q11-what-is-a-condition-variable-and-why-use-while-instead-of-if}
+\subsection{\texorpdfstring{Q11: What is a condition variable and why use \texttt{while} instead of \texttt{if}?}{Q11: What is a condition variable and why use while instead of if?}}\label{q11-what-is-a-condition-variable-and-why-use-while-instead-of-if}
 
 \textbf{Model answer:} Condition variable pairs with a mutex. Thread calls \texttt{wait()} to atomically release mutex and sleep until signaled. After waking, re-acquires mutex. Use \texttt{while} because: (1) spurious wakeups (real POSIX behavior --- thread wakes without explicit signal), (2) multiple waiters --- condition may be true when signaled but false again by the time this thread executes.
 
-\subsubsection{Q12: Difference between thread pool\textquotesingle s fixed vs cached vs work-stealing executors?}\label{q12-difference-between-thread-pools-fixed-vs-cached-vs-work-stealing-executors}
+\subsection{Q12: Difference between thread pool\textquotesingle s fixed vs cached vs work-stealing executors?}\label{q12-difference-between-thread-pools-fixed-vs-cached-vs-work-stealing-executors}
+
+\setcodelang{}
 
 \begin{verbatim}
 Executors.newFixedThreadPool(n):   fixed n threads, unbounded queue
@@ -1406,9 +1504,11 @@ Executors.newWorkStealingPool():   ForkJoinPool, work-stealing deques per thread
                                    → best for recursive/tree tasks (divide and conquer)
 \end{verbatim}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{1. Amdahl\textquotesingle s Law --- Theoretical Speedup Limit}\label{1-amdahls-law--theoretical-speedup-limit}
+\subsection{1. Amdahl\textquotesingle s Law --- Theoretical Speedup Limit}\label{1-amdahls-law--theoretical-speedup-limit}
+
+\setcodelang{}
 
 \begin{verbatim}
 Speedup = 1 / (S + (1-S)/N)
@@ -1422,11 +1522,11 @@ If 5% of your code must be serial:
 
 \textbf{Implication:} Identify and minimize serial bottlenecks before adding more threads/cores.
 
-\subsubsection{2. Memory Model Sophistication}\label{2-memory-model-sophistication}
+\subsection{2. Memory Model Sophistication}\label{2-memory-model-sophistication}
 
 Modern CPUs use TSO (Total Store Order --- x86), allowing stores to be reordered relative to other stores from other cores\textquotesingle{} perspective. ARM/POWER allow more reorderings. High-performance code targeting multiple architectures must use explicit memory fences (\texttt{std::atomic\_thread\_fence}), not just volatile.
 
-\subsubsection{3. Lock-Free Algorithm Design Challenges}\label{3-lock-free-algorithm-design-challenges}
+\subsection{3. Lock-Free Algorithm Design Challenges}\label{3-lock-free-algorithm-design-challenges}
 
 Beyond ABA: lock-free algorithms are notoriously difficult. Even with CAS, you need careful thought about:
 
@@ -1442,9 +1542,11 @@ Beyond ABA: lock-free algorithms are notoriously difficult. Even with CAS, you n
 
 Epoch-based reclamation and hazard pointers are standard techniques for safe memory reclamation in lock-free data structures.
 
-\subsubsection{4. Virtual Threads (Java 21 Project Loom)}\label{4-virtual-threads-java-21-project-loom}
+\subsection{4. Virtual Threads (Java 21 Project Loom)}\label{4-virtual-threads-java-21-project-loom}
 
 Java 21 introduces virtual threads --- millions of lightweight threads mapped to OS threads by the JVM. Blocking operations (I/O, sleep) on virtual threads park the virtual thread without blocking the underlying OS thread. This combines the programming simplicity of threads with async scalability.
+
+\setcodelang{Java}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1461,15 +1563,17 @@ Java 21 introduces virtual threads --- millions of lightweight threads mapped to
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{5. STM (Software Transactional Memory)}\label{5-stm-software-transactional-memory}
+\subsection{5. STM (Software Transactional Memory)}\label{5-stm-software-transactional-memory}
 
 Database-like transactions for memory: group reads/writes into a transaction, auto-retry on conflict. Clojure uses STM for its reference types. Eliminates deadlocks (transactions can always roll back) but high overhead for write-heavy workloads.
 
-\subsubsection{6. Reactive/Actor Model}\label{6-reactiveactor-model}
+\subsection{6. Reactive/Actor Model}\label{6-reactiveactor-model}
 
 \textbf{Actor model (Akka, Erlang):} Each actor has mailbox and processes one message at a time --- no shared state. Concurrency via message passing. Deadlock-resistant by design (no locks). Actors can be distributed transparently.
 
-\subsubsection{7. Lock Granularity Trade-offs}\label{7-lock-granularity-trade-offs}
+\subsection{7. Lock Granularity Trade-offs}\label{7-lock-granularity-trade-offs}
+
+\setcodelang{}
 
 \begin{verbatim}
 Coarse-grained locking:    One lock for entire data structure
@@ -1482,51 +1586,51 @@ Lock-free:                 CAS-based, no locks
 
 \textbf{ConcurrentHashMap progression:} Per-structure lock \(\rightarrow\) 16 segments \(\rightarrow\) per-bucket CAS/sync (Java 8+).
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
-\subsubsection{\texorpdfstring{1. Using \texttt{if} instead of \texttt{while} for condition variable waits}{1. Using if instead of while for condition variable waits}}\label{1-using-if-instead-of-while-for-condition-variable-waits}
+\subsection{\texorpdfstring{1. Using \texttt{if} instead of \texttt{while} for condition variable waits}{1. Using if instead of while for condition variable waits}}\label{1-using-if-instead-of-while-for-condition-variable-waits}
 
 \textbf{Symptom:} Intermittent NullPointerExceptions or incorrect values after wait(). \textbf{Fix:} Always \texttt{while\ (condition\ not\ met)\ \{\ wait();\ \}}
 
-\subsubsection{2. Wrong semaphore acquire order causing deadlock}\label{2-wrong-semaphore-acquire-order-causing-deadlock}
+\subsection{2. Wrong semaphore acquire order causing deadlock}\label{2-wrong-semaphore-acquire-order-causing-deadlock}
 
 \textbf{Symptom:} Producer-consumer deadlocks when buffer is full. \textbf{Fix:} Acquire resource semaphore (empty/full) before mutex, never after.
 
-\subsubsection{\texorpdfstring{3. Checking for \texttt{==\ null} on volatile reference without synchronized block}{3. Checking for == null on volatile reference without synchronized block}}\label{3-checking-for--null-on-volatile-reference-without-synchronized-block}
+\subsection{\texorpdfstring{3. Checking for \texttt{==\ null} on volatile reference without synchronized block}{3. Checking for == null on volatile reference without synchronized block}}\label{3-checking-for--null-on-volatile-reference-without-synchronized-block}
 
 \textbf{Symptom:} Two instances created in double-checked locking without volatile. \textbf{Fix:} Declare instance variable as volatile.
 
-\subsubsection{4. Forgetting to release locks (no RAII/try-finally)}\label{4-forgetting-to-release-locks-no-raiitry-finally}
+\subsection{4. Forgetting to release locks (no RAII/try-finally)}\label{4-forgetting-to-release-locks-no-raiitry-finally}
 
 \textbf{Symptom:} System hangs intermittently when exceptions thrown in critical section. \textbf{Fix:} Always use try-finally or RAII (\texttt{lock\_guard}, \texttt{with\ lock:}).
 
-\subsubsection{5. Using Thread.stop() or Thread.suspend() (deprecated)}\label{5-using-threadstop-or-threadsuspend-deprecated}
+\subsection{5. Using Thread.stop() or Thread.suspend() (deprecated)}\label{5-using-threadstop-or-threadsuspend-deprecated}
 
 \textbf{Symptom:} Orphaned locks, corrupt state. \textbf{Fix:} Use interrupt flags + cooperative checking (\texttt{while\ (!Thread.interrupted())}).
 
-\subsubsection{6. Thinking volatile fixes race conditions for compound operations}\label{6-thinking-volatile-fixes-race-conditions-for-compound-operations}
+\subsection{6. Thinking volatile fixes race conditions for compound operations}\label{6-thinking-volatile-fixes-race-conditions-for-compound-operations}
 
 \textbf{Symptom:} Lost updates on \texttt{volatile\ int\ counter} with \texttt{counter++}. \textbf{Fix:} Use \texttt{AtomicInteger.incrementAndGet()}.
 
-\subsubsection{7. Assuming HashMap.get() is thread-safe because it\textquotesingle s "read-only"}\label{7-assuming-hashmapget-is-thread-safe-because-its-read-only}
+\subsection{7. Assuming HashMap.get() is thread-safe because it\textquotesingle s "read-only"}\label{7-assuming-hashmapget-is-thread-safe-because-its-read-only}
 
 \textbf{Symptom:} Infinite loops or NPE during concurrent modification (HashMap can infinite loop on get during rehash in Java). \textbf{Fix:} Use \texttt{ConcurrentHashMap}.
 
-\subsubsection{\texorpdfstring{8. Ignoring lock ordering \(\rightarrow\) deadlock in production}{8. Ignoring lock ordering \textbackslash rightarrow deadlock in production}}\label{8-ignoring-lock-ordering-rightarrow-deadlock-in-production}
+\subsection{\texorpdfstring{8. Ignoring lock ordering \(\rightarrow\) deadlock in production}{8. Ignoring lock ordering \textbackslash rightarrow deadlock in production}}\label{8-ignoring-lock-ordering-rightarrow-deadlock-in-production}
 
 \textbf{Symptom:} Rare deadlocks that only happen under load. \textbf{Fix:} Establish and document global lock acquisition order.
 
-\subsubsection{9. Creating too many threads for CPU-bound work}\label{9-creating-too-many-threads-for-cpu-bound-work}
+\subsection{9. Creating too many threads for CPU-bound work}\label{9-creating-too-many-threads-for-cpu-bound-work}
 
 \textbf{Symptom:} Performance degrades with 100 threads for CPU work on 8-core machine. \textbf{Fix:} Thread count \(\approx\) core count for CPU-bound.
 
-\subsubsection{10. Assuming thread-safe classes compose safely}\label{10-assuming-thread-safe-classes-compose-safely}
+\subsection{10. Assuming thread-safe classes compose safely}\label{10-assuming-thread-safe-classes-compose-safely}
 
 \textbf{Symptom:} \texttt{if\ (!list.contains(x))\ list.add(x)} on a \texttt{CopyOnWriteArrayList} still has race. \textbf{Fix:} The compound check-then-act still needs external synchronization.
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{Operating Systems}\label{operating-systems}
+\subsection{Operating Systems}\label{operating-systems}
 
 \begin{itemize}
 \tightlist
@@ -1540,7 +1644,7 @@ Lock-free:                 CAS-based, no locks
   Virtual memory and copy-on-write (fork() performance)
 \end{itemize}
 
-\subsubsection{System Design}\label{system-design}
+\subsection{System Design}\label{system-design}
 
 \begin{itemize}
 \tightlist
@@ -1558,7 +1662,7 @@ Lock-free:                 CAS-based, no locks
   MVCC (Multi-Version Concurrency Control) = database reader-writer problem solution
 \end{itemize}
 
-\subsubsection{Performance Engineering}\label{performance-engineering}
+\subsection{Performance Engineering}\label{performance-engineering}
 
 \begin{itemize}
 \tightlist
@@ -1572,7 +1676,7 @@ Lock-free:                 CAS-based, no locks
   Cache-coherent NUMA architectures --- prefer thread-local data
 \end{itemize}
 
-\subsubsection{Databases}\label{databases}
+\subsection{Databases}\label{databases}
 
 \begin{itemize}
 \tightlist
@@ -1588,7 +1692,7 @@ Lock-free:                 CAS-based, no locks
   MVCC: reads don\textquotesingle t block writes, writes don\textquotesingle t block reads --- read-committed, snapshot isolation
 \end{itemize}
 
-\subsubsection{Distributed Systems}\label{distributed-systems}
+\subsection{Distributed Systems}\label{distributed-systems}
 
 \begin{itemize}
 \tightlist
@@ -1602,9 +1706,9 @@ Lock-free:                 CAS-based, no locks
   Event sourcing / CQRS \(\rightarrow\) separates reads and writes to avoid reader-writer contention
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
-\subsubsection{Strategy by Interview Type}\label{strategy-by-interview-type}
+\subsection{Strategy by Interview Type}\label{strategy-by-interview-type}
 
 \textbf{Coding round:} If given a multi-threading problem:
 
@@ -1643,7 +1747,7 @@ Lock-free:                 CAS-based, no locks
   Mention specific tools: Java thread dumps, \texttt{jstack}, Go\textquotesingle s race detector (\texttt{go\ test\ -race}), Helgrind
 \end{itemize}
 
-\subsubsection{Language-Specific Tips}\label{language-specific-tips}
+\subsection{Language-Specific Tips}\label{language-specific-tips}
 
 \textbf{Java:} Know \texttt{synchronized}, \texttt{volatile}, \texttt{java.util.concurrent.*}, \texttt{ReentrantLock}, \texttt{ReadWriteLock}, \texttt{AtomicInteger}, \texttt{CountDownLatch}, \texttt{CyclicBarrier}, \texttt{Semaphore}, \texttt{CompletableFuture}. Virtual threads (Java 21).
 
@@ -1653,7 +1757,7 @@ Lock-free:                 CAS-based, no locks
 
 \textbf{Go:} Goroutines, channels (preferred over shared memory), \texttt{sync.Mutex}, \texttt{sync.RWMutex}, \texttt{sync.WaitGroup}, \texttt{sync/atomic}, \texttt{go\ test\ -race}.
 
-\subsubsection{Common FAANG Patterns They Test}\label{common-faang-patterns-they-test}
+\subsection{Common FAANG Patterns They Test}\label{common-faang-patterns-they-test}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1672,7 +1776,7 @@ Lock-free:                 CAS-based, no locks
   \textbf{Deadlock diagnosis from thread dump} (senior-level Google SRE/SWE)
 \end{enumerate}
 
-\subsubsection{What Separates Good from Great Answers}\label{what-separates-good-from-great-answers}
+\subsection{What Separates Good from Great Answers}\label{what-separates-good-from-great-answers}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3316}}
@@ -1694,9 +1798,9 @@ Great Answer
 "Deadlock: two threads waiting" & "Four Coffman conditions; break circular wait via lock ordering" \\
 \end{longtable}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Revision Summary}\label{10-minute-revision-summary}
+\subsection{10-Minute Revision Summary}\label{10-minute-revision-summary}
 
 \textbf{The 3 fundamental problems:}
 
@@ -1753,7 +1857,7 @@ Great Answer
   \textbf{Go:} prefer channels over shared memory; goroutines are cheap (\textasciitilde2KB stack)
 \end{itemize}
 
-\subsubsection{Key Points to Remember}\label{key-points-to-remember}
+\subsection{Key Points to Remember}\label{key-points-to-remember}
 
 \begin{itemize}
 \tightlist
@@ -1781,7 +1885,7 @@ Great Answer
   Livelock: both active, no progress; Starvation: one thread never gets resource
 \end{itemize}
 
-\subsubsection{Compact Cheat Sheet Table}\label{compact-cheat-sheet-table}
+\subsection{Compact Cheat Sheet Table}\label{compact-cheat-sheet-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1323}}
@@ -1821,7 +1925,7 @@ Producer-Consumer & Bounded buffer sync problem & empty + full semaphores + mute
 async/await & Cooperative coroutines on event loop & \texttt{await\ asyncio.gather(*tasks)} & Sync code blocks entire loop \\
 \end{longtable}
 
-\subsubsection{Most Important Interview Concepts (Ranked by Frequency)}\label{most-important-interview-concepts-ranked-by-frequency}
+\subsection{Most Important Interview Concepts (Ranked by Frequency)}\label{most-important-interview-concepts-ranked-by-frequency}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

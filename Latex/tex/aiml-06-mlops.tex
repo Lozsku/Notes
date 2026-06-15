@@ -63,13 +63,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{MLOps \& ML System Design}\label{mlops--ml-system-design}
-
 \begin{quote}
 MLOps is the engineering discipline that closes the loop between ML research and production impact --- the difference between a model that scores well in a notebook and one that earns billions of dollars reliably at scale.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 MLOps (Machine Learning Operations) is the set of practices, tools, and cultural norms that make it possible to deploy, monitor, and continuously improve ML systems in production. ML System Design is the interview skill of architecting those systems end-to-end given business and technical constraints.
 
@@ -102,7 +100,7 @@ MLOps (Machine Learning Operations) is the set of practices, tools, and cultural
   Reason about latency, cost, fairness, and iteration speed from the start
 \end{itemize}
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 Classical software engineering has a clean input-output contract: given the same code and inputs, outputs are deterministic and bugs are reproducible. ML systems break every assumption:
 
@@ -141,7 +139,7 @@ MLOps exists because the ML development lifecycle is fundamentally different fro
   \textbf{Deployment bottlenecks}: data scientists can\textquotesingle t deploy; engineers can\textquotesingle t understand models
 \end{itemize}
 
-\subsection{Why FAANG Cares (be specific --- recsys/ranking/ads are the revenue engines)}\label{why-faang-cares-be-specific--recsysrankingads-are-the-revenue-engines}
+\section{Why FAANG Cares (be specific --- recsys/ranking/ads are the revenue engines)}\label{why-faang-cares-be-specific--recsysrankingads-are-the-revenue-engines}
 
 At FAANG scale, ML systems are not infrastructure --- they ARE the product.
 
@@ -199,16 +197,18 @@ TikTok & For You page ranking & Primary retention mechanism for 1B+ MAU \\
   \textbf{Multi-objective optimization}: engagement vs. revenue vs. diversity vs. user wellbeing
 \end{itemize}
 
-\subsection{The ML System Design Framework (Step-by-Step Playbook)}\label{the-ml-system-design-framework-step-by-step-playbook}
+\section{The ML System Design Framework (Step-by-Step Playbook)}\label{the-ml-system-design-framework-step-by-step-playbook}
 
 Use this framework in every ML system design interview. Walk through each step explicitly --- interviewers reward structured thinking.
+
+\setcodelang{}
 
 \begin{verbatim}
 FRAMEWORK: C-O-D-F-M-T-E-S-M-I
 Clarify → Objective → Data → Features → Model → Train → Evaluate → Serve → Monitor → Iterate
 \end{verbatim}
 
-\subsubsection{Step 1: Clarify Requirements (5 min)}\label{step-1-clarify-requirements-5-min}
+\subsection{Step 1: Clarify Requirements (5 min)}\label{step-1-clarify-requirements-5-min}
 
 Always start here. Never design before clarifying.
 
@@ -232,7 +232,7 @@ Always start here. Never design before clarifying.
 
 \textbf{Interview tip}: Say "Before I design, let me ask a few clarifying questions to make sure I\textquotesingle m solving the right problem."
 
-\subsubsection{Step 2: Define ML Objective \& Metrics}\label{step-2-define-ml-objective--metrics}
+\subsection{Step 2: Define ML Objective \& Metrics}\label{step-2-define-ml-objective--metrics}
 
 Translate the business goal into a precise ML problem.
 
@@ -275,7 +275,7 @@ Improve search & Rank relevant docs higher & NDCG@10, MRR & Click-through-rank \
   \textbf{Guardrail metrics}: what must NOT degrade (latency P99, flagged content rate)
 \end{itemize}
 
-\subsubsection{Step 3: Data Strategy}\label{step-3-data-strategy}
+\subsection{Step 3: Data Strategy}\label{step-3-data-strategy}
 
 \textbf{Questions to answer:}
 
@@ -307,7 +307,7 @@ Improve search & Rank relevant docs higher & NDCG@10, MRR & Click-through-rank \
   \textbf{Position bias}: items shown in position 1 get clicked more regardless of quality
 \end{itemize}
 
-\subsubsection{Step 4: Feature Engineering}\label{step-4-feature-engineering}
+\subsection{Step 4: Feature Engineering}\label{step-4-feature-engineering}
 
 \textbf{Categorize features:}
 
@@ -351,7 +351,7 @@ Real-time/online & Seconds & Must be fast & Current session activity \\
 
 \textbf{Training-serving skew}: The \#1 production issue. Occurs when features computed at serving time differ from features used during training. Fix: use the same feature pipeline for both.
 
-\subsubsection{Step 5: Model Selection}\label{step-5-model-selection}
+\subsection{Step 5: Model Selection}\label{step-5-model-selection}
 
 \textbf{Choose model complexity based on:}
 
@@ -369,12 +369,14 @@ Real-time/online & Seconds & Must be fast & Current session activity \\
 
 \textbf{Model progression:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep Learning
 (baseline)    (fast, interpretable)  (best for tabular)  (embeddings)    (most expressive)
 \end{verbatim}
 
-\subsubsection{Step 6: Training Infrastructure}\label{step-6-training-infrastructure}
+\subsection{Step 6: Training Infrastructure}\label{step-6-training-infrastructure}
 
 \begin{itemize}
 \tightlist
@@ -388,7 +390,7 @@ Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep L
   \textbf{Retraining frequency}: daily? hourly? triggered by drift?
 \end{itemize}
 
-\subsubsection{Step 7: Evaluation}\label{step-7-evaluation}
+\subsection{Step 7: Evaluation}\label{step-7-evaluation}
 
 \textbf{Offline evaluation:}
 
@@ -414,7 +416,7 @@ Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep L
   Shadow mode: run new model in parallel without affecting users
 \end{itemize}
 
-\subsubsection{Step 8: Serving Architecture}\label{step-8-serving-architecture}
+\subsection{Step 8: Serving Architecture}\label{step-8-serving-architecture}
 
 \textbf{Key decisions:}
 
@@ -430,7 +432,7 @@ Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep L
   Cascading: multiple models at different cost-accuracy tradeoffs
 \end{itemize}
 
-\subsubsection{Step 9: Monitoring \& Observability}\label{step-9-monitoring--observability}
+\subsection{Step 9: Monitoring \& Observability}\label{step-9-monitoring--observability}
 
 \textbf{What to monitor:}
 
@@ -446,7 +448,7 @@ Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep L
   \textbf{Fairness}: performance across demographic slices
 \end{itemize}
 
-\subsubsection{Step 10: Iterate}\label{step-10-iterate}
+\subsection{Step 10: Iterate}\label{step-10-iterate}
 
 \begin{itemize}
 \tightlist
@@ -458,11 +460,13 @@ Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep L
   A/B test every change before full rollout
 \end{itemize}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Data Pipelines \& Data Versioning}\label{data-pipelines--data-versioning}
+\subsection{Data Pipelines \& Data Versioning}\label{data-pipelines--data-versioning}
 
 \textbf{Data pipeline components:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Raw Sources → Ingestion → Validation → Transformation → Storage → Feature Computation
@@ -512,7 +516,7 @@ Raw Sources → Ingestion → Validation → Transformation → Storage → Feat
   Tools: \textbf{Great Expectations}, \textbf{TFX Data Validation}, \textbf{Deequ}
 \end{itemize}
 
-\subsubsection{Feature Engineering at Scale \& Feature Stores}\label{feature-engineering-at-scale--feature-stores}
+\subsection{Feature Engineering at Scale \& Feature Stores}\label{feature-engineering-at-scale--feature-stores}
 
 \textbf{The feature store problem:}
 Without a feature store, the same feature (e.g., "user\textquotesingle s 7-day click rate") is computed independently by:
@@ -528,6 +532,8 @@ Without a feature store, the same feature (e.g., "user\textquotesingle s 7-day c
 This causes training-serving skew and duplicated engineering work.
 
 \textbf{Feature store architecture:}
+
+\setcodelang{}
 
 \begin{verbatim}
                      FEATURE STORE
@@ -612,7 +618,7 @@ Near-real-time & Minutes & Medium & Medium & Recent session behavior \\
 Real-time & Seconds & \textless{} 10ms required & High & Current context features \\
 \end{longtable}
 
-\subsubsection{Experiment Tracking \& Model Registry}\label{experiment-tracking--model-registry}
+\subsection{Experiment Tracking \& Model Registry}\label{experiment-tracking--model-registry}
 
 \textbf{Experiment tracking captures:}
 
@@ -646,6 +652,8 @@ Real-time & Seconds & \textless{} 10ms required & High & Current context feature
 
 \textbf{MLflow workflow:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ControlFlowTok{with}\NormalTok{ mlflow.start\_run():}
@@ -663,6 +671,8 @@ Real-time & Seconds & \textless{} 10ms required & High & Current context feature
 \end{Shaded}
 
 \textbf{Model Registry} manages the model lifecycle:
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────────────────────────────────────┐
@@ -693,7 +703,7 @@ Real-time & Seconds & \textless{} 10ms required & High & Current context feature
   \textbf{Rollback}: one-click revert to previous version
 \end{itemize}
 
-\subsubsection{Distributed Training}\label{distributed-training}
+\subsection{Distributed Training}\label{distributed-training}
 
 \textbf{Why distributed?}
 
@@ -709,7 +719,9 @@ Real-time & Seconds & \textless{} 10ms required & High & Current context feature
 
 \textbf{Three parallelism paradigms:}
 
-\paragraph{Data Parallelism}\label{data-parallelism}
+\subsubsection{Data Parallelism}\label{data-parallelism}
+
+\setcodelang{}
 
 \begin{verbatim}
          Master (gradient aggregation)
@@ -761,6 +773,8 @@ Example & Horovod, PyTorch DDP & TensorFlow PS, Uber Petastorm \\
 
 \textbf{Ring All-Reduce} (NCCL):
 
+\setcodelang{}
+
 \begin{verbatim}
 W1 → W2 → W3 → W4
 ↑               ↓
@@ -769,7 +783,9 @@ W4 ← W3 ← W2 ← W1
 
 Each worker sends a chunk to the next, receives a chunk from the previous. After N-1 steps, each worker has the full gradient sum. Bandwidth-optimal: each worker sends/receives exactly one full gradient tensor total.
 
-\paragraph{Model Parallelism}\label{model-parallelism}
+\subsubsection{Model Parallelism}\label{model-parallelism}
+
+\setcodelang{}
 
 \begin{verbatim}
 Worker 1        Worker 2        Worker 3
@@ -793,6 +809,8 @@ Worker 1        Worker 2        Worker 3
 
 \textbf{Pipeline Parallelism} (GPipe, PipeDream):
 
+\setcodelang{}
+
 \begin{verbatim}
 Micro-batch 1: [W1 compute] → [W2 compute] → [W3 compute]
 Micro-batch 2:               [W1 compute] → [W2 compute] → [W3 compute]
@@ -801,7 +819,7 @@ Micro-batch 3:                              [W1 compute] → [W2 compute] → ..
 
 Split model into stages + split mini-batch into micro-batches to fill the pipeline.
 
-\paragraph{Tensor Parallelism}\label{tensor-parallelism}
+\subsubsection{Tensor Parallelism}\label{tensor-parallelism}
 
 \begin{itemize}
 \tightlist
@@ -817,10 +835,14 @@ Split model into stages + split mini-batch into micro-batches to fill the pipeli
 
 \textbf{Combined: 3D Parallelism (Megatron + DeepSpeed)}
 
-\begin{verbatim}
-Data Parallel × Pipeline Parallel × Tensor Parallel
-= can train 1 trillion parameter models
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Data Parallel × Pipeline Parallel × Tensor Parallel}
+\OperatorTok{=}\NormalTok{ can train }\DecValTok{1}\NormalTok{ trillion parameter models}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{DeepSpeed ZeRO} (Zero Redundancy Optimizer):
 Partitions optimizer states, gradients, and parameters across data-parallel workers, dramatically reducing per-GPU memory.
@@ -846,7 +868,7 @@ Stage 2 & Optimizer states + gradients & 8x \\
 Stage 3 & Optimizer states + gradients + parameters & 64x \\
 \end{longtable}
 
-\subsubsection{Model Serving}\label{model-serving}
+\subsection{Model Serving}\label{model-serving}
 
 \textbf{Three serving paradigms:}
 
@@ -905,6 +927,8 @@ Failure handling & Retry easily & Circuit breakers, fallbacks \\
 \end{longtable}
 
 \textbf{Serving stack components:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client Request
@@ -994,11 +1018,13 @@ vLLM & LLM inference & PagedAttention, continuous batching \\
   \textbf{Multi-armed bandit}: dynamically allocate traffic to better-performing variants
 \end{itemize}
 
-\subsubsection{A/B Testing \& Online Experimentation}\label{ab-testing--online-experimentation}
+\subsection{A/B Testing \& Online Experimentation}\label{ab-testing--online-experimentation}
 
 \textbf{Why A/B test?} Offline metrics (AUC, NDCG) don\textquotesingle t always translate to business metrics (revenue, engagement). Online experiments close this gap.
 
 \textbf{A/B test anatomy:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Traffic → [Experiment Assignment] → Control (A) or Treatment (B)
@@ -1080,7 +1106,7 @@ Switchback & Alternate between A/B by time period & Fast & Marketplace, supply-s
   Content flagging rate
 \end{itemize}
 
-\subsubsection{Monitoring \& Observability}\label{monitoring--observability}
+\subsection{Monitoring \& Observability}\label{monitoring--observability}
 
 \textbf{Four types of drift:}
 
@@ -1111,15 +1137,21 @@ Example
 
 \textbf{Population Stability Index (PSI):}
 
-\begin{verbatim}
-PSI = Σ (Actual% - Expected%) × ln(Actual% / Expected%)
+\setcodelang{Python}
 
-PSI < 0.1: No significant change
-PSI 0.1-0.2: Moderate change, monitor
-PSI > 0.2: Major shift, investigate
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PSI }\OperatorTok{=}\NormalTok{ Σ (Actual}\OperatorTok{\%} \OperatorTok{{-}}\NormalTok{ Expected}\OperatorTok{\%}\NormalTok{) × ln(Actual}\OperatorTok{\%} \OperatorTok{/}\NormalTok{ Expected}\OperatorTok{\%}\NormalTok{)}
+
+\NormalTok{PSI }\OperatorTok{\textless{}} \FloatTok{0.1}\NormalTok{: No significant change}
+\NormalTok{PSI }\FloatTok{0.1}\OperatorTok{{-}}\FloatTok{0.2}\NormalTok{: Moderate change, monitor}
+\NormalTok{PSI }\OperatorTok{\textgreater{}} \FloatTok{0.2}\NormalTok{: Major shift, investigate}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Monitoring stack:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Production Traffic
@@ -1182,7 +1214,7 @@ Monitoring Pipeline (Spark Streaming / Flink)
   \textbf{Prometheus + Grafana}: metrics and dashboards (infrastructure layer)
 \end{itemize}
 
-\subsubsection{CI/CD for ML (Continuous Training)}\label{cicd-for-ml-continuous-training}
+\subsection{CI/CD for ML (Continuous Training)}\label{cicd-for-ml-continuous-training}
 
 \textbf{Standard CI/CD vs. ML CI/CD:}
 
@@ -1221,6 +1253,8 @@ Monitor & Uptime, error rate & Prediction quality, data drift \\
 \item
   \textbf{Full CT pipeline}:
 \end{itemize}
+
+\setcodelang{}
 
 \begin{verbatim}
 Trigger → Data Pipeline → Validation → Training → Evaluation
@@ -1272,9 +1306,11 @@ Trigger → Data Pipeline → Validation → Training → Evaluation
   \textbf{Vertex AI Pipelines}: GCP managed, Kubeflow-compatible
 \end{itemize}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{End-to-End MLOps Pipeline}\label{end-to-end-mlops-pipeline}
+\subsection{End-to-End MLOps Pipeline}\label{end-to-end-mlops-pipeline}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -1321,7 +1357,9 @@ Trigger → Data Pipeline → Validation → Training → Evaluation
 └─────────────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{Feature Store Architecture (Online/Offline)}\label{feature-store-architecture-onlineoffline}
+\subsection{Feature Store Architecture (Online/Offline)}\label{feature-store-architecture-onlineoffline}
+
+\setcodelang{}
 
 \begin{verbatim}
                          FEATURE STORE DEEP DIVE
@@ -1357,7 +1395,9 @@ Trigger → Data Pipeline → Validation → Training → Evaluation
 └─────────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{Two-Tower Recommendation Architecture}\label{two-tower-recommendation-architecture}
+\subsection{Two-Tower Recommendation Architecture}\label{two-tower-recommendation-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
                     TWO-TOWER MODEL ARCHITECTURE
@@ -1401,7 +1441,9 @@ Trigger → Data Pipeline → Validation → Training → Evaluation
 └───────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{\texorpdfstring{Candidate Generation \(\rightarrow\) Ranking Funnel}{Candidate Generation \textbackslash rightarrow Ranking Funnel}}\label{candidate-generation-rightarrow-ranking-funnel}
+\subsection{\texorpdfstring{Candidate Generation \(\rightarrow\) Ranking Funnel}{Candidate Generation \textbackslash rightarrow Ranking Funnel}}\label{candidate-generation-rightarrow-ranking-funnel}
+
+\setcodelang{}
 
 \begin{verbatim}
                 RECOMMENDATION FUNNEL (NETFLIX/YOUTUBE SCALE)
@@ -1453,7 +1495,9 @@ All Items (millions)
                User sees feed
 \end{verbatim}
 
-\subsubsection{Data vs. Model Parallelism}\label{data-vs-model-parallelism}
+\subsection{Data vs. Model Parallelism}\label{data-vs-model-parallelism}
+
+\setcodelang{}
 
 \begin{verbatim}
 DATA PARALLELISM
@@ -1489,7 +1533,9 @@ GPU 1: W[rows 0:N/2, :] × X = partial result 1 ─┐
 GPU 2: W[rows N/2:N, :] × X = partial result 2  ─┴─ AllGather → full result
 \end{verbatim}
 
-\subsubsection{Drift Monitoring Loop}\label{drift-monitoring-loop}
+\subsection{Drift Monitoring Loop}\label{drift-monitoring-loop}
+
+\setcodelang{}
 
 \begin{verbatim}
 DRIFT MONITORING & RESPONSE LOOP
@@ -1521,9 +1567,9 @@ Production ──▶ Feature Logging ──▶ Data Store (S3)
          (retrained model pushed back to prod)
 \end{verbatim}
 
-\subsection{Worked Examples}\label{worked-examples}
+\section{Worked Examples}\label{worked-examples}
 
-\subsubsection{Design a Recommendation System (e.g., YouTube / Netflix)}\label{design-a-recommendation-system-eg-youtube--netflix}
+\subsection{Design a Recommendation System (e.g., YouTube / Netflix)}\label{design-a-recommendation-system-eg-youtube--netflix}
 
 \textbf{Clarify requirements:}
 
@@ -1674,7 +1720,7 @@ Cross & user\textquotesingle s historical engagement with this creator/category 
   Retraining trigger: if offline AUC drops \textgreater{} 0.5\% OR drift PSI \textgreater{} 0.2 on key features
 \end{itemize}
 
-\subsubsection{Design CTR (Click-Through Rate) Prediction for Ads}\label{design-ctr-click-through-rate-prediction-for-ads}
+\subsection{Design CTR (Click-Through Rate) Prediction for Ads}\label{design-ctr-click-through-rate-prediction-for-ads}
 
 \textbf{Context:} This is the core revenue model at Google, Meta, Amazon ads.
 
@@ -1747,6 +1793,8 @@ Historical & user CTR for this ad, CTR for advertiser, position stats & Daily ba
 \textbf{Model:}
 
 \textbf{DLRM (Deep Learning Recommendation Model)} or \textbf{Wide \& Deep}:
+
+\setcodelang{}
 
 \begin{verbatim}
 Sparse Features              Dense Features
@@ -1821,7 +1869,7 @@ Sparse Features              Dense Features
   \textbf{Latency P99}: ads must not delay page load
 \end{itemize}
 
-\subsubsection{Design News Feed Ranking (Facebook / Twitter / LinkedIn)}\label{design-news-feed-ranking-facebook--twitter--linkedin}
+\subsection{Design News Feed Ranking (Facebook / Twitter / LinkedIn)}\label{design-news-feed-ranking-facebook--twitter--linkedin}
 
 \textbf{Context:} Orders millions of posts per user per day into a feed that maximizes engagement and wellbeing.
 
@@ -1864,6 +1912,8 @@ Sparse Features              Dense Features
 \end{itemize}
 
 \textbf{Architecture:}
+
+\setcodelang{}
 
 \begin{verbatim}
 FEED RANKING PIPELINE
@@ -1959,7 +2009,7 @@ User session & time of day, session length, last 10 posts interacted with \\
   Engagement health vs. wellbeing indicators
 \end{itemize}
 
-\subsubsection{Design Search/Ranking System (Google Search / Bing / Amazon Product Search)}\label{design-searchranking-system-google-search--bing--amazon-product-search}
+\subsection{Design Search/Ranking System (Google Search / Bing / Amazon Product Search)}\label{design-searchranking-system-google-search--bing--amazon-product-search}
 
 \textbf{Key differences from recommendations:}
 
@@ -1974,6 +2024,8 @@ User session & time of day, session length, last 10 posts interacted with \\
 \end{itemize}
 
 \textbf{Pipeline:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Query → Query Understanding → Retrieval → Ranking → Results
@@ -2032,7 +2084,7 @@ Query → Query Understanding → Retrieval → Ranking → Results
   \textbf{Listwise}: optimize a list-level metric directly (LambdaMART, AdaRank)
 \end{itemize}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
 \textbf{Netflix:}
 
@@ -2114,7 +2166,7 @@ Query → Query Understanding → Retrieval → Ranking → Results
   Training-serving skew: courier GPS features differ between training logs and real-time serving
 \end{itemize}
 
-\subsection{Real-Life Analogies --- An Airport Operations Center Running Flights at Scale}\label{real-life-analogies--an-airport-operations-center-running-flights-at-scale}
+\section{Real-Life Analogies --- An Airport Operations Center Running Flights at Scale}\label{real-life-analogies--an-airport-operations-center-running-flights-at-scale}
 
 \emph{Every piece of MLOps maps to the controlled chaos of keeping thousands of flights departing on time from a major hub like Chicago O\textquotesingle Hare.}
 
@@ -2154,7 +2206,7 @@ Why The Parallel Works
 
 \emph{The throughput goal: every flight on time, safe, efficient. The ML goal: every prediction timely, accurate, at scale.}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
 \textbf{The Framework: "CODFMTESMI"}
 Say: "\textbf{C}hef \textbf{O}rders \textbf{D}ishes \textbf{F}resh \textbf{M}ornings --- \textbf{T}aste, \textbf{E}at, \textbf{S}erve, \textbf{M}onitor, \textbf{I}terate"
@@ -2258,9 +2310,9 @@ Say: "\textbf{C}hef \textbf{O}rders \textbf{D}ishes \textbf{F}resh \textbf{M}orn
   \end{quote}
 \end{itemize}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: "Design a recommendation system for Netflix."}\label{q1-design-a-recommendation-system-for-netflix}
+\subsection{Q1: "Design a recommendation system for Netflix."}\label{q1-design-a-recommendation-system-for-netflix}
 
 \textbf{Model answer framework:}
 
@@ -2299,7 +2351,7 @@ Say: "\textbf{C}hef \textbf{O}rders \textbf{D}ishes \textbf{F}resh \textbf{M}orn
   "How would you handle feedback loops?" \(\rightarrow\) Off-policy correction, causal inference, debiasing weights
 \end{itemize}
 
-\subsubsection{Q2: "How do you detect and handle model degradation in production?"}\label{q2-how-do-you-detect-and-handle-model-degradation-in-production}
+\subsection{Q2: "How do you detect and handle model degradation in production?"}\label{q2-how-do-you-detect-and-handle-model-degradation-in-production}
 
 \textbf{Model answer:}
 
@@ -2338,7 +2390,7 @@ Say: "\textbf{C}hef \textbf{O}rders \textbf{D}ishes \textbf{F}resh \textbf{M}orn
   "How do you get ground truth labels quickly?" \(\rightarrow\) For ads: clicks are near-instant; for purchase predictions: 30-day delay; workaround: proxy labels (add-to-cart)
 \end{itemize}
 
-\subsubsection{Q3: "Explain training-serving skew and how you prevent it."}\label{q3-explain-training-serving-skew-and-how-you-prevent-it}
+\subsection{Q3: "Explain training-serving skew and how you prevent it."}\label{q3-explain-training-serving-skew-and-how-you-prevent-it}
 
 \textbf{Model answer:}
 Training-serving skew occurs when the features computed at training time differ from features computed at serving time. This is the \#1 production issue in ML systems.
@@ -2373,7 +2425,7 @@ Prevention:
   \textbf{Test for skew}: statistical comparison of feature distributions between training set and serving logs
 \end{enumerate}
 
-\subsubsection{Q4: "What\textquotesingle s the difference between data parallelism and model parallelism?"}\label{q4-whats-the-difference-between-data-parallelism-and-model-parallelism}
+\subsection{Q4: "What\textquotesingle s the difference between data parallelism and model parallelism?"}\label{q4-whats-the-difference-between-data-parallelism-and-model-parallelism}
 
 \textbf{Model answer:}
 \textbf{Data parallelism}: Every worker holds a full copy of the model. Data is split --- each worker processes a different mini-batch. Workers compute gradients independently, then gradients are averaged (via all-reduce). Works when model fits on one GPU. Most common approach (PyTorch DDP, Horovod).
@@ -2384,7 +2436,7 @@ Prevention:
 
 \textbf{In practice}: Use data parallelism first. Only use model parallelism when model \textgreater{} GPU memory.
 
-\subsubsection{Q5: "How do you run A/B tests for ranking systems?"}\label{q5-how-do-you-run-ab-tests-for-ranking-systems}
+\subsection{Q5: "How do you run A/B tests for ranking systems?"}\label{q5-how-do-you-run-ab-tests-for-ranking-systems}
 
 \textbf{Model answer:}
 Standard A/B tests are suboptimal for ranking because: they need large sample sizes (weeks), high variance, and network effects corrupt randomization.
@@ -2415,7 +2467,7 @@ For any experiment:
   Analyze primary metric + guardrail metrics + segment breakdowns
 \end{itemize}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
 \textbf{1. Feedback loops and their dangers:}
 When a model influences the data used to train its successor, feedback loops emerge. Example: recommendation model recommends popular items \(\rightarrow\) popular items get more clicks \(\rightarrow\) model trains on these skewed clicks \(\rightarrow\) recommends even more popular content \(\rightarrow\) "rich get richer." Solution: mix exploration (\(\varepsilon\)-greedy, Thompson sampling) with exploitation; off-policy evaluation; counterfactual logging.
@@ -2488,7 +2540,7 @@ The choice of how to weight P(engagement) vs. P(wellbeing) vs. P(revenue) is a v
   Counterfactual fairness: if a protected attribute changed, would the prediction change?
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \textbf{Mistake 1: Jumping to model architecture too quickly.}
 \emph{Problem}: Candidates start designing neural network architectures before clarifying requirements, defining metrics, or discussing data.
@@ -2530,7 +2582,7 @@ The choice of how to weight P(engagement) vs. P(wellbeing) vs. P(revenue) is a v
 \emph{Problem}: Using both terms interchangeably.
 \emph{Fix}: Data drift = input distribution P(X) changed. Concept drift = the relationship P(Y\textbar X) changed. Both require different responses.
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
 \textbf{ML Fundamentals:}
 
@@ -2616,7 +2668,7 @@ The choice of how to weight P(engagement) vs. P(wellbeing) vs. P(revenue) is a v
   Schema evolution and data versioning (Delta Lake) are data engineering concerns
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \textbf{For Google / YouTube:}
 
@@ -2706,13 +2758,13 @@ The choice of how to weight P(engagement) vs. P(wellbeing) vs. P(revenue) is a v
   Demonstrate that you\textquotesingle ve shipped production ML, not just trained notebooks
 \end{itemize}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 MLOps solves the gap between model training and reliable production impact. The core loop is: \textbf{data \(\rightarrow\) features \(\rightarrow\) train \(\rightarrow\) evaluate \(\rightarrow\) serve \(\rightarrow\) monitor \(\rightarrow\) retrain}. Feature stores eliminate training-serving skew by providing a single feature computation layer for both offline training and online serving. Distributed training uses data parallelism (copy model, split data) for large datasets and model parallelism (split model across GPUs) for giant models. All-reduce (ring-based) is more bandwidth-efficient than parameter servers for homogeneous clusters. Serving choices are batch (hours, cheap), online (\textless{} 100ms, expensive), or streaming (seconds). A/B tests validate offline improvements translate to online business metrics; interleaving is 100x faster for ranking systems. Monitor for four drift types: data, concept, prediction, label. Detect with PSI (\textgreater{} 0.2 = act). The recommendation funnel is: candidate generation (millions \(\rightarrow\) hundreds via ANN) \(\rightarrow\) ranking (deep model) \(\rightarrow\) re-ranking (diversity, business rules). CTR prediction requires calibrated probabilities (not just discrimination) because auction prices depend on exact predicted values.
 
-\subsubsection{Key Points}\label{key-points}
+\subsection{Key Points}\label{key-points}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2743,7 +2795,7 @@ MLOps solves the gap between model training and reliable production impact. The 
   \textbf{LLMOps additions}: prompt versioning, eval harness, guardrails, cost management, RAG vs. fine-tune decision
 \end{enumerate}
 
-\subsubsection{Cheat Sheet Table}\label{cheat-sheet-table}
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3529}}
@@ -2778,7 +2830,7 @@ Online serving & Request-triggered, \textless{} 100ms, GPU cluster & "real-time 
 Calibration & P(click) exact value must be correct & "ad auction" question \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts}\label{most-important-concepts}
+\subsection{Most Important Concepts}\label{most-important-concepts}
 
 \textbf{For the interview, these 5 concepts matter most:}
 

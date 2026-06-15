@@ -14,7 +14,46 @@
 \providecommand{\pandocbounded}[1]{#1}
 
 % syntax-highlighting macros emitted by pandoc (skylighting)
-
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
 
 \begin{document}
 
@@ -24,15 +63,13 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Distributed Systems --- Interview Mastery Guide}\label{distributed-systems--interview-mastery-guide}
-
 \begin{quote}
 \textbf{Audience:} Senior engineers preparing for FAANG system-design and depth loops.
 \textbf{Goal:} First-principles mastery of every distributed systems concept examiners probe.
 \textbf{How to use:} Read deeply once, then use the Revision Cheat Sheet to refresh before each interview.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 A \textbf{distributed system} is a collection of autonomous computing nodes that communicate over a network and appear to users as a single coherent system.
 
@@ -54,7 +91,7 @@ Key properties:
 
 \textbf{Why it\textquotesingle s hard in one sentence:} Nodes fail, networks partition, and clocks lie --- all simultaneously, silently, and at the worst possible moment.
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 Distributed systems are necessary when a single machine\textquotesingle s limits are reached:
 
@@ -82,9 +119,9 @@ Throughput ceiling & Partition (shard) data across nodes \\
 
 The moment you cross machine boundaries, you inherit: network unreliability, partial failures, clock skew, and the need to coordinate --- the core distributed systems problems.
 
-\subsection{Why FAANG Cares (be specific per company)}\label{why-faang-cares-be-specific-per-company}
+\section{Why FAANG Cares (be specific per company)}\label{why-faang-cares-be-specific-per-company}
 
-\subsubsection{Google}\label{google}
+\subsection{Google}\label{google}
 
 \begin{itemize}
 \tightlist
@@ -98,7 +135,7 @@ The moment you cross machine boundaries, you inherit: network unreliability, par
   Google interviews heavily test \textbf{consensus, consistency models, and CAP trade-offs}. Expect: "Design Spanner\textquotesingle s TrueTime" or "How does Chubby work?"
 \end{itemize}
 
-\subsubsection{Meta (Facebook)}\label{meta-facebook}
+\subsection{Meta (Facebook)}\label{meta-facebook}
 
 \begin{itemize}
 \tightlist
@@ -112,7 +149,7 @@ The moment you cross machine boundaries, you inherit: network unreliability, par
   Meta cares about \textbf{eventual consistency, caching patterns, and large-scale fan-out}
 \end{itemize}
 
-\subsubsection{Amazon / AWS}\label{amazon--aws}
+\subsection{Amazon / AWS}\label{amazon--aws}
 
 \begin{itemize}
 \tightlist
@@ -126,7 +163,7 @@ The moment you cross machine boundaries, you inherit: network unreliability, par
   Amazon interviews emphasize \textbf{Dynamo-style trade-offs, eventual consistency, and operational realities}
 \end{itemize}
 
-\subsubsection{Microsoft}\label{microsoft}
+\subsection{Microsoft}\label{microsoft}
 
 \begin{itemize}
 \tightlist
@@ -138,7 +175,7 @@ The moment you cross machine boundaries, you inherit: network unreliability, par
   Microsoft asks about \textbf{consistency models} (they literally offer five), PACELC, and geo-replication
 \end{itemize}
 
-\subsubsection{Apple / Netflix / Uber / LinkedIn}\label{apple--netflix--uber--linkedin}
+\subsection{Apple / Netflix / Uber / LinkedIn}\label{apple--netflix--uber--linkedin}
 
 \begin{itemize}
 \tightlist
@@ -152,7 +189,7 @@ The moment you cross machine boundaries, you inherit: network unreliability, par
   Interviews test \textbf{Kafka deep dives, service discovery, distributed caching}
 \end{itemize}
 
-\subsection{The 8 Fallacies of Distributed Computing}\label{the-8-fallacies-of-distributed-computing}
+\section{The 8 Fallacies of Distributed Computing}\label{the-8-fallacies-of-distributed-computing}
 
 Originally articulated by Peter Deutsch (Sun Microsystems, 1994). Every fallacy represents an assumption that kills distributed systems.
 
@@ -184,9 +221,9 @@ Why It Bites You
 
 \textbf{Interview takeaway:} Bring up the 8 fallacies when asked "What makes distributed systems hard?" --- it signals systems maturity. The most interview-relevant are \textbf{\#1 (reliability) + \#2 (latency) + topology change (\#5)}.
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{CAP Theorem}\label{cap-theorem}
+\subsection{CAP Theorem}\label{cap-theorem}
 
 \textbf{Statement (Brewer, 2000; formalized by Gilbert \& Lynch, 2002):}
 
@@ -230,7 +267,7 @@ Meaning
 
 \textbf{Interview takeaway:} "CA is not a real choice in distributed systems --- partitions happen, so you always pick CP or AP. The choice is: do you return an error or stale data when the network splits?"
 
-\subsubsection{PACELC}\label{pacelc}
+\subsection{PACELC}\label{pacelc}
 
 \textbf{Extension by Daniel Abadi (2010):} Captures what happens when there\textquotesingle s NO partition too.
 
@@ -239,10 +276,14 @@ Meaning
 \textbf{ELse (normal operation):} choose between \textbf{L}atency and \textbf{C}onsistency
 \end{quote}
 
-\begin{verbatim}
-P -> A vs C
-ELC -> L vs C
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P }\OperatorTok{{-}\textgreater{}}\NormalTok{ A vs C}
+\NormalTok{ELC }\OperatorTok{{-}\textgreater{}}\NormalTok{ L vs C}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1112}}
@@ -275,7 +316,7 @@ Cosmos DB & Tunable & Tunable & All categories depending on config \\
 
 \textbf{Interview takeaway:} "CAP is about rare partition events. PACELC is about the trade-off you make on every operation. Most high-traffic systems choose AP/EL --- they prefer low latency and availability over strong consistency."
 
-\subsubsection{Consistency Models}\label{consistency-models}
+\subsection{Consistency Models}\label{consistency-models}
 
 From strongest to weakest:
 
@@ -309,6 +350,8 @@ Examples
 
 \textbf{Interview mental model:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Strongest                                         Weakest
 Linearizable → Sequential → Causal → Read-your-writes → Eventual
@@ -324,11 +367,13 @@ Linearizable → Sequential → Causal → Read-your-writes → Eventual
   \textbf{Eventual vs Strong:} Eventual is fine for social media likes. Strong is required for bank balances and inventory counts.
 \end{itemize}
 
-\subsubsection{Consistent Hashing}\label{consistent-hashing}
+\subsection{Consistent Hashing}\label{consistent-hashing}
 
 \textbf{Problem:} Naive hash-based sharding (node = hash(key) \% N) requires remapping ALL keys when N changes. Catastrophic for large caches or DBs.
 
 \textbf{Solution:} Place both nodes and keys on a virtual ring {[}0, 2\^{}32). A key maps to the nearest node clockwise.
+
+\setcodelang{}
 
 \begin{verbatim}
 ASCII: Consistent Hashing Ring
@@ -354,6 +399,8 @@ When NodeB is REMOVED:
 \textbf{Virtual nodes (vnodes):}
 Each physical node owns multiple positions on the ring. This improves load distribution and makes rebalancing smoother.
 
+\setcodelang{}
+
 \begin{verbatim}
 Physical: NodeA, NodeB, NodeC (3 nodes)
 Virtual:  A1, A2, B1, B2, C1, C2 scattered around ring
@@ -367,11 +414,13 @@ Adding NodeD: It claims some positions from A, B, and C equally
 
 \textbf{Real usage:} Amazon Dynamo, Apache Cassandra, Memcached (ketama), CDN edge node selection.
 
-\subsubsection{Quorum (R + W \textgreater{} N)}\label{quorum-r--w--n}
+\subsection{Quorum (R + W \textgreater{} N)}\label{quorum-r--w--n}
 
 \textbf{Setup:} N total replicas. Write to W replicas. Read from R replicas.
 
 \textbf{Quorum rule:} R + W \textgreater{} N guarantees at least one node in the read set has the latest write.
+
+\setcodelang{}
 
 \begin{verbatim}
 Quorum intersection example (N=3):
@@ -418,13 +467,15 @@ N & 1 & N & Read-heavy: fast writes, slow reads \\
 
 \textbf{Interview takeaway:} "R+W\textgreater N guarantees read-write overlap, making strong consistency possible without a single coordinator. Sloppy quorum breaks this guarantee for higher availability --- AP trade-off."
 
-\subsubsection{Consensus: Raft}\label{consensus-raft}
+\subsection{Consensus: Raft}\label{consensus-raft}
 
 \textbf{Problem:} How do distributed nodes agree on a single value (or sequence of values) despite failures?
 
 \textbf{Raft} (Ongaro \& Ousterhout, 2014) --- designed to be understandable vs Paxos.
 
-\paragraph{Raft: Three Roles}\label{raft-three-roles}
+\subsubsection{Raft: Three Roles}\label{raft-three-roles}
+
+\setcodelang{}
 
 \begin{verbatim}
 Leader:    Handles all client reads/writes. Sends heartbeats.
@@ -437,11 +488,13 @@ State machine:
    Leader    → (higher term seen)  → Follower
 \end{verbatim}
 
-\paragraph{Raft: Terms}\label{raft-terms}
+\subsubsection{Raft: Terms}\label{raft-terms}
 
 Each "epoch" is a \textbf{term} (monotonically increasing integer). Term acts as a logical clock. Stale leaders detecting a higher term immediately step down.
 
-\paragraph{Raft: Leader Election}\label{raft-leader-election}
+\subsubsection{Raft: Leader Election}\label{raft-leader-election}
+
+\setcodelang{}
 
 \begin{verbatim}
 Step 1: Follower's election timeout fires (150-300ms random)
@@ -456,7 +509,9 @@ Split vote: Multiple candidates, no majority. Election timeout fires again with 
 Random timeouts make split votes rare.
 \end{verbatim}
 
-\paragraph{Raft: Log Replication}\label{raft-log-replication}
+\subsubsection{Raft: Log Replication}\label{raft-log-replication}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client → Leader (append "SET x=5")
@@ -479,23 +534,25 @@ Leader always checks prevLogIndex and prevLogTerm before appending
 This ensures followers' logs never diverge
 \end{verbatim}
 
-\paragraph{Raft: Safety Guarantee}\label{raft-safety-guarantee}
+\subsubsection{Raft: Safety Guarantee}\label{raft-safety-guarantee}
 
 \textbf{Leader Completeness:} A leader always has all committed entries. Guaranteed by the election constraint: a candidate cannot win if its log is less up-to-date than the majority. "Up-to-date" = higher last term, or same last term and longer log.
 
 \textbf{Log Matching:} If two entries in different logs have the same index and term, the logs are identical up to that index.
 
-\paragraph{Raft: Cluster Changes}\label{raft-cluster-changes}
+\subsubsection{Raft: Cluster Changes}\label{raft-cluster-changes}
 
 \textbf{Joint consensus:} When adding/removing nodes, Raft uses a two-phase config change to avoid split-brain (two independent majorities).
 
-\subsubsection{Consensus: Paxos}\label{consensus-paxos}
+\subsection{Consensus: Paxos}\label{consensus-paxos}
 
 \textbf{Paxos} (Lamport, 1989/1998) --- the original consensus algorithm. Notoriously hard to understand and implement.
 
-\paragraph{Single-Decree Paxos: Two Phases}\label{single-decree-paxos-two-phases}
+\subsubsection{Single-Decree Paxos: Two Phases}\label{single-decree-paxos-two-phases}
 
 \textbf{Phase 1: Prepare/Promise}
+
+\setcodelang{}
 
 \begin{verbatim}
 Proposer → sends Prepare(n) to majority of Acceptors   (n = proposal number)
@@ -505,6 +562,8 @@ Acceptor → if n > any seen before:
 \end{verbatim}
 
 \textbf{Phase 2: Accept/Accepted}
+
+\setcodelang{}
 
 \begin{verbatim}
 Proposer → sends Accept(n, v) to majority
@@ -531,7 +590,7 @@ Proposer → value is chosen when majority accept
   \textbf{Implementation complexity} --- Google Chubby paper says it took 2 years to get right
 \end{enumerate}
 
-\paragraph{Raft vs Paxos Comparison}\label{raft-vs-paxos-comparison}
+\subsubsection{Raft vs Paxos Comparison}\label{raft-vs-paxos-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2048}}
@@ -561,7 +620,7 @@ Performance & Comparable & Comparable \\
 
 \textbf{Interview takeaway:} "Paxos is proven correct but painful to implement. Raft achieves equivalent safety with explicit leader election and sequential log, making it far easier to implement correctly. For interviews, know Raft deeply."
 
-\subsubsection{Leader Election}\label{leader-election}
+\subsection{Leader Election}\label{leader-election}
 
 Beyond Raft, general leader election approaches:
 
@@ -619,11 +678,11 @@ Beyond Raft, general leader election approaches:
 
 \textbf{Interview takeaway:} "In practice, leader election is solved by Raft/Paxos or by external coordination services like etcd/ZooKeeper. Bully and ring are textbook algorithms rarely used in production."
 
-\subsubsection{Vector Clocks and Lamport Timestamps}\label{vector-clocks-and-lamport-timestamps}
+\subsection{Vector Clocks and Lamport Timestamps}\label{vector-clocks-and-lamport-timestamps}
 
 \textbf{The problem:} Distributed nodes have no shared clock. We need to reason about event ordering without a global clock.
 
-\paragraph{Lamport Timestamps}\label{lamport-timestamps}
+\subsubsection{Lamport Timestamps}\label{lamport-timestamps}
 
 \textbf{Rules:}
 
@@ -640,6 +699,8 @@ Beyond Raft, general leader election approaches:
   On receive: max(local, message\_counter) + 1
 \end{enumerate}
 
+\setcodelang{}
+
 \begin{verbatim}
 Process A:   1    2         4    5
                   |         ↑
@@ -652,7 +713,7 @@ Process C:                  6    7    8
 
 \textbf{Limitation:} Lamport timestamps give a total order but cannot distinguish concurrent events. If A.ts \textless{} B.ts, A happened-before B OR they are concurrent --- you can\textquotesingle t tell which.
 
-\paragraph{Vector Clocks}\label{vector-clocks}
+\subsubsection{Vector Clocks}\label{vector-clocks}
 
 Each node maintains a vector of counters, one per process.
 
@@ -679,6 +740,8 @@ Each node maintains a vector of counters, one per process.
   Concurrent: neither V\_a \textless{} V\_b nor V\_b \textless{} V\_a
 \end{itemize}
 
+\setcodelang{}
+
 \begin{verbatim}
 Example (3 nodes A, B, C):
 A sends to B: A=[1,0,0]
@@ -693,11 +756,13 @@ C=[1,2,1] vs A=[2,0,0]: C[0]=1 < A[0]=2 but C[1]=2 > A[1]=0 → CONCURRENT
 
 \textbf{Interview takeaway:} "Vector clocks detect causality between events in distributed systems. DynamoDB used them (originally) to detect conflicting writes. They scale as O(N) per message. For large N, dotted version vectors or hybrid logical clocks are used."
 
-\subsubsection{Two-Phase Commit (2PC) and Alternatives}\label{two-phase-commit-2pc-and-alternatives}
+\subsection{Two-Phase Commit (2PC) and Alternatives}\label{two-phase-commit-2pc-and-alternatives}
 
 \textbf{2PC} --- classic distributed transaction protocol.
 
-\paragraph{2PC Flow}\label{2pc-flow}
+\subsubsection{2PC Flow}\label{2pc-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
                      COORDINATOR
@@ -743,17 +808,19 @@ Description
 \textbf{Performance} & 2 round trips + synchronous lock holding = high latency \\
 \end{longtable}
 
-\paragraph{Three-Phase Commit (3PC)}\label{three-phase-commit-3pc}
+\subsubsection{Three-Phase Commit (3PC)}\label{three-phase-commit-3pc}
 
 Adds a \textbf{Pre-Commit} phase between Prepare and Commit. Allows participants to safely abort if coordinator fails after Pre-Commit. Theoretically non-blocking but rarely used because: complex, still fails under network partition, and adds a 3rd round trip.
 
 \textbf{Production reality:} 2PC is used in databases (XA transactions) but rarely across microservices. Too slow, too fragile.
 
-\subsubsection{Distributed Transactions and Saga Pattern}\label{distributed-transactions-and-saga-pattern}
+\subsection{Distributed Transactions and Saga Pattern}\label{distributed-transactions-and-saga-pattern}
 
 \textbf{Saga Pattern} --- alternative to 2PC for long-running distributed transactions.
 
 \textbf{Concept:} Break a transaction into a sequence of local transactions. Each local transaction publishes an event or message. If any step fails, execute \textbf{compensating transactions} to undo previous steps.
+
+\setcodelang{}
 
 \begin{verbatim}
 Order Saga:
@@ -820,7 +887,7 @@ Blocking & Yes (coordinator crash) & No \\
 
 \textbf{Interview takeaway:} "2PC gives strong consistency but blocks on coordinator failure. Saga gives eventual consistency with better availability. For microservices, Saga is preferred. The cost: you must design compensating transactions and accept temporary inconsistency."
 
-\subsubsection{Replication Strategies}\label{replication-strategies}
+\subsection{Replication Strategies}\label{replication-strategies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1257}}
@@ -861,22 +928,26 @@ Cons
 
 Solutions: sticky sessions, read from leader after write, version-based consistency.
 
-\subsubsection{Gossip Protocol}\label{gossip-protocol}
+\subsection{Gossip Protocol}\label{gossip-protocol}
 
 \textbf{Concept:} Nodes periodically select random neighbors and exchange state information. Epidemiological model --- information spreads like a virus.
 
-\begin{verbatim}
-Step 0: Node A has new info
-        [A*] [B] [C] [D] [E] [F]
+\setcodelang{Python}
 
-Step 1: A gossips to C and E
-        [A*] [B] [C*] [D] [E*] [F]
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Step }\DecValTok{0}\NormalTok{: Node A has new info}
+\NormalTok{        [A}\OperatorTok{*}\NormalTok{] [B] [C] [D] [E] [F]}
 
-Step 2: C gossips to B; E gossips to D and F
-        [A*] [B*] [C*] [D*] [E*] [F*]
+\NormalTok{Step }\DecValTok{1}\NormalTok{: A gossips to C }\KeywordTok{and}\NormalTok{ E}
+\NormalTok{        [A}\OperatorTok{*}\NormalTok{] [B] [C}\OperatorTok{*}\NormalTok{] [D] [E}\OperatorTok{*}\NormalTok{] [F]}
 
-All nodes informed in O(log N) rounds
-\end{verbatim}
+\NormalTok{Step }\DecValTok{2}\NormalTok{: C gossips to B}\OperatorTok{;}\NormalTok{ E gossips to D }\KeywordTok{and}\NormalTok{ F}
+\NormalTok{        [A}\OperatorTok{*}\NormalTok{] [B}\OperatorTok{*}\NormalTok{] [C}\OperatorTok{*}\NormalTok{] [D}\OperatorTok{*}\NormalTok{] [E}\OperatorTok{*}\NormalTok{] [F}\OperatorTok{*}\NormalTok{]}
+
+\NormalTok{All nodes informed }\KeywordTok{in}\NormalTok{ O(log N) rounds}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Properties:}
 
@@ -906,7 +977,7 @@ All nodes informed in O(log N) rounds
 
 \textbf{Interview takeaway:} "Gossip provides decentralized, fault-tolerant information propagation. Cassandra uses gossip for cluster membership. It\textquotesingle s eventually consistent --- nodes might have temporarily stale views."
 
-\subsubsection{Heartbeats and Failure Detection}\label{heartbeats-and-failure-detection}
+\subsection{Heartbeats and Failure Detection}\label{heartbeats-and-failure-detection}
 
 \textbf{Challenge:} In asynchronous networks, you cannot distinguish a slow node from a dead one (FLP impossibility).
 
@@ -928,6 +999,8 @@ Instead of binary live/dead, outputs a suspicion level \(\varphi\) (phi). \(\var
 \textbf{Split-Brain:}
 When a network partition isolates part of a cluster, both sides may believe they\textquotesingle re the leader. Both sides serve writes \(\rightarrow\) data diverges \(\rightarrow\) nightmare.
 
+\setcodelang{}
+
 \begin{verbatim}
 Before partition:                After partition:
   [Leader] ─── [F1]               [Leader] ─X─ [F1]
@@ -948,13 +1021,15 @@ Both sides think they're primary. Writes diverge.
   \textbf{Epoch/term numbers:} New leader always has higher term. Old leader rejects its own writes when it sees higher terms.
 \end{itemize}
 
-\subsubsection{Service Discovery}\label{service-discovery}
+\subsection{Service Discovery}\label{service-discovery}
 
 \textbf{Problem:} In dynamic environments (containers, auto-scaling), service IPs change constantly. Clients can\textquotesingle t use static IPs.
 
 \textbf{Two patterns:}
 
 \textbf{Client-Side Discovery:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client → Query Registry (etcd/Consul/ZooKeeper) → Get list of instances
@@ -972,6 +1047,8 @@ Client → Load balances itself → Picks instance → Direct call
 \end{itemize}
 
 \textbf{Server-Side Discovery:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client → Load Balancer (ELB, Nginx, Envoy)
@@ -1014,7 +1091,7 @@ Load Balancer → Query Registry → Pick instance → Forward
   \textbf{Ephemeral leases:} If service dies, lease expires and entry removed
 \end{itemize}
 
-\subsubsection{Distributed Caching}\label{distributed-caching}
+\subsection{Distributed Caching}\label{distributed-caching}
 
 \textbf{Cache patterns:}
 
@@ -1088,7 +1165,7 @@ Random & Random item & Surprisingly OK; simple to implement \\
 TTL & Expired items & Time-sensitive data \\
 \end{longtable}
 
-\subsubsection{Kafka}\label{kafka}
+\subsection{Kafka}\label{kafka}
 
 \textbf{Kafka} --- distributed event streaming platform. Originally LinkedIn, now Apache.
 
@@ -1160,9 +1237,11 @@ Meaning
 
 \textbf{Consumer group rebalancing:} When consumers join/leave, partitions are reassigned. All consumers stop processing during rebalance (stop-the-world). Kafka 2.4+ introduced cooperative rebalancing to minimize disruption.
 
-\subsubsection{Idempotency and Exactly-Once vs At-Least-Once}\label{idempotency-and-exactly-once-vs-at-least-once}
+\subsection{Idempotency and Exactly-Once vs At-Least-Once}\label{idempotency-and-exactly-once-vs-at-least-once}
 
 \textbf{Idempotent operation:} Applying it multiple times has the same effect as applying once.
+
+\setcodelang{}
 
 \begin{verbatim}
 Idempotent:     SET x = 5           → safe to retry
@@ -1172,6 +1251,8 @@ Making it idempotent: SET x = 5 WHERE version = 3
 \end{verbatim}
 
 \textbf{Idempotency key:} Client sends a unique ID with each request. Server deduplicates.
+
+\setcodelang{}
 
 \begin{verbatim}
 POST /payments
@@ -1210,9 +1291,11 @@ Real-world usage & Most systems & Payment systems, financial \\
 
 \textbf{Interview takeaway:} "Exactly-once is extremely hard to achieve end-to-end. At-least-once + idempotent consumers is the practical solution in \textgreater95\% of systems. Design your consumer operations to be naturally idempotent or add idempotency keys."
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{CAP Triangle}\label{cap-triangle}
+\subsection{CAP Triangle}\label{cap-triangle}
+
+\setcodelang{}
 
 \begin{verbatim}
         Consistency
@@ -1233,7 +1316,9 @@ Real-world usage & Most systems & Payment systems, financial \\
    Availability ←──────────→
 \end{verbatim}
 
-\subsubsection{Consistent Hashing Ring}\label{consistent-hashing-ring}
+\subsection{Consistent Hashing Ring}\label{consistent-hashing-ring}
+
+\setcodelang{}
 
 \begin{verbatim}
                      0
@@ -1259,7 +1344,9 @@ Key at hash 100 → next clockwise ≥ 100 → 120 (NodeA)
 Key at hash 200 → next clockwise ≥ 200 → 210 (NodeC)
 \end{verbatim}
 
-\subsubsection{Raft: Leader Election and Log Replication}\label{raft-leader-election-and-log-replication}
+\subsection{Raft: Leader Election and Log Replication}\label{raft-leader-election-and-log-replication}
+
+\setcodelang{}
 
 \begin{verbatim}
 INITIAL STATE:                    AFTER ELECTION:
@@ -1292,7 +1379,9 @@ SAFETY: Follower only votes for candidate whose log is at least as up-to-date
         This prevents any node from winning without all committed entries
 \end{verbatim}
 
-\subsubsection{Quorum Reads and Writes (N=5, R=3, W=3)}\label{quorum-reads-and-writes-n5-r3-w3}
+\subsection{Quorum Reads and Writes (N=5, R=3, W=3)}\label{quorum-reads-and-writes-n5-r3-w3}
+
+\setcodelang{}
 
 \begin{verbatim}
 WRITE (W=3):
@@ -1313,7 +1402,9 @@ Write set {N1,N2,N3}, Read set {N1,N2,N3}: Overlap = {N1,N2,N3}
 At least one node in read set always has the latest write. ✓
 \end{verbatim}
 
-\subsubsection{Kafka Topic/Partition/Consumer-Group}\label{kafka-topicpartitionconsumer-group}
+\subsection{Kafka Topic/Partition/Consumer-Group}\label{kafka-topicpartitionconsumer-group}
+
+\setcodelang{}
 
 \begin{verbatim}
 Topic: "user-events"  (3 partitions, replication-factor=2)
@@ -1340,7 +1431,7 @@ Rule: Each partition is consumed by exactly ONE consumer per consumer group
       Multiple consumer groups each see ALL messages independently
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0763}}
@@ -1376,7 +1467,7 @@ Notes
 \textbf{Memcached} & AP & None (no replication) & Client-side consistent hash & Pure cache, no HA by itself \\
 \end{longtable}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One kingdom of villages, connected only by riders --- every concept is a village, a decree, or a messenger.}
 
@@ -1407,9 +1498,11 @@ Analogy
 \textbf{Idempotency} & A rider delivers the same levy decree twice because the road was muddy and they feared the first had been lost. A wise village elder stamps the decree\textquotesingle s unique seal number in the ledger: if the seal has already been recorded, the levy is not collected a second time --- the kingdom\textquotesingle s accounts stay sound no matter how many copies arrive. \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{CAP: "Pick 2, but P is not optional"}\label{cap-pick-2-but-p-is-not-optional}
+\subsection{CAP: "Pick 2, but P is not optional"}\label{cap-pick-2-but-p-is-not-optional}
+
+\setcodelang{}
 
 \begin{verbatim}
 CAP = C A P
@@ -1421,7 +1514,9 @@ CAP = C A P
 Real choice: CP (return error) or AP (return stale data)
 \end{verbatim}
 
-\subsubsection{PACELC: "P picks A or C, ELse picks L or C"}\label{pacelc-p-picks-a-or-c-else-picks-l-or-c}
+\subsection{PACELC: "P picks A or C, ELse picks L or C"}\label{pacelc-p-picks-a-or-c-else-picks-l-or-c}
+
+\setcodelang{}
 
 \begin{verbatim}
 P → A/C (partition scenario)
@@ -1429,7 +1524,9 @@ ELC → L/C (normal scenario)
 "During Partition = AC, Else = LC"
 \end{verbatim}
 
-\subsubsection{Raft: "FELT" for leader election}\label{raft-felt-for-leader-election}
+\subsection{Raft: "FELT" for leader election}\label{raft-felt-for-leader-election}
+
+\setcodelang{}
 
 \begin{verbatim}
 F - Follower times out
@@ -1438,7 +1535,9 @@ L - Log check (only vote if candidate log ≥ mine)
 T - Term number (higher term always wins)
 \end{verbatim}
 
-\subsubsection{Quorum: R + W \textgreater{} N}\label{quorum-r--w--n-1}
+\subsection{Quorum: R + W \textgreater{} N}\label{quorum-r--w--n-1}
+
+\setcodelang{}
 
 \begin{verbatim}
 N = 5, want quorum: R=3, W=3 → 3+3=6 > 5 ✓
@@ -1447,7 +1546,9 @@ Fast reads: R=1, W=5 → write to all
 Fast writes: R=5, W=1 → read from all
 \end{verbatim}
 
-\subsubsection{Consistency Levels (strongest to weakest):}\label{consistency-levels-strongest-to-weakest}
+\subsection{Consistency Levels (strongest to weakest):}\label{consistency-levels-strongest-to-weakest}
+
+\setcodelang{}
 
 \begin{verbatim}
 "Lions Shouldn't Carry Raw Meat Ever"
@@ -1459,7 +1560,9 @@ M - Monotonic reads
 E - Eventual
 \end{verbatim}
 
-\subsubsection{8 Fallacies: "NLB-STT-Z"}\label{8-fallacies-nlb-stt-z}
+\subsection{8 Fallacies: "NLB-STT-Z"}\label{8-fallacies-nlb-stt-z}
+
+\setcodelang{}
 
 \begin{verbatim}
 N - Network is reliable
@@ -1474,23 +1577,27 @@ H - Homogeneous network
 
 (Or remember: "No Legitimate Business Survives Thinking They\textquotesingle re Zeus-like Homogeneous")
 
-\subsubsection{2PC vs Saga}\label{2pc-vs-saga}
+\subsection{2PC vs Saga}\label{2pc-vs-saga}
+
+\setcodelang{}
 
 \begin{verbatim}
 2PC = "2 Phases, Can block" → ACID, tight coupling, blocking
 SAGA = "Steps And Compensating Actions" → eventual, loose, non-blocking
 \end{verbatim}
 
-\subsubsection{Raft Safety in one line:}\label{raft-safety-in-one-line}
+\subsection{Raft Safety in one line:}\label{raft-safety-in-one-line}
+
+\setcodelang{}
 
 \begin{verbatim}
 "A leader can only win if its log is as complete as the majority"
 → Ensures all committed entries survive leader changes
 \end{verbatim}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: "What is the CAP theorem? Give examples."}\label{q1-what-is-the-cap-theorem-give-examples}
+\subsection{Q1: "What is the CAP theorem? Give examples."}\label{q1-what-is-the-cap-theorem-give-examples}
 
 \textbf{Model answer:}
 "CAP states that in the presence of a network partition, a distributed system must choose between consistency and availability. Partition tolerance isn\textquotesingle t optional --- networks partition, so you always pick CP or AP.
@@ -1513,7 +1620,7 @@ Important nuance: CAP only describes behavior during a partition. PACELC extends
   "What\textquotesingle s PACELC?" \(\rightarrow\) See PACELC section above
 \end{itemize}
 
-\subsubsection{Q2: "Explain how Raft works."}\label{q2-explain-how-raft-works}
+\subsection{Q2: "Explain how Raft works."}\label{q2-explain-how-raft-works}
 
 \textbf{Model answer:}
 "Raft is a consensus algorithm that replicates a state machine log across a cluster. It has three key components:
@@ -1538,7 +1645,7 @@ Raft guarantees: leader completeness (elected leader has all committed entries),
   "How does Raft handle log conflicts?" \(\rightarrow\) AppendEntries includes prevLogIndex and prevLogTerm. Follower rejects if mismatch. Leader walks back until they agree, then overwrites.
 \end{itemize}
 
-\subsubsection{Q3: "Design a distributed cache."}\label{q3-design-a-distributed-cache}
+\subsection{Q3: "Design a distributed cache."}\label{q3-design-a-distributed-cache}
 
 \textbf{Model answer:}
 "I\textquotesingle d use a consistent hashing ring with virtual nodes for data distribution across N cache nodes. For high availability, replicate each key to the next K nodes clockwise.
@@ -1581,7 +1688,7 @@ Raft guarantees: leader completeness (elected leader has all committed entries),
 
 At scale (e.g., Meta\textquotesingle s Memcached), layers: L1 in-process cache \(\rightarrow\) L2 regional Memcached cluster \(\rightarrow\) DB. Replication groups for high read throughput."
 
-\subsubsection{Q4: "Explain consistent hashing and why it\textquotesingle s used."}\label{q4-explain-consistent-hashing-and-why-its-used}
+\subsection{Q4: "Explain consistent hashing and why it\textquotesingle s used."}\label{q4-explain-consistent-hashing-and-why-its-used}
 
 \textbf{Model answer:}
 "Consistent hashing places nodes and keys on a virtual ring from 0 to 2\^{}32. A key is assigned to the nearest node clockwise. When a node joins or leaves, only O(K/N) keys --- the ones between the departing node and its predecessor --- are remapped, vs O(K) for naive modular hashing.
@@ -1590,7 +1697,7 @@ Without it, adding one node to a 10-node cluster would remap \textasciitilde90\%
 
 Virtual nodes improve load distribution: each physical node has multiple ring positions, so adding or removing a node draws/redistributes keys from many neighbors rather than just two."
 
-\subsubsection{Q5: "What is idempotency and why does it matter?"}\label{q5-what-is-idempotency-and-why-does-it-matter}
+\subsection{Q5: "What is idempotency and why does it matter?"}\label{q5-what-is-idempotency-and-why-does-it-matter}
 
 \textbf{Model answer:}
 "An idempotent operation produces the same result whether applied once or multiple times. It matters because in distributed systems, network failures cause retries. Without idempotency, retries cause double-charges, duplicate orders, or corrupted state.
@@ -1601,7 +1708,7 @@ In Kafka: idempotent producers use a PID + sequence number. Broker deduplicates 
 
 The practical rule: at-least-once delivery + idempotent consumers = effectively-once processing, without the complexity of true exactly-once."
 
-\subsubsection{Q6: "What is split-brain and how do you prevent it?"}\label{q6-what-is-split-brain-and-how-do-you-prevent-it}
+\subsection{Q6: "What is split-brain and how do you prevent it?"}\label{q6-what-is-split-brain-and-how-do-you-prevent-it}
 
 \textbf{Model answer:}
 "Split-brain occurs when a network partition causes two sides of a cluster to each believe they\textquotesingle re the active leader. Both accept writes, creating divergent state that\textquotesingle s extremely hard to reconcile.
@@ -1623,9 +1730,9 @@ Prevention strategies:
 
 In Raft: the minority-side leader steps down when it can no longer replicate to a majority and stops receiving heartbeats from the new leader."
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{Why Paxos Is Hard to Implement}\label{why-paxos-is-hard-to-implement}
+\subsection{Why Paxos Is Hard to Implement}\label{why-paxos-is-hard-to-implement}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1644,7 +1751,7 @@ In Raft: the minority-side leader steps down when it can no longer replicate to 
 
 Google\textquotesingle s Chubby paper (2006): "there are significant gaps between the description of the Paxos algorithm and the needs of a real-world system... the final system will be based on an unproven protocol."
 
-\subsubsection{The Exactly-Once Myth}\label{the-exactly-once-myth}
+\subsection{The Exactly-Once Myth}\label{the-exactly-once-myth}
 
 True exactly-once delivery at the network layer is \textbf{impossible} in the face of node failures (you can\textquotesingle t know if a message was delivered or not without asking, which risks duplicates). What systems achieve:
 
@@ -1656,7 +1763,7 @@ True exactly-once delivery at the network layer is \textbf{impossible} in the fa
   \textbf{Practical exactly-once:} Kafka + idempotent consumer with a transactional DB. Write the output AND commit the Kafka offset in one DB transaction. If processing fails, rollback both. But requires the consumer\textquotesingle s output to be in the same transactional store as the offset.
 \end{itemize}
 
-\subsubsection{Trade-offs: Consistency vs. Latency}\label{trade-offs-consistency-vs-latency}
+\subsection{Trade-offs: Consistency vs. Latency}\label{trade-offs-consistency-vs-latency}
 
 \begin{itemize}
 \tightlist
@@ -1670,7 +1777,7 @@ True exactly-once delivery at the network layer is \textbf{impossible} in the fa
   For financial systems (balances, inventory), strong consistency is required --- business logic demands it
 \end{itemize}
 
-\subsubsection{Failure Scenarios to Discuss}\label{failure-scenarios-to-discuss}
+\subsection{Failure Scenarios to Discuss}\label{failure-scenarios-to-discuss}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1687,7 +1794,7 @@ True exactly-once delivery at the network layer is \textbf{impossible} in the fa
   \textbf{Cascading failure:} Node A fails \(\rightarrow\) Node B takes on its load \(\rightarrow\) B becomes overloaded \(\rightarrow\) B fails \(\rightarrow\) cascade. Mitigation: load shedding, bulkheads, backpressure.
 \end{enumerate}
 
-\subsubsection{Gossip vs Consensus for Membership}\label{gossip-vs-consensus-for-membership}
+\subsection{Gossip vs Consensus for Membership}\label{gossip-vs-consensus-for-membership}
 
 \begin{itemize}
 \tightlist
@@ -1697,7 +1804,7 @@ True exactly-once delivery at the network layer is \textbf{impossible} in the fa
   \textbf{Consensus (ZooKeeper, etcd):} Strongly consistent membership. All nodes agree. Slower (requires majority ACK). Required for systems that need exactly-once leader election or distributed locks.
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3105}}
@@ -1724,9 +1831,9 @@ Treating CAP as binary switches & Tunable consistency (Cassandra) shows it\textq
 Forgetting clock skew & Always mention that distributed timestamps require care. Lamport clocks, vector clocks, or TrueTime. Never assume clocks are synchronized. \\
 \end{longtable}
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{System Design}\label{system-design}
+\subsection{System Design}\label{system-design}
 
 \begin{itemize}
 \tightlist
@@ -1738,7 +1845,7 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   "Design WhatsApp" \(\rightarrow\) Kafka for message queuing, consistent hashing for user routing, read-your-writes consistency for messages
 \end{itemize}
 
-\subsubsection{Databases}\label{databases}
+\subsection{Databases}\label{databases}
 
 \begin{itemize}
 \tightlist
@@ -1754,7 +1861,7 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   MVCC + snapshot isolation = consistency model at DB level
 \end{itemize}
 
-\subsubsection{Computer Networks}\label{computer-networks}
+\subsection{Computer Networks}\label{computer-networks}
 
 \begin{itemize}
 \tightlist
@@ -1770,7 +1877,7 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   TLS/mTLS: solve fallacy \#4 (network security)
 \end{itemize}
 
-\subsubsection{Concurrency}\label{concurrency}
+\subsection{Concurrency}\label{concurrency}
 
 \begin{itemize}
 \tightlist
@@ -1786,7 +1893,7 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   Deadlock \(\rightarrow\) distributed deadlock detection is harder (requires global knowledge)
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \textbf{For system design rounds:}
 
@@ -1846,9 +1953,9 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   Treating distributed systems as deterministic/reliable
 \end{itemize}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1883,7 +1990,7 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   \textbf{Service discovery:} Client-side (Eureka) vs server-side (ELB). Registry must have health checks.
 \end{enumerate}
 
-\subsubsection{Key Points}\label{key-points}
+\subsection{Key Points}\label{key-points}
 
 \begin{itemize}
 \tightlist
@@ -1903,9 +2010,11 @@ Forgetting clock skew & Always mention that distributed timestamps require care.
   \textbf{2PC vs Saga:} 2PC = strong, blocking; Saga = eventual, non-blocking, compensating transactions
 \end{itemize}
 
-\subsubsection{Comparison Tables Cheat Sheet}\label{comparison-tables-cheat-sheet}
+\subsection{Comparison Tables Cheat Sheet}\label{comparison-tables-cheat-sheet}
 
 \textbf{CAP:}
+
+\setcodelang{}
 
 \begin{verbatim}
 CP: error on partition | AP: stale data on partition
@@ -1914,12 +2023,18 @@ ZooKeeper, etcd       | Cassandra, DynamoDB, DNS
 
 \textbf{Quorum:}
 
-\begin{verbatim}
-R+W>N = strong consistency guarantee
-R=1, W=N: fast reads | R=N, W=1: fast writes | R=W=(N+1)/2: balanced
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{R}\OperatorTok{+}\NormalTok{W}\OperatorTok{\textgreater{}}\NormalTok{N }\OperatorTok{=}\NormalTok{ strong consistency guarantee}
+\NormalTok{R}\OperatorTok{=}\DecValTok{1}\NormalTok{, W}\OperatorTok{=}\NormalTok{N: fast reads }\OperatorTok{|}\NormalTok{ R}\OperatorTok{=}\NormalTok{N, W}\OperatorTok{=}\DecValTok{1}\NormalTok{: fast writes }\OperatorTok{|}\NormalTok{ R}\OperatorTok{=}\NormalTok{W}\OperatorTok{=}\NormalTok{(N}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{/}\DecValTok{2}\NormalTok{: balanced}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Raft vs Paxos:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Raft: explicit leader, sequential log, understandable, etcd/CockroachDB
@@ -1928,12 +2043,16 @@ Paxos: implicit leader, log holes, complex, Chubby/Spanner
 
 \textbf{2PC vs Saga:}
 
+\setcodelang{}
+
 \begin{verbatim}
 2PC: ACID, blocking, tight coupling, same DB
 Saga: eventual, non-blocking, loose coupling, microservices
 \end{verbatim}
 
 \textbf{At-least-once vs Exactly-once:}
+
+\setcodelang{}
 
 \begin{verbatim}
 At-least-once: simple, may duplicate → make consumers idempotent
@@ -1942,13 +2061,17 @@ Exactly-once: complex, within Kafka only → use idempotency keys end-to-end
 
 \textbf{Delivery semantics:}
 
-\begin{verbatim}
-At-most-once: acks=0, may lose, no duplicates
-At-least-once: acks=all + retry, no loss, may duplicate
-Exactly-once: idempotent producer + transactions (Kafka internal)
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{Most Important Concepts (Priority Order)}\label{most-important-concepts-priority-order}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{At}\OperatorTok{{-}}\NormalTok{most}\OperatorTok{{-}}\NormalTok{once: acks}\OperatorTok{=}\DecValTok{0}\NormalTok{, may lose, no duplicates}
+\NormalTok{At}\OperatorTok{{-}}\NormalTok{least}\OperatorTok{{-}}\NormalTok{once: acks}\OperatorTok{=}\BuiltInTok{all} \OperatorTok{+}\NormalTok{ retry, no loss, may duplicate}
+\NormalTok{Exactly}\OperatorTok{{-}}\NormalTok{once: idempotent producer }\OperatorTok{+}\NormalTok{ transactions (Kafka internal)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Most Important Concepts (Priority Order)}\label{most-important-concepts-priority-order}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

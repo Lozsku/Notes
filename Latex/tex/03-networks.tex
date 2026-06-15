@@ -14,7 +14,46 @@
 \providecommand{\pandocbounded}[1]{#1}
 
 % syntax-highlighting macros emitted by pandoc (skylighting)
-
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
 
 \begin{document}
 
@@ -24,14 +63,12 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Computer Networks --- FAANG Interview Mastery}\label{computer-networks--faang-interview-mastery}
-
 \begin{quote}
 \textbf{Target:} Deep understanding from first principles + rapid recall under pressure.
 \textbf{Covers:} OSI/TCP-IP, TCP/UDP, HTTP/HTTPS, TLS/SSL, DNS, REST, gRPC, WebSockets, HTTP/2\&3, Load Balancing, CORS, and more.
 \end{quote}
 
-\subsection{Overview --- What It Is}\label{overview--what-it-is}
+\section{Overview --- What It Is}\label{overview--what-it-is}
 
 Computer networking is the discipline of \textbf{connecting computing devices so they can exchange data}. Every product at scale --- from a URL you type to a microservice call 10 hops away --- relies on a layered stack of protocols, each solving one narrow problem.
 
@@ -59,7 +96,7 @@ Throughput & Actual data successfully delivered per unit time \\
 MTU & Maximum Transmission Unit --- largest packet a link can carry (typically 1500 bytes on Ethernet) \\
 \end{longtable}
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 \textbf{Problem:} Two machines separated by any distance need to exchange bytes reliably, efficiently, and securely --- even over unreliable physical media (copper, fiber, radio).
 
@@ -79,7 +116,7 @@ MTU & Maximum Transmission Unit --- largest packet a link can carry (typically 1
 
 This separation of concerns is why you can swap WiFi for Ethernet without changing your HTTP client.
 
-\subsection{Why FAANG Cares (Per Company)}\label{why-faang-cares-per-company}
+\section{Why FAANG Cares (Per Company)}\label{why-faang-cares-per-company}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1255}}
@@ -104,13 +141,15 @@ Specific Concern
 
 \textbf{FAANG universal:} System design interviews are networking interviews in disguise. "Design a URL shortener" \(\rightarrow\) DNS, HTTP redirects. "Design a chat app" \(\rightarrow\) WebSockets, long-polling, scaling connections. "Design a video platform" \(\rightarrow\) CDN, adaptive streaming, load balancing.
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{1. OSI Model vs TCP/IP Model}\label{1-osi-model-vs-tcpip-model}
+\subsection{1. OSI Model vs TCP/IP Model}\label{1-osi-model-vs-tcpip-model}
 
-\paragraph{OSI Model (7 Layers)}\label{osi-model-7-layers}
+\subsubsection{OSI Model (7 Layers)}\label{osi-model-7-layers}
 
 The \textbf{Open Systems Interconnection} model is a conceptual framework --- not an implementation. It exists to give engineers a common vocabulary.
+
+\setcodelang{}
 
 \begin{verbatim}
 Layer 7 — Application    [HTTP, DNS, SMTP, FTP, gRPC]
@@ -122,20 +161,26 @@ Layer 2 — Data Link      [Ethernet, MAC addresses, switches, ARP]
 Layer 1 — Physical       [bits on wire, fiber, radio, voltage levels]
 \end{verbatim}
 
-\paragraph{TCP/IP Model (4 Layers)}\label{tcpip-model-4-layers}
+\subsubsection{TCP/IP Model (4 Layers)}\label{tcpip-model-4-layers}
 
 The practical model actually implemented in the internet:
 
-\begin{verbatim}
-Application     = OSI Layers 5+6+7
-Transport       = OSI Layer 4
-Internet        = OSI Layer 3
-Network Access  = OSI Layers 1+2
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Application     }\OperatorTok{=}\NormalTok{ OSI Layers }\DecValTok{5}\OperatorTok{+}\DecValTok{6}\OperatorTok{+}\DecValTok{7}
+\NormalTok{Transport       }\OperatorTok{=}\NormalTok{ OSI Layer }\DecValTok{4}
+\NormalTok{Internet        }\OperatorTok{=}\NormalTok{ OSI Layer }\DecValTok{3}
+\NormalTok{Network Access  }\OperatorTok{=}\NormalTok{ OSI Layers }\DecValTok{1}\OperatorTok{+}\DecValTok{2}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Interview takeaway:} OSI is for vocabulary and troubleshooting; TCP/IP is what runs on real systems. When asked "what layer does X operate at?" --- use OSI layer numbers.
 
-\paragraph{Data encapsulation flow:}\label{data-encapsulation-flow}
+\subsubsection{Data encapsulation flow:}\label{data-encapsulation-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
 App writes data
@@ -149,9 +194,9 @@ App writes data
 
 On the receiving side, each layer strips its header and passes the payload up.
 
-\subsubsection{2. IP Addressing, Subnetting, CIDR, NAT}\label{2-ip-addressing-subnetting-cidr-nat}
+\subsection{2. IP Addressing, Subnetting, CIDR, NAT}\label{2-ip-addressing-subnetting-cidr-nat}
 
-\paragraph{IPv4 Addressing}\label{ipv4-addressing}
+\subsubsection{IPv4 Addressing}\label{ipv4-addressing}
 
 \begin{itemize}
 \tightlist
@@ -163,15 +208,19 @@ On the receiving side, each layer strips its header and passes the payload up.
   \textbf{Classes (historical, replaced by CIDR):}
 \end{itemize}
 
+\setcodelang{}
+
 \begin{verbatim}
 Class A: 1.0.0.0   – 126.255.255.255  /8  (/8 → 16M hosts)
 Class B: 128.0.0.0 – 191.255.255.255  /16 (→ 65K hosts)
 Class C: 192.0.0.0 – 223.255.255.255  /24 (→ 254 hosts)
 \end{verbatim}
 
-\paragraph{CIDR (Classless Inter-Domain Routing)}\label{cidr-classless-inter-domain-routing}
+\subsubsection{CIDR (Classless Inter-Domain Routing)}\label{cidr-classless-inter-domain-routing}
 
 Notation: \texttt{IP/prefix\_length} --- the prefix length tells how many bits are the \textbf{network portion}.
+
+\setcodelang{}
 
 \begin{verbatim}
 192.168.1.0/24
@@ -187,7 +236,9 @@ Notation: \texttt{IP/prefix\_length} --- the prefix length tells how many bits a
 
 \textbf{Usable hosts} = 2\^{}(32 - prefix) - 2 (subtract network address and broadcast)
 
-\paragraph{Private IP Ranges (RFC 1918)}\label{private-ip-ranges-rfc-1918}
+\subsubsection{Private IP Ranges (RFC 1918)}\label{private-ip-ranges-rfc-1918}
+
+\setcodelang{}
 
 \begin{verbatim}
 10.0.0.0/8          (10.x.x.x)
@@ -198,11 +249,13 @@ Notation: \texttt{IP/prefix\_length} --- the prefix length tells how many bits a
 
 These are \textbf{not routable on the public internet} --- this is why NAT exists.
 
-\paragraph{NAT (Network Address Translation)}\label{nat-network-address-translation}
+\subsubsection{NAT (Network Address Translation)}\label{nat-network-address-translation}
 
 \textbf{Problem:} Private addresses can\textquotesingle t be routed on the internet. Companies have thousands of devices sharing a handful of public IPs.
 
 \textbf{Solution:} NAT router rewrites packet headers, maintaining a translation table.
+
+\setcodelang{}
 
 \begin{verbatim}
 Internal device            NAT Router            Internet Server
@@ -216,7 +269,7 @@ NAT table entry: \texttt{(internal\ IP,\ internal\ port)\ ↔\ (public\ IP,\ pub
 
 \textbf{NAT types:} Full cone (most permissive) \(\rightarrow\) Restricted cone \(\rightarrow\) Port-restricted cone \(\rightarrow\) Symmetric (most restrictive). Symmetric NAT breaks peer-to-peer --- forces use of TURN relays (relevant for WebRTC).
 
-\paragraph{IPv6}\label{ipv6}
+\subsubsection{IPv6}\label{ipv6}
 
 \begin{itemize}
 \tightlist
@@ -230,13 +283,15 @@ NAT table entry: \texttt{(internal\ IP,\ internal\ port)\ ↔\ (public\ IP,\ pub
   Adoption \textasciitilde40\% of internet traffic (Google data)
 \end{itemize}
 
-\subsubsection{3. TCP vs UDP}\label{3-tcp-vs-udp}
+\subsection{3. TCP vs UDP}\label{3-tcp-vs-udp}
 
-\paragraph{TCP (Transmission Control Protocol)}\label{tcp-transmission-control-protocol}
+\subsubsection{TCP (Transmission Control Protocol)}\label{tcp-transmission-control-protocol}
 
 TCP provides a \textbf{reliable, ordered, byte-stream} abstraction over unreliable IP.
 
 \textbf{TCP Header (20 bytes minimum):}
+
+\setcodelang{}
 
 \begin{verbatim}
 [Source Port 16b][Dest Port 16b]
@@ -250,6 +305,8 @@ TCP provides a \textbf{reliable, ordered, byte-stream} abstraction over unreliab
 Key flags: \textbf{SYN} (synchronize), \textbf{ACK} (acknowledge), \textbf{FIN} (finish), \textbf{RST} (reset), \textbf{PSH} (push), \textbf{URG} (urgent)
 
 \textbf{Three-Way Handshake (connection establishment):}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client                          Server
@@ -266,6 +323,8 @@ Client                          Server
 Why 3-way and not 2-way? Both sides need to agree on initial sequence numbers. The third ACK confirms the server\textquotesingle s SYN was received.
 
 \textbf{Four-Way Teardown (connection close):}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client                          Server
@@ -313,6 +372,8 @@ Client                          Server
   \textbf{TCP CUBIC (Linux default):} cwnd grows as cubic function of time since last loss
 \end{itemize}
 
+\setcodelang{}
+
 \begin{verbatim}
 cwnd
   |    /
@@ -324,11 +385,13 @@ cwnd
   +─────────────────────────── RTTs
 \end{verbatim}
 
-\paragraph{UDP (User Datagram Protocol)}\label{udp-user-datagram-protocol}
+\subsubsection{UDP (User Datagram Protocol)}\label{udp-user-datagram-protocol}
 
 UDP provides \textbf{unreliable, unordered datagrams} --- just source/dest port + payload + checksum.
 
 \textbf{UDP Header (8 bytes only):}
+
+\setcodelang{}
 
 \begin{verbatim}
 [Source Port 16b][Dest Port 16b]
@@ -338,7 +401,7 @@ UDP provides \textbf{unreliable, unordered datagrams} --- just source/dest port 
 
 No connection, no sequencing, no retransmission, no congestion control.
 
-\paragraph{TCP vs UDP Comparison Table}\label{tcp-vs-udp-comparison-table}
+\subsubsection{TCP vs UDP Comparison Table}\label{tcp-vs-udp-comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2283}}
@@ -369,11 +432,13 @@ Head-of-line blocking & Yes (one lost packet stalls stream) & No (each datagram 
 
 \textbf{Interview takeaway:} Choose UDP when: latency \textgreater{} reliability (live video, games), you\textquotesingle re implementing your own reliability (QUIC), or you need multicast/broadcast. Choose TCP for everything else.
 
-\subsubsection{4. DNS (Domain Name System)}\label{4-dns-domain-name-system}
+\subsection{4. DNS (Domain Name System)}\label{4-dns-domain-name-system}
 
 DNS is the \textbf{phone book of the internet} --- maps human-readable names to IP addresses.
 
-\paragraph{DNS Hierarchy}\label{dns-hierarchy}
+\subsubsection{DNS Hierarchy}\label{dns-hierarchy}
+
+\setcodelang{}
 
 \begin{verbatim}
                      Root (.)
@@ -385,7 +450,7 @@ DNS is the \textbf{phone book of the internet} --- maps human-readable names to 
            mail      www
 \end{verbatim}
 
-\paragraph{DNS Record Types}\label{dns-record-types}
+\subsubsection{DNS Record Types}\label{dns-record-types}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0782}}
@@ -414,7 +479,9 @@ Example
 \textbf{SRV} & Service location & \texttt{\_http.\_tcp.example.com\ →\ 80\ www.example.com} \\
 \end{longtable}
 
-\paragraph{DNS Resolution Flow (Full Recursive)}\label{dns-resolution-flow-full-recursive}
+\subsubsection{DNS Resolution Flow (Full Recursive)}\label{dns-resolution-flow-full-recursive}
+
+\setcodelang{}
 
 \begin{verbatim}
 Browser         Resolver        Root NS      .com NS     Auth NS
@@ -453,9 +520,9 @@ Browser         Resolver        Root NS      .com NS     Auth NS
 
 \textbf{DNSSEC:} Adds cryptographic signatures to DNS records. Prevents DNS spoofing/cache poisoning.
 
-\subsubsection{5. HTTP --- HyperText Transfer Protocol}\label{5-http--hypertext-transfer-protocol}
+\subsection{5. HTTP --- HyperText Transfer Protocol}\label{5-http--hypertext-transfer-protocol}
 
-\paragraph{HTTP Methods}\label{http-methods}
+\subsubsection{HTTP Methods}\label{http-methods}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1165}}
@@ -490,7 +557,9 @@ CONNECT & No & No & Tunnel (used for HTTPS through proxy) \\
 
 \textbf{Interview trap:} POST is not idempotent (double-submit creates two orders). PUT is idempotent (setting resource to same state twice). DELETE is idempotent (deleting what\textquotesingle s gone still = gone).
 
-\paragraph{HTTP Status Codes}\label{http-status-codes}
+\subsubsection{HTTP Status Codes}\label{http-status-codes}
+
+\setcodelang{}
 
 \begin{verbatim}
 1xx  Informational     100 Continue, 101 Switching Protocols
@@ -515,34 +584,38 @@ CONNECT & No & No & Tunnel (used for HTTPS through proxy) \\
   502 = load balancer can\textquotesingle t reach upstream, 503 = server busy/down, 504 = upstream timeout
 \end{itemize}
 
-\paragraph{Key HTTP Headers}\label{key-http-headers}
+\subsubsection{Key HTTP Headers}\label{key-http-headers}
 
-\begin{verbatim}
-Request headers:
-  Host: www.example.com
-  Authorization: Bearer <token>
-  Content-Type: application/json
-  Accept: application/json
-  Cache-Control: no-cache
-  If-None-Match: "abc123"  (conditional GET)
-  Cookie: session=abc
-  User-Agent: Mozilla/5.0...
-  Origin: https://app.example.com  (CORS)
-  Connection: keep-alive
+\setcodelang{Python}
 
-Response headers:
-  Content-Type: application/json; charset=utf-8
-  Cache-Control: max-age=3600, public
-  ETag: "abc123"
-  Set-Cookie: session=xyz; HttpOnly; Secure; SameSite=Strict
-  X-RateLimit-Remaining: 99
-  Access-Control-Allow-Origin: https://app.example.com  (CORS)
-  Strict-Transport-Security: max-age=31536000  (HSTS)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Request headers:}
+\NormalTok{  Host: www.example.com}
+\NormalTok{  Authorization: Bearer }\OperatorTok{\textless{}}\NormalTok{token}\OperatorTok{\textgreater{}}
+\NormalTok{  Content}\OperatorTok{{-}}\NormalTok{Type: application}\OperatorTok{/}\NormalTok{json}
+\NormalTok{  Accept: application}\OperatorTok{/}\NormalTok{json}
+\NormalTok{  Cache}\OperatorTok{{-}}\NormalTok{Control: no}\OperatorTok{{-}}\NormalTok{cache}
+\NormalTok{  If}\OperatorTok{{-}}\VariableTok{None}\OperatorTok{{-}}\NormalTok{Match: }\StringTok{"abc123"}\NormalTok{  (conditional GET)}
+\NormalTok{  Cookie: session}\OperatorTok{=}\NormalTok{abc}
+\NormalTok{  User}\OperatorTok{{-}}\NormalTok{Agent: Mozilla}\OperatorTok{/}\FloatTok{5.0}\NormalTok{...}
+\NormalTok{  Origin: https:}\OperatorTok{//}\NormalTok{app.example.com  (CORS)}
+\NormalTok{  Connection: keep}\OperatorTok{{-}}\NormalTok{alive}
 
-\subsubsection{6. HTTPS and TLS/SSL}\label{6-https-and-tlsssl}
+\NormalTok{Response headers:}
+\NormalTok{  Content}\OperatorTok{{-}}\NormalTok{Type: application}\OperatorTok{/}\NormalTok{json}\OperatorTok{;}\NormalTok{ charset}\OperatorTok{=}\NormalTok{utf}\OperatorTok{{-}}\DecValTok{8}
+\NormalTok{  Cache}\OperatorTok{{-}}\NormalTok{Control: }\BuiltInTok{max}\OperatorTok{{-}}\NormalTok{age}\OperatorTok{=}\DecValTok{3600}\NormalTok{, public}
+\NormalTok{  ETag: }\StringTok{"abc123"}
+\NormalTok{  Set}\OperatorTok{{-}}\NormalTok{Cookie: session}\OperatorTok{=}\NormalTok{xyz}\OperatorTok{;}\NormalTok{ HttpOnly}\OperatorTok{;}\NormalTok{ Secure}\OperatorTok{;}\NormalTok{ SameSite}\OperatorTok{=}\NormalTok{Strict}
+\NormalTok{  X}\OperatorTok{{-}}\NormalTok{RateLimit}\OperatorTok{{-}}\NormalTok{Remaining: }\DecValTok{99}
+\NormalTok{  Access}\OperatorTok{{-}}\NormalTok{Control}\OperatorTok{{-}}\NormalTok{Allow}\OperatorTok{{-}}\NormalTok{Origin: https:}\OperatorTok{//}\NormalTok{app.example.com  (CORS)}
+\NormalTok{  Strict}\OperatorTok{{-}}\NormalTok{Transport}\OperatorTok{{-}}\NormalTok{Security: }\BuiltInTok{max}\OperatorTok{{-}}\NormalTok{age}\OperatorTok{=}\DecValTok{31536000}\NormalTok{  (HSTS)}
+\end{Highlighting}
+\end{Shaded}
 
-\paragraph{Why TLS Exists}\label{why-tls-exists}
+\subsection{6. HTTPS and TLS/SSL}\label{6-https-and-tlsssl}
+
+\subsubsection{Why TLS Exists}\label{why-tls-exists}
 
 Plain HTTP is sent in clear text. Anyone on the network path (ISP, coffee shop WiFi, rogue router) can:
 
@@ -559,9 +632,11 @@ Plain HTTP is sent in clear text. Anyone on the network path (ISP, coffee shop W
 
 TLS fixes all three.
 
-\paragraph{TLS 1.3 Handshake (Step by Step)}\label{tls-13-handshake-step-by-step}
+\subsubsection{TLS 1.3 Handshake (Step by Step)}\label{tls-13-handshake-step-by-step}
 
 TLS 1.3 (current standard) completes in \textbf{1 RTT} (vs TLS 1.2\textquotesingle s 2 RTTs).
+
+\setcodelang{}
 
 \begin{verbatim}
 Client                                      Server
@@ -629,6 +704,8 @@ Client                                      Server
 
 \textbf{4. Certificate Chain (Root of Trust):}
 
+\setcodelang{}
+
 \begin{verbatim}
 Root CA cert (in OS/browser trust store)
   └── Intermediate CA cert (signed by Root CA)
@@ -667,11 +744,11 @@ Key exchange & RSA or DH & ECDHE only \\
 Handshake encryption & Partly encrypted & Fully encrypted from ServerHello \\
 \end{longtable}
 
-\subsubsection{7. REST APIs}\label{7-rest-apis}
+\subsection{7. REST APIs}\label{7-rest-apis}
 
 \textbf{REST (Representational State Transfer)} is an architectural style, not a protocol, defined by Roy Fielding\textquotesingle s 2000 dissertation.
 
-\paragraph{Six REST Constraints}\label{six-rest-constraints}
+\subsubsection{Six REST Constraints}\label{six-rest-constraints}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -690,7 +767,9 @@ Handshake encryption & Partly encrypted & Fully encrypted from ServerHello \\
   \textbf{Code on Demand (optional):} Server can send executable code (JavaScript)
 \end{enumerate}
 
-\paragraph{REST API Design Principles}\label{rest-api-design-principles}
+\subsubsection{REST API Design Principles}\label{rest-api-design-principles}
+
+\setcodelang{}
 
 \begin{verbatim}
 Resource: /users
@@ -714,24 +793,28 @@ Versioning:
   X-API-Version: 2  (header versioning)
 \end{verbatim}
 
-\subsubsection{8. gRPC}\label{8-grpc}
+\subsection{8. gRPC}\label{8-grpc}
 
 \textbf{gRPC} (Google Remote Procedure Call) is a high-performance, open-source RPC framework using \textbf{Protocol Buffers} for serialization and \textbf{HTTP/2} for transport.
 
-\paragraph{How it Works}\label{how-it-works}
+\subsubsection{How it Works}\label{how-it-works}
 
-\begin{verbatim}
-Service definition (proto file):
-  service UserService {
-    rpc GetUser(GetUserRequest) returns (User);
-    rpc StreamUsers(Empty) returns (stream User);
-  }
+\setcodelang{Python}
 
-Proto compiler generates:
-  - Client stub (in any language)
-  - Server interface to implement
-  - Serialization/deserialization code
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Service definition (proto }\BuiltInTok{file}\NormalTok{):}
+\NormalTok{  service UserService \{}
+\NormalTok{    rpc GetUser(GetUserRequest) returns (User)}\OperatorTok{;}
+\NormalTok{    rpc StreamUsers(Empty) returns (stream User)}\OperatorTok{;}
+\NormalTok{  \}}
+
+\NormalTok{Proto compiler generates:}
+  \OperatorTok{{-}}\NormalTok{ Client stub (}\KeywordTok{in} \BuiltInTok{any}\NormalTok{ language)}
+  \OperatorTok{{-}}\NormalTok{ Server interface to implement}
+  \OperatorTok{{-}}\NormalTok{ Serialization}\OperatorTok{/}\NormalTok{deserialization code}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Protocol Buffers (Protobuf):}
 
@@ -762,7 +845,7 @@ Proto compiler generates:
   \textbf{Bidirectional streaming:} Both sides stream simultaneously
 \end{enumerate}
 
-\paragraph{REST vs gRPC vs GraphQL}\label{rest-vs-grpc-vs-graphql}
+\subsubsection{REST vs gRPC vs GraphQL}\label{rest-vs-grpc-vs-graphql}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1754}}
@@ -798,13 +881,15 @@ Code generation & Optional (OpenAPI) & Required & Optional \\
 
 \textbf{Interview takeaway:} Use REST for public-facing APIs (human-readable, universal tooling). Use gRPC for internal microservice-to-microservice calls (performance, type safety, streaming). Use GraphQL when clients have diverse data needs and you want to avoid N+1 REST calls.
 
-\subsubsection{9. WebSockets, SSE, and Long-Polling}\label{9-websockets-sse-and-long-polling}
+\subsection{9. WebSockets, SSE, and Long-Polling}\label{9-websockets-sse-and-long-polling}
 
-\paragraph{The Problem}\label{the-problem}
+\subsubsection{The Problem}\label{the-problem}
 
 HTTP is \textbf{request-response}: client asks, server answers. For real-time applications (chat, live dashboards, games), you need server-to-client push without repeated polling.
 
-\paragraph{Long-Polling}\label{long-polling}
+\subsubsection{Long-Polling}\label{long-polling}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client: GET /events  ─────────────────────────────────────► Server holds open
@@ -815,24 +900,30 @@ Client: GET /events  ───────────────────�
 
 \textbf{Pros:} Works everywhere (plain HTTP). \textbf{Cons:} High latency (event waits for next request), server holds many open connections, head-of-line blocking.
 
-\paragraph{Server-Sent Events (SSE)}\label{server-sent-events-sse}
+\subsubsection{Server-Sent Events (SSE)}\label{server-sent-events-sse}
 
-\begin{verbatim}
-Client: GET /events
-Server: Content-Type: text/event-stream
+\setcodelang{Python}
 
-data: {"type":"price_update","value":150.23}\n\n
-data: {"type":"price_update","value":150.50}\n\n
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Client: GET }\OperatorTok{/}\NormalTok{events}
+\NormalTok{Server: Content}\OperatorTok{{-}}\NormalTok{Type: text}\OperatorTok{/}\NormalTok{event}\OperatorTok{{-}}\NormalTok{stream}
+
+\NormalTok{data: \{}\StringTok{"type"}\NormalTok{:}\StringTok{"price\_update"}\NormalTok{,}\StringTok{"value"}\NormalTok{:}\FloatTok{150.23}\NormalTok{\}\textbackslash{}n\textbackslash{}n}
+\NormalTok{data: \{}\StringTok{"type"}\NormalTok{:}\StringTok{"price\_update"}\NormalTok{,}\StringTok{"value"}\NormalTok{:}\FloatTok{150.50}\NormalTok{\}\textbackslash{}n\textbackslash{}n}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Pros:} Simple, native browser support (EventSource API), HTTP/2 multiplexing, automatic reconnection.
 \textbf{Cons:} \textbf{One-directional} (server \(\rightarrow\) client only), text-only (HTTP/2 adds binary), max 6 connections per domain on HTTP/1.1.
 
-\paragraph{WebSockets}\label{websockets}
+\subsubsection{WebSockets}\label{websockets}
 
 WebSockets upgrade an HTTP connection to a \textbf{full-duplex, bidirectional, persistent} TCP connection.
 
 \textbf{Upgrade handshake:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client → Server:
@@ -853,13 +944,15 @@ Server → Client:
 
 \textbf{WebSocket Frame:}
 
+\setcodelang{}
+
 \begin{verbatim}
 FIN|RSV|Opcode|Mask|Payload Length|Masking Key|Payload
 \end{verbatim}
 
 Opcodes: 0x1=text, 0x2=binary, 0x8=close, 0x9=ping, 0xA=pong
 
-\paragraph{Comparison: Polling vs SSE vs WebSocket}\label{comparison-polling-vs-sse-vs-websocket}
+\subsubsection{Comparison: Polling vs SSE vs WebSocket}\label{comparison-polling-vs-sse-vs-websocket}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1485}}
@@ -894,9 +987,11 @@ Scalability & Harder at scale & Easier & Harder (stateful connections) \\
 
 \textbf{Interview takeaway:} WebSockets for truly interactive real-time (chat, multiplayer games, collaborative editing). SSE for one-way push (stock tickers, news feeds, notifications). Long-polling for maximum compatibility.
 
-\subsubsection{10. HTTP/1.1 vs HTTP/2 vs HTTP/3}\label{10-http11-vs-http2-vs-http3}
+\subsection{10. HTTP/1.1 vs HTTP/2 vs HTTP/3}\label{10-http11-vs-http2-vs-http3}
 
-\paragraph{HTTP/1.1 Problems}\label{http11-problems}
+\subsubsection{HTTP/1.1 Problems}\label{http11-problems}
+
+\setcodelang{}
 
 \begin{verbatim}
 Request 1: ──────────────────────────────────────────► wait ◄── Response 1
@@ -907,9 +1002,11 @@ Workaround: browsers open 6 parallel TCP connections per domain
             → pipelining spec exists but broken in practice
 \end{verbatim}
 
-\paragraph{HTTP/2 Solutions}\label{http2-solutions}
+\subsubsection{HTTP/2 Solutions}\label{http2-solutions}
 
 HTTP/2 (2015) revolutionizes transport with \textbf{binary framing} over a single TCP connection.
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────┐
@@ -941,9 +1038,11 @@ HTTP/2 (2015) revolutionizes transport with \textbf{binary framing} over a singl
 
 \textbf{HTTP/2 limitation:} Still uses TCP \(\rightarrow\) TCP-level head-of-line blocking. One lost packet stalls ALL streams.
 
-\paragraph{HTTP/3 (QUIC)}\label{http3-quic}
+\subsubsection{HTTP/3 (QUIC)}\label{http3-quic}
 
 HTTP/3 replaces TCP with \textbf{QUIC} (Quick UDP Internet Connections), built on \textbf{UDP}.
+
+\setcodelang{}
 
 \begin{verbatim}
 HTTP/1.1:  [HTTP text]  over  [TCP]   over  [IP]
@@ -967,6 +1066,8 @@ QUIC bakes in:
 
 \textbf{QUIC connection setup:}
 
+\setcodelang{}
+
 \begin{verbatim}
 HTTP/1.1+TLS 1.2:  TCP(1.5 RTT) + TLS(2 RTT)  = 3.5 RTT before data
 HTTP/2+TLS 1.3:    TCP(1 RTT) + TLS(1 RTT)     = 2 RTT before data
@@ -974,7 +1075,7 @@ HTTP/3+QUIC:       QUIC+TLS(1 RTT)             = 1 RTT before data
                    (0-RTT resumption)           = 0 RTT before data
 \end{verbatim}
 
-\paragraph{HTTP Comparison Table}\label{http-comparison-table}
+\subsubsection{HTTP Comparison Table}\label{http-comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2703}}
@@ -1007,13 +1108,13 @@ Connection migration & No & No & Yes (QUIC CID) \\
 Adoption & Universal & \textasciitilde60\% & \textasciitilde25\% growing \\
 \end{longtable}
 
-\subsubsection{11. Load Balancing}\label{11-load-balancing}
+\subsection{11. Load Balancing}\label{11-load-balancing}
 
-\paragraph{Why Load Balancing}\label{why-load-balancing}
+\subsubsection{Why Load Balancing}\label{why-load-balancing}
 
 A single server can handle N requests/second. To handle 10N, you need 10 servers + a \textbf{load balancer} to distribute traffic.
 
-\paragraph{L4 vs L7 Load Balancing}\label{l4-vs-l7-load-balancing}
+\subsubsection{L4 vs L7 Load Balancing}\label{l4-vs-l7-load-balancing}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2000}}
@@ -1044,12 +1145,16 @@ Health checks & TCP connect & HTTP endpoint check \\
 
 \textbf{L4 flow:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Client ──► L4 LB ──► Server A
            (sees IP:port, picks backend, NATs packet)
 \end{verbatim}
 
 \textbf{L7 flow:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Client ──► L7 LB (terminates TCP+TLS, parses HTTP)
@@ -1058,7 +1163,7 @@ Client ──► L7 LB (terminates TCP+TLS, parses HTTP)
            └─ /static/* ──► CDN / S3
 \end{verbatim}
 
-\paragraph{Load Balancing Algorithms}\label{load-balancing-algorithms}
+\subsubsection{Load Balancing Algorithms}\label{load-balancing-algorithms}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2116}}
@@ -1086,7 +1191,7 @@ Best for
 \textbf{Resource-based} & Route by server CPU/memory utilization & Compute-intensive workloads \\
 \end{longtable}
 
-\paragraph{Health Checks}\label{health-checks}
+\subsubsection{Health Checks}\label{health-checks}
 
 Load balancers continuously probe backends:
 
@@ -1100,7 +1205,9 @@ Load balancers continuously probe backends:
 
 \textbf{Circuit Breaker pattern:} After N failures, stop sending traffic to a backend for M seconds (fast-fail instead of timeout cascades). Libraries: Hystrix, Resilience4j.
 
-\paragraph{Topology Options}\label{topology-options}
+\subsubsection{Topology Options}\label{topology-options}
+
+\setcodelang{}
 
 \begin{verbatim}
 Single LB (SPOF):
@@ -1117,7 +1224,7 @@ Multi-tier:
                                 ──► [Region B LB] ──► [App Servers]
 \end{verbatim}
 
-\subsubsection{12. CORS (Cross-Origin Resource Sharing)}\label{12-cors-cross-origin-resource-sharing}
+\subsection{12. CORS (Cross-Origin Resource Sharing)}\label{12-cors-cross-origin-resource-sharing}
 
 \textbf{Same-Origin Policy (SOP):} Browsers prevent JavaScript on \texttt{https://app.example.com} from making requests to \texttt{https://api.other.com} --- different origin.
 
@@ -1125,11 +1232,13 @@ Multi-tier:
 
 \textbf{CORS solves this} by letting the server declare which origins are permitted.
 
-\paragraph{Simple vs Preflight Requests}\label{simple-vs-preflight-requests}
+\subsubsection{Simple vs Preflight Requests}\label{simple-vs-preflight-requests}
 
 \textbf{Simple request} (GET/POST with basic headers): Browser sends request with \texttt{Origin} header, checks \texttt{Access-Control-Allow-Origin} in response.
 
 \textbf{Preflight request} (PUT/DELETE/custom headers, content-type: application/json):
+
+\setcodelang{}
 
 \begin{verbatim}
 Browser                                 Server
@@ -1166,9 +1275,11 @@ Browser                                 Server
 
 \textbf{Interview trap:} CORS is a \textbf{browser security mechanism} --- it doesn\textquotesingle t protect your API server. Server-to-server requests bypass CORS entirely. CORS headers tell the browser what\textquotesingle s allowed; the browser enforces it.
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{OSI Stack Diagram}\label{osi-stack-diagram}
+\subsection{OSI Stack Diagram}\label{osi-stack-diagram}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────────────────────────────────────────────┐
@@ -1190,7 +1301,9 @@ Browser                                 Server
 └──────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{TCP 3-Way Handshake}\label{tcp-3-way-handshake}
+\subsection{TCP 3-Way Handshake}\label{tcp-3-way-handshake}
+
+\setcodelang{}
 
 \begin{verbatim}
   Client              Network              Server
@@ -1208,7 +1321,9 @@ Browser                                 Server
     │◄═══════════════════════════════════════►│
 \end{verbatim}
 
-\subsubsection{TLS 1.3 Handshake}\label{tls-13-handshake}
+\subsection{TLS 1.3 Handshake}\label{tls-13-handshake}
+
+\setcodelang{}
 
 \begin{verbatim}
   Client                                   Server
@@ -1230,7 +1345,9 @@ Browser                                 Server
     │          (1 RTT total!)                │
 \end{verbatim}
 
-\subsubsection{DNS Resolution Flow}\label{dns-resolution-flow}
+\subsection{DNS Resolution Flow}\label{dns-resolution-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────┐    1. query      ┌──────────────┐
@@ -1255,7 +1372,9 @@ Browser                                 Server
                           .com TLD"   auth NS"         93.184.x.x"
 \end{verbatim}
 
-\subsubsection{HTTP/2 Multiplexing}\label{http2-multiplexing}
+\subsection{HTTP/2 Multiplexing}\label{http2-multiplexing}
+
+\setcodelang{}
 
 \begin{verbatim}
 HTTP/1.1 — 6 parallel TCP connections needed:
@@ -1276,7 +1395,9 @@ HTTP/2 — 1 TCP connection, multiple streams:
   (all in parallel, in-order per stream)
 \end{verbatim}
 
-\subsubsection{Load Balancer Topology}\label{load-balancer-topology}
+\subsection{Load Balancer Topology}\label{load-balancer-topology}
+
+\setcodelang{}
 
 \begin{verbatim}
          Internet
@@ -1301,7 +1422,7 @@ HTTP/2 — 1 TCP connection, multiple streams:
   └───────────────────┘
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
 \textbf{Google Search:} Your browser makes an HTTP/3 GET request. Before that, DNS resolves google.com (likely cached). TLS 1.3 negotiated in 1 RTT. Response arrives in \textasciitilde100ms because Google\textquotesingle s servers are globally distributed via anycast.
 
@@ -1313,7 +1434,7 @@ HTTP/2 — 1 TCP connection, multiple streams:
 
 \textbf{CloudFlare:} Acts as L7 reverse proxy + DDoS protection. Your traffic hits CloudFlare edge \(\rightarrow\) TLS terminated there \(\rightarrow\) re-encrypted to your origin. CloudFlare\textquotesingle s anycast network means clients connect to nearest PoP.
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One postal network --- every concept is a parcel, a courier, or a depot in the same delivery system.}
 
@@ -1350,9 +1471,9 @@ Analogy
 \textbf{CDN} & Regional depots stocked with copies of the most popular goods: instead of every parcel shipping from the central warehouse hundreds of miles away, customers in each region collect from the nearest local depot --- same goods, fraction of the journey \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{OSI Layers (Top to Bottom)}\label{osi-layers-top-to-bottom}
+\subsection{OSI Layers (Top to Bottom)}\label{osi-layers-top-to-bottom}
 
 \textbf{"All People Seem To Need Data Processing"}
 
@@ -1376,7 +1497,7 @@ Analogy
 
 Bottom to Top: \textbf{"Please Do Not Throw Sausage Pizza Away"}
 
-\subsubsection{TCP Flags}\label{tcp-flags}
+\subsection{TCP Flags}\label{tcp-flags}
 
 \textbf{"Unskilled Attackers Pester Real Security Folk"}
 
@@ -1386,7 +1507,7 @@ Bottom to Top: \textbf{"Please Do Not Throw Sausage Pizza Away"}
   \textbf{U}RG, \textbf{A}CK, \textbf{P}SH, \textbf{R}ST, \textbf{S}YN, \textbf{F}IN
 \end{itemize}
 
-\subsubsection{HTTP Status Code Families}\label{http-status-code-families}
+\subsection{HTTP Status Code Families}\label{http-status-code-families}
 
 \textbf{"Information, Success, Redirect, Client-fault, Server-fault"}
 
@@ -1404,11 +1525,11 @@ Bottom to Top: \textbf{"Please Do Not Throw Sausage Pizza Away"}
   5xx = Server error (their fault)
 \end{itemize}
 
-\subsubsection{TCP Handshake}\label{tcp-handshake}
+\subsection{TCP Handshake}\label{tcp-handshake}
 
 \textbf{SYN \(\rightarrow\) SYN-ACK \(\rightarrow\) ACK} = \textbf{"See ya!" \(\rightarrow\) "See ya, and you!" \(\rightarrow\) "You!"}
 
-\subsubsection{\texorpdfstring{REST HTTP Methods \(\rightarrow\) CRUD}{REST HTTP Methods \textbackslash rightarrow CRUD}}\label{rest-http-methods-rightarrow-crud}
+\subsection{\texorpdfstring{REST HTTP Methods \(\rightarrow\) CRUD}{REST HTTP Methods \textbackslash rightarrow CRUD}}\label{rest-http-methods-rightarrow-crud}
 
 \begin{itemize}
 \tightlist
@@ -1422,15 +1543,15 @@ Bottom to Top: \textbf{"Please Do Not Throw Sausage Pizza Away"}
   \textbf{D}elete = DELETE
 \end{itemize}
 
-\subsubsection{TLS 1.3 in one line}\label{tls-13-in-one-line}
+\subsection{TLS 1.3 in one line}\label{tls-13-in-one-line}
 
 \textbf{"Hello \(\rightarrow\) Hello+Keys \(\rightarrow\) Cert+Verify+Done \(\rightarrow\) Done \(\rightarrow\) Data"}
 
-\subsubsection{DNS hierarchy}\label{dns-hierarchy-1}
+\subsection{DNS hierarchy}\label{dns-hierarchy-1}
 
 \textbf{Root \(\rightarrow\) TLD \(\rightarrow\) Auth \(\rightarrow\) Answer} = \textbf{"Root\textquotesingle s Totally Authoritative Answers"}
 
-\subsubsection{Load Balancing levels}\label{load-balancing-levels}
+\subsection{Load Balancing levels}\label{load-balancing-levels}
 
 \textbf{"Layer 4 is Fewer, Layer 7 is Flexible"}
 
@@ -1442,7 +1563,7 @@ Bottom to Top: \textbf{"Please Do Not Throw Sausage Pizza Away"}
   L7 = Feature-rich (headers, URLs, cookies)
 \end{itemize}
 
-\subsubsection{CIDR quick math}\label{cidr-quick-math}
+\subsection{CIDR quick math}\label{cidr-quick-math}
 
 \begin{itemize}
 \tightlist
@@ -1456,9 +1577,9 @@ Bottom to Top: \textbf{"Please Do Not Throw Sausage Pizza Away"}
   Each bit you remove from prefix \(\rightarrow\) doubles the addresses
 \end{itemize}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{\texorpdfstring{Q1: "What happens when you type \url{https://www.google.com} in your browser and press Enter?"}{Q1: "What happens when you type https://www.google.com in your browser and press Enter?"}}\label{q1-what-happens-when-you-type-httpswwwgooglecom-in-your-browser-and-press-enter}
+\subsection{\texorpdfstring{Q1: "What happens when you type \url{https://www.google.com} in your browser and press Enter?"}{Q1: "What happens when you type https://www.google.com in your browser and press Enter?"}}\label{q1-what-happens-when-you-type-httpswwwgooglecom-in-your-browser-and-press-enter}
 
 This is the most comprehensive networking question. A complete answer demonstrates end-to-end mastery.
 
@@ -1466,6 +1587,8 @@ This is the most comprehensive networking question. A complete answer demonstrat
 Browser parses: scheme=\texttt{https}, host=\texttt{www.google.com}, port=\texttt{443} (implied), path=\texttt{/}
 
 \textbf{Step 2 --- DNS Resolution}
+
+\setcodelang{}
 
 \begin{verbatim}
 Browser checks: in-memory cache → OS cache → /etc/hosts
@@ -1478,6 +1601,8 @@ If not cached:
 
 \textbf{Step 3 --- TCP Connection}
 
+\setcodelang{}
+
 \begin{verbatim}
 Browser → TCP SYN to 142.250.80.78:443
 Server  → TCP SYN-ACK
@@ -1486,6 +1611,8 @@ Browser → TCP ACK
 \end{verbatim}
 
 \textbf{Step 4 --- TLS Handshake (TLS 1.3)}
+
+\setcodelang{}
 
 \begin{verbatim}
 Browser → ClientHello (cipher suites, key_share)
@@ -1498,14 +1625,18 @@ Browser → verifies cert chain (root CA in OS trust store)
 
 \textbf{Step 5 --- HTTP Request}
 
-\begin{verbatim}
-GET / HTTP/2
-Host: www.google.com
-Accept: text/html,application/xhtml+xml
-Accept-Encoding: gzip, deflate, br
-Accept-Language: en-US,en;q=0.9
-Cookie: [existing cookies]
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET }\OperatorTok{/}\NormalTok{ HTTP}\OperatorTok{/}\DecValTok{2}
+\NormalTok{Host: www.google.com}
+\NormalTok{Accept: text}\OperatorTok{/}\NormalTok{html,application}\OperatorTok{/}\NormalTok{xhtml}\OperatorTok{+}\NormalTok{xml}
+\NormalTok{Accept}\OperatorTok{{-}}\NormalTok{Encoding: gzip, deflate, br}
+\NormalTok{Accept}\OperatorTok{{-}}\NormalTok{Language: en}\OperatorTok{{-}}\NormalTok{US,en}\OperatorTok{;}\NormalTok{q}\OperatorTok{=}\FloatTok{0.9}
+\NormalTok{Cookie: [existing cookies]}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Step 6 --- Server Processing}
 
@@ -1523,13 +1654,17 @@ Cookie: [existing cookies]
 
 \textbf{Step 7 --- HTTP Response}
 
-\begin{verbatim}
-HTTP/2 200 OK
-Content-Type: text/html; charset=UTF-8
-Content-Encoding: br (Brotli compressed)
-Cache-Control: private, max-age=0
-[HTML body]
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HTTP}\OperatorTok{/}\DecValTok{2} \DecValTok{200}\NormalTok{ OK}
+\NormalTok{Content}\OperatorTok{{-}}\NormalTok{Type: text}\OperatorTok{/}\NormalTok{html}\OperatorTok{;}\NormalTok{ charset}\OperatorTok{=}\NormalTok{UTF}\OperatorTok{{-}}\DecValTok{8}
+\NormalTok{Content}\OperatorTok{{-}}\NormalTok{Encoding: br (Brotli compressed)}
+\NormalTok{Cache}\OperatorTok{{-}}\NormalTok{Control: private, }\BuiltInTok{max}\OperatorTok{{-}}\NormalTok{age}\OperatorTok{=}\DecValTok{0}
+\NormalTok{[HTML body]}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Step 8 --- Browser Rendering}
 
@@ -1563,7 +1698,7 @@ Cache-Control: private, max-age=0
 \textbf{Follow-up Q: "What is HSTS and when does it kick in?"}
 \(\rightarrow\) After first HTTPS visit, server sends \texttt{Strict-Transport-Security} header. Browser caches this and automatically upgrades future HTTP requests to HTTPS for that domain (for max-age duration).
 
-\subsubsection{Q2: "Explain TCP flow control vs congestion control"}\label{q2-explain-tcp-flow-control-vs-congestion-control}
+\subsection{Q2: "Explain TCP flow control vs congestion control"}\label{q2-explain-tcp-flow-control-vs-congestion-control}
 
 \textbf{Flow control} solves: receiver overwhelmed by fast sender.
 
@@ -1597,7 +1732,7 @@ Cache-Control: private, max-age=0
 
 \textbf{Key distinction:} Flow control = receiver tells you to slow down. Congestion control = sender figures out network is congested.
 
-\subsubsection{Q3: "Why does TLS use both asymmetric and symmetric cryptography?"}\label{q3-why-does-tls-use-both-asymmetric-and-symmetric-cryptography}
+\subsection{Q3: "Why does TLS use both asymmetric and symmetric cryptography?"}\label{q3-why-does-tls-use-both-asymmetric-and-symmetric-cryptography}
 
 \textbf{Asymmetric crypto} (RSA, ECDH): mathematically expensive but lets two parties establish a shared secret without ever transmitting it. Cannot be used for bulk data --- too slow (1000x slower than symmetric).
 
@@ -1605,7 +1740,7 @@ Cache-Control: private, max-age=0
 
 \textbf{Solution:} Use asymmetric crypto \emph{once} to establish a shared secret, then use symmetric crypto for all data. This is called a \textbf{hybrid cryptosystem} and is how all practical secure communication works.
 
-\subsubsection{Q4: "REST vs gRPC --- when do you choose each?"}\label{q4-rest-vs-grpc--when-do-you-choose-each}
+\subsection{Q4: "REST vs gRPC --- when do you choose each?"}\label{q4-rest-vs-grpc--when-do-you-choose-each}
 
 \textbf{Choose REST when:}
 
@@ -1653,7 +1788,7 @@ Cache-Control: private, max-age=0
   Less mature ecosystem for HTTP-level tooling (caching, analytics)
 \end{itemize}
 
-\subsubsection{Q5: "What is HTTP/2 head-of-line blocking and how does HTTP/3 fix it?"}\label{q5-what-is-http2-head-of-line-blocking-and-how-does-http3-fix-it}
+\subsection{Q5: "What is HTTP/2 head-of-line blocking and how does HTTP/3 fix it?"}\label{q5-what-is-http2-head-of-line-blocking-and-how-does-http3-fix-it}
 
 \textbf{HTTP/1.1 HOL blocking:} Only one request per connection at a time. Solution: open 6 parallel connections (wasteful).
 
@@ -1661,7 +1796,7 @@ Cache-Control: private, max-age=0
 
 \textbf{HTTP/3 fix:} Replace TCP with QUIC (UDP-based). QUIC implements streams at the protocol level. A lost packet only stalls the stream that contained it --- other streams continue flowing. True end-to-end elimination of HOL blocking.
 
-\subsubsection{Q6: "Explain the difference between L4 and L7 load balancing. When do you use each?"}\label{q6-explain-the-difference-between-l4-and-l7-load-balancing-when-do-you-use-each}
+\subsection{Q6: "Explain the difference between L4 and L7 load balancing. When do you use each?"}\label{q6-explain-the-difference-between-l4-and-l7-load-balancing-when-do-you-use-each}
 
 \textbf{L4 Load Balancer:}
 
@@ -1703,7 +1838,7 @@ Cache-Control: private, max-age=0
   \textbf{Use when:} Need content-based routing, canary deployments, A/B testing, microservices
 \end{itemize}
 
-\subsubsection{Q7: "What is CORS and why does it exist? How is it different from authentication?"}\label{q7-what-is-cors-and-why-does-it-exist-how-is-it-different-from-authentication}
+\subsection{Q7: "What is CORS and why does it exist? How is it different from authentication?"}\label{q7-what-is-cors-and-why-does-it-exist-how-is-it-different-from-authentication}
 
 \textbf{CORS exists to relax Same-Origin Policy.} SOP prevents JS on evil.com from making credentialed requests to bank.com. Without SOP, malicious site could steal your banking session via AJAX.
 
@@ -1713,7 +1848,7 @@ CORS headers tell the browser "JavaScript from origin X is allowed to read my re
 
 \textbf{Common mistake:} Thinking CORS provides security. It doesn\textquotesingle t --- it enables access in a controlled way. Your API still needs proper auth regardless.
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
 \textbf{1. QUIC and UDP reliability paradox}
 UDP is unreliable, yet QUIC on UDP provides reliability. QUIC implements its own: sequence numbers, ACKs, retransmission, congestion control --- but all at the application layer with stream-level independence. This shows that reliability is software, not a hardware necessity.
@@ -1739,7 +1874,7 @@ Classic Unix \texttt{select()} is O(N) per call --- breaks above 1000 connection
 \textbf{8. TCP time-wait and port exhaustion}
 Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitilde60s). High-throughput systems (\textgreater1000 connections/sec) exhaust the 64K ephemeral port range. Solutions: \texttt{SO\_REUSEADDR}, \texttt{TCP\_TIMESTAMPS\ +\ tw\_reuse}, multiple IPs, or connection pooling.
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1769,9 +1904,9 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   \textbf{Saying "add more servers" without discussing the load balancer:} More servers require a load balancer. Candidates should discuss health checks, algorithms, and session affinity.
 \end{enumerate}
 
-\subsection{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{System Design}\label{system-design}
+\subsection{System Design}\label{system-design}
 
 \begin{itemize}
 \tightlist
@@ -1787,7 +1922,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   \textbf{Real-time features} = WebSockets or SSE --- stateful connections affect scaling
 \end{itemize}
 
-\subsubsection{Distributed Systems}\label{distributed-systems}
+\subsection{Distributed Systems}\label{distributed-systems}
 
 \begin{itemize}
 \tightlist
@@ -1801,7 +1936,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   \textbf{Circuit breakers:} Complement to load balancing when backends fail
 \end{itemize}
 
-\subsubsection{Security}\label{security}
+\subsection{Security}\label{security}
 
 \begin{itemize}
 \tightlist
@@ -1817,7 +1952,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   \textbf{DDoS mitigation:} Anycast + rate limiting at L3/L4 (SYN flood protection)
 \end{itemize}
 
-\subsubsection{Cloud (AWS/GCP/Azure)}\label{cloud-awsgcpazure}
+\subsection{Cloud (AWS/GCP/Azure)}\label{cloud-awsgcpazure}
 
 \begin{itemize}
 \tightlist
@@ -1835,7 +1970,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   \textbf{CloudFront} = CDN + L7 features (Lambda@Edge)
 \end{itemize}
 
-\subsubsection{Performance Engineering}\label{performance-engineering}
+\subsection{Performance Engineering}\label{performance-engineering}
 
 \begin{itemize}
 \tightlist
@@ -1849,7 +1984,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
   \textbf{TTFB (Time to First Byte):} Metric for server responsiveness, affected by routing/LB
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \textbf{1. Think out loud, always.} Networking questions are diagnostic. Show your mental model even when uncertain.
 
@@ -1885,9 +2020,9 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
 
 \textbf{10. Security angle:} Always mention TLS. "And of course all communication would be over TLS" should be reflexive.
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \textbf{OSI:} 7 layers, Physical \(\rightarrow\) Data Link \(\rightarrow\) Network \(\rightarrow\) Transport \(\rightarrow\) Session \(\rightarrow\) Presentation \(\rightarrow\) Application. Mnemonic: "Please Do Not Throw Sausage Pizza Away."
 
@@ -1917,7 +2052,7 @@ Each closed TCP connection stays in TIME\_WAIT for 2\(\times\)MSL (\textasciitil
 
 \textbf{CIDR:} /N means N bits are network prefix. Usable hosts = 2\^{}(32-N) - 2.
 
-\subsubsection{Key Numbers to Memorize}\label{key-numbers-to-memorize}
+\subsection{Key Numbers to Memorize}\label{key-numbers-to-memorize}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5385}}
@@ -1949,7 +2084,7 @@ Browser TCP conns per domain & 6 (HTTP/1.1) \\
 /16 subnet addresses & 65,536 \\
 \end{longtable}
 
-\subsubsection{Master Comparison Table}\label{master-comparison-table}
+\subsection{Master Comparison Table}\label{master-comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0969}}
@@ -1993,7 +2128,7 @@ UDP & 4 & --- & Binary & Datagrams & --- & Fast transport \\
 IP & 3 & --- & Binary & Packets & --- & Routing \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts (FAANG Top-10)}\label{most-important-concepts-faang-top-10}
+\subsection{Most Important Concepts (FAANG Top-10)}\label{most-important-concepts-faang-top-10}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

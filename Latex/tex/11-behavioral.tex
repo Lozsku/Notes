@@ -14,7 +14,46 @@
 \providecommand{\pandocbounded}[1]{#1}
 
 % syntax-highlighting macros emitted by pandoc (skylighting)
-
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
 
 \begin{document}
 
@@ -24,14 +63,12 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{11 --- Behavioral / Leadership / Googleyness}\label{11--behavioral--leadership--googleyness}
-
 \begin{quote}
 \textbf{Audience:} Mid-to-senior engineers preparing for FAANG behavioral rounds.
 \textbf{Goal:} Deep mastery --- templates, story banks, worked examples, mnemonics --- ready for prep and night-before revision.
 \end{quote}
 
-\subsection{Overview --- What it is}\label{overview--what-it-is}
+\section{Overview --- What it is}\label{overview--what-it-is}
 
 Behavioral interviews assess \emph{how} you work, not just \emph{what} you can build. Interviewers ask you to recall real past situations and narrate them. The premise: \textbf{past behavior is the best predictor of future behavior.}
 
@@ -62,9 +99,9 @@ Apple & "Apple Values" & Less structured but heavily culture-oriented \\
 
 These rounds are \textbf{as eliminatory as coding.} A strong algorithm answer will not save you from a failing behavioral score.
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
-\subsubsection{What companies are actually buying}\label{what-companies-are-actually-buying}
+\subsection{What companies are actually buying}\label{what-companies-are-actually-buying}
 
 When a company hires a senior engineer, they are not buying code --- they are buying \textbf{judgment, influence, and force multiplication.} Behavioral rounds exist to answer:
 
@@ -83,11 +120,11 @@ When a company hires a senior engineer, they are not buying code --- they are bu
   \textbf{Have they done this before at the level we need?}
 \end{enumerate}
 
-\subsubsection{The bar-raiser model (Amazon) and calibrated loops (Google)}\label{the-bar-raiser-model-amazon-and-calibrated-loops-google}
+\subsection{The bar-raiser model (Amazon) and calibrated loops (Google)}\label{the-bar-raiser-model-amazon-and-calibrated-loops-google}
 
 At Amazon, one "Bar Raiser" --- a trained, senior, cross-org interviewer --- has veto power over any hire. Their job is exclusively to assess LPs and ensure the candidate is "above the median of everyone in this role." At Google, a hiring committee reads all scorecards and calibrates against the job ladder. \textbf{Your behavioral answers are being pattern-matched against a written rubric, not vibes.}
 
-\subsubsection{What gets screened out}\label{what-gets-screened-out}
+\subsection{What gets screened out}\label{what-gets-screened-out}
 
 \begin{itemize}
 \tightlist
@@ -103,15 +140,15 @@ At Amazon, one "Bar Raiser" --- a trained, senior, cross-org interviewer --- has
   Engineers who can\textquotesingle t measure their own impact
 \end{itemize}
 
-\subsection{Why FAANG Cares}\label{why-faang-cares}
+\section{Why FAANG Cares}\label{why-faang-cares}
 
-\subsubsection{Amazon --- Leadership Principles \& Bar Raiser}\label{amazon--leadership-principles--bar-raiser}
+\subsection{Amazon --- Leadership Principles \& Bar Raiser}\label{amazon--leadership-principles--bar-raiser}
 
 Amazon codified 16 (now expanded from 14) LPs that define every hiring, promotion, and performance decision. The Bar Raiser is specifically trained to probe LPs. \textbf{Each interview loop is pre-assigned specific LPs} --- you may face 2-3 LPs per interviewer. Failing on any LP can be a veto. Amazon is arguably the most rigorous behavioral interviewer in the industry.
 
 \textbf{Key Amazon signal:} Specificity. Vague answers score 0. They want \emph{exact} situations, \emph{exact} data, \emph{exact} decisions you made personally.
 
-\subsubsection{Google --- Googleyness \& Leadership}\label{google--googleyness--leadership}
+\subsection{Google --- Googleyness \& Leadership}\label{google--googleyness--leadership}
 
 Google\textquotesingle s rubric has two components:
 
@@ -127,7 +164,7 @@ Google is looking for the \textbf{"brilliant friend"} --- someone smart enough t
 
 \textbf{Key Google signal:} Ownership + intellectual humility. Did you push something forward while bringing others along?
 
-\subsubsection{Meta --- "Move Fast, Be Direct"}\label{meta--move-fast-be-direct}
+\subsection{Meta --- "Move Fast, Be Direct"}\label{meta--move-fast-be-direct}
 
 Meta\textquotesingle s behavioral lens centers on:
 
@@ -143,7 +180,7 @@ Meta\textquotesingle s behavioral lens centers on:
 
 Meta also weights \textbf{cross-functional collaboration} heavily --- did you work well with PM, design, data science?
 
-\subsubsection{Microsoft --- Growth Mindset}\label{microsoft--growth-mindset}
+\subsection{Microsoft --- Growth Mindset}\label{microsoft--growth-mindset}
 
 Microsoft post-Nadella is heavily Dweck-influenced. They want to see:
 
@@ -157,7 +194,7 @@ Microsoft post-Nadella is heavily Dweck-influenced. They want to see:
   Empowering others.
 \end{itemize}
 
-\subsubsection{How each company weights behavioral vs. technical}\label{how-each-company-weights-behavioral-vs-technical}
+\subsection{How each company weights behavioral vs. technical}\label{how-each-company-weights-behavioral-vs-technical}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1189}}
@@ -183,9 +220,11 @@ Microsoft & Medium & Usually softens a borderline tech score \\
 
 \textbf{Takeaway: Behavioral is not a box-check. It is a co-equal signal.}
 
-\subsection{The STAR Method}\label{the-star-method}
+\section{The STAR Method}\label{the-star-method}
 
-\subsubsection{Structure}\label{structure}
+\subsection{Structure}\label{structure}
+
+\setcodelang{}
 
 \begin{verbatim}
 S — Situation   (10-15% of answer time)
@@ -194,7 +233,7 @@ A — Action      (60-70%)  ← this is where you score points
 R — Result      (15-20%)  ← must be concrete and quantified
 \end{verbatim}
 
-\subsubsection{The STAR principle}\label{the-star-principle}
+\subsection{The STAR principle}\label{the-star-principle}
 
 \begin{itemize}
 \tightlist
@@ -208,7 +247,7 @@ R — Result      (15-20%)  ← must be concrete and quantified
   \textbf{R:} What happened? Numbers. Business outcome. What would have happened without you?
 \end{itemize}
 
-\subsubsection{The Weak vs. Strong worked example}\label{the-weak-vs-strong-worked-example}
+\subsection{The Weak vs. Strong worked example}\label{the-weak-vs-strong-worked-example}
 
 \textbf{Question:} "Tell me about a time you had to influence a decision without having authority."
 
@@ -270,7 +309,7 @@ The meta-lesson I took: influence without authority works best when you make it 
   Closes with a principle --- shows self-awareness and growth
 \end{itemize}
 
-\subsubsection{STAR anti-patterns}\label{star-anti-patterns}
+\subsection{STAR anti-patterns}\label{star-anti-patterns}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4524}}
@@ -292,9 +331,9 @@ Vague situation & Name the product, the quarter, the user count \\
 Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y because..." \\
 \end{longtable}
 
-\subsection{Core Themes}\label{core-themes}
+\section{Core Themes}\label{core-themes}
 
-\subsubsection{Leadership}\label{leadership}
+\subsection{Leadership}\label{leadership}
 
 \textbf{What interviewers look for:} Did you step up without being asked? Did you set direction, align others, make hard calls? Do you distinguish management from leadership?
 
@@ -316,7 +355,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Leadership = initiating + aligning + delivering + owning outcomes.}
 
-\subsubsection{Ownership}\label{ownership}
+\subsection{Ownership}\label{ownership}
 
 \textbf{What interviewers look for:} Do you treat problems as yours to solve, or do you pass them up the chain? Do you follow through? Do you own failures?
 
@@ -338,7 +377,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Ownership = "my problem until it\textquotesingle s solved, regardless of org chart."}
 
-\subsubsection{Conflict Resolution}\label{conflict-resolution}
+\subsection{Conflict Resolution}\label{conflict-resolution}
 
 \textbf{What interviewers look for:} Do you avoid conflict (bad) or escalate too quickly (bad)? Can you disagree productively and maintain relationships?
 
@@ -362,7 +401,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Good conflict = direct + data-driven + resolution-focused. Bad conflict = avoided or escalated.}
 
-\subsubsection{Cross-team Collaboration}\label{cross-team-collaboration}
+\subsection{Cross-team Collaboration}\label{cross-team-collaboration}
 
 \textbf{What interviewers look for:} Can you work across org boundaries, different incentives, different timelines? Do you create mutual wins or "win" at others\textquotesingle{} expense?
 
@@ -384,7 +423,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Cross-team = understand their incentives, create mutual wins, maintain relationships.}
 
-\subsubsection{Ambiguity}\label{ambiguity}
+\subsection{Ambiguity}\label{ambiguity}
 
 \textbf{What interviewers look for:} When requirements are unclear, do you freeze? Do you ask good questions? Do you make a reasonable bet, execute, and correct course?
 
@@ -408,7 +447,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Ambiguity = clarify \(\rightarrow\) bet \(\rightarrow\) validate \(\rightarrow\) adjust. Don\textquotesingle t wait for perfect info.}
 
-\subsubsection{Mentoring}\label{mentoring}
+\subsection{Mentoring}\label{mentoring}
 
 \textbf{What interviewers look for:} Do you make the team better? Do you invest in others? Do you create leverage beyond your own output?
 
@@ -430,7 +469,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Mentoring = specific investment, measurable growth, you multiplied the team\textquotesingle s output.}
 
-\subsubsection{Project Impact}\label{project-impact}
+\subsection{Project Impact}\label{project-impact}
 
 \textbf{What interviewers look for:} Can you connect your technical work to business outcomes? Do you measure your impact or just ship code?
 
@@ -452,7 +491,7 @@ Skipping alternatives in the Action & Say: "I considered X, Y, Z. I chose Y beca
 
 \textbf{Interview takeaway: Impact = metric moved \(\times\) scale \(\times\) counterfactual.}
 
-\subsection{Amazon\textquotesingle s 16 Leadership Principles}\label{amazons-16-leadership-principles}
+\section{Amazon\textquotesingle s 16 Leadership Principles}\label{amazons-16-leadership-principles}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0600}}
@@ -503,48 +542,52 @@ Sample Interview Question
   LP 6 (Hire and Develop) is critical for senior+ roles; junior candidates can use mentoring stories
 \end{itemize}
 
-\subsection{Building Your Story Bank}\label{building-your-story-bank}
+\section{Building Your Story Bank}\label{building-your-story-bank}
 
-\subsubsection{Why a story bank}\label{why-a-story-bank}
+\subsection{Why a story bank}\label{why-a-story-bank}
 
 You have \textasciitilde6-8 strong career stories. Each story, told well, can answer 4-6 different question types. Without a bank, you repeat yourself, blank on questions, or give unrelated examples. With a bank, you map questions to stories in 5 seconds.
 
-\subsubsection{The matrix template}\label{the-matrix-template}
+\subsection{The matrix template}\label{the-matrix-template}
 
 Copy this template and fill in your real stories.
 
-\begin{verbatim}
-STORY BANK MATRIX
-=================
+\setcodelang{Python}
 
-           | Lead | Own  | Conflict | Xteam | Ambig | Mentor | Impact | Fail  | LP specific
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story A    |  ✓   |  ✓   |          |  ✓    |       |        |  ✓     |       | LP2, LP14
-(Project X)|      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story B    |      |      |  ✓       |       |  ✓    |        |        |  ✓    | LP13, LP9
-(Conflict) |      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story C    |      |  ✓   |          |       |  ✓    |        |  ✓     |       | LP3, LP9
-(Ambig)    |      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story D    |      |      |          |  ✓    |       |  ✓     |  ✓     |       | LP6, LP11
-(Mentored) |      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story E    |  ✓   |      |  ✓       |       |       |        |        |  ✓    | LP13, LP8
-(Failure)  |      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story F    |  ✓   |  ✓   |          |  ✓    |  ✓    |        |  ✓     |       | LP1, LP14
-(Big proj) |      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story G    |      |      |          |  ✓    |       |  ✓     |        |       | LP6, LP11
-(Collab)   |      |      |          |       |       |        |        |       |
------------+------+------+----------+-------+-------+--------+--------+-------+------------
-Story H    |      |  ✓   |          |       |       |        |        |  ✓    | LP2, LP5
-(Screwup)  |      |      |          |       |       |        |        |       |
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{STORY BANK MATRIX}
+\OperatorTok{=================}
 
-\subsubsection{Story bank rules}\label{story-bank-rules}
+           \OperatorTok{|}\NormalTok{ Lead }\OperatorTok{|}\NormalTok{ Own  }\OperatorTok{|}\NormalTok{ Conflict }\OperatorTok{|}\NormalTok{ Xteam }\OperatorTok{|}\NormalTok{ Ambig }\OperatorTok{|}\NormalTok{ Mentor }\OperatorTok{|}\NormalTok{ Impact }\OperatorTok{|}\NormalTok{ Fail  }\OperatorTok{|}\NormalTok{ LP specific}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story A    }\OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}          \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}\NormalTok{  ✓     }\OperatorTok{|}       \OperatorTok{|}\NormalTok{ LP2, LP14}
+\NormalTok{(Project X)}\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story B    }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}\NormalTok{  ✓       }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}\NormalTok{ LP13, LP9}
+\NormalTok{(Conflict) }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story C    }\OperatorTok{|}      \OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}        \OperatorTok{|}\NormalTok{  ✓     }\OperatorTok{|}       \OperatorTok{|}\NormalTok{ LP3, LP9}
+\NormalTok{(Ambig)    }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story D    }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  ✓     }\OperatorTok{|}\NormalTok{  ✓     }\OperatorTok{|}       \OperatorTok{|}\NormalTok{ LP6, LP11}
+\NormalTok{(Mentored) }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story E    }\OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}      \OperatorTok{|}\NormalTok{  ✓       }\OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}\NormalTok{ LP13, LP8}
+\NormalTok{(Failure)  }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story F    }\OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}          \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}        \OperatorTok{|}\NormalTok{  ✓     }\OperatorTok{|}       \OperatorTok{|}\NormalTok{ LP1, LP14}
+\NormalTok{(Big proj) }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story G    }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  ✓     }\OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}\NormalTok{ LP6, LP11}
+\NormalTok{(Collab)   }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{Story H    }\OperatorTok{|}      \OperatorTok{|}\NormalTok{  ✓   }\OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}\NormalTok{  ✓    }\OperatorTok{|}\NormalTok{ LP2, LP5}
+\NormalTok{(Screwup)  }\OperatorTok{|}      \OperatorTok{|}      \OperatorTok{|}          \OperatorTok{|}       \OperatorTok{|}       \OperatorTok{|}        \OperatorTok{|}        \OperatorTok{|}       \OperatorTok{|}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Story bank rules}\label{story-bank-rules}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -565,7 +608,9 @@ Story H    |      |  ✓   |          |       |       |        |        |  ✓  
   \textbf{Vary recency.} Don\textquotesingle t use all stories from one job. Spread across at least 2 roles.
 \end{enumerate}
 
-\subsubsection{Story template (fill in for each story)}\label{story-template-fill-in-for-each-story}
+\subsection{Story template (fill in for each story)}\label{story-template-fill-in-for-each-story}
+
+\setcodelang{}
 
 \begin{verbatim}
 Story Name: ____________________
@@ -595,9 +640,11 @@ What it demonstrates:
 LP coverage: ____________________
 \end{verbatim}
 
-\subsection{Architecture / Frameworks}\label{architecture--frameworks}
+\section{Architecture / Frameworks}\label{architecture--frameworks}
 
-\subsubsection{STAR structure (ASCII)}\label{star-structure-ascii}
+\subsection{STAR structure (ASCII)}\label{star-structure-ascii}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────────────────────────────────┐
@@ -619,7 +666,9 @@ LP coverage: ____________________
 └─────────────┴────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{Story matrix grid (themes vs. LPs)}\label{story-matrix-grid-themes-vs-lps}
+\subsection{Story matrix grid (themes vs. LPs)}\label{story-matrix-grid-themes-vs-lps}
+
+\setcodelang{}
 
 \begin{verbatim}
 STORY → THEME MAPPING GRID
@@ -639,7 +688,9 @@ Goal: No column has fewer than 2 checkmarks.
       No row has only 1 checkmark.
 \end{verbatim}
 
-\subsubsection{Scoring rubric (how interviewers actually score)}\label{scoring-rubric-how-interviewers-actually-score}
+\subsection{Scoring rubric (how interviewers actually score)}\label{scoring-rubric-how-interviewers-actually-score}
+
+\setcodelang{}
 
 \begin{verbatim}
 BEHAVIORAL SCORING RUBRIC (4-point scale)
@@ -674,9 +725,9 @@ Senior Engineer → expects cross-team influence, measurable impact
 Staff/Principal → expects org-wide influence, sets direction, drives strategy
 \end{verbatim}
 
-\subsection{Real-World Example Answers}\label{real-world-example-answers}
+\section{Real-World Example Answers}\label{real-world-example-answers}
 
-\subsubsection{Example 1: Conflict resolution}\label{example-1-conflict-resolution}
+\subsection{Example 1: Conflict resolution}\label{example-1-conflict-resolution}
 
 \textbf{Q: "Tell me about a time you had a conflict with a teammate."}
 
@@ -694,7 +745,7 @@ The migration took ten weeks, slightly longer than either original estimate, but
 
 \textbf{Why it works:} Specific timeline, legitimate two-sided conflict, solution that integrated both perspectives, quantified result, relationship outcome.
 
-\subsubsection{Example 2: Failure}\label{example-2-failure}
+\subsection{Example 2: Failure}\label{example-2-failure}
 
 \textbf{Q: "Tell me about a time you failed."}
 
@@ -714,7 +765,7 @@ What I changed after that: I now require a technical spike for any project that 
 
 \textbf{Why it works:} Real failure (not disguised success), takes personal accountability, result still had business impact, clear behavioral change afterward.
 
-\subsubsection{Example 3: Leadership / impact}\label{example-3-leadership--impact}
+\subsection{Example 3: Leadership / impact}\label{example-3-leadership--impact}
 
 \textbf{Q: "Tell me about your most impactful project."}
 
@@ -734,7 +785,7 @@ We shipped the new onboarding to 20\% of new users. At 8 weeks: 7-day retention 
 
 \textbf{Why it works:} Started with problem identification (not assignment), cross-team collaboration, user research, specific metrics, business impact quantified, lasting process contribution.
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One team, one season --- every trait is a play, a role, or a moment on the same field.}
 
@@ -766,9 +817,9 @@ Failure / Learning & Watching the match film the morning after a defeat, pausing
 Quantifying Impact & Posting the actual scoreboard --- goals, assists, clean sheets, league position --- not just telling the board "we played well." The scoreboard is what gets your contract renewed. \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{Remembering STAR}\label{remembering-star}
+\subsection{Remembering STAR}\label{remembering-star}
 
 \textbf{"Stories Tell Actual Results"}
 
@@ -786,7 +837,7 @@ Quantifying Impact & Posting the actual scoreboard --- goals, assists, clean she
 
 Or the spatial trick: \textbf{S}cene \(\rightarrow\) \textbf{T}rigger \(\rightarrow\) \textbf{A}ction \(\rightarrow\) \textbf{A}ftermath (STAA if you need a variant).
 
-\subsubsection{Remembering Amazon\textquotesingle s 16 LPs (grouped)}\label{remembering-amazons-16-lps-grouped}
+\subsection{Remembering Amazon\textquotesingle s 16 LPs (grouped)}\label{remembering-amazons-16-lps-grouped}
 
 Group them into 4 buckets of 4:
 
@@ -825,11 +876,11 @@ Group them into 4 buckets of 4:
 
 \textbf{Memory hook for the 4 buckets:} \textbf{"CQPJ"} --- "Customers Quietly Pay Justly"
 
-\subsubsection{Remembering not to say "we"}\label{remembering-not-to-say-we}
+\subsection{Remembering not to say "we"}\label{remembering-not-to-say-we}
 
 \textbf{The "I" audit:} After every practice answer, read it back and underline every "I." If there are fewer than 5 in the Action section, you\textquotesingle re probably hiding behind "we." Interviewers can\textquotesingle t score what they can\textquotesingle t see.
 
-\subsubsection{The 3-number rule for results}\label{the-3-number-rule-for-results}
+\subsection{The 3-number rule for results}\label{the-3-number-rule-for-results}
 
 Every result should have: \textbf{a baseline, a change, and a scale.}
 
@@ -841,7 +892,7 @@ Every result should have: \textbf{a baseline, a change, and a scale.}
   Mnemonic: \textbf{B-C-S} = Before \(\rightarrow\) Change \(\rightarrow\) Scale
 \end{itemize}
 
-\subsubsection{Pre-interview 5-minute mental warm-up}\label{pre-interview-5-minute-mental-warm-up}
+\subsection{Pre-interview 5-minute mental warm-up}\label{pre-interview-5-minute-mental-warm-up}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -858,9 +909,9 @@ Every result should have: \textbf{a baseline, a change, and a scale.}
   Remind yourself: "I am describing my actual experience. There\textquotesingle s no trick answer." (15 seconds)
 \end{enumerate}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Leadership}\label{leadership-1}
+\subsection{Leadership}\label{leadership-1}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5352}}
@@ -882,7 +933,7 @@ What it\textquotesingle s really probing
 "When have you had to make a decision that was unpopular?" & Backbone; willing to do the hard right thing \\
 \end{longtable}
 
-\subsubsection{Conflict}\label{conflict}
+\subsection{Conflict}\label{conflict}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5572}}
@@ -904,7 +955,7 @@ What it\textquotesingle s really probing
 "Describe a time you and a colleague couldn\textquotesingle t agree. What happened?" & Do you leave conflicts unresolved? \\
 \end{longtable}
 
-\subsubsection{Failure / Learning}\label{failure--learning}
+\subsection{Failure / Learning}\label{failure--learning}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5271}}
@@ -926,7 +977,7 @@ What it\textquotesingle s really probing
 "Have you ever made a decision you later regretted?" & Judgment quality + learning \\
 \end{longtable}
 
-\subsubsection{Ambiguity}\label{ambiguity-1}
+\subsection{Ambiguity}\label{ambiguity-1}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6282}}
@@ -947,7 +998,7 @@ What it\textquotesingle s really probing
 "Describe a time you had to figure out what to build without a clear spec." & Product thinking + initiative \\
 \end{longtable}
 
-\subsubsection{Impact}\label{impact}
+\subsection{Impact}\label{impact}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5562}}
@@ -968,7 +1019,7 @@ What it\textquotesingle s really probing
 "What\textquotesingle s the hardest technical problem you\textquotesingle ve solved?" & Problem-solving + communication \\
 \end{longtable}
 
-\subsubsection{Teamwork / Cross-team}\label{teamwork--cross-team}
+\subsection{Teamwork / Cross-team}\label{teamwork--cross-team}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6263}}
@@ -989,9 +1040,9 @@ What it\textquotesingle s really probing
 "How have you handled a situation where teams had conflicting priorities?" & Negotiation + shared goal-finding \\
 \end{longtable}
 
-\subsection{Senior/Staff-Level Discussion Points}\label{seniorstaff-level-discussion-points}
+\section{Senior/Staff-Level Discussion Points}\label{seniorstaff-level-discussion-points}
 
-\subsubsection{Scope expectations by level}\label{scope-expectations-by-level}
+\subsection{Scope expectations by level}\label{scope-expectations-by-level}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2350}}
@@ -1013,9 +1064,11 @@ Staff/L6+ & Org-level impact; setting technical strategy; influencing across org
 
 \textbf{At staff level, interviewers explicitly listen for:} org-wide scope, not just team-wide. If your stories are all "I fixed it on my team," that scores senior, not staff.
 
-\subsubsection{Influence without authority}\label{influence-without-authority}
+\subsection{Influence without authority}\label{influence-without-authority}
 
 This is the defining skill of senior+ engineers. Framework:
+
+\setcodelang{}
 
 \begin{verbatim}
 INFLUENCE WITHOUT AUTHORITY PLAYBOOK
@@ -1036,7 +1089,7 @@ INFLUENCE WITHOUT AUTHORITY PLAYBOOK
    → Disagree-and-commit. State your view once, clearly, then execute.
 \end{verbatim}
 
-\subsubsection{Driving org-level impact}\label{driving-org-level-impact}
+\subsection{Driving org-level impact}\label{driving-org-level-impact}
 
 For staff+ roles, you should have stories about:
 
@@ -1052,11 +1105,13 @@ For staff+ roles, you should have stories about:
   Creating leverage: a tool, a platform, a process that accelerated other teams
 \end{itemize}
 
-\subsubsection{Handling disagreement with leadership}\label{handling-disagreement-with-leadership}
+\subsection{Handling disagreement with leadership}\label{handling-disagreement-with-leadership}
 
 This is the hardest conversation and the most important to have a real story for.
 
 \textbf{The disagree-and-commit framework:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Step 1: State your position once, clearly, with data
@@ -1081,11 +1136,11 @@ What NOT to do:
 - Tell your team "I don't agree with this but we have to do it"
 \end{verbatim}
 
-\subsubsection{For "influence up" stories at senior+ level}\label{for-influence-up-stories-at-senior-level}
+\subsection{For "influence up" stories at senior+ level}\label{for-influence-up-stories-at-senior-level}
 
 Interviewers want to see you influenced a \emph{decision}, not just an implementation. "I convinced my manager to give us two more weeks" is not the same as "I changed the technical direction of a \$2M initiative."
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2778}}
@@ -1115,9 +1170,9 @@ Fix
 \textbf{Not adapting to the company} & Amazon LP story that never mentions customer & Map your story emphasis to the company\textquotesingle s framework \\
 \end{longtable}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
-\subsubsection{Amazon}\label{amazon}
+\subsection{Amazon}\label{amazon}
 
 \begin{itemize}
 \tightlist
@@ -1135,7 +1190,7 @@ Fix
   It\textquotesingle s okay to ask for 30 seconds to think of an example
 \end{itemize}
 
-\subsubsection{Google}\label{google}
+\subsection{Google}\label{google}
 
 \begin{itemize}
 \tightlist
@@ -1151,7 +1206,7 @@ Fix
   In Google loops, your behavioral interview is reviewed by the hiring committee who also see your coding and design scores --- they look for consistency
 \end{itemize}
 
-\subsubsection{Meta}\label{meta}
+\subsection{Meta}\label{meta}
 
 \begin{itemize}
 \tightlist
@@ -1165,7 +1220,7 @@ Fix
   Meta explicitly looks for people who can operate without tight process --- show you\textquotesingle ve worked in ambiguous environments
 \end{itemize}
 
-\subsubsection{Microsoft}\label{microsoft}
+\subsection{Microsoft}\label{microsoft}
 
 \begin{itemize}
 \tightlist
@@ -1179,7 +1234,7 @@ Fix
   "Clarity, Energy, Success" is Nadella\textquotesingle s framework --- your stories can loosely map to these
 \end{itemize}
 
-\subsubsection{General FAANG tips}\label{general-faang-tips}
+\subsection{General FAANG tips}\label{general-faang-tips}
 
 \begin{itemize}
 \tightlist
@@ -1195,9 +1250,9 @@ Fix
   \textbf{Ask at the end:} "Is there anything about my answers you\textquotesingle d like me to expand on?" --- shows confidence and gives you a second chance
 \end{itemize}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-minute summary}\label{10-minute-summary}
+\subsection{10-minute summary}\label{10-minute-summary}
 
 \textbf{Behavioral rounds screen for:} judgment, ownership, influence, learning. Not just technical skill.
 
@@ -1217,7 +1272,7 @@ Fix
 
 \textbf{Influence without authority:} Understand their incentives. Build credibility with data. Make it easy to say yes.
 
-\subsubsection{Key points (top 10)}\label{key-points-top-10}
+\subsection{Key points (top 10)}\label{key-points-top-10}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1244,7 +1299,7 @@ Fix
   Disagree-and-commit: express once with data, then execute fully
 \end{enumerate}
 
-\subsubsection{Pre-interview checklist}\label{pre-interview-checklist}
+\subsection{Pre-interview checklist}\label{pre-interview-checklist}
 
 \textbf{One week before:}
 
@@ -1291,7 +1346,9 @@ Fix
   End each answer with your result number or a principle statement
 \end{itemize}
 
-\subsubsection{Most important concepts at a glance}\label{most-important-concepts-at-a-glance}
+\subsection{Most important concepts at a glance}\label{most-important-concepts-at-a-glance}
+
+\setcodelang{}
 
 \begin{verbatim}
 STAR: Situation → Task → Action(60%) → Result(numbers)

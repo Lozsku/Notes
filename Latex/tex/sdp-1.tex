@@ -63,16 +63,14 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{System Design --- Part 1: Foundational Problems}\label{system-design--part-1-foundational-problems}
-
 \begin{quote}
 Complete end-to-end worked designs for a 45--60 min FAANG system-design round.
 Each section mirrors the structure you should drive in the actual interview.
 \end{quote}
 
-\subsection{1. Design a URL Shortener (TinyURL / bit.ly)}\label{1-design-a-url-shortener-tinyurl--bitly}
+\section{1. Design a URL Shortener (TinyURL / bit.ly)}\label{1-design-a-url-shortener-tinyurl--bitly}
 
-\subsubsection{1. Requirements}\label{1-requirements}
+\subsection{1. Requirements}\label{1-requirements}
 
 \textbf{Clarifying questions to ask the interviewer:}
 
@@ -123,7 +121,7 @@ Each section mirrors the structure you should drive in the actual interview.
   The system is \textbf{read-heavy} (100:1 read-to-write ratio is typical).
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation}
 
 \textbf{Assumptions:}
 
@@ -137,12 +135,16 @@ Each section mirrors the structure you should drive in the actual interview.
 
 \textbf{Write QPS:}
 
+\setcodelang{}
+
 \begin{verbatim}
 500,000,000 / (30 × 86,400) ≈ 193 writes/sec  ≈ ~200 writes/sec
 Peak (3×):                                      ≈ ~600 writes/sec
 \end{verbatim}
 
 \textbf{Read QPS:}
+
+\setcodelang{}
 
 \begin{verbatim}
 50,000,000,000 / (30 × 86,400) ≈ 19,290 reads/sec  ≈ ~20,000 reads/sec
@@ -151,13 +153,19 @@ Peak (3×):                                           ≈ ~60,000 reads/sec
 
 \textbf{Storage (URLs, 5 years):}
 
-\begin{verbatim}
-500M writes/month × 12 months × 5 years = 30 billion URLs
-Each record ≈ 500 bytes (long URL ~400 B + metadata ~100 B)
-Total: 30B × 500 B = 15 TB
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{500}\ErrorTok{M}\NormalTok{ writes}\OperatorTok{/}\NormalTok{month × }\DecValTok{12}\NormalTok{ months × }\DecValTok{5}\NormalTok{ years }\OperatorTok{=} \DecValTok{30}\NormalTok{ billion URLs}
+\NormalTok{Each record ≈ }\DecValTok{500} \BuiltInTok{bytes}\NormalTok{ (}\BuiltInTok{long}\NormalTok{ URL }\OperatorTok{\textasciitilde{}}\DecValTok{400}\NormalTok{ B }\OperatorTok{+}\NormalTok{ metadata }\OperatorTok{\textasciitilde{}}\DecValTok{100}\NormalTok{ B)}
+\NormalTok{Total: }\DecValTok{30}\ErrorTok{B}\NormalTok{ × }\DecValTok{500}\NormalTok{ B }\OperatorTok{=} \DecValTok{15}\NormalTok{ TB}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Cache (top 20\% URLs serve 80\% traffic):}
+
+\setcodelang{}
 
 \begin{verbatim}
 20,000 reads/sec × 86,400 sec/day = 1.728 billion reads/day
@@ -167,49 +175,55 @@ Pragmatic: cache last 24 hrs of writes = 500M/30 × 500B ≈ 8.3 GB/day  →  ~1
 
 \textbf{Bandwidth:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Inbound (writes):  200/sec × 500 B  ≈ 100 KB/s
 Outbound (reads):  20,000/sec × 500 B ≈ 10 MB/s
 \end{verbatim}
 
-\subsubsection{3. API Design}\label{3-api-design}
+\subsection{3. API Design}\label{3-api-design}
 
-\begin{verbatim}
-# Shorten a URL
-POST /api/v1/shorten
-Request:
-  {
-    "long_url":   "https://www.example.com/very/long/path?q=something",
-    "custom_code": "my-alias",          // optional
-    "expires_at":  "2027-01-01T00:00Z" // optional
-  }
-Response 201:
-  {
-    "short_url": "https://tny.io/aB3kX9",
-    "short_code": "aB3kX9",
-    "expires_at": "2027-01-01T00:00Z"
-  }
+\setcodelang{Python}
 
-# Redirect (the critical read path)
-GET /{short_code}
-Response 302:
-  Location: https://www.example.com/very/long/path?q=something
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Shorten a URL}
+\NormalTok{POST }\OperatorTok{/}\NormalTok{api}\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{shorten}
+\NormalTok{Request:}
+\NormalTok{  \{}
+    \StringTok{"long\_url"}\NormalTok{:   }\StringTok{"https://www.example.com/very/long/path?q=something"}\NormalTok{,}
+    \StringTok{"custom\_code"}\NormalTok{: }\StringTok{"my{-}alias"}\NormalTok{,          }\OperatorTok{//}\NormalTok{ optional}
+    \StringTok{"expires\_at"}\NormalTok{:  }\StringTok{"2027{-}01{-}01T00:00Z"} \OperatorTok{//}\NormalTok{ optional}
+\NormalTok{  \}}
+\NormalTok{Response }\DecValTok{201}\NormalTok{:}
+\NormalTok{  \{}
+    \StringTok{"short\_url"}\NormalTok{: }\StringTok{"https://tny.io/aB3kX9"}\NormalTok{,}
+    \StringTok{"short\_code"}\NormalTok{: }\StringTok{"aB3kX9"}\NormalTok{,}
+    \StringTok{"expires\_at"}\NormalTok{: }\StringTok{"2027{-}01{-}01T00:00Z"}
+\NormalTok{  \}}
 
-# Analytics (optional)
-GET /api/v1/stats/{short_code}
-Response 200:
-  {
-    "clicks": 14982,
-    "top_countries": [...],
-    "referrers": [...]
-  }
+\CommentTok{\# Redirect (the critical read path)}
+\NormalTok{GET }\OperatorTok{/}\NormalTok{\{short\_code\}}
+\NormalTok{Response }\DecValTok{302}\NormalTok{:}
+\NormalTok{  Location: https:}\OperatorTok{//}\NormalTok{www.example.com}\OperatorTok{/}\NormalTok{very}\OperatorTok{/}\BuiltInTok{long}\OperatorTok{/}\NormalTok{path?q}\OperatorTok{=}\NormalTok{something}
 
-# Delete
-DELETE /api/v1/shorten/{short_code}
-Response 204
-\end{verbatim}
+\CommentTok{\# Analytics (optional)}
+\NormalTok{GET }\OperatorTok{/}\NormalTok{api}\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{stats}\OperatorTok{/}\NormalTok{\{short\_code\}}
+\NormalTok{Response }\DecValTok{200}\NormalTok{:}
+\NormalTok{  \{}
+    \StringTok{"clicks"}\NormalTok{: }\DecValTok{14982}\NormalTok{,}
+    \StringTok{"top\_countries"}\NormalTok{: [...],}
+    \StringTok{"referrers"}\NormalTok{: [...]}
+\NormalTok{  \}}
 
-\subsubsection{4. Data Model}\label{4-data-model}
+\CommentTok{\# Delete}
+\NormalTok{DELETE }\OperatorTok{/}\NormalTok{api}\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{shorten}\OperatorTok{/}\NormalTok{\{short\_code\}}
+\NormalTok{Response }\DecValTok{204}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{4. Data Model}\label{4-data-model}
 
 \textbf{SQL vs NoSQL decision:}
 
@@ -227,18 +241,24 @@ Response 204
 
 \textbf{URL Table (Cassandra / DynamoDB):}
 
-\begin{verbatim}
-urls
+\setcodelang{Python}
 
-short_code    TEXT       PRIMARY KEY        -- "aB3kX9"
-long_url      TEXT       NOT NULL           -- original URL
-user_id       UUID                          -- creator (nullable for anonymous)
-created_at    TIMESTAMP
-expires_at    TIMESTAMP                     -- NULL = never expires
-is_deleted    BOOLEAN    DEFAULT false
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{urls}
+
+\NormalTok{short\_code    TEXT       PRIMARY KEY        }\OperatorTok{{-}{-}} \StringTok{"aB3kX9"}
+\NormalTok{long\_url      TEXT       NOT NULL           }\OperatorTok{{-}{-}}\NormalTok{ original URL}
+\NormalTok{user\_id       UUID                          }\OperatorTok{{-}{-}}\NormalTok{ creator (nullable }\ControlFlowTok{for}\NormalTok{ anonymous)}
+\NormalTok{created\_at    TIMESTAMP}
+\NormalTok{expires\_at    TIMESTAMP                     }\OperatorTok{{-}{-}}\NormalTok{ NULL }\OperatorTok{=}\NormalTok{ never expires}
+\NormalTok{is\_deleted    BOOLEAN    DEFAULT false}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Users Table (PostgreSQL):}
+
+\setcodelang{}
 
 \begin{verbatim}
 users
@@ -251,18 +271,24 @@ created_at    TIMESTAMP
 
 \textbf{Analytics Table (write-optimized, e.g., Cassandra or ClickHouse):}
 
-\begin{verbatim}
-click_events
+\setcodelang{Python}
 
-short_code    TEXT
-clicked_at    TIMESTAMP
-country       TEXT
-referrer      TEXT
-user_agent    TEXT
--- Partition key: short_code; Clustering key: clicked_at DESC
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{click\_events}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture}
+\NormalTok{short\_code    TEXT}
+\NormalTok{clicked\_at    TIMESTAMP}
+\NormalTok{country       TEXT}
+\NormalTok{referrer      TEXT}
+\NormalTok{user\_agent    TEXT}
+\OperatorTok{{-}{-}}\NormalTok{ Partition key: short\_code}\OperatorTok{;}\NormalTok{ Clustering key: clicked\_at DESC}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
                          ┌─────────────────────────────────────────────────┐
@@ -320,9 +346,9 @@ user_agent    TEXT
   \textbf{Kafka} asynchronously receives click events; \textbf{Analytics Service} batch-writes to ClickHouse for reporting.
 \end{enumerate}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives}
+\subsection{6. Deep Dives}\label{6-deep-dives}
 
-\paragraph{6.1 Key Generation: How to create short codes?}\label{61-key-generation-how-to-create-short-codes}
+\subsubsection{6.1 Key Generation: How to create short codes?}\label{61-key-generation-how-to-create-short-codes}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1103}}
@@ -367,7 +393,7 @@ KGS design:
   KGS itself can be replicated with a leader for key assignment.
 \end{itemize}
 
-\paragraph{6.2 Redirect: 301 vs 302?}\label{62-redirect-301-vs-302}
+\subsubsection{6.2 Redirect: 301 vs 302?}\label{62-redirect-301-vs-302}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1866}}
@@ -392,7 +418,7 @@ Load on TinyURL & Lower after first visit & Higher (every click) \\
 
 \textbf{Interview takeaway:} Always use 302 unless you explicitly trade analytics for reduced server load.
 
-\paragraph{6.3 Collision Handling}\label{63-collision-handling}
+\subsubsection{6.3 Collision Handling}\label{63-collision-handling}
 
 If using hash-based approach:
 
@@ -411,7 +437,7 @@ If using hash-based approach:
 
 With KGS, collisions are impossible --- keys are pre-assigned and marked used atomically.
 
-\paragraph{6.4 Custom Aliases}\label{64-custom-aliases}
+\subsubsection{6.4 Custom Aliases}\label{64-custom-aliases}
 
 \begin{itemize}
 \tightlist
@@ -427,7 +453,7 @@ With KGS, collisions are impossible --- keys are pre-assigned and marked used at
   Rate-limit custom alias creation per user to prevent squatting.
 \end{itemize}
 
-\paragraph{6.5 URL Expiry}\label{65-url-expiry}
+\subsubsection{6.5 URL Expiry}\label{65-url-expiry}
 
 \begin{itemize}
 \tightlist
@@ -441,7 +467,7 @@ With KGS, collisions are impossible --- keys are pre-assigned and marked used at
   Cache entries: set Redis TTL = \texttt{expires\_at\ -\ NOW()} so expired URLs auto-evict.
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling}
 
 \textbf{Read hotspot --- viral URLs:}
 
@@ -509,7 +535,7 @@ With KGS, collisions are impossible --- keys are pre-assigned and marked used at
   URL writes go to a primary region; replicated asynchronously to others.
 \end{itemize}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1494}}
@@ -538,9 +564,9 @@ Analytics pipeline & \textbf{Kafka \(\rightarrow\) ClickHouse (async)} & Sync wr
 Custom aliases & \textbf{Supported (rate-limited)} & Not supported & Product differentiator; must prevent abuse \\
 \end{longtable}
 
-\subsection{2. Design a Rate Limiter}\label{2-design-a-rate-limiter}
+\section{2. Design a Rate Limiter}\label{2-design-a-rate-limiter}
 
-\subsubsection{1. Requirements}\label{1-requirements-1}
+\subsection{1. Requirements}\label{1-requirements-1}
 
 \textbf{Clarifying questions to ask the interviewer:}
 
@@ -589,7 +615,7 @@ Custom aliases & \textbf{Supported (rate-limited)} & Not supported & Product dif
   Accurate enough --- exact precision not required; small over-limit acceptable.
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-1}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation-1}
 
 \textbf{Assumptions:}
 
@@ -603,12 +629,16 @@ Custom aliases & \textbf{Supported (rate-limited)} & Not supported & Product dif
 
 \textbf{QPS to rate limiter:}
 
+\setcodelang{}
+
 \begin{verbatim}
 1,000,000,000 / 86,400 ≈ 11,574 req/sec  ≈ ~12,000 checks/sec
 Peak (3×):                                ≈ ~36,000 checks/sec
 \end{verbatim}
 
 \textbf{Memory for rate limit counters:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Strategy: sliding window counter per user per endpoint, 1-hr window.
@@ -626,45 +656,51 @@ Strategy: sliding window counter per user per endpoint, 1-hr window.
   Each Redis call \(\approx\) microseconds; no large data transfer.
 \end{itemize}
 
-\subsubsection{3. API Design}\label{3-api-design-1}
+\subsection{3. API Design}\label{3-api-design-1}
 
 The rate limiter is typically middleware, not a standalone API. But if exposing as a service:
 
-\begin{verbatim}
-# Check and record a request (called by API gateway)
-POST /rate-limit/check
-Request:
-  {
-    "client_id": "user:1234",
-    "endpoint":  "/api/v1/posts",
-    "timestamp": 1718000000
-  }
-Response 200 (allowed):
-  {
-    "allowed": true,
-    "remaining": 42,
-    "reset_at": 1718003600
-  }
-Response 429 (throttled):
-  {
-    "allowed": false,
-    "retry_after": 58,       // seconds until window resets
-    "limit": 100,
-    "window": "1m"
-  }
+\setcodelang{Python}
 
-# Update rules (admin)
-PUT /rate-limit/rules/{client_id}
-Request:
-  {
-    "rules": [
-      { "window": "1m", "limit": 100 },
-      { "window": "1h", "limit": 1000 }
-    ]
-  }
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Check and record a request (called by API gateway)}
+\NormalTok{POST }\OperatorTok{/}\NormalTok{rate}\OperatorTok{{-}}\NormalTok{limit}\OperatorTok{/}\NormalTok{check}
+\NormalTok{Request:}
+\NormalTok{  \{}
+    \StringTok{"client\_id"}\NormalTok{: }\StringTok{"user:1234"}\NormalTok{,}
+    \StringTok{"endpoint"}\NormalTok{:  }\StringTok{"/api/v1/posts"}\NormalTok{,}
+    \StringTok{"timestamp"}\NormalTok{: }\DecValTok{1718000000}
+\NormalTok{  \}}
+\NormalTok{Response }\DecValTok{200}\NormalTok{ (allowed):}
+\NormalTok{  \{}
+    \StringTok{"allowed"}\NormalTok{: true,}
+    \StringTok{"remaining"}\NormalTok{: }\DecValTok{42}\NormalTok{,}
+    \StringTok{"reset\_at"}\NormalTok{: }\DecValTok{1718003600}
+\NormalTok{  \}}
+\NormalTok{Response }\DecValTok{429}\NormalTok{ (throttled):}
+\NormalTok{  \{}
+    \StringTok{"allowed"}\NormalTok{: false,}
+    \StringTok{"retry\_after"}\NormalTok{: }\DecValTok{58}\NormalTok{,       }\OperatorTok{//}\NormalTok{ seconds until window resets}
+    \StringTok{"limit"}\NormalTok{: }\DecValTok{100}\NormalTok{,}
+    \StringTok{"window"}\NormalTok{: }\StringTok{"1m"}
+\NormalTok{  \}}
+
+\CommentTok{\# Update rules (admin)}
+\NormalTok{PUT }\OperatorTok{/}\NormalTok{rate}\OperatorTok{{-}}\NormalTok{limit}\OperatorTok{/}\NormalTok{rules}\OperatorTok{/}\NormalTok{\{client\_id\}}
+\NormalTok{Request:}
+\NormalTok{  \{}
+    \StringTok{"rules"}\NormalTok{: [}
+\NormalTok{      \{ }\StringTok{"window"}\NormalTok{: }\StringTok{"1m"}\NormalTok{, }\StringTok{"limit"}\NormalTok{: }\DecValTok{100}\NormalTok{ \},}
+\NormalTok{      \{ }\StringTok{"window"}\NormalTok{: }\StringTok{"1h"}\NormalTok{, }\StringTok{"limit"}\NormalTok{: }\DecValTok{1000}\NormalTok{ \}}
+\NormalTok{    ]}
+\NormalTok{  \}}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Response headers to include on every API response:}
+
+\setcodelang{}
 
 \begin{verbatim}
 X-RateLimit-Limit:     100
@@ -673,37 +709,51 @@ X-RateLimit-Reset:     1718003600
 Retry-After:           58          // only on 429
 \end{verbatim}
 
-\subsubsection{4. Data Model}\label{4-data-model-1}
+\subsection{4. Data Model}\label{4-data-model-1}
 
 \textbf{Redis data structures (no SQL needed --- state is ephemeral):}
 
 \textbf{Token Bucket / Fixed Window counter:}
 
-\begin{verbatim}
-Key:   "rl:{client_id}:{endpoint}:{window_start}"
-Value: integer (request count)
-TTL:   window duration (e.g., 60s for 1-min window)
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Key:   }\StringTok{"rl:}\SpecialCharTok{\{client\_id\}}\StringTok{:}\SpecialCharTok{\{endpoint\}}\StringTok{:}\SpecialCharTok{\{window\_start\}}\StringTok{"}
+\NormalTok{Value: integer (request count)}
+\NormalTok{TTL:   window duration (e.g., }\DecValTok{60}\ErrorTok{s} \ControlFlowTok{for} \DecValTok{1}\OperatorTok{{-}}\BuiltInTok{min}\NormalTok{ window)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Sliding Window Log:}
 
-\begin{verbatim}
-Key:   "rl:{client_id}:{endpoint}"
-Type:  Redis Sorted Set
-Member: request_id (UUID)
-Score:  timestamp (epoch ms)
-TTL:   window duration
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Key:   }\StringTok{"rl:}\SpecialCharTok{\{client\_id\}}\StringTok{:}\SpecialCharTok{\{endpoint\}}\StringTok{"}
+\NormalTok{Type:  Redis Sorted Set}
+\NormalTok{Member: request\_id (UUID)}
+\NormalTok{Score:  timestamp (epoch ms)}
+\NormalTok{TTL:   window duration}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Rules config (read rarely, cache in-process):}
 
-\begin{verbatim}
-# Redis Hash or a config store (Consul / etcd)
-Key:   "rule:{client_id}"
-Value: JSON { "rules": [{"window":"1m","limit":100}, ...] }
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-1}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Redis Hash or a config store (Consul / etcd)}
+\NormalTok{Key:   }\StringTok{"rule:}\SpecialCharTok{\{client\_id\}}\StringTok{"}
+\NormalTok{Value: JSON \{ }\StringTok{"rules"}\NormalTok{: [\{}\StringTok{"window"}\NormalTok{:}\StringTok{"1m"}\NormalTok{,}\StringTok{"limit"}\NormalTok{:}\DecValTok{100}\NormalTok{\}, ...] \}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture-1}
+
+\setcodelang{}
 
 \begin{verbatim}
            ┌──────────────────────────────────────────────┐
@@ -763,9 +813,9 @@ Rules flow:
   If denied: return 429 immediately with \texttt{Retry-After}.
 \end{enumerate}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives-1}
+\subsection{6. Deep Dives}\label{6-deep-dives-1}
 
-\paragraph{6.1 Algorithm Comparison}\label{61-algorithm-comparison}
+\subsubsection{6.1 Algorithm Comparison}\label{61-algorithm-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1188}}
@@ -798,7 +848,9 @@ Best for
 
 \textbf{Key Decision: Sliding Window Counter for most API rate limiting. Token Bucket when you want to allow short bursts.}
 
-\paragraph{6.2 Sliding Window Counter --- Implementation Detail}\label{62-sliding-window-counter--implementation-detail}
+\subsubsection{6.2 Sliding Window Counter --- Implementation Detail}\label{62-sliding-window-counter--implementation-detail}
+
+\setcodelang{}
 
 \begin{verbatim}
 Window = 1 minute.
@@ -815,6 +867,8 @@ If count > limit → reject.
 \end{verbatim}
 
 Redis implementation:
+
+\setcodelang{Lua}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -840,7 +894,7 @@ Redis implementation:
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{6.3 Where to Place the Rate Limiter?}\label{63-where-to-place-the-rate-limiter}
+\subsubsection{6.3 Where to Place the Rate Limiter?}\label{63-where-to-place-the-rate-limiter}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2279}}
@@ -865,7 +919,7 @@ Cons
 \textbf{Recommended: Gateway + Redis} & Rules centralized in Redis; enforced at gateway & Need to handle Redis failure gracefully \\
 \end{longtable}
 
-\paragraph{6.4 Distributed Rate Limiting --- Race Conditions}\label{64-distributed-rate-limiting--race-conditions}
+\subsubsection{6.4 Distributed Rate Limiting --- Race Conditions}\label{64-distributed-rate-limiting--race-conditions}
 
 \textbf{Problem:} Two requests arrive simultaneously on different servers. Both read count=99 (limit=100), both increment to 100, both allow. Result: 2 requests slip through over limit.
 
@@ -879,11 +933,15 @@ Cons
   \textbf{Redis INCR + EXPIRE pattern:}
 \end{enumerate}
 
-\begin{verbatim}
-count = INCR(key)
-if count == 1: EXPIRE(key, window)  -- set TTL only on first request
-if count > limit: return 429
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{count }\OperatorTok{=}\NormalTok{ INCR(key)}
+\ControlFlowTok{if}\NormalTok{ count }\OperatorTok{==} \DecValTok{1}\NormalTok{: EXPIRE(key, window)  }\OperatorTok{{-}{-}} \BuiltInTok{set}\NormalTok{ TTL only on first request}
+\ControlFlowTok{if}\NormalTok{ count }\OperatorTok{\textgreater{}}\NormalTok{ limit: }\ControlFlowTok{return} \DecValTok{429}
+\end{Highlighting}
+\end{Shaded}
 
 Problem: race between INCR and EXPIRE if server crashes. Mitigate with \texttt{SET\ key\ 0\ EX\ window\ NX} on first call.
 
@@ -897,7 +955,7 @@ Problem: race between INCR and EXPIRE if server crashes. Mitigate with \texttt{S
 
 \textbf{Key Decision: Use Redis Lua scripts for atomicity. No locks, no transactions overhead.}
 
-\paragraph{6.5 Fail-Open vs Fail-Closed}\label{65-fail-open-vs-fail-closed}
+\subsubsection{6.5 Fail-Open vs Fail-Closed}\label{65-fail-open-vs-fail-closed}
 
 \begin{itemize}
 \tightlist
@@ -909,7 +967,7 @@ Problem: race between INCR and EXPIRE if server crashes. Mitigate with \texttt{S
   Implementation: wrap Redis call in try-catch; on exception, log and allow the request, alert on-call.
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-1}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-1}
 
 \textbf{Redis as single point of failure:}
 
@@ -953,7 +1011,7 @@ Problem: race between INCR and EXPIRE if server crashes. Mitigate with \texttt{S
   Use local in-process counter as first layer (no Redis call for clearly non-bursting clients), then Redis for enforcement.
 \end{itemize}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-1}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary-1}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1217}}
@@ -982,9 +1040,9 @@ Failure mode & \textbf{Fail-open} & Fail-closed & Availability \textgreater{} pe
 Rules storage & \textbf{etcd + in-process cache} & DB query per request & Rules rarely change; in-process cache eliminates lookup overhead \\
 \end{longtable}
 
-\subsection{3. Design a News Feed (Facebook/Twitter Timeline)}\label{3-design-a-news-feed-facebooktwitter-timeline}
+\section{3. Design a News Feed (Facebook/Twitter Timeline)}\label{3-design-a-news-feed-facebooktwitter-timeline}
 
-\subsubsection{1. Requirements}\label{1-requirements-2}
+\subsection{1. Requirements}\label{1-requirements-2}
 
 \textbf{Clarifying questions to ask the interviewer:}
 
@@ -1035,7 +1093,7 @@ Rules storage & \textbf{etcd + in-process cache} & DB query per request & Rules 
   Users can have up to 5,000 friends (Facebook) or millions of followers (Twitter celebrities).
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-2}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation-2}
 
 \textbf{Assumptions:}
 
@@ -1053,12 +1111,16 @@ Rules storage & \textbf{etcd + in-process cache} & DB query per request & Rules 
 
 \textbf{Post write QPS:}
 
+\setcodelang{}
+
 \begin{verbatim}
 100,000,000 / 86,400 ≈ 1,157 writes/sec  ≈ ~1,200 posts/sec
 Peak (5×):                                ≈ ~6,000 posts/sec
 \end{verbatim}
 
 \textbf{Feed read QPS:}
+
+\setcodelang{}
 
 \begin{verbatim}
 2,500,000,000 / 86,400 ≈ 28,935 reads/sec  ≈ ~29,000 reads/sec
@@ -1067,12 +1129,16 @@ Peak (3×):                                  ≈ ~87,000 reads/sec
 
 \textbf{Fanout writes (push model --- writing to all follower feeds on post):}
 
+\setcodelang{}
+
 \begin{verbatim}
 1,200 posts/sec × 300 avg followers = 360,000 feed writes/sec
 Celebrity (10M followers): 1 post → 10M writes (burst)
 \end{verbatim}
 
 \textbf{Storage:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Posts: 100M/day × 1 KB (text) = 100 GB/day text
@@ -1082,51 +1148,55 @@ Feed cache: 500M users × 20 cached posts × 1 KB = 10 TB → too big for RAM
     50M users × 20 posts × 1 KB = 1 TB → feasible with Redis cluster
 \end{verbatim}
 
-\subsubsection{3. API Design}\label{3-api-design-2}
+\subsection{3. API Design}\label{3-api-design-2}
 
-\begin{verbatim}
-# Create a post
-POST /api/v1/posts
-Auth: Bearer token
-Request:
-  {
-    "content":    "Hello world!",
-    "media_urls": ["https://cdn.example.com/img/abc.jpg"],
-    "visibility": "friends"   // or "public", "private"
-  }
-Response 201:
-  {
-    "post_id":    "p_9x3kA2",
-    "created_at": "2026-06-14T10:00:00Z"
-  }
+\setcodelang{Python}
 
-# Get news feed
-GET /api/v1/feed?limit=20&cursor=<opaque_cursor>
-Auth: Bearer token
-Response 200:
-  {
-    "posts": [
-      {
-        "post_id":    "p_9x3kA2",
-        "author_id":  "u_4f2k",
-        "author_name":"Alice",
-        "content":    "Hello world!",
-        "media_urls": [...],
-        "like_count": 142,
-        "comment_count": 7,
-        "created_at": "2026-06-14T10:00:00Z"
-      },
-      ...
-    ],
-    "next_cursor": "<opaque_cursor>"
-  }
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Create a post}
+\NormalTok{POST }\OperatorTok{/}\NormalTok{api}\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{posts}
+\NormalTok{Auth: Bearer token}
+\NormalTok{Request:}
+\NormalTok{  \{}
+    \StringTok{"content"}\NormalTok{:    }\StringTok{"Hello world!"}\NormalTok{,}
+    \StringTok{"media\_urls"}\NormalTok{: [}\StringTok{"https://cdn.example.com/img/abc.jpg"}\NormalTok{],}
+    \StringTok{"visibility"}\NormalTok{: }\StringTok{"friends"}   \OperatorTok{//} \KeywordTok{or} \StringTok{"public"}\NormalTok{, }\StringTok{"private"}
+\NormalTok{  \}}
+\NormalTok{Response }\DecValTok{201}\NormalTok{:}
+\NormalTok{  \{}
+    \StringTok{"post\_id"}\NormalTok{:    }\StringTok{"p\_9x3kA2"}\NormalTok{,}
+    \StringTok{"created\_at"}\NormalTok{: }\StringTok{"2026{-}06{-}14T10:00:00Z"}
+\NormalTok{  \}}
 
-# Get a user's profile posts
-GET /api/v1/users/{user_id}/posts?limit=20&cursor=<cursor>
-Response 200: { "posts": [...], "next_cursor": "..." }
-\end{verbatim}
+\CommentTok{\# Get news feed}
+\NormalTok{GET }\OperatorTok{/}\NormalTok{api}\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{feed?limit}\OperatorTok{=}\DecValTok{20}\OperatorTok{\&}\NormalTok{cursor}\OperatorTok{=\textless{}}\NormalTok{opaque\_cursor}\OperatorTok{\textgreater{}}
+\NormalTok{Auth: Bearer token}
+\NormalTok{Response }\DecValTok{200}\NormalTok{:}
+\NormalTok{  \{}
+    \StringTok{"posts"}\NormalTok{: [}
+\NormalTok{      \{}
+        \StringTok{"post\_id"}\NormalTok{:    }\StringTok{"p\_9x3kA2"}\NormalTok{,}
+        \StringTok{"author\_id"}\NormalTok{:  }\StringTok{"u\_4f2k"}\NormalTok{,}
+        \StringTok{"author\_name"}\NormalTok{:}\StringTok{"Alice"}\NormalTok{,}
+        \StringTok{"content"}\NormalTok{:    }\StringTok{"Hello world!"}\NormalTok{,}
+        \StringTok{"media\_urls"}\NormalTok{: [...],}
+        \StringTok{"like\_count"}\NormalTok{: }\DecValTok{142}\NormalTok{,}
+        \StringTok{"comment\_count"}\NormalTok{: }\DecValTok{7}\NormalTok{,}
+        \StringTok{"created\_at"}\NormalTok{: }\StringTok{"2026{-}06{-}14T10:00:00Z"}
+\NormalTok{      \},}
+\NormalTok{      ...}
+\NormalTok{    ],}
+    \StringTok{"next\_cursor"}\NormalTok{: }\StringTok{"\textless{}opaque\_cursor\textgreater{}"}
+\NormalTok{  \}}
 
-\subsubsection{4. Data Model}\label{4-data-model-2}
+\CommentTok{\# Get a user\textquotesingle{}s profile posts}
+\NormalTok{GET }\OperatorTok{/}\NormalTok{api}\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{users}\OperatorTok{/}\NormalTok{\{user\_id\}}\OperatorTok{/}\NormalTok{posts?limit}\OperatorTok{=}\DecValTok{20}\OperatorTok{\&}\NormalTok{cursor}\OperatorTok{=\textless{}}\NormalTok{cursor}\OperatorTok{\textgreater{}}
+\NormalTok{Response }\DecValTok{200}\NormalTok{: \{ }\StringTok{"posts"}\NormalTok{: [...], }\StringTok{"next\_cursor"}\NormalTok{: }\StringTok{"..."}\NormalTok{ \}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{4. Data Model}\label{4-data-model-2}
 
 \textbf{SQL vs NoSQL:}
 
@@ -1144,6 +1214,8 @@ Response 200: { "posts": [...], "next_cursor": "..." }
 
 \textbf{Posts Table (Cassandra --- partition by author, cluster by time):}
 
+\setcodelang{}
+
 \begin{verbatim}
 posts
 
@@ -1156,6 +1228,8 @@ created_at  TIMESTAMP
 \end{verbatim}
 
 \textbf{Social Graph Table (Cassandra --- two tables for O(1) lookups):}
+
+\setcodelang{}
 
 \begin{verbatim}
 follows_by_follower          -- "who does user X follow?"
@@ -1171,15 +1245,21 @@ follower_id  UUID  CLUSTERING KEY
 
 \textbf{Feed Cache (Redis Sorted Set per user):}
 
-\begin{verbatim}
-Key:     "feed:{user_id}"
-Members: post_id
-Scores:  timestamp (epoch ms) — higher = newer
-TTL:     48 hours (evict inactive users)
-Max size: 800 posts per user (trim older entries)
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-2}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Key:     }\StringTok{"feed:}\SpecialCharTok{\{user\_id\}}\StringTok{"}
+\NormalTok{Members: post\_id}
+\NormalTok{Scores:  timestamp (epoch ms) — higher }\OperatorTok{=}\NormalTok{ newer}
+\NormalTok{TTL:     }\DecValTok{48}\NormalTok{ hours (evict inactive users)}
+\NormalTok{Max size: }\DecValTok{800}\NormalTok{ posts per user (trim older entries)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture-2}
+
+\setcodelang{}
 
 \begin{verbatim}
             ┌──────────────────────────────────────────────────┐
@@ -1218,9 +1298,9 @@ Fanout flow:         Kafka → Fanout Workers → Redis (write to follower feeds
 Feed read flow:      Feed Svc → Redis cache → (miss) Cassandra
 \end{verbatim}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives-2}
+\subsection{6. Deep Dives}\label{6-deep-dives-2}
 
-\paragraph{6.1 Fanout Strategies}\label{61-fanout-strategies}
+\subsubsection{6.1 Fanout Strategies}\label{61-fanout-strategies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0979}}
@@ -1265,7 +1345,7 @@ Implementation:
   Skip fanout for users who haven\textquotesingle t been active in 7 days (check last\_active timestamp).
 \end{itemize}
 
-\paragraph{6.2 Celebrity Problem (Hotspot)}\label{62-celebrity-problem-hotspot}
+\subsubsection{6.2 Celebrity Problem (Hotspot)}\label{62-celebrity-problem-hotspot}
 
 A celebrity with 10 million followers posts \(\rightarrow\) need 10 million cache writes within seconds.
 
@@ -1282,22 +1362,26 @@ A celebrity with 10 million followers posts \(\rightarrow\) need 10 million cach
   \textbf{Pre-fetch:} For celebrities, replicate their latest posts to a separate, highly-cached "celebrity feed" shard. All followers read from the same shard (CDN-like effect).
 \end{enumerate}
 
-\paragraph{6.3 Feed Ranking}\label{63-feed-ranking}
+\subsubsection{6.3 Feed Ranking}\label{63-feed-ranking}
 
 Simple timeline: sort by \texttt{score\ =\ timestamp}.
 
 ML-ranked feed (Facebook/Instagram model):
 
-\begin{verbatim}
-score = f(recency, engagement_velocity, relationship_strength, content_type)
+\setcodelang{Python}
 
-engagement_velocity = likes_per_hour / avg_likes_per_hour_for_author
-relationship_strength = interaction_history(viewer, author)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{score }\OperatorTok{=}\NormalTok{ f(recency, engagement\_velocity, relationship\_strength, content\_type)}
+
+\NormalTok{engagement\_velocity }\OperatorTok{=}\NormalTok{ likes\_per\_hour }\OperatorTok{/}\NormalTok{ avg\_likes\_per\_hour\_for\_author}
+\NormalTok{relationship\_strength }\OperatorTok{=}\NormalTok{ interaction\_history(viewer, author)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Interview takeaway:} In the interview, acknowledge ranking but defer details. Say: "We\textquotesingle d train an ML model offline, serve predictions via a Feature Store + low-latency inference service. The feed service re-ranks the top 200 candidates before returning the top 20."
 
-\paragraph{6.4 Pagination}\label{64-pagination}
+\subsubsection{6.4 Pagination}\label{64-pagination}
 
 \textbf{Cursor-based pagination (not offset):}
 
@@ -1313,7 +1397,7 @@ relationship_strength = interaction_history(viewer, author)
   Cursor makes the feed stable even as new posts arrive.
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-2}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-2}
 
 \textbf{Feed cache size:}
 
@@ -1349,6 +1433,8 @@ relationship_strength = interaction_history(viewer, author)
 
 \textbf{Read path latency breakdown (target \textless{} 200 ms):}
 
+\setcodelang{}
+
 \begin{verbatim}
 Redis feed read:          5 ms
 Celebrity post fetch:    20 ms (parallel)
@@ -1358,7 +1444,7 @@ Network + serialization: 10 ms
 Total:                  ~60 ms  (well within 200 ms budget)
 \end{verbatim}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-2}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary-2}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1575}}
@@ -1387,9 +1473,9 @@ Post DB & \textbf{Cassandra} & PostgreSQL (sharded) & Write throughput; natural 
 Celebrity handling & \textbf{Pull at read time} & Fanout to all followers & Avoids 10M+ write storms per celebrity post \\
 \end{longtable}
 
-\subsection{4. Design a Chat System (WhatsApp / Messenger)}\label{4-design-a-chat-system-whatsapp--messenger}
+\section{4. Design a Chat System (WhatsApp / Messenger)}\label{4-design-a-chat-system-whatsapp--messenger}
 
-\subsubsection{1. Requirements}\label{1-requirements-3}
+\subsection{1. Requirements}\label{1-requirements-3}
 
 \textbf{Clarifying questions to ask the interviewer:}
 
@@ -1448,7 +1534,7 @@ Celebrity handling & \textbf{Pull at read time} & Fanout to all followers & Avoi
   End-to-end encryption support (Signal Protocol) --- note architecture impact.
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-3}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation-3}
 
 \textbf{Assumptions:}
 
@@ -1468,12 +1554,16 @@ Celebrity handling & \textbf{Pull at read time} & Fanout to all followers & Avoi
 
 \textbf{Message write QPS:}
 
+\setcodelang{}
+
 \begin{verbatim}
 20,000,000,000 / 86,400 ≈ 231,481 msg/sec  ≈ ~230,000 messages/sec
 Peak (3×):                                  ≈ ~700,000 messages/sec
 \end{verbatim}
 
 \textbf{Storage:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Text messages:  20B/day × 100 B         = 2 TB/day
@@ -1484,6 +1574,8 @@ Total text+meta ≈ 3 TB/day → 1.1 PB/year (text only)
 
 \textbf{Concurrent WebSocket connections:}
 
+\setcodelang{}
+
 \begin{verbatim}
 500M DAU × 30% online simultaneously = 150M concurrent connections
 Each connection: 65KB OS overhead
@@ -1493,7 +1585,9 @@ Total: 150M × 65KB ≈ 9.75 TB RAM just for connections
 → 1,500 servers (100K connections each)
 \end{verbatim}
 
-\subsubsection{3. API Design}\label{3-api-design-3}
+\subsection{3. API Design}\label{3-api-design-3}
+
+\setcodelang{}
 
 \begin{verbatim}
 # WebSocket connection (real-time channel)
@@ -1542,7 +1636,7 @@ GET /api/v1/users/{user_id}/presence
 Response: { "online": false, "last_seen": "2026-06-14T09:55:00Z" }
 \end{verbatim}
 
-\subsubsection{4. Data Model}\label{4-data-model-3}
+\subsection{4. Data Model}\label{4-data-model-3}
 
 \textbf{Storage choices:}
 
@@ -1564,21 +1658,27 @@ Response: { "online": false, "last_seen": "2026-06-14T09:55:00Z" }
 
 \textbf{Messages Table (HBase / Cassandra):}
 
-\begin{verbatim}
-messages
+\setcodelang{Python}
 
-conversation_id   TEXT       PARTITION KEY    -- "conv:{user1}_{user2}" or "group:{id}"
-seq_num           BIGINT     CLUSTERING KEY DESC  -- monotonically increasing per conversation
-msg_id            UUID       -- globally unique
-sender_id         UUID
-content           TEXT
-media_url         TEXT
-msg_type          TEXT       -- "text", "image", "video", "system"
-status            TEXT       -- "sent", "delivered", "read"
-created_at        TIMESTAMP
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{messages}
+
+\NormalTok{conversation\_id   TEXT       PARTITION KEY    }\OperatorTok{{-}{-}} \StringTok{"conv:}\SpecialCharTok{\{user1\}}\StringTok{\_}\SpecialCharTok{\{user2\}}\StringTok{"} \KeywordTok{or} \StringTok{"group:}\SpecialCharTok{\{id\}}\StringTok{"}
+\NormalTok{seq\_num           BIGINT     CLUSTERING KEY DESC  }\OperatorTok{{-}{-}}\NormalTok{ monotonically increasing per conversation}
+\NormalTok{msg\_id            UUID       }\OperatorTok{{-}{-}}\NormalTok{ globally unique}
+\NormalTok{sender\_id         UUID}
+\NormalTok{content           TEXT}
+\NormalTok{media\_url         TEXT}
+\NormalTok{msg\_type          TEXT       }\OperatorTok{{-}{-}} \StringTok{"text"}\NormalTok{, }\StringTok{"image"}\NormalTok{, }\StringTok{"video"}\NormalTok{, }\StringTok{"system"}
+\NormalTok{status            TEXT       }\OperatorTok{{-}{-}} \StringTok{"sent"}\NormalTok{, }\StringTok{"delivered"}\NormalTok{, }\StringTok{"read"}
+\NormalTok{created\_at        TIMESTAMP}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Conversations Table:}
+
+\setcodelang{}
 
 \begin{verbatim}
 conversations
@@ -1592,6 +1692,8 @@ last_msg_at       TIMESTAMP
 
 \textbf{User Conversations Index (reverse lookup):}
 
+\setcodelang{}
+
 \begin{verbatim}
 user_conversations   -- "what conversations is user X in?"
 
@@ -1603,13 +1705,19 @@ unread_count         INT
 
 \textbf{Presence Table (Redis):}
 
-\begin{verbatim}
-Key:   "presence:{user_id}"
-Value: { "online": true, "last_heartbeat": 1718000000000 }
-TTL:   30 seconds (refreshed by heartbeat every 10s)
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-3}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Key:   }\StringTok{"presence:}\SpecialCharTok{\{user\_id\}}\StringTok{"}
+\NormalTok{Value: \{ }\StringTok{"online"}\NormalTok{: true, }\StringTok{"last\_heartbeat"}\NormalTok{: }\DecValTok{1718000000000}\NormalTok{ \}}
+\NormalTok{TTL:   }\DecValTok{30}\NormalTok{ seconds (refreshed by heartbeat every }\DecValTok{10}\ErrorTok{s}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture-3}
+
+\setcodelang{}
 
 \begin{verbatim}
                     ┌──────────────────────────────────────────────┐
@@ -1677,9 +1785,9 @@ TTL:   30 seconds (refreshed by heartbeat every 10s)
   Recipient client sends \texttt{ack:\ delivered} \(\rightarrow\) Chat Server B \(\rightarrow\) Message Service \(\rightarrow\) Cassandra (update status) \(\rightarrow\) Kafka \(\rightarrow\) Chat Server A \(\rightarrow\) sender gets double-tick.
 \end{enumerate}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives-3}
+\subsection{6. Deep Dives}\label{6-deep-dives-3}
 
-\paragraph{6.1 WebSocket Connection Management}\label{61-websocket-connection-management}
+\subsubsection{6.1 WebSocket Connection Management}\label{61-websocket-connection-management}
 
 \textbf{Why WebSocket instead of HTTP polling?}
 
@@ -1712,9 +1820,13 @@ SSE (Server-Sent Events) & Server pushes, client uses XHR for sends & Simpler th
 
 \textbf{Connection registry in Redis:}
 
-\begin{verbatim}
-SET "conn:{user_id}" "chat-server-47" EX 300
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SET }\StringTok{"conn:}\SpecialCharTok{\{user\_id\}}\StringTok{"} \StringTok{"chat{-}server{-}47"}\NormalTok{ EX }\DecValTok{300}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -1734,7 +1846,9 @@ SET "conn:{user_id}" "chat-server-47" EX 300
   Use consistent hashing on \texttt{user\_id} for connection routing (optional but reduces cross-server lookups).
 \end{itemize}
 
-\paragraph{6.2 Message Delivery: Online vs Offline}\label{62-message-delivery-online-vs-offline}
+\subsubsection{6.2 Message Delivery: Online vs Offline}\label{62-message-delivery-online-vs-offline}
+
+\setcodelang{}
 
 \begin{verbatim}
 Sender posts message
@@ -1766,7 +1880,7 @@ Sender posts message
   If retry received with same \texttt{client\_msg\_id}, return existing \texttt{server\_msg\_id} (idempotent).
 \end{itemize}
 
-\paragraph{6.3 Group Chat Delivery}\label{63-group-chat-delivery}
+\subsubsection{6.3 Group Chat Delivery}\label{63-group-chat-delivery}
 
 \textbf{Small groups (\(\leq\) 500 members):}
 
@@ -1779,6 +1893,8 @@ Sender posts message
 \end{itemize}
 
 \textbf{Recommended for \(\leq\) 500 members:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Message write → Kafka
@@ -1798,7 +1914,7 @@ Offline members → Push notification
   Similar to news feed pull model.
 \end{itemize}
 
-\paragraph{6.4 Message Ordering and Sequence Numbers}\label{64-message-ordering-and-sequence-numbers}
+\subsubsection{6.4 Message Ordering and Sequence Numbers}\label{64-message-ordering-and-sequence-numbers}
 
 \textbf{Problem:} Two users send messages simultaneously. Who goes first?
 
@@ -1816,12 +1932,14 @@ Offline members → Push notification
 
 \textbf{Clock skew:} Client timestamps cannot be trusted. Always use server-assigned \texttt{seq\_num} for ordering. Client timestamp only shown as display time.
 
+\setcodelang{}
+
 \begin{verbatim}
 INCR "seq:{conversation_id}"  → returns 100034 (atomic in Redis)
 Store message with seq=100034
 \end{verbatim}
 
-\paragraph{6.5 Online Presence}\label{65-online-presence}
+\subsubsection{6.5 Online Presence}\label{65-online-presence}
 
 \textbf{Heartbeat protocol:}
 
@@ -1857,9 +1975,11 @@ Store message with seq=100034
   Use presence fanout sparingly: only push presence updates to contacts who have a conversation open with that user.
 \end{itemize}
 
-\paragraph{6.6 Read Receipts}\label{66-read-receipts}
+\subsubsection{6.6 Read Receipts}\label{66-read-receipts}
 
 \textbf{States:} \texttt{sent} \(\rightarrow\) \texttt{delivered} \(\rightarrow\) \texttt{read}.
+
+\setcodelang{}
 
 \begin{verbatim}
 sent:       Message reached the chat server (ack from server to sender).
@@ -1891,7 +2011,7 @@ read:       Recipient opened the conversation (client sends "read" ack).
   Show "Read by X, Y, Z" as clients send individual read acks.
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-3}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-3}
 
 \textbf{150 million concurrent WebSocket connections:}
 
@@ -1955,7 +2075,7 @@ read:       Recipient opened the conversation (client sends "read" ack).
   Use async workers + APNs/FCM batch APIs. Rate limit per APNs connection (use multiple connections).
 \end{itemize}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-3}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary-3}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1382}}

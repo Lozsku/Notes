@@ -63,13 +63,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Deep Learning \& Neural Networks}\label{deep-learning--neural-networks}
-
 \begin{quote}
 A neural network is a universal function approximator built from stacked, differentiable transformations --- trained end-to-end by propagating error gradients backward through the chain rule.
 \end{quote}
 
-\subsection{Overview --- What It Is}\label{overview--what-it-is}
+\section{Overview --- What It Is}\label{overview--what-it-is}
 
 Deep Learning is a subfield of machine learning that uses \textbf{multi-layered artificial neural networks} to learn hierarchical representations directly from raw data. Instead of handcrafting features, the network learns them automatically through a training process that adjusts millions (or billions) of parameters.
 
@@ -77,7 +75,7 @@ Deep Learning is a subfield of machine learning that uses \textbf{multi-layered 
 
 \textbf{"Deep"} = more than one hidden layer. Depth enables the network to compose simple features into complex ones: edges \(\rightarrow\) textures \(\rightarrow\) parts \(\rightarrow\) objects (in vision); characters \(\rightarrow\) morphemes \(\rightarrow\) words \(\rightarrow\) meaning (in NLP).
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1221}}
@@ -116,7 +114,7 @@ Deep Learning exists because:
   \textbf{Data availability} --- ImageNet (1.2M images), web text corpora, etc.
 \end{enumerate}
 
-\subsection{Why FAANG Cares (Be Specific)}\label{why-faang-cares-be-specific}
+\section{Why FAANG Cares (Be Specific)}\label{why-faang-cares-be-specific}
 
 \begin{itemize}
 \tightlist
@@ -148,16 +146,20 @@ Deep Learning exists because:
   Knowing normalization + initialization = avoiding 90\% of training instability issues.
 \end{itemize}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{The Perceptron --- Atomic Unit}\label{the-perceptron--atomic-unit}
+\subsection{The Perceptron --- Atomic Unit}\label{the-perceptron--atomic-unit}
 
 The \textbf{perceptron} (Rosenblatt, 1958) is a single artificial neuron:
 
-\begin{verbatim}
-y = f( w1*x1 + w2*x2 + ... + wn*xn + b )
-  = f( W·x + b )
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{y }\OperatorTok{=}\NormalTok{ f( w1}\OperatorTok{*}\NormalTok{x1 }\OperatorTok{+}\NormalTok{ w2}\OperatorTok{*}\NormalTok{x2 }\OperatorTok{+}\NormalTok{ ... }\OperatorTok{+}\NormalTok{ wn}\OperatorTok{*}\NormalTok{xn }\OperatorTok{+}\NormalTok{ b )}
+  \OperatorTok{=}\NormalTok{ f( W·x }\OperatorTok{+}\NormalTok{ b )}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -177,9 +179,11 @@ A single perceptron is a linear classifier --- it can only separate linearly sep
 
 \textbf{Interview takeaway:} A perceptron without a non-linear activation is just linear regression. Non-linearity is what makes neural nets powerful.
 
-\subsubsection{Multilayer Perceptron (MLP)}\label{multilayer-perceptron-mlp}
+\subsection{Multilayer Perceptron (MLP)}\label{multilayer-perceptron-mlp}
 
 Stack multiple perceptrons in layers:
+
+\setcodelang{}
 
 \begin{verbatim}
 Input Layer → Hidden Layer 1 → Hidden Layer 2 → ... → Output Layer
@@ -201,11 +205,13 @@ Each layer: \texttt{h\ =\ f(W·h\_prev\ +\ b)}
 
 \textbf{Parameters:} \texttt{sum\ over\ layers\ of\ (n\_in\ *\ n\_out\ +\ n\_out)} --- weights + biases per layer.
 
-\subsubsection{Activation Functions}\label{activation-functions}
+\subsection{Activation Functions}\label{activation-functions}
 
 Activation functions introduce \textbf{non-linearity} --- without them, stacking layers collapses to a single linear transformation (\texttt{W3\ *\ W2\ *\ W1\ *\ x\ =\ W\_combined\ *\ x}).
 
-\paragraph{Sigmoid}\label{sigmoid}
+\subsubsection{Sigmoid}\label{sigmoid}
+
+\setcodelang{}
 
 \begin{verbatim}
 σ(x) = 1 / (1 + e^(-x))    range: (0, 1)
@@ -223,7 +229,9 @@ Activation functions introduce \textbf{non-linearity} --- without them, stacking
   \textbf{Use:} Binary output layer only (never in hidden layers today)
 \end{itemize}
 
-\paragraph{Tanh}\label{tanh}
+\subsubsection{Tanh}\label{tanh}
+
+\setcodelang{}
 
 \begin{verbatim}
 tanh(x) = (e^x - e^(-x)) / (e^x + e^(-x))    range: (-1, 1)
@@ -239,7 +247,9 @@ tanh(x) = (e^x - e^(-x)) / (e^x + e^(-x))    range: (-1, 1)
   \textbf{Use:} RNN hidden states (historically common)
 \end{itemize}
 
-\paragraph{ReLU (Rectified Linear Unit)}\label{relu-rectified-linear-unit}
+\subsubsection{ReLU (Rectified Linear Unit)}\label{relu-rectified-linear-unit}
+
+\setcodelang{}
 
 \begin{verbatim}
 ReLU(x) = max(0, x)
@@ -257,7 +267,9 @@ ReLU(x) = max(0, x)
   \textbf{Use:} Default for hidden layers in most modern networks
 \end{itemize}
 
-\paragraph{Leaky ReLU}\label{leaky-relu}
+\subsubsection{Leaky ReLU}\label{leaky-relu}
+
+\setcodelang{}
 
 \begin{verbatim}
 LeakyReLU(x) = max(0.01*x, x)
@@ -273,7 +285,9 @@ LeakyReLU(x) = max(0.01*x, x)
   \textbf{Use:} When dead neuron problem is observed
 \end{itemize}
 
-\paragraph{GELU (Gaussian Error Linear Unit)}\label{gelu-gaussian-error-linear-unit}
+\subsubsection{GELU (Gaussian Error Linear Unit)}\label{gelu-gaussian-error-linear-unit}
+
+\setcodelang{}
 
 \begin{verbatim}
 GELU(x) ≈ 0.5 * x * (1 + tanh(√(2/π) * (x + 0.044715 * x³)))
@@ -291,7 +305,9 @@ GELU(x) ≈ 0.5 * x * (1 + tanh(√(2/π) * (x + 0.044715 * x³)))
   \textbf{Intuition:} Stochastically gates input based on its magnitude
 \end{itemize}
 
-\paragraph{Softmax}\label{softmax}
+\subsubsection{Softmax}\label{softmax}
+
+\setcodelang{}
 
 \begin{verbatim}
 softmax(x_i) = e^(x_i) / sum_j(e^(x_j))
@@ -309,7 +325,7 @@ softmax(x_i) = e^(x_i) / sum_j(e^(x_j))
   \textbf{Numerical stability trick:} subtract max(x) before exponentiating
 \end{itemize}
 
-\paragraph{Activation Function Comparison Table}\label{activation-function-comparison-table}
+\subsubsection{Activation Function Comparison Table}\label{activation-function-comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1181}}
@@ -346,6 +362,8 @@ Softmax & (0,1), sum=1 & No & N/A & N/A & Multiclass output \\
 
 \textbf{Why non-linearity matters --- the collapse argument:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# WITHOUT activation (just linear layers):}
@@ -362,9 +380,11 @@ Softmax & (0,1), sum=1 & No & N/A & N/A & Multiclass output \\
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Forward Propagation}\label{forward-propagation}
+\subsection{Forward Propagation}\label{forward-propagation}
 
 The \textbf{forward pass} computes the network\textquotesingle s output from input to prediction:
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -393,15 +413,19 @@ The \textbf{forward pass} computes the network\textquotesingle s output from inp
 
 Store both \texttt{z} and \texttt{a} for each layer --- needed in backprop.
 
-\subsubsection{Loss Functions}\label{loss-functions}
+\subsection{Loss Functions}\label{loss-functions}
 
 The loss function measures how wrong the network\textquotesingle s predictions are. It must be \textbf{differentiable} so gradients can flow.
 
-\paragraph{Mean Squared Error (MSE) --- Regression}\label{mean-squared-error-mse--regression}
+\subsubsection{Mean Squared Error (MSE) --- Regression}\label{mean-squared-error-mse--regression}
 
-\begin{verbatim}
-MSE = (1/n) * sum_i( (y_i - y_hat_i)^2 )
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MSE }\OperatorTok{=}\NormalTok{ (}\DecValTok{1}\OperatorTok{/}\NormalTok{n) }\OperatorTok{*}\NormalTok{ sum\_i( (y\_i }\OperatorTok{{-}}\NormalTok{ y\_hat\_i)}\OperatorTok{\^{}}\DecValTok{2}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -413,7 +437,9 @@ MSE = (1/n) * sum_i( (y_i - y_hat_i)^2 )
   Gradient: \texttt{dL/dy\_hat\ =\ -2/n\ *\ (y\ -\ y\_hat)}
 \end{itemize}
 
-\paragraph{Binary Cross-Entropy --- Binary Classification}\label{binary-cross-entropy--binary-classification}
+\subsubsection{Binary Cross-Entropy --- Binary Classification}\label{binary-cross-entropy--binary-classification}
+
+\setcodelang{}
 
 \begin{verbatim}
 BCE = -( y * log(y_hat) + (1-y) * log(1-y_hat) )
@@ -427,7 +453,9 @@ BCE = -( y * log(y_hat) + (1-y) * log(1-y_hat) )
   Penalizes confident wrong predictions heavily (log of near-zero \(\rightarrow\) -\(\infty\))
 \end{itemize}
 
-\paragraph{Categorical Cross-Entropy --- Multiclass}\label{categorical-cross-entropy--multiclass}
+\subsubsection{Categorical Cross-Entropy --- Multiclass}\label{categorical-cross-entropy--multiclass}
+
+\setcodelang{}
 
 \begin{verbatim}
 CE = -sum_c( y_c * log(y_hat_c) )
@@ -443,7 +471,7 @@ CE = -sum_c( y_c * log(y_hat_c) )
   Combined with softmax \(\rightarrow\) "softmax + cross-entropy" (numerically stable together)
 \end{itemize}
 
-\paragraph{Cross-Entropy vs MSE for Classification}\label{cross-entropy-vs-mse-for-classification}
+\subsubsection{Cross-Entropy vs MSE for Classification}\label{cross-entropy-vs-mse-for-classification}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2650}}
@@ -466,20 +494,26 @@ Output activation & Softmax/Sigmoid & Linear \\
 Why CE is better for classification & Log loss aligns with MLE for categorical distributions & Gradients vanish with sigmoid/softmax output when error is large \\
 \end{longtable}
 
-\subsubsection{Backpropagation \& the Chain Rule}\label{backpropagation--the-chain-rule}
+\subsection{Backpropagation \& the Chain Rule}\label{backpropagation--the-chain-rule}
 
 Backpropagation is \textbf{automatic differentiation applied to a computational graph} --- computing \texttt{dL/dW} for every weight \texttt{W} using the chain rule of calculus.
 
 \textbf{The chain rule:}
 
-\begin{verbatim}
-If y = f(g(x)), then dy/dx = dy/dg * dg/dx
+\setcodelang{Python}
 
-More generally for composed functions:
-dL/dW^(l) = dL/da^(l) * da^(l)/dz^(l) * dz^(l)/dW^(l)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{If y }\OperatorTok{=}\NormalTok{ f(g(x)), then dy}\OperatorTok{/}\NormalTok{dx }\OperatorTok{=}\NormalTok{ dy}\OperatorTok{/}\NormalTok{dg }\OperatorTok{*}\NormalTok{ dg}\OperatorTok{/}\NormalTok{dx}
+
+\NormalTok{More generally }\ControlFlowTok{for}\NormalTok{ composed functions:}
+\NormalTok{dL}\OperatorTok{/}\NormalTok{dW}\OperatorTok{\^{}}\NormalTok{(l) }\OperatorTok{=}\NormalTok{ dL}\OperatorTok{/}\NormalTok{da}\OperatorTok{\^{}}\NormalTok{(l) }\OperatorTok{*}\NormalTok{ da}\OperatorTok{\^{}}\NormalTok{(l)}\OperatorTok{/}\NormalTok{dz}\OperatorTok{\^{}}\NormalTok{(l) }\OperatorTok{*}\NormalTok{ dz}\OperatorTok{\^{}}\NormalTok{(l)}\OperatorTok{/}\NormalTok{dW}\OperatorTok{\^{}}\NormalTok{(l)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Backprop algorithm:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -515,15 +549,19 @@ dL/dW^(l) = dL/da^(l) * da^(l)/dz^(l) * dz^(l)/dW^(l)
 
 \textbf{Interview takeaway:} Backprop is just the chain rule applied layer by layer. The "backward" graph is the transpose of the forward graph.
 
-\subsubsection{Optimizers}\label{optimizers}
+\subsection{Optimizers}\label{optimizers}
 
 Optimizers determine \textbf{how} gradient information is used to update weights.
 
-\paragraph{SGD (Stochastic Gradient Descent)}\label{sgd-stochastic-gradient-descent}
+\subsubsection{SGD (Stochastic Gradient Descent)}\label{sgd-stochastic-gradient-descent}
 
-\begin{verbatim}
-W = W - lr * dL/dW
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{W }\OperatorTok{=}\NormalTok{ W }\OperatorTok{{-}}\NormalTok{ lr }\OperatorTok{*}\NormalTok{ dL}\OperatorTok{/}\NormalTok{dW}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -535,12 +573,16 @@ W = W - lr * dL/dW
   \textbf{Stochastic} = uses mini-batches (random subset), not full dataset --- noisy but faster
 \end{itemize}
 
-\paragraph{SGD with Momentum}\label{sgd-with-momentum}
+\subsubsection{SGD with Momentum}\label{sgd-with-momentum}
 
-\begin{verbatim}
-v_t = β * v_{t-1} + (1-β) * dL/dW_t
-W = W - lr * v_t
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{v\_t }\OperatorTok{=}\NormalTok{ β }\OperatorTok{*}\NormalTok{ v\_\{t}\OperatorTok{{-}}\DecValTok{1}\NormalTok{\} }\OperatorTok{+}\NormalTok{ (}\DecValTok{1}\OperatorTok{{-}}\NormalTok{β) }\OperatorTok{*}\NormalTok{ dL}\OperatorTok{/}\NormalTok{dW\_t}
+\NormalTok{W }\OperatorTok{=}\NormalTok{ W }\OperatorTok{{-}}\NormalTok{ lr }\OperatorTok{*}\NormalTok{ v\_t}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -554,12 +596,16 @@ W = W - lr * v_t
   \textbf{Analogy:} A ball rolling downhill --- it builds momentum in the right direction
 \end{itemize}
 
-\paragraph{RMSprop}\label{rmsprop}
+\subsubsection{RMSprop}\label{rmsprop}
 
-\begin{verbatim}
-s_t = β * s_{t-1} + (1-β) * (dL/dW_t)²
-W = W - (lr / sqrt(s_t + ε)) * dL/dW_t
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s\_t }\OperatorTok{=}\NormalTok{ β }\OperatorTok{*}\NormalTok{ s\_\{t}\OperatorTok{{-}}\DecValTok{1}\NormalTok{\} }\OperatorTok{+}\NormalTok{ (}\DecValTok{1}\OperatorTok{{-}}\NormalTok{β) }\OperatorTok{*}\NormalTok{ (dL}\OperatorTok{/}\NormalTok{dW\_t)²}
+\NormalTok{W }\OperatorTok{=}\NormalTok{ W }\OperatorTok{{-}}\NormalTok{ (lr }\OperatorTok{/}\NormalTok{ sqrt(s\_t }\OperatorTok{+}\NormalTok{ ε)) }\OperatorTok{*}\NormalTok{ dL}\OperatorTok{/}\NormalTok{dW\_t}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -571,17 +617,21 @@ W = W - (lr / sqrt(s_t + ε)) * dL/dW_t
   Good for RNNs and non-stationary objectives
 \end{itemize}
 
-\paragraph{Adam (Adaptive Moment Estimation)}\label{adam-adaptive-moment-estimation}
+\subsubsection{Adam (Adaptive Moment Estimation)}\label{adam-adaptive-moment-estimation}
 
-\begin{verbatim}
-m_t = β1 * m_{t-1} + (1-β1) * g_t          # 1st moment (mean)
-v_t = β2 * v_{t-1} + (1-β2) * g_t²         # 2nd moment (uncentered variance)
+\setcodelang{Python}
 
-m_hat = m_t / (1 - β1^t)                    # bias correction
-v_hat = v_t / (1 - β2^t)                    # bias correction
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m\_t }\OperatorTok{=}\NormalTok{ β}\DecValTok{1} \OperatorTok{*}\NormalTok{ m\_\{t}\OperatorTok{{-}}\DecValTok{1}\NormalTok{\} }\OperatorTok{+}\NormalTok{ (}\DecValTok{1}\OperatorTok{{-}}\NormalTok{β}\DecValTok{1}\NormalTok{) }\OperatorTok{*}\NormalTok{ g\_t          }\CommentTok{\# 1st moment (mean)}
+\NormalTok{v\_t }\OperatorTok{=}\NormalTok{ β}\DecValTok{2} \OperatorTok{*}\NormalTok{ v\_\{t}\OperatorTok{{-}}\DecValTok{1}\NormalTok{\} }\OperatorTok{+}\NormalTok{ (}\DecValTok{1}\OperatorTok{{-}}\NormalTok{β}\DecValTok{2}\NormalTok{) }\OperatorTok{*}\NormalTok{ g\_t²         }\CommentTok{\# 2nd moment (uncentered variance)}
 
-W = W - lr * m_hat / (sqrt(v_hat) + ε)
-\end{verbatim}
+\NormalTok{m\_hat }\OperatorTok{=}\NormalTok{ m\_t }\OperatorTok{/}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ β}\DecValTok{1}\OperatorTok{\^{}}\NormalTok{t)                    }\CommentTok{\# bias correction}
+\NormalTok{v\_hat }\OperatorTok{=}\NormalTok{ v\_t }\OperatorTok{/}\NormalTok{ (}\DecValTok{1} \OperatorTok{{-}}\NormalTok{ β}\DecValTok{2}\OperatorTok{\^{}}\NormalTok{t)                    }\CommentTok{\# bias correction}
+
+\NormalTok{W }\OperatorTok{=}\NormalTok{ W }\OperatorTok{{-}}\NormalTok{ lr }\OperatorTok{*}\NormalTok{ m\_hat }\OperatorTok{/}\NormalTok{ (sqrt(v\_hat) }\OperatorTok{+}\NormalTok{ ε)}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -597,7 +647,7 @@ W = W - lr * m_hat / (sqrt(v_hat) + ε)
   \textbf{Weakness:} Can generalize slightly worse than SGD+momentum on some tasks (Adam converges faster but to a slightly different minimum)
 \end{itemize}
 
-\paragraph{Learning Rate Schedules}\label{learning-rate-schedules}
+\subsubsection{Learning Rate Schedules}\label{learning-rate-schedules}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1799}}
@@ -624,7 +674,7 @@ ReduceLROnPlateau & Reduce LR when metric stops improving & When you don\textquo
 
 \textbf{Why warmup?} Large models are unstable early in training --- gradients are noisy, momentum is uninitialized. Starting with a small LR and ramping up prevents early divergence.
 
-\paragraph{Optimizer Comparison}\label{optimizer-comparison}
+\subsubsection{Optimizer Comparison}\label{optimizer-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1503}}
@@ -655,11 +705,13 @@ Adam & Yes & Yes & 3x params & Default: most deep learning tasks \\
 AdamW & Yes & Yes & 3x params & Transformers (decouples weight decay) \\
 \end{longtable}
 
-\subsubsection{Vanishing \& Exploding Gradients}\label{vanishing--exploding-gradients}
+\subsection{Vanishing \& Exploding Gradients}\label{vanishing--exploding-gradients}
 
 \textbf{Vanishing gradients:} During backprop, gradients become exponentially small as they propagate through many layers \(\rightarrow\) early layers learn very slowly or not at all.
 
 \textbf{Root cause:} Chain rule multiplies many numbers together. If each factor \textless{} 1 (e.g., sigmoid derivative max = 0.25), the product shrinks exponentially with depth.
+
+\setcodelang{}
 
 \begin{verbatim}
 dL/dW^(1) = dL/da^(L) * (da^(L)/dz^(L)) * ... * (da^(2)/dz^(2)) * (da^(1)/dz^(1))
@@ -697,13 +749,15 @@ Both & LSTM/GRU gating & Additive cell state update instead of multiplicative \\
 
 \textbf{Interview takeaway:} ReLU + residual connections + BatchNorm together largely solved vanishing gradients for feedforward nets. LSTMs solved it for RNNs.
 
-\subsubsection{Weight Initialization}\label{weight-initialization}
+\subsection{Weight Initialization}\label{weight-initialization}
 
 Poor initialization \(\rightarrow\) dead neurons, vanishing/exploding gradients from step 1 (before training even starts).
 
 \textbf{Goal:} Keep the variance of activations and gradients approximately constant across layers.
 
-\paragraph{Xavier/Glorot Initialization (for Tanh/Sigmoid)}\label{xavierglorot-initialization-for-tanhsigmoid}
+\subsubsection{Xavier/Glorot Initialization (for Tanh/Sigmoid)}\label{xavierglorot-initialization-for-tanhsigmoid}
+
+\setcodelang{}
 
 \begin{verbatim}
 W ~ Uniform(-√(6/(n_in + n_out)), √(6/(n_in + n_out)))
@@ -719,7 +773,9 @@ W ~ Normal(0, √(2/(n_in + n_out)))
   Works well with tanh and sigmoid
 \end{itemize}
 
-\paragraph{He Initialization (for ReLU)}\label{he-initialization-for-relu}
+\subsubsection{He Initialization (for ReLU)}\label{he-initialization-for-relu}
+
+\setcodelang{}
 
 \begin{verbatim}
 W ~ Normal(0, √(2/n_in))
@@ -733,7 +789,9 @@ W ~ Normal(0, √(2/n_in))
   \textbf{Use He init with ReLU networks}
 \end{itemize}
 
-\paragraph{Why initialization matters}\label{why-initialization-matters}
+\subsubsection{Why initialization matters}\label{why-initialization-matters}
+
+\setcodelang{}
 
 \begin{verbatim}
 # Bad init: all zeros
@@ -749,20 +807,24 @@ activations → near zero → gradients near zero → barely learns
 
 \textbf{Interview takeaway:} Xavier for tanh/sigmoid, He for ReLU. Always random (never all-zeros for weights --- zeros for biases is fine).
 
-\subsubsection{Batch Normalization \& Layer Normalization}\label{batch-normalization--layer-normalization}
+\subsection{Batch Normalization \& Layer Normalization}\label{batch-normalization--layer-normalization}
 
-\paragraph{Batch Normalization (BatchNorm)}\label{batch-normalization-batchnorm}
+\subsubsection{Batch Normalization (BatchNorm)}\label{batch-normalization-batchnorm}
 
 Normalize activations \textbf{across the batch dimension} for each feature:
 
-\begin{verbatim}
-μ_B = (1/m) * sum_i(x_i)          # batch mean
-σ²_B = (1/m) * sum_i((x_i - μ_B)²) # batch variance
+\setcodelang{Python}
 
-x_hat_i = (x_i - μ_B) / sqrt(σ²_B + ε)   # normalize
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{μ\_B }\OperatorTok{=}\NormalTok{ (}\DecValTok{1}\OperatorTok{/}\NormalTok{m) }\OperatorTok{*}\NormalTok{ sum\_i(x\_i)          }\CommentTok{\# batch mean}
+\NormalTok{σ²\_B }\OperatorTok{=}\NormalTok{ (}\DecValTok{1}\OperatorTok{/}\NormalTok{m) }\OperatorTok{*}\NormalTok{ sum\_i((x\_i }\OperatorTok{{-}}\NormalTok{ μ\_B)²) }\CommentTok{\# batch variance}
 
-y_i = γ * x_hat_i + β             # learnable scale and shift
-\end{verbatim}
+\NormalTok{x\_hat\_i }\OperatorTok{=}\NormalTok{ (x\_i }\OperatorTok{{-}}\NormalTok{ μ\_B) }\OperatorTok{/}\NormalTok{ sqrt(σ²\_B }\OperatorTok{+}\NormalTok{ ε)   }\CommentTok{\# normalize}
+
+\NormalTok{y\_i }\OperatorTok{=}\NormalTok{ γ }\OperatorTok{*}\NormalTok{ x\_hat\_i }\OperatorTok{+}\NormalTok{ β             }\CommentTok{\# learnable scale and shift}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -801,17 +863,21 @@ y_i = γ * x_hat_i + β             # learnable scale and shift
   Creates dependency between samples in a batch
 \end{itemize}
 
-\paragraph{Layer Normalization (LayerNorm)}\label{layer-normalization-layernorm}
+\subsubsection{Layer Normalization (LayerNorm)}\label{layer-normalization-layernorm}
 
 Normalize \textbf{across the feature dimension} for each sample:
 
-\begin{verbatim}
-μ = (1/H) * sum_j(x_j)            # mean over features
-σ² = (1/H) * sum_j((x_j - μ)²)   # variance over features
+\setcodelang{Python}
 
-x_hat = (x - μ) / sqrt(σ² + ε)
-y = γ * x_hat + β
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{μ }\OperatorTok{=}\NormalTok{ (}\DecValTok{1}\OperatorTok{/}\NormalTok{H) }\OperatorTok{*}\NormalTok{ sum\_j(x\_j)            }\CommentTok{\# mean over features}
+\NormalTok{σ² }\OperatorTok{=}\NormalTok{ (}\DecValTok{1}\OperatorTok{/}\NormalTok{H) }\OperatorTok{*}\NormalTok{ sum\_j((x\_j }\OperatorTok{{-}}\NormalTok{ μ)²)   }\CommentTok{\# variance over features}
+
+\NormalTok{x\_hat }\OperatorTok{=}\NormalTok{ (x }\OperatorTok{{-}}\NormalTok{ μ) }\OperatorTok{/}\NormalTok{ sqrt(σ² }\OperatorTok{+}\NormalTok{ ε)}
+\NormalTok{y }\OperatorTok{=}\NormalTok{ γ }\OperatorTok{*}\NormalTok{ x\_hat }\OperatorTok{+}\NormalTok{ β}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -825,7 +891,7 @@ y = γ * x_hat + β
   Default in all Transformer architectures (BERT, GPT, etc.)
 \end{itemize}
 
-\paragraph{BatchNorm vs LayerNorm}\label{batchnorm-vs-layernorm}
+\subsubsection{BatchNorm vs LayerNorm}\label{batchnorm-vs-layernorm}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3418}}
@@ -850,11 +916,13 @@ Train/inference difference & Yes (running stats) & No \\
 Acts as regularizer & Yes (batch noise) & Minimal \\
 \end{longtable}
 
-\subsubsection{Dropout \& Regularization in Deep Learning}\label{dropout--regularization-in-deep-learning}
+\subsection{Dropout \& Regularization in Deep Learning}\label{dropout--regularization-in-deep-learning}
 
-\paragraph{Dropout}\label{dropout}
+\subsubsection{Dropout}\label{dropout}
 
 During training, randomly set each neuron\textquotesingle s output to \textbf{zero with probability p} (typically p=0.2 to 0.5):
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -881,7 +949,7 @@ During training, randomly set each neuron\textquotesingle s output to \textbf{ze
 
 \textbf{Where to apply:} After fully-connected layers, NOT typically after convolutions (or use spatial dropout for CNNs).
 
-\paragraph{Other DL Regularization Techniques}\label{other-dl-regularization-techniques}
+\subsubsection{Other DL Regularization Techniques}\label{other-dl-regularization-techniques}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1640}}
@@ -908,13 +976,15 @@ Label Smoothing & \texttt{y\ =\ (1-ε)*y\_onehot\ +\ ε/K} & Classification, pre
 Batch Norm & Noise from batch statistics & CNNs \\
 \end{longtable}
 
-\subsubsection{Convolutional Neural Networks (CNNs)}\label{convolutional-neural-networks-cnns}
+\subsection{Convolutional Neural Networks (CNNs)}\label{convolutional-neural-networks-cnns}
 
 CNNs exploit \textbf{spatial structure} --- nearby pixels are correlated. Instead of connecting every input pixel to every neuron (which would be computationally infeasible for images), use \textbf{local, shared filters}.
 
-\paragraph{Core Components}\label{core-components}
+\subsubsection{Core Components}\label{core-components}
 
 \textbf{Convolution Operation:}
+
+\setcodelang{}
 
 \begin{verbatim}
 (f * I)[i,j] = sum_m sum_n f[m,n] * I[i+m, j+n]
@@ -954,9 +1024,13 @@ CNNs exploit \textbf{spatial structure} --- nearby pixels are correlated. Instea
 
 \textbf{Output size formula:}
 
-\begin{verbatim}
-output_size = floor((input_size - kernel_size + 2*padding) / stride) + 1
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{output\_size }\OperatorTok{=}\NormalTok{ floor((input\_size }\OperatorTok{{-}}\NormalTok{ kernel\_size }\OperatorTok{+} \DecValTok{2}\OperatorTok{*}\NormalTok{padding) }\OperatorTok{/}\NormalTok{ stride) }\OperatorTok{+} \DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Pooling:}
 
@@ -972,7 +1046,7 @@ output_size = floor((input_size - kernel_size + 2*padding) / stride) + 1
 
 \textbf{Receptive Field:} The area of the original input that influences one output neuron. Deeper layers have larger receptive fields.
 
-\paragraph{Classic CNN Architectures}\label{classic-cnn-architectures}
+\subsubsection{Classic CNN Architectures}\label{classic-cnn-architectures}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2417}}
@@ -1003,25 +1077,35 @@ EfficientNet & 2019 & Compound scaling (depth, width, resolution) & 5-66M \\
 
 \textbf{ResNet key innovation --- skip connections:}
 
-\begin{verbatim}
-h = F(x, W) + x    # Instead of just h = F(x, W)
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{h }\OperatorTok{=}\NormalTok{ F(x, W) }\OperatorTok{+}\NormalTok{ x    }\CommentTok{\# Instead of just h = F(x, W)}
+\end{Highlighting}
+\end{Shaded}
 
 The \texttt{+\ x} creates a "gradient highway" --- backprop can flow directly through the identity connection, bypassing potentially vanishing layers.
 
-\paragraph{Parameter Count for Convolution Layer}\label{parameter-count-for-convolution-layer}
+\subsubsection{Parameter Count for Convolution Layer}\label{parameter-count-for-convolution-layer}
 
-\begin{verbatim}
-params = (kernel_h * kernel_w * in_channels + 1) * out_channels
-#         weights per filter                       number of filters
-#         +1 for bias
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{params }\OperatorTok{=}\NormalTok{ (kernel\_h }\OperatorTok{*}\NormalTok{ kernel\_w }\OperatorTok{*}\NormalTok{ in\_channels }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\OperatorTok{*}\NormalTok{ out\_channels}
+\CommentTok{\#         weights per filter                       number of filters}
+\CommentTok{\#         +1 for bias}
+\end{Highlighting}
+\end{Shaded}
 
 Compare to FC layer: \texttt{params\ =\ in\_size\ *\ out\_size\ +\ out\_size}. For images, conv is massively more parameter-efficient.
 
-\subsubsection{Recurrent Neural Networks (RNNs)}\label{recurrent-neural-networks-rnns}
+\subsection{Recurrent Neural Networks (RNNs)}\label{recurrent-neural-networks-rnns}
 
 RNNs process \textbf{sequential data} by maintaining a hidden state that carries information across time steps:
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1047,9 +1131,11 @@ RNNs process \textbf{sequential data} by maintaining a hidden state that carries
   \textbf{Short-term memory:} Effectively forgets information from \textgreater10-20 steps back
 \end{enumerate}
 
-\paragraph{LSTM (Long Short-Term Memory)}\label{lstm-long-short-term-memory}
+\subsubsection{LSTM (Long Short-Term Memory)}\label{lstm-long-short-term-memory}
 
 LSTMs solve the vanishing gradient problem with a \textbf{cell state} (long-term memory) and \textbf{gating mechanisms}:
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1081,9 +1167,11 @@ LSTMs solve the vanishing gradient problem with a \textbf{cell state} (long-term
   Separate \texttt{h\_t} (working memory) and \texttt{c\_t} (long-term memory)
 \end{itemize}
 
-\paragraph{GRU (Gated Recurrent Unit)}\label{gru-gated-recurrent-unit}
+\subsubsection{GRU (Gated Recurrent Unit)}\label{gru-gated-recurrent-unit}
 
 Simplified LSTM with two gates instead of three:
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1106,7 +1194,7 @@ Simplified LSTM with two gates instead of three:
   Comparable performance to LSTM in practice
 \end{itemize}
 
-\paragraph{RNN vs LSTM vs GRU}\label{rnn-vs-lstm-vs-gru}
+\subsubsection{RNN vs LSTM vs GRU}\label{rnn-vs-lstm-vs-gru}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2379}}
@@ -1134,7 +1222,7 @@ Gates & 0 & 3 (i,f,o) & 2 (z,r) \\
 When to use & Rarely & Long sequences & Long sequences, faster training \\
 \end{longtable}
 
-\subsubsection{Embeddings \& Word2Vec}\label{embeddings--word2vec}
+\subsection{Embeddings \& Word2Vec}\label{embeddings--word2vec}
 
 \textbf{Embedding:} A dense, low-dimensional vector representation of a discrete entity (word, user, product).
 
@@ -1168,13 +1256,13 @@ When to use & Rarely & Long sequences & Long sequences, faster training \\
 
 \textbf{Interview takeaway:} An embedding layer is just a lookup table (a matrix of size \texttt{vocab\_size\ ×\ embed\_dim}) --- \texttt{nn.Embedding(vocab\_size,\ d)} in PyTorch is literally a matrix, indexed by integer word IDs.
 
-\subsubsection{Transfer Learning \& Fine-Tuning}\label{transfer-learning--fine-tuning}
+\subsection{Transfer Learning \& Fine-Tuning}\label{transfer-learning--fine-tuning}
 
 \textbf{Transfer learning:} Use a model pre-trained on a large dataset (ImageNet, web text) as starting point for a different (usually smaller) task.
 
 \textbf{Why it works:} Early layers learn universal features (edges, curves, basic patterns) that transfer across tasks. Later layers learn task-specific features that can be replaced or fine-tuned.
 
-\paragraph{Strategies}\label{strategies}
+\subsubsection{Strategies}\label{strategies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2079}}
@@ -1217,9 +1305,11 @@ LoRA/PEFT & Most weights & Low-rank adapters & LLM fine-tuning, minimal compute 
 
 \textbf{Interview takeaway:} Transfer learning is one of the most practically important concepts in modern ML --- almost no one trains from scratch at FAANG; everything starts from a pre-trained checkpoint.
 
-\subsubsection{Autoencoders}\label{autoencoders}
+\subsection{Autoencoders}\label{autoencoders}
 
 An \textbf{autoencoder} is a neural network trained to compress its input into a low-dimensional \textbf{latent representation} (encoding) and then reconstruct the original input (decoding):
+
+\setcodelang{}
 
 \begin{verbatim}
 Input x → Encoder → Latent z (bottleneck) → Decoder → Reconstruction x̂
@@ -1241,9 +1331,11 @@ Loss = ||x - x̂||²  (reconstruction loss)
   \textbf{Variational Autoencoder (VAE):} Latent space is a probability distribution (Normal) \(\rightarrow\) enables generation. Loss adds KL-divergence term.
 \end{itemize}
 
-\subsubsection{Generative Adversarial Networks (GANs)}\label{generative-adversarial-networks-gans}
+\subsection{Generative Adversarial Networks (GANs)}\label{generative-adversarial-networks-gans}
 
 \textbf{Two networks competing in a minimax game:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Generator G: latent noise z → fake sample G(z)
@@ -1286,11 +1378,13 @@ Combined: min_G max_D V(D,G) = E[log D(x)] + E[log(1-D(G(z)))]
 
 \textbf{Modern successors:} Diffusion models have largely replaced GANs for image generation (DALL-E, Stable Diffusion) due to training stability.
 
-\subsubsection{Overfitting in Deep Learning}\label{overfitting-in-deep-learning}
+\subsection{Overfitting in Deep Learning}\label{overfitting-in-deep-learning}
 
 \textbf{Overfitting:} Model memorizes training data, performs poorly on unseen data. Neural nets are especially prone --- they have massive capacity.
 
 \textbf{Diagnosing:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Training loss: 0.01
@@ -1334,23 +1428,29 @@ Label smoothing & Prevents overconfident predictions \\
   Deep learning has largely killed the classical bias-variance trade-off concern at scale --- modern large models can simultaneously have low bias AND low variance if trained with enough data (the "double descent" phenomenon)
 \end{itemize}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{Single Neuron / Perceptron}\label{single-neuron--perceptron}
+\subsection{Single Neuron / Perceptron}\label{single-neuron--perceptron}
 
-\begin{verbatim}
-    x1 ----w1----\
-                  \
-    x2 ----w2-----[∑ + b]----[f(.)]-----> y
-                  /
-    x3 ----w3----/
+\setcodelang{Python}
 
-∑ = w1*x1 + w2*x2 + w3*x3 + b   (linear combination)
-f = activation function           (non-linearity)
-y = f(∑)                          (neuron output)
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{    x1 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w1}\OperatorTok{{-}{-}{-}{-}\textbackslash{}}
+                  \OperatorTok{\textbackslash{}}
+\NormalTok{    x2 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w2}\OperatorTok{{-}{-}{-}{-}{-}}\NormalTok{[∑ }\OperatorTok{+}\NormalTok{ b]}\OperatorTok{{-}{-}{-}{-}}\NormalTok{[f(.)]}\OperatorTok{{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ y}
+                  \OperatorTok{/}
+\NormalTok{    x3 }\OperatorTok{{-}{-}{-}{-}}\NormalTok{w3}\OperatorTok{{-}{-}{-}{-}/}
 
-\subsubsection{MLP Architecture}\label{mlp-architecture}
+\NormalTok{∑ }\OperatorTok{=}\NormalTok{ w1}\OperatorTok{*}\NormalTok{x1 }\OperatorTok{+}\NormalTok{ w2}\OperatorTok{*}\NormalTok{x2 }\OperatorTok{+}\NormalTok{ w3}\OperatorTok{*}\NormalTok{x3 }\OperatorTok{+}\NormalTok{ b   (linear combination)}
+\NormalTok{f }\OperatorTok{=}\NormalTok{ activation function           (non}\OperatorTok{{-}}\NormalTok{linearity)}
+\NormalTok{y }\OperatorTok{=}\NormalTok{ f(∑)                          (neuron output)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{MLP Architecture}\label{mlp-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 INPUT           HIDDEN 1        HIDDEN 2        OUTPUT
@@ -1368,7 +1468,9 @@ Every node in one layer connects to every node in next layer (fully connected).
 Each connection has a weight. Each node has a bias.
 \end{verbatim}
 
-\subsubsection{Forward + Backpropagation Flow}\label{forward--backpropagation-flow}
+\subsection{Forward + Backpropagation Flow}\label{forward--backpropagation-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
 FORWARD PASS (left to right, computing predictions):
@@ -1392,7 +1494,9 @@ dW²  da²   dz²  dW²
     = dL/da² · f'(z²) · a¹ᵀ
 \end{verbatim}
 
-\subsubsection{Activation Function Shapes}\label{activation-function-shapes}
+\subsection{Activation Function Shapes}\label{activation-function-shapes}
+
+\setcodelang{}
 
 \begin{verbatim}
 SIGMOID:            TANH:               ReLU:               Leaky ReLU:
@@ -1407,7 +1511,9 @@ SIGMOID:            TANH:               ReLU:               Leaky ReLU:
 Saturates at ±∞   Saturates at ±∞   Dead for x<0    Small slope for x<0
 \end{verbatim}
 
-\subsubsection{CNN Architecture}\label{cnn-architecture}
+\subsection{CNN Architecture}\label{cnn-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 INPUT           CONV+RELU       POOL            CONV+RELU       FC+SOFTMAX
@@ -1427,7 +1533,9 @@ Filter slides across entire image, producing one output value per position.
 32 different filters → 32 feature maps (different patterns detected).
 \end{verbatim}
 
-\subsubsection{Gradient Descent Visualization}\label{gradient-descent-visualization}
+\subsection{Gradient Descent Visualization}\label{gradient-descent-visualization}
+
+\setcodelang{}
 
 \begin{verbatim}
 Loss
@@ -1448,7 +1556,9 @@ Loss
   Adam → adaptive α per parameter
 \end{verbatim}
 
-\subsubsection{RNN / LSTM Unrolled}\label{rnn--lstm-unrolled}
+\subsection{RNN / LSTM Unrolled}\label{rnn--lstm-unrolled}
+
+\setcodelang{}
 
 \begin{verbatim}
 VANILLA RNN (unrolled across time):
@@ -1476,7 +1586,7 @@ c_{t-1}─────→[  × f_t ]──→[+ i_t*g_t]──→[tanh]─→[×
 KEY: c_t uses ADDITION (+), not multiplication → gradient highway!
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1287}}
@@ -1507,7 +1617,7 @@ Spotify & Song recommendations & Autoencoder + collab filtering & Learned audio 
 OpenAI DALL-E & Image generation & Diffusion + CLIP & Contrastive + generative \\
 \end{longtable}
 
-\subsection{Real-Life Analogies --- The Learning Factory Assembly Line}\label{real-life-analogies--the-learning-factory-assembly-line}
+\section{Real-Life Analogies --- The Learning Factory Assembly Line}\label{real-life-analogies--the-learning-factory-assembly-line}
 
 \emph{Every component of deep learning maps onto a factory that manufactures products and learns by inspecting its own output quality.}
 
@@ -1548,7 +1658,7 @@ Overfitting & The line gets so optimized for the specific training products it\t
 Embeddings & Each product type gets a detailed spec sheet (dense vector) summarizing its properties for downstream stations \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
 \textbf{Activation functions --- "STRL GS":}
 
@@ -1642,9 +1752,9 @@ Embeddings & Each product type gets a detailed spec sheet (dense vector) summari
   \textbf{H}normalization (batch/layer norm)
 \end{itemize}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: Explain backpropagation from first principles.}\label{q1-explain-backpropagation-from-first-principles}
+\subsection{Q1: Explain backpropagation from first principles.}\label{q1-explain-backpropagation-from-first-principles}
 
 \textbf{Model answer:}
 Backpropagation computes gradients of the loss with respect to all parameters using the chain rule of calculus. After the forward pass computes the loss, we propagate the error signal backward through the computational graph.
@@ -1678,7 +1788,7 @@ The key insight: each layer\textquotesingle s gradient depends only on the next 
   Gradient checkpointing trades compute for memory by recomputing activations
 \end{itemize}
 
-\subsubsection{Q2: Why does ReLU work better than sigmoid for hidden layers?}\label{q2-why-does-relu-work-better-than-sigmoid-for-hidden-layers}
+\subsection{Q2: Why does ReLU work better than sigmoid for hidden layers?}\label{q2-why-does-relu-work-better-than-sigmoid-for-hidden-layers}
 
 \textbf{Model answer:}
 Three reasons:
@@ -1705,7 +1815,7 @@ Three reasons:
   LSTM gates (need to produce values in {[}0,1{]} for gating)
 \end{itemize}
 
-\subsubsection{Q3: Explain the vanishing gradient problem and how ResNets solve it.}\label{q3-explain-the-vanishing-gradient-problem-and-how-resnets-solve-it}
+\subsection{Q3: Explain the vanishing gradient problem and how ResNets solve it.}\label{q3-explain-the-vanishing-gradient-problem-and-how-resnets-solve-it}
 
 \textbf{Model answer:}
 In backprop, the gradient at layer \texttt{l} is the product of Jacobians from layer \texttt{l} to the output. With L layers of sigmoid (max derivative 0.25), the gradient magnitude scales as 0.25\^{}L. For L=20, that\textquotesingle s \textasciitilde10\^{}-12 --- effectively zero. Early layers learn nothing.
@@ -1718,7 +1828,7 @@ The \texttt{I} (identity) term means there\textquotesingle s always a direct gra
 
 \textbf{Analogy:} Like adding a fiber optic cable directly from the foreman\textquotesingle s office to every station, bypassing the chain of verbal relays.
 
-\subsubsection{Q4: Compare Adam vs SGD. When would you use each?}\label{q4-compare-adam-vs-sgd-when-would-you-use-each}
+\subsection{Q4: Compare Adam vs SGD. When would you use each?}\label{q4-compare-adam-vs-sgd-when-would-you-use-each}
 
 \textbf{Model answer:}
 
@@ -1760,7 +1870,7 @@ The \texttt{I} (identity) term means there\textquotesingle s always a direct gra
 
 \textbf{AdamW:} Adam with proper weight decay (decoupled from gradient update). Use this for transformer fine-tuning --- standard Adam\textquotesingle s weight decay is mathematically incorrect (it interacts with the adaptive LR).
 
-\subsubsection{Q5: Why does dropout work as regularization?}\label{q5-why-does-dropout-work-as-regularization}
+\subsection{Q5: Why does dropout work as regularization?}\label{q5-why-does-dropout-work-as-regularization}
 
 \textbf{Model answer:}
 Two complementary explanations:
@@ -1785,7 +1895,7 @@ Two complementary explanations:
   Dropout after softmax would create non-probability outputs
 \end{itemize}
 
-\subsubsection{Q6: What\textquotesingle s the difference between batch normalization and layer normalization?}\label{q6-whats-the-difference-between-batch-normalization-and-layer-normalization}
+\subsection{Q6: What\textquotesingle s the difference between batch normalization and layer normalization?}\label{q6-whats-the-difference-between-batch-normalization-and-layer-normalization}
 
 \textbf{Model answer:}
 Both normalize activations to stabilize training, but they differ in \textbf{which dimension} they normalize over:
@@ -1818,7 +1928,7 @@ Both normalize activations to stabilize training, but they differ in \textbf{whi
 
 \textbf{Intuition:} BatchNorm says "make this feature zero-mean unit-variance across the batch." LayerNorm says "make this sample\textquotesingle s representation zero-mean unit-variance across features."
 
-\subsubsection{Q7: How do LSTMs solve the vanishing gradient problem in RNNs?}\label{q7-how-do-lstms-solve-the-vanishing-gradient-problem-in-rnns}
+\subsection{Q7: How do LSTMs solve the vanishing gradient problem in RNNs?}\label{q7-how-do-lstms-solve-the-vanishing-gradient-problem-in-rnns}
 
 \textbf{Model answer:}
 Vanilla RNNs: \texttt{h\_t\ =\ tanh(W\_h\ *\ h\_\{t-1\}\ +\ W\_x\ *\ x\_t)}. The gradient through time requires multiplying \texttt{dh\_t/dh\_\{t-1\}\ =\ W\_h\ *\ tanh\textquotesingle{}(...)} for T steps \(\rightarrow\) exponentially small.
@@ -1833,7 +1943,7 @@ The LSTM can learn to keep its forget gate open for long-range dependencies, all
 \textbf{Follow-up:} "Do LSTMs completely solve vanishing gradients?"
 No --- they mitigate it significantly but don\textquotesingle t eliminate it. For very long sequences (\textgreater500 steps), attention mechanisms (Transformers) work better because every position can directly attend to every other position.
 
-\subsubsection{Q8: Explain transfer learning and when fine-tuning is appropriate.}\label{q8-explain-transfer-learning-and-when-fine-tuning-is-appropriate}
+\subsection{Q8: Explain transfer learning and when fine-tuning is appropriate.}\label{q8-explain-transfer-learning-and-when-fine-tuning-is-appropriate}
 
 \textbf{Model answer:}
 Transfer learning uses knowledge from a pre-trained model (trained on a large dataset) as the starting point for a new task. Instead of random initialization, start from a model that already understands useful features.
@@ -1876,41 +1986,41 @@ Large & Different & Full fine-tuning or train from scratch \\
 
 \textbf{Why it works:} Early CNN layers detect edges and textures that are universal across vision tasks. Early NLP layers learn syntax/semantics that transfer across text tasks. Only the final, task-specific layers need heavy adaptation.
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{1. The Double Descent Phenomenon}\label{1-the-double-descent-phenomenon}
+\subsection{1. The Double Descent Phenomenon}\label{1-the-double-descent-phenomenon}
 
 Classical statistics says: more model capacity \(\rightarrow\) overfitting. Modern deep learning violates this. As model capacity grows beyond the interpolation threshold (where training loss = 0), test loss can \emph{decrease again} --- the "second descent." Large models that perfectly fit training data can still generalize well. This challenges bias-variance trade-off intuitions.
 
-\subsubsection{2. Neural Scaling Laws}\label{2-neural-scaling-laws}
+\subsection{2. Neural Scaling Laws}\label{2-neural-scaling-laws}
 
 Performance improves predictably as a power law with: number of parameters, dataset size, and compute. Kaplan et al. (OpenAI, 2020) showed these laws hold over many orders of magnitude. \textbf{Implication:} Given a compute budget, optimal allocation is a specific ratio of model size to data (Chinchilla scaling).
 
-\subsubsection{3. Loss Landscape Geometry}\label{3-loss-landscape-geometry}
+\subsection{3. Loss Landscape Geometry}\label{3-loss-landscape-geometry}
 
 SGD with noise tends to find flatter minima (wider loss basins) than Adam. Flat minima generalize better --- small perturbations to weights cause small changes in loss. Sharp minima are "brittle." This is one reason SGD sometimes generalizes better than Adam despite slower convergence.
 
-\subsubsection{4. Gradient Checkpointing}\label{4-gradient-checkpointing}
+\subsection{4. Gradient Checkpointing}\label{4-gradient-checkpointing}
 
 Trading compute for memory: instead of storing all activations during forward pass, recompute them during backward pass. Reduces memory from O(L) to O(\(\surd\)L) layers at the cost of \textasciitilde33\% more compute. Essential for training very deep models on limited GPU memory.
 
-\subsubsection{5. Mixed Precision Training}\label{5-mixed-precision-training}
+\subsection{5. Mixed Precision Training}\label{5-mixed-precision-training}
 
 Use FP16 for forward/backward pass, FP32 for weight updates. 2x memory savings, \textasciitilde3x throughput on modern GPUs. Critical: maintain FP32 master copy of weights, use loss scaling to prevent FP16 underflow of small gradients.
 
-\subsubsection{6. BatchNorm at Inference vs Training}\label{6-batchnorm-at-inference-vs-training}
+\subsection{6. BatchNorm at Inference vs Training}\label{6-batchnorm-at-inference-vs-training}
 
 BatchNorm uses batch statistics during training (noisy, slightly different each step) but uses running averages at inference (deterministic). This mismatch can cause subtle bugs --- if your training pipeline has any distribution shift between batches, the running statistics diverge from batch statistics. Always call \texttt{model.eval()} before inference in PyTorch.
 
-\subsubsection{7. The Problem with Adam\textquotesingle s Weight Decay}\label{7-the-problem-with-adams-weight-decay}
+\subsection{7. The Problem with Adam\textquotesingle s Weight Decay}\label{7-the-problem-with-adams-weight-decay}
 
 Standard Adam applies weight decay to the adaptive-LR-scaled gradient, not the weight directly. This means weight decay strength varies by parameter history. AdamW decouples weight decay: \texttt{W\ =\ W\ *\ (1\ -\ wd)\ -\ lr\ *\ m\_hat\ /\ (sqrt(v\_hat)\ +\ ε)}. Always use AdamW for Transformers.
 
-\subsubsection{8. Dying ReLU in Practice}\label{8-dying-relu-in-practice}
+\subsection{8. Dying ReLU in Practice}\label{8-dying-relu-in-practice}
 
 Networks with very large learning rates can have many neurons "die" in the first few training steps. Symptoms: training loss stops decreasing, gradient norms collapse. Solutions: reduce LR, use He initialization, use Leaky ReLU, use gradient clipping.
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1936,9 +2046,9 @@ Networks with very large learning rates can have many neurons "die" in the first
   \textbf{Confusing parameters vs hyperparameters} --- Weights/biases are parameters (learned via gradient descent). Learning rate, batch size, number of layers, dropout rate, etc. are hyperparameters (set before training, tuned via validation).
 \end{enumerate}
 
-\subsection{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{\texorpdfstring{\(\rightarrow\) ML Fundamentals}{\textbackslash rightarrow ML Fundamentals}}\label{rightarrow-ml-fundamentals}
+\subsection{\texorpdfstring{\(\rightarrow\) ML Fundamentals}{\textbackslash rightarrow ML Fundamentals}}\label{rightarrow-ml-fundamentals}
 
 \begin{itemize}
 \tightlist
@@ -1950,7 +2060,7 @@ Networks with very large learning rates can have many neurons "die" in the first
   Neural networks are function approximators --- they\textquotesingle re just more powerful versions of linear models with non-linear feature transformations
 \end{itemize}
 
-\subsubsection{\texorpdfstring{\(\rightarrow\) Transformers / LLMs}{\textbackslash rightarrow Transformers / LLMs}}\label{rightarrow-transformers--llms}
+\subsection{\texorpdfstring{\(\rightarrow\) Transformers / LLMs}{\textbackslash rightarrow Transformers / LLMs}}\label{rightarrow-transformers--llms}
 
 \begin{itemize}
 \tightlist
@@ -1966,7 +2076,7 @@ Networks with very large learning rates can have many neurons "die" in the first
   GELU activation (vs ReLU) is standard in transformers
 \end{itemize}
 
-\subsubsection{\texorpdfstring{\(\rightarrow\) MLOps}{\textbackslash rightarrow MLOps}}\label{rightarrow-mlops}
+\subsection{\texorpdfstring{\(\rightarrow\) MLOps}{\textbackslash rightarrow MLOps}}\label{rightarrow-mlops}
 
 \begin{itemize}
 \tightlist
@@ -1982,7 +2092,7 @@ Networks with very large learning rates can have many neurons "die" in the first
   Experiment tracking: loss curves, gradient norms, activation distributions (TensorBoard, W\&B)
 \end{itemize}
 
-\subsubsection{\texorpdfstring{\(\rightarrow\) Performance Engineering}{\textbackslash rightarrow Performance Engineering}}\label{rightarrow-performance-engineering}
+\subsection{\texorpdfstring{\(\rightarrow\) Performance Engineering}{\textbackslash rightarrow Performance Engineering}}\label{rightarrow-performance-engineering}
 
 \begin{itemize}
 \tightlist
@@ -1998,7 +2108,7 @@ Networks with very large learning rates can have many neurons "die" in the first
   Hardware: GPU tensor cores optimized for matrix multiplication, TPUs for large batch training
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \textbf{Coding questions (ML-adjacent):}
 
@@ -2066,9 +2176,9 @@ Networks with very large learning rates can have many neurons "die" in the first
   \textbf{Apple:} On-device ML, CoreML, privacy-preserving training, efficient architectures
 \end{itemize}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2099,7 +2209,7 @@ Networks with very large learning rates can have many neurons "die" in the first
   \textbf{Transfer learning:} Pre-trained backbone + fine-tune head. Use smaller LR for pre-trained layers.
 \end{enumerate}
 
-\subsubsection{Key Numbers to Remember}\label{key-numbers-to-remember}
+\subsection{Key Numbers to Remember}\label{key-numbers-to-remember}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3498}}
@@ -2126,7 +2236,7 @@ GRU: gates count & 2 (update, reset) \\
 Softmax temperature & 1.0 default; \textless{} 1 = sharper; \textgreater{} 1 = softer \\
 \end{longtable}
 
-\subsubsection{Cheat-Sheet Table: Picking the Right Tool}\label{cheat-sheet-table-picking-the-right-tool}
+\subsection{Cheat-Sheet Table: Picking the Right Tool}\label{cheat-sheet-table-picking-the-right-tool}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3723}}
@@ -2159,7 +2269,7 @@ Training unstable & Gradient clipping, reduce LR, check init \\
 Gradients vanishing & ReLU, residual connections, BatchNorm, He init \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts (Interview Priority)}\label{most-important-concepts-interview-priority}
+\subsection{Most Important Concepts (Interview Priority)}\label{most-important-concepts-interview-priority}
 
 \textbf{P0 --- Must know cold:}
 

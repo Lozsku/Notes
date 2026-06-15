@@ -63,17 +63,15 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Machine Learning Fundamentals}\label{machine-learning-fundamentals}
-
 \begin{quote}
 The art of making computers learn from experience so we don\textquotesingle t have to hand-code every rule --- the foundation of every intelligent system at FAANG.
 \end{quote}
 
-\subsection{Overview --- What It Is}\label{overview--what-it-is}
+\section{Overview --- What It Is}\label{overview--what-it-is}
 
 Machine Learning (ML) is a subfield of Artificial Intelligence where systems learn patterns from data and improve their performance on tasks \textbf{without being explicitly programmed for each case}.
 
-\subsubsection{The Classic Definition}\label{the-classic-definition}
+\subsection{The Classic Definition}\label{the-classic-definition}
 
 \textbf{Arthur Samuel (1959):} "The field of study that gives computers the ability to learn without being explicitly programmed."
 
@@ -100,7 +98,9 @@ T & Task & Classify incoming emails \\
 P & Performance & Accuracy on new emails \\
 \end{longtable}
 
-\subsubsection{The Core Shift in Thinking}\label{the-core-shift-in-thinking}
+\subsection{The Core Shift in Thinking}\label{the-core-shift-in-thinking}
+
+\setcodelang{}
 
 \begin{verbatim}
 Traditional Programming:
@@ -122,7 +122,7 @@ The model IS the learned rules --- a function \texttt{f(x)\ →\ y} where:
   \texttt{f} = learned mapping (parameters/weights trained from data)
 \end{itemize}
 
-\subsubsection{The Four Learning Paradigms}\label{the-four-learning-paradigms}
+\subsection{The Four Learning Paradigms}\label{the-four-learning-paradigms}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1272}}
@@ -149,7 +149,7 @@ Example
 \textbf{Reinforcement} & No labels, rewards & Sparse reward signal after actions & AlphaGo, game-playing agents, RLHF \\
 \end{longtable}
 
-\paragraph{Supervised Learning --- Deep Dive}\label{supervised-learning--deep-dive}
+\subsubsection{Supervised Learning --- Deep Dive}\label{supervised-learning--deep-dive}
 
 The model learns a mapping from inputs to outputs using labeled training data.
 
@@ -177,6 +177,8 @@ The model learns a mapping from inputs to outputs using labeled training data.
   Temperature prediction
 \end{itemize}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Supervised learning conceptual loop}
@@ -189,7 +191,7 @@ The model learns a mapping from inputs to outputs using labeled training data.
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Unsupervised Learning --- Deep Dive}\label{unsupervised-learning--deep-dive}
+\subsubsection{Unsupervised Learning --- Deep Dive}\label{unsupervised-learning--deep-dive}
 
 No labels. The model discovers inherent structure.
 
@@ -205,7 +207,7 @@ No labels. The model discovers inherent structure.
   \textbf{Anomaly Detection:} points far from learned distribution are anomalies
 \end{itemize}
 
-\paragraph{Self-Supervised Learning --- Deep Dive}\label{self-supervised-learning--deep-dive}
+\subsubsection{Self-Supervised Learning --- Deep Dive}\label{self-supervised-learning--deep-dive}
 
 The model creates its own supervision signal from unlabeled data. The \emph{pretext task} generates pseudo-labels automatically.
 
@@ -223,9 +225,11 @@ Examples:
 
 \textbf{Why it matters for FAANG:} Enables training on petabytes of unlabeled web data. Foundation models are built this way.
 
-\paragraph{Reinforcement Learning --- Deep Dive}\label{reinforcement-learning--deep-dive}
+\subsubsection{Reinforcement Learning --- Deep Dive}\label{reinforcement-learning--deep-dive}
 
 An \textbf{agent} interacts with an \textbf{environment}, taking \textbf{actions} to maximize cumulative \textbf{reward}.
+
+\setcodelang{}
 
 \begin{verbatim}
 Agent → Action → Environment → State + Reward → Agent
@@ -247,9 +251,9 @@ Key terms:
 
 FAANG usage: recommendation system ranking, ad bidding, RLHF for LLM alignment (ChatGPT).
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
-\subsubsection{The Scaling Argument --- Why Rules Don\textquotesingle t Work}\label{the-scaling-argument--why-rules-dont-work}
+\subsection{The Scaling Argument --- Why Rules Don\textquotesingle t Work}\label{the-scaling-argument--why-rules-dont-work}
 
 Humans cannot write explicit rules for:
 
@@ -266,15 +270,15 @@ Humans cannot write explicit rules for:
   \textbf{Unknown patterns:} Fraud patterns are novel by design. ML detects statistical anomalies without knowing what fraud looks like in advance.
 \end{enumerate}
 
-\subsubsection{The Statistical Argument}\label{the-statistical-argument}
+\subsection{The Statistical Argument}\label{the-statistical-argument}
 
 ML is applied statistics at scale. Given enough data, a model can approximate any function (Universal Approximation Theorem for neural networks). We are essentially doing \textbf{function approximation} --- finding the best \texttt{f} from a hypothesis space \texttt{H} that maps inputs to outputs.
 
-\subsubsection{The Economic Argument}\label{the-economic-argument}
+\subsection{The Economic Argument}\label{the-economic-argument}
 
 Labor costs for labeling data (crowdsourced) are vastly cheaper than engineering every rule. A single model can replace thousands of if-else branches and outperform them.
 
-\subsection{Why FAANG Cares}\label{why-faang-cares}
+\section{Why FAANG Cares}\label{why-faang-cares}
 
 Each company has multi-billion dollar ML bets. Interviewers want engineers who understand ML at a system level, not just as a black box.
 
@@ -306,9 +310,11 @@ Why Fundamentals Matter
 
 \textbf{Interview Takeaway: Every FAANG interviewer expects you to connect ML concepts to business metrics --- not just formula recall.}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{The End-to-End ML Lifecycle}\label{the-end-to-end-ml-lifecycle}
+\subsection{The End-to-End ML Lifecycle}\label{the-end-to-end-ml-lifecycle}
+
+\setcodelang{}
 
 \begin{verbatim}
 Problem Definition → Data Collection → EDA → Feature Engineering →
@@ -343,9 +349,11 @@ Deployment & Training-serving skew & Do you think about production? \\
 Monitoring & No data drift detection & Do you think about model decay? \\
 \end{longtable}
 
-\subsubsection{Train / Validation / Test Split}\label{train--validation--test-split}
+\subsection{Train / Validation / Test Split}\label{train--validation--test-split}
 
 \textbf{The Golden Rule:} The test set is touched EXACTLY ONCE --- after all decisions are made.
+
+\setcodelang{}
 
 \begin{verbatim}
 All Data
@@ -366,6 +374,8 @@ All Data
   If you use test set for tuning, you\textquotesingle ve overfit to the test set --- it\textquotesingle s no longer unbiased
 \end{itemize}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ sklearn.model\_selection }\ImportTok{import}\NormalTok{ train\_test\_split}
@@ -378,9 +388,11 @@ All Data
 
 \textbf{Interview Gotcha:} What if your dataset has only 1000 samples? A 700/150/150 split leaves too little for robust test estimation \(\rightarrow\) use cross-validation.
 
-\subsubsection{Cross-Validation}\label{cross-validation}
+\subsection{Cross-Validation}\label{cross-validation}
 
 K-Fold CV: split training data into K folds, train on K-1, validate on 1, rotate.
+
+\setcodelang{}
 
 \begin{verbatim}
 5-Fold CV:
@@ -412,6 +424,8 @@ Use Case
 \textbf{Nested CV} & Hyperparameter tuning without test set contamination (outer loop = eval, inner loop = tuning) \\
 \end{longtable}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ sklearn.model\_selection }\ImportTok{import}\NormalTok{ StratifiedKFold, cross\_val\_score}
@@ -422,7 +436,7 @@ Use Case
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{The Bias--Variance Tradeoff}\label{the-biasvariance-tradeoff}
+\subsection{The Bias--Variance Tradeoff}\label{the-biasvariance-tradeoff}
 
 \textbf{The fundamental tension in ML.} Every model lives on this spectrum.
 
@@ -448,6 +462,8 @@ Intuition
 \textbf{Variance} & Error from sensitivity to small training data fluctuations (overfitting) & Model memorizes noise, fails on new data \\
 \textbf{Irreducible Noise} & Inherent randomness in data & Cannot be reduced; sets the floor \\
 \end{longtable}
+
+\setcodelang{}
 
 \begin{verbatim}
 High Bias (Underfit):       High Variance (Overfit):
@@ -493,6 +509,8 @@ High Bias (Underfit):       High Variance (Overfit):
   Goal: find the sweet spot that minimizes total error on unseen data
 \end{itemize}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Illustrating bias{-}variance with polynomial degree}
@@ -512,7 +530,7 @@ High Bias (Underfit):       High Variance (Overfit):
 
 \textbf{Interview Takeaway: When someone says "my model isn\textquotesingle t performing well," your FIRST diagnostic questions should be: Is it underfitting (high bias) or overfitting (high variance)? These have opposite fixes.}
 
-\subsubsection{Overfitting vs Underfitting}\label{overfitting-vs-underfitting}
+\subsection{Overfitting vs Underfitting}\label{overfitting-vs-underfitting}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1484}}
@@ -548,15 +566,19 @@ Also called & High variance & High bias \\
   Underfit: 55\% training accuracy, 54\% validation accuracy (both terrible)
 \end{itemize}
 
-\subsubsection{Regularization}\label{regularization}
+\subsection{Regularization}\label{regularization}
 
 Regularization adds a penalty term to the loss function to discourage complexity, reducing overfitting.
 
 \textbf{Modified Loss:}
 
-\begin{verbatim}
-Total Loss = Data Loss + λ × Complexity Penalty
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Total Loss }\OperatorTok{=}\NormalTok{ Data Loss }\OperatorTok{+}\NormalTok{ λ × Complexity Penalty}
+\end{Highlighting}
+\end{Shaded}
 
 Where \texttt{λ} (lambda) controls the regularization strength:
 
@@ -568,11 +590,15 @@ Where \texttt{λ} (lambda) controls the regularization strength:
   \texttt{λ\ →\ ∞} \(\rightarrow\) model pushed toward all-zero weights (underfitting)
 \end{itemize}
 
-\paragraph{L1 Regularization (Lasso)}\label{l1-regularization-lasso}
+\subsubsection{L1 Regularization (Lasso)}\label{l1-regularization-lasso}
 
-\begin{verbatim}
-Loss = MSE + λ × Σ|wᵢ|
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Loss }\OperatorTok{=}\NormalTok{ MSE }\OperatorTok{+}\NormalTok{ λ × Σ}\OperatorTok{|}\NormalTok{wᵢ}\OperatorTok{|}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -588,11 +614,15 @@ Loss = MSE + λ × Σ|wᵢ|
   Non-differentiable at zero (requires subgradient methods)
 \end{itemize}
 
-\paragraph{L2 Regularization (Ridge)}\label{l2-regularization-ridge}
+\subsubsection{L2 Regularization (Ridge)}\label{l2-regularization-ridge}
 
-\begin{verbatim}
-Loss = MSE + λ × Σwᵢ²
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Loss }\OperatorTok{=}\NormalTok{ MSE }\OperatorTok{+}\NormalTok{ λ × Σwᵢ²}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -608,7 +638,7 @@ Loss = MSE + λ × Σwᵢ²
   Preferred when most features are relevant
 \end{itemize}
 
-\paragraph{L1 vs L2 Comparison}\label{l1-vs-l2-comparison}
+\subsubsection{L1 vs L2 Comparison}\label{l1-vs-l2-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2393}}
@@ -638,15 +668,21 @@ Geometric intuition & Diamond constraint (L1 ball) & Circle constraint (L2 ball)
 
 \textbf{Elastic Net:} Combines both.
 
-\begin{verbatim}
-Loss = MSE + λ₁ × Σ|wᵢ| + λ₂ × Σwᵢ²
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Loss }\OperatorTok{=}\NormalTok{ MSE }\OperatorTok{+}\NormalTok{ λ₁ × Σ}\OperatorTok{|}\NormalTok{wᵢ}\OperatorTok{|} \OperatorTok{+}\NormalTok{ λ₂ × Σwᵢ²}
+\end{Highlighting}
+\end{Shaded}
 
 Best of both: sparse AND handles correlated features.
 
-\paragraph{Dropout (Neural Networks)}\label{dropout-neural-networks}
+\subsubsection{Dropout (Neural Networks)}\label{dropout-neural-networks}
 
 Randomly zero out neurons during training with probability \texttt{p} (typically 0.2--0.5).
+
+\setcodelang{}
 
 \begin{verbatim}
 Training:           Inference:
@@ -660,9 +696,11 @@ Training:           Inference:
 
 \textbf{Interview Gotcha:} Dropout is NOT applied at inference time. Either: (1) scale activations by \texttt{(1-p)} at inference, or (2) use \textbf{inverted dropout} --- divide by \texttt{(1-p)} during training so inference is unchanged (PyTorch default).
 
-\paragraph{Early Stopping}\label{early-stopping}
+\subsubsection{Early Stopping}\label{early-stopping}
 
 Stop training when validation loss stops improving (or starts increasing).
+
+\setcodelang{}
 
 \begin{verbatim}
 Training loss: ↘↘↘↘↘↘↘↘↘↘↘
@@ -670,6 +708,8 @@ Val loss:      ↘↘↘↘↘↘↗↗↗↗↗
                       ↑
                  Stop here (best model checkpoint)
 \end{verbatim}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -696,11 +736,13 @@ Val loss:      ↘↘↘↘↘↘↗↗↗↗↗
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Evaluation Metrics --- Classification}\label{evaluation-metrics--classification}
+\subsection{Evaluation Metrics --- Classification}\label{evaluation-metrics--classification}
 
-\paragraph{The Confusion Matrix}\label{the-confusion-matrix}
+\subsubsection{The Confusion Matrix}\label{the-confusion-matrix}
 
 For binary classification (Positive = class of interest, e.g., Fraud):
+
+\setcodelang{}
 
 \begin{verbatim}
                     Predicted
@@ -734,7 +776,9 @@ FP & False Positive (Type I Error) & Predicted Positive, Actually Negative \\
 FN & False Negative (Type II Error) & Predicted Negative, Actually Positive \\
 \end{longtable}
 
-\paragraph{Core Metrics}\label{core-metrics}
+\subsubsection{Core Metrics}\label{core-metrics}
+
+\setcodelang{}
 
 \begin{verbatim}
 Accuracy  = (TP + TN) / (TP + TN + FP + FN)
@@ -744,7 +788,7 @@ F1 Score  = 2 × (Precision × Recall) / (Precision + Recall)
 Specificity = TN / (TN + FP) ← True Negative Rate
 \end{verbatim}
 
-\paragraph{Precision vs Recall Tradeoff}\label{precision-vs-recall-tradeoff}
+\subsubsection{Precision vs Recall Tradeoff}\label{precision-vs-recall-tradeoff}
 
 \textbf{You cannot maximize both simultaneously} (for a fixed model). Raising the classification threshold increases precision but decreases recall.
 
@@ -772,7 +816,7 @@ When to Prioritize
 
 \textbf{Interview Classic:} "Would you use precision or recall for a cancer detection model?" Answer: \textbf{Recall} --- a false negative (missed cancer) is far more harmful than a false positive (unnecessary biopsy). But also: optimize Precision at high Recall using PR-AUC.
 
-\paragraph{ROC-AUC vs PR-AUC}\label{roc-auc-vs-pr-auc}
+\subsubsection{ROC-AUC vs PR-AUC}\label{roc-auc-vs-pr-auc}
 
 \textbf{ROC Curve:} Plot TPR (Recall) vs FPR at all thresholds.
 
@@ -795,6 +839,8 @@ When to Prioritize
 \item
   A random classifier on imbalanced data (1\% positive) gets PR-AUC \(\approx\) 0.01, not 0.5
 \end{itemize}
+
+\setcodelang{}
 
 \begin{verbatim}
 ROC Curve           PR Curve
@@ -823,7 +869,9 @@ ROC-AUC & Classes roughly balanced; care about ranking ability \\
 PR-AUC & Severe class imbalance; care about positive class performance \\
 \end{longtable}
 
-\paragraph{Log Loss (Cross-Entropy Loss)}\label{log-loss-cross-entropy-loss}
+\subsubsection{Log Loss (Cross-Entropy Loss)}\label{log-loss-cross-entropy-loss}
+
+\setcodelang{}
 
 \begin{verbatim}
 Log Loss = -(1/N) × Σ [yᵢ × log(ŷᵢ) + (1 - yᵢ) × log(1 - ŷᵢ)]
@@ -843,7 +891,7 @@ Log Loss = -(1/N) × Σ [yᵢ × log(ŷᵢ) + (1 - yᵢ) × log(1 - ŷᵢ)]
 
 \textbf{Interview Takeaway: Log loss penalizes arrogant wrong predictions. A model that says "I\textquotesingle m 99\% sure this is spam" and it\textquotesingle s not spam gets a massive penalty.}
 
-\subsubsection{Evaluation Metrics --- Regression}\label{evaluation-metrics--regression}
+\subsection{Evaluation Metrics --- Regression}\label{evaluation-metrics--regression}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0726}}
@@ -871,6 +919,8 @@ Sensitive to Outliers?
 \textbf{MAPE} & `(1/n)Σ & (yᵢ - ŷᵢ)/yᵢ & ` \\
 \end{longtable}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ sklearn.metrics }\ImportTok{import}\NormalTok{ mean\_squared\_error, mean\_absolute\_error, r2\_score}
@@ -895,7 +945,7 @@ Sensitive to Outliers?
   R\(^2\) \textless{} 0: model is worse than predicting the mean
 \end{itemize}
 
-\subsubsection{Feature Engineering}\label{feature-engineering}
+\subsection{Feature Engineering}\label{feature-engineering}
 
 The process of transforming raw data into informative representations that improve model performance.
 
@@ -915,6 +965,8 @@ The process of transforming raw data into informative representations that impro
 \item
   \textbf{Feature Selection} --- remove redundant/irrelevant features (variance threshold, mutual information, LASSO)
 \end{enumerate}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -939,7 +991,7 @@ The process of transforming raw data into informative representations that impro
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Feature Scaling / Normalization}\label{feature-scaling--normalization}
+\subsection{Feature Scaling / Normalization}\label{feature-scaling--normalization}
 
 Why needed: Many algorithms (SVM, KNN, gradient descent-based) are sensitive to feature magnitude.
 
@@ -969,6 +1021,8 @@ Notes
 \textbf{L2 Normalization} & `x / & & x \\
 \end{longtable}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ sklearn.preprocessing }\ImportTok{import}\NormalTok{ StandardScaler, MinMaxScaler, RobustScaler}
@@ -988,7 +1042,7 @@ Notes
 \textbf{Algorithms that DO need scaling:} Linear/Logistic Regression, SVM, KNN, PCA, Neural Networks.\\
 \textbf{Algorithms that DON\textquotesingle T need scaling:} Decision Trees, Random Forests, Gradient Boosting (tree-based methods use splits, not distances).
 
-\subsubsection{Data Leakage}\label{data-leakage}
+\subsection{Data Leakage}\label{data-leakage}
 
 \textbf{The silent killer of ML models.} A model appears to perform amazingly but fails completely in production.
 
@@ -1032,6 +1086,8 @@ Notes
   \end{itemize}
 \end{enumerate}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Leakage Example — WRONG}
@@ -1062,7 +1118,7 @@ Notes
   Performance collapses in production
 \end{itemize}
 
-\subsubsection{Class Imbalance}\label{class-imbalance}
+\subsection{Class Imbalance}\label{class-imbalance}
 
 \textbf{Problem:} Binary classification where one class is rare (e.g., 1\% fraud, 99\% legitimate).
 
@@ -1094,6 +1150,8 @@ Cons
 \textbf{Ensemble (BalancedRF)} & Bootstrap with balanced classes per tree & Robust & More compute \\
 \end{longtable}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ sklearn.utils.class\_weight }\ImportTok{import}\NormalTok{ compute\_class\_weight}
@@ -1119,15 +1177,19 @@ Cons
 
 \textbf{Interview Takeaway:} Always mention changing the evaluation metric first (use PR-AUC, F1 instead of accuracy). Then data techniques. Then loss function adjustments.
 
-\subsubsection{Gradient Descent}\label{gradient-descent}
+\subsection{Gradient Descent}\label{gradient-descent}
 
 The workhorse optimization algorithm for training ML models with differentiable loss functions.
 
 \textbf{The Core Idea:} Start at some parameter values, compute how much the loss would decrease if we nudge each parameter, then nudge them in that direction.
 
-\begin{verbatim}
-θ_new = θ_old - α × ∇_θ L(θ)
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{θ\_new }\OperatorTok{=}\NormalTok{ θ\_old }\OperatorTok{{-}}\NormalTok{ α × ∇\_θ L(θ)}
+\end{Highlighting}
+\end{Shaded}
 
 Where:
 
@@ -1142,6 +1204,8 @@ Where:
 \end{itemize}
 
 \textbf{The Loss Bowl Intuition:}
+
+\setcodelang{}
 
 \begin{verbatim}
        Loss
@@ -1171,7 +1235,7 @@ Where:
   Just right: converges to minimum efficiently
 \end{itemize}
 
-\paragraph{Batch vs SGD vs Mini-Batch}\label{batch-vs-sgd-vs-mini-batch}
+\subsubsection{Batch vs SGD vs Mini-Batch}\label{batch-vs-sgd-vs-mini-batch}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1483}}
@@ -1213,6 +1277,8 @@ Cons
   Batch Normalization works better with mini-batches
 \end{enumerate}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Mini{-}batch gradient descent}
@@ -1245,7 +1311,7 @@ Cons
   \textbf{AdamW:} Adam + decoupled L2 weight decay. Standard for transformers.
 \end{itemize}
 
-\subsubsection{The Curse of Dimensionality}\label{the-curse-of-dimensionality}
+\subsection{The Curse of Dimensionality}\label{the-curse-of-dimensionality}
 
 As the number of features (dimensions) grows:
 
@@ -1261,11 +1327,15 @@ As the number of features (dimensions) grows:
   \textbf{Computational cost:} Many algorithms scale exponentially with dimensions.
 \end{enumerate}
 
-\begin{verbatim}
-1D space [0,1]: 10 samples covers it well
-2D space [0,1]²: need 100 samples for same coverage
-10D space [0,1]^10: need 10^10 = 10 billion samples!
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{1}\ErrorTok{D}\NormalTok{ space [}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{]: }\DecValTok{10}\NormalTok{ samples covers it well}
+\DecValTok{2}\ErrorTok{D}\NormalTok{ space [}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{]²: need }\DecValTok{100}\NormalTok{ samples }\ControlFlowTok{for}\NormalTok{ same coverage}
+\DecValTok{10}\ErrorTok{D}\NormalTok{ space [}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{]}\OperatorTok{\^{}}\DecValTok{10}\NormalTok{: need }\DecValTok{10}\OperatorTok{\^{}}\DecValTok{10} \OperatorTok{=} \DecValTok{10}\NormalTok{ billion samples}\OperatorTok{!}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Solutions:}
 
@@ -1283,7 +1353,7 @@ As the number of features (dimensions) grows:
   Domain knowledge to identify informative features
 \end{itemize}
 
-\subsubsection{Generalization}\label{generalization}
+\subsection{Generalization}\label{generalization}
 
 \textbf{The central goal of ML:} perform well on unseen data, not just training data.
 
@@ -1321,9 +1391,11 @@ Key insights:
 
 \textbf{Interview Takeaway:} A model with 100\% training accuracy and 60\% test accuracy has ZERO generalization --- it\textquotesingle s memorized the training set. The job is always to minimize generalization error, not training error.
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{The Full ML Workflow Pipeline}\label{the-full-ml-workflow-pipeline}
+\subsection{The Full ML Workflow Pipeline}\label{the-full-ml-workflow-pipeline}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -1353,7 +1425,9 @@ Key insights:
                                          retraining triggers
 \end{verbatim}
 
-\subsubsection{Train / Validation / Test Split Diagram}\label{train--validation--test-split-diagram}
+\subsection{Train / Validation / Test Split Diagram}\label{train--validation--test-split-diagram}
+
+\setcodelang{}
 
 \begin{verbatim}
 All Available Labeled Data
@@ -1380,7 +1454,9 @@ Training → Validation → [Iterate] → Test
                                      completely done
 \end{verbatim}
 
-\subsubsection{Bias--Variance Curve}\label{biasvariance-curve}
+\subsection{Bias--Variance Curve}\label{biasvariance-curve}
+
+\setcodelang{}
 
 \begin{verbatim}
 Error
@@ -1402,7 +1478,9 @@ Error
   Underfit                                    Overfit
 \end{verbatim}
 
-\subsubsection{Confusion Matrix (Fraud Detection Example)}\label{confusion-matrix-fraud-detection-example}
+\subsection{Confusion Matrix (Fraud Detection Example)}\label{confusion-matrix-fraud-detection-example}
+
+\setcodelang{}
 
 \begin{verbatim}
                         Predicted by Model
@@ -1420,7 +1498,9 @@ Recall    = 90 / (90 + 10)    = 90.0%   ← Of real fraud, 90% caught
 F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
 \end{verbatim}
 
-\subsubsection{Gradient Descent on Loss Bowl}\label{gradient-descent-on-loss-bowl}
+\subsection{Gradient Descent on Loss Bowl}\label{gradient-descent-on-loss-bowl}
+
+\setcodelang{}
 
 \begin{verbatim}
                 Loss Surface (2D projection of high-dim loss)
@@ -1446,7 +1526,9 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
       Adam optimizer adapts lr per-parameter — avoids these pathologies
 \end{verbatim}
 
-\subsubsection{Overfitting / Underfitting Fit Curves}\label{overfitting--underfitting-fit-curves}
+\subsection{Overfitting / Underfitting Fit Curves}\label{overfitting--underfitting-fit-curves}
+
+\setcodelang{}
 
 \begin{verbatim}
   Training Data (dots) and Model Fit (line)
@@ -1463,9 +1545,9 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
   Diagnosis: too simple       Diagnosis: just right     Diagnosis: memorized noise
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
-\subsubsection{Google Search --- Learning to Rank}\label{google-search--learning-to-rank}
+\subsection{Google Search --- Learning to Rank}\label{google-search--learning-to-rank}
 
 \begin{itemize}
 \tightlist
@@ -1483,7 +1565,7 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
   \textbf{Bias-variance relevance:} Simple linear ranker (high bias, misses interaction effects) vs. deep LambdaMART (risk of overfit to stale click patterns)
 \end{itemize}
 
-\subsubsection{Netflix Recommendations --- Collaborative Filtering}\label{netflix-recommendations--collaborative-filtering}
+\subsection{Netflix Recommendations --- Collaborative Filtering}\label{netflix-recommendations--collaborative-filtering}
 
 \begin{itemize}
 \tightlist
@@ -1499,7 +1581,7 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
   \textbf{Feature Engineering:} Time of day user watches, device type, country, genre embeddings
 \end{itemize}
 
-\subsubsection{Amazon Fraud Detection --- Anomaly + Supervised}\label{amazon-fraud-detection--anomaly--supervised}
+\subsection{Amazon Fraud Detection --- Anomaly + Supervised}\label{amazon-fraud-detection--anomaly--supervised}
 
 \begin{itemize}
 \tightlist
@@ -1515,7 +1597,7 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
   \textbf{Evaluation:} PR-AUC not ROC-AUC (highly imbalanced)
 \end{itemize}
 
-\subsubsection{Uber ETA Prediction --- Regression}\label{uber-eta-prediction--regression}
+\subsection{Uber ETA Prediction --- Regression}\label{uber-eta-prediction--regression}
 
 \begin{itemize}
 \tightlist
@@ -1531,7 +1613,7 @@ F1        = 2×(0.643×0.9)/(0.643+0.9)  = 75.0%
   \textbf{Real-world concern:} Training data from completed trips (selection bias --- trips that didn\textquotesingle t complete aren\textquotesingle t in training)
 \end{itemize}
 
-\subsection{Real-Life Analogies --- Training a Student Through School}\label{real-life-analogies--training-a-student-through-school}
+\section{Real-Life Analogies --- Training a Student Through School}\label{real-life-analogies--training-a-student-through-school}
 
 \emph{Every ML concept maps perfectly to a student\textquotesingle s academic journey --- once you see this, you\textquotesingle ll never forget the terminology.}
 
@@ -1576,9 +1658,9 @@ One-Line Explanation
 \textbf{Irreducible noise} & Ambiguous exam questions that even perfect studying can\textquotesingle t answer & Inherent randomness; cannot be eliminated \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{Precision vs Recall}\label{precision-vs-recall}
+\subsection{Precision vs Recall}\label{precision-vs-recall}
 
 \textbf{"Precise people don\textquotesingle t waste your time (no FP). Recall people find everyone (no FN)."}
 
@@ -1590,7 +1672,7 @@ One-Line Explanation
   \textbf{R}ecall \(\rightarrow\) Real Positives \(\rightarrow\) \textbf{R}escue everyone (avoid FN)
 \end{itemize}
 
-\subsubsection{Bias vs Variance}\label{bias-vs-variance}
+\subsection{Bias vs Variance}\label{bias-vs-variance}
 
 \textbf{"Bias is a BAD ASSUMPTION. Variance is WILD SENSITIVITY."}
 
@@ -1602,7 +1684,7 @@ One-Line Explanation
   \textbf{V}ariance = Very sensitive to which training samples you use (too complex)
 \end{itemize}
 
-\subsubsection{L1 vs L2 Regularization}\label{l1-vs-l2-regularization}
+\subsection{L1 vs L2 Regularization}\label{l1-vs-l2-regularization}
 
 \textbf{"L1 = Lasso (lasso ropes in/eliminates features). L2 = Ridge (ridge shrinks but keeps all)."}
 
@@ -1614,7 +1696,7 @@ One-Line Explanation
   \textbf{L2 Ridge \(\rightarrow\) Rounded (all weights survive, just smaller)}
 \end{itemize}
 
-\subsubsection{Type I vs Type II Error}\label{type-i-vs-type-ii-error}
+\subsection{Type I vs Type II Error}\label{type-i-vs-type-ii-error}
 
 \textbf{"I cried wolf (Type I = False Positive). II missed the wolf (Type II = False Negative)."}
 
@@ -1626,7 +1708,7 @@ One-Line Explanation
   Type \textbf{II} Error \(\rightarrow\) False Negative \(\rightarrow\) missed the real criminal
 \end{itemize}
 
-\subsubsection{Confusion Matrix: TN, FP, FN, TP (reading order)}\label{confusion-matrix-tn-fp-fn-tp-reading-order}
+\subsection{Confusion Matrix: TN, FP, FN, TP (reading order)}\label{confusion-matrix-tn-fp-fn-tp-reading-order}
 
 \textbf{"Truly the most Frequently misunderstood Perfectly --- True Negative, False Positive, False Negative, True Positive"}
 
@@ -1638,7 +1720,7 @@ One-Line Explanation
   Second word (Positive/Negative) = What did we predict?
 \end{itemize}
 
-\subsubsection{Cross-Validation}\label{cross-validation-1}
+\subsection{Cross-Validation}\label{cross-validation-1}
 
 \textbf{"K-Fold = K chances to be the test set"}
 
@@ -1650,7 +1732,7 @@ One-Line Explanation
   Best estimate when data is scarce
 \end{itemize}
 
-\subsubsection{Gradient Descent Learning Rate}\label{gradient-descent-learning-rate}
+\subsection{Gradient Descent Learning Rate}\label{gradient-descent-learning-rate}
 
 \textbf{"Goldilocks Rate: not too hot, not too cold"}
 
@@ -1664,17 +1746,17 @@ One-Line Explanation
   Just right: smooth convergence
 \end{itemize}
 
-\subsubsection{Overfitting vs Underfitting}\label{overfitting-vs-underfitting-1}
+\subsection{Overfitting vs Underfitting}\label{overfitting-vs-underfitting-1}
 
 \textbf{"Overfit = Over-smart student who studied only past papers. Underfit = Under-prepared student who barely studied."}
 
-\subsubsection{The Bias-Variance-Noise Decomposition}\label{the-bias-variance-noise-decomposition}
+\subsection{The Bias-Variance-Noise Decomposition}\label{the-bias-variance-noise-decomposition}
 
 \textbf{MSE = Bias\(^2\) + Variance + Noise --- "Every Model Succeeds by Balancing Variance and Noise"}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: What is the bias-variance tradeoff?}\label{q1-what-is-the-bias-variance-tradeoff}
+\subsection{Q1: What is the bias-variance tradeoff?}\label{q1-what-is-the-bias-variance-tradeoff}
 
 \textbf{Model Answer:}
 Bias-variance tradeoff is the tension between two sources of error that prevent ML models from generalizing. Total test error decomposes as: \textbf{Bias\(^2\) + Variance + Irreducible Noise}.
@@ -1702,7 +1784,7 @@ The tradeoff: making a model more complex reduces bias but increases variance. F
 \textbf{Follow-up:} \emph{"How do you know which problem you have?"}
 Plot learning curves: training loss and validation loss vs. training set size. High bias \(\rightarrow\) both losses plateau high. High variance \(\rightarrow\) large gap between training loss (low) and validation loss (high).
 
-\subsubsection{Q2: Explain precision and recall. When would you use each?}\label{q2-explain-precision-and-recall-when-would-you-use-each}
+\subsection{Q2: Explain precision and recall. When would you use each?}\label{q2-explain-precision-and-recall-when-would-you-use-each}
 
 \textbf{Model Answer:}
 Both measure different aspects of a classifier\textquotesingle s performance on positive class:
@@ -1732,7 +1814,7 @@ They trade off against each other via the decision threshold. Lowering the thres
 \textbf{Follow-up:} \emph{"What\textquotesingle s the F1 score and why harmonic mean?"}
 F1 = 2PR/(P+R). Harmonic mean penalizes extreme imbalance --- a model with Precision=1.0, Recall=0.01 gets F1=0.02, not 0.5 (arithmetic mean). It forces both to be reasonably high.
 
-\subsubsection{Q3: What is data leakage and how do you detect it?}\label{q3-what-is-data-leakage-and-how-do-you-detect-it}
+\subsection{Q3: What is data leakage and how do you detect it?}\label{q3-what-is-data-leakage-and-how-do-you-detect-it}
 
 \textbf{Model Answer:}
 Data leakage occurs when information from outside the training time-window or from the target variable flows into the training features, making a model appear to perform better than it will in production.
@@ -1777,7 +1859,7 @@ Data leakage occurs when information from outside the training time-window or fr
 \textbf{Follow-up:} \emph{"How do you handle time-series specifically?"}
 Use TimeSeriesSplit from sklearn which always ensures training window is before validation window. Never shuffle time-series data.
 
-\subsubsection{Q4: Your model has 98\% accuracy but the business is unhappy. What\textquotesingle s wrong?}\label{q4-your-model-has-98-accuracy-but-the-business-is-unhappy-whats-wrong}
+\subsection{Q4: Your model has 98\% accuracy but the business is unhappy. What\textquotesingle s wrong?}\label{q4-your-model-has-98-accuracy-but-the-business-is-unhappy-whats-wrong}
 
 \textbf{Model Answer:}
 Classic class imbalance problem. If the dataset is 98\% negative class, a model that always predicts "negative" achieves 98\% accuracy with zero utility.
@@ -1815,7 +1897,7 @@ Classic class imbalance problem. If the dataset is 98\% negative class, a model 
 \textbf{Follow-up:} \emph{"What if SMOTE makes things worse?"}
 SMOTE fails when classes heavily overlap in feature space --- synthetic minority samples get created in ambiguous regions. Try cost-sensitive learning (class weights) or ensemble methods (BalancedRandomForest) instead.
 
-\subsubsection{Q5: Explain the difference between L1 and L2 regularization.}\label{q5-explain-the-difference-between-l1-and-l2-regularization}
+\subsection{Q5: Explain the difference between L1 and L2 regularization.}\label{q5-explain-the-difference-between-l1-and-l2-regularization}
 
 \textbf{Model Answer:}
 Both add a penalty to the loss function to prevent overfitting:
@@ -1847,7 +1929,7 @@ L2 penalty is a circular constraint. The smooth circular boundary means optimal 
 \textbf{Follow-up:} \emph{"How does the lambda hyperparameter affect training?"}
 Higher \(\lambda\) \(\rightarrow\) more regularization \(\rightarrow\) simpler model \(\rightarrow\) moves along tradeoff toward higher bias/lower variance. Tune via cross-validation; too high \(\rightarrow\) underfit; too low \(\rightarrow\) overfit.
 
-\subsubsection{Q6: What is cross-validation and when do you use it?}\label{q6-what-is-cross-validation-and-when-do-you-use-it}
+\subsection{Q6: What is cross-validation and when do you use it?}\label{q6-what-is-cross-validation-and-when-do-you-use-it}
 
 \textbf{Model Answer:}
 Cross-validation is a resampling technique to estimate model performance on unseen data and tune hyperparameters when data is limited.
@@ -1883,11 +1965,13 @@ Cross-validation is a resampling technique to estimate model performance on unse
 \textbf{Follow-up:} \emph{"What\textquotesingle s the difference between 5-fold and LOO CV?"}
 LOO (Leave-One-Out): each sample is the validation set once. Gives nearly unbiased estimate but O(N) training runs. For N=10,000 that\textquotesingle s 10,000 model fits --- computationally expensive. 5-fold is a practical compromise.
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{1. The Learning Curve as a Diagnostic Tool}\label{1-the-learning-curve-as-a-diagnostic-tool}
+\subsection{1. The Learning Curve as a Diagnostic Tool}\label{1-the-learning-curve-as-a-diagnostic-tool}
 
 Beyond just looking at final metrics, senior engineers analyze learning curves --- performance vs. training set size:
+
+\setcodelang{}
 
 \begin{verbatim}
 High Bias (Underfit):           High Variance (Overfit):
@@ -1903,24 +1987,24 @@ Fix: more complex model          Fix: more data, regularization
 \textbf{If error plateaus early regardless of more data \(\rightarrow\) high bias.} Adding data won\textquotesingle t help; need better model or features.
 \textbf{If gap between train/val stays large with more data \(\rightarrow\) high variance.} Need regularization or architecture changes.
 
-\subsubsection{2. The No Free Lunch Theorem}\label{2-the-no-free-lunch-theorem}
+\subsection{2. The No Free Lunch Theorem}\label{2-the-no-free-lunch-theorem}
 
 There is no single algorithm that works best across all problems. Every algorithm makes assumptions. Linear regression assumes linear relationships; KNN assumes local smoothness; Naive Bayes assumes feature independence. Choosing algorithms is always about matching inductive biases to data structure.
 
 Practical implication: always try simple baselines (logistic regression, linear regression, majority class) before complex models. If a deep network doesn\textquotesingle t beat logistic regression significantly, the problem might be inherently linear.
 
-\subsubsection{3. Statistical Significance of Evaluation Results}\label{3-statistical-significance-of-evaluation-results}
+\subsection{3. Statistical Significance of Evaluation Results}\label{3-statistical-significance-of-evaluation-results}
 
 A model scoring 0.85 AUC vs. 0.84 AUC --- is that meaningful? Senior engineers run paired t-tests or McNemar\textquotesingle s test to determine if differences are statistically significant. With cross-validation, compute mean \(\pm\) confidence interval. Never declare a winner based on a single train-test split.
 
-\subsubsection{4. Calibration vs. Discrimination}\label{4-calibration-vs-discrimination}
+\subsection{4. Calibration vs. Discrimination}\label{4-calibration-vs-discrimination}
 
 \textbf{Discrimination:} Does the model rank positive examples higher? \(\rightarrow\) ROC-AUC measures this.
 \textbf{Calibration:} When the model says P(fraud) = 0.7, is the actual fraud rate among such predictions \(\approx\) 70\%? \(\rightarrow\) Brier score, calibration curve measure this.
 
 Many high-AUC models are poorly calibrated. For downstream decision-making (setting fraud thresholds, resource allocation), calibration is critical. Platt scaling or isotonic regression can post-hoc calibrate a model.
 
-\subsubsection{5. Distributional Shift --- The Biggest Production Failure Mode}\label{5-distributional-shift--the-biggest-production-failure-mode}
+\subsection{5. Distributional Shift --- The Biggest Production Failure Mode}\label{5-distributional-shift--the-biggest-production-failure-mode}
 
 Models trained on historical data fail when:
 
@@ -1936,11 +2020,11 @@ Models trained on historical data fail when:
 
 Detection: monitor input feature distributions (KL divergence, PSI), model output distributions, and actual labels if available. Mitigation: regular retraining, importance weighting, domain adaptation.
 
-\subsubsection{6. Inductive Bias and Regularization as Two Sides of a Coin}\label{6-inductive-bias-and-regularization-as-two-sides-of-a-coin}
+\subsection{6. Inductive Bias and Regularization as Two Sides of a Coin}\label{6-inductive-bias-and-regularization-as-two-sides-of-a-coin}
 
 Regularization is how we impose prior knowledge into model training. L2 regularization says "weights should be small" (a prior that says effects are generally moderate). L1 says "most features are irrelevant." Dropout says "no single neuron should be critical." These are all forms of Bayesian priors --- L2 corresponds to a Gaussian prior on weights, L1 to a Laplace prior. Senior engineers understand regularization from both frequentist and Bayesian perspectives.
 
-\subsubsection{7. Hyperparameter Optimization at Scale}\label{7-hyperparameter-optimization-at-scale}
+\subsection{7. Hyperparameter Optimization at Scale}\label{7-hyperparameter-optimization-at-scale}
 
 \begin{itemize}
 \tightlist
@@ -1954,68 +2038,68 @@ Regularization is how we impose prior knowledge into model training. L2 regulari
   \textbf{Population-Based Training (PBT):} Used at DeepMind; train a population of models, periodically copy best model\textquotesingle s weights to poor performers with mutated hyperparameters.
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
-\subsubsection{1. Using Test Set for Validation}\label{1-using-test-set-for-validation}
+\subsection{1. Using Test Set for Validation}\label{1-using-test-set-for-validation}
 
 \textbf{Mistake:} "I tuned my hyperparameters and kept testing on the test set until I found the best."\\
 \textbf{Why it\textquotesingle s wrong:} You\textquotesingle ve now overfit to the test set. It\textquotesingle s no longer an unbiased estimate. Report results will be optimistic; production will disappoint.\\
 \textbf{Correct:} Use a separate validation set OR nested cross-validation for all tuning decisions.
 
-\subsubsection{2. Ignoring Class Imbalance}\label{2-ignoring-class-imbalance}
+\subsection{2. Ignoring Class Imbalance}\label{2-ignoring-class-imbalance}
 
 \textbf{Mistake:} "My model gets 99\% accuracy, so it\textquotesingle s great!"\\
 \textbf{Why it\textquotesingle s wrong:} On a 99:1 imbalanced dataset, always predicting the majority class achieves 99\%. Precision/recall on the minority class is 0\%.\\
 \textbf{Correct:} Always check class distribution first. Use PR-AUC, F1, or per-class metrics.
 
-\subsubsection{3. Not Scaling Features Before Distance-Based Algorithms}\label{3-not-scaling-features-before-distance-based-algorithms}
+\subsection{3. Not Scaling Features Before Distance-Based Algorithms}\label{3-not-scaling-features-before-distance-based-algorithms}
 
 \textbf{Mistake:} Running KNN or SVM on features with wildly different scales (age in {[}0,100{]} vs. income in {[}0,1,000,000{]}).\\
 \textbf{Why it\textquotesingle s wrong:} Distance is dominated by the large-scale feature; other features become irrelevant.\\
 \textbf{Correct:} Always standardize or normalize features before KNN, SVM, logistic regression, neural networks.
 
-\subsubsection{4. Fitting Preprocessors on All Data}\label{4-fitting-preprocessors-on-all-data}
+\subsection{4. Fitting Preprocessors on All Data}\label{4-fitting-preprocessors-on-all-data}
 
 \textbf{Mistake:} \texttt{scaler.fit(X\_all);\ X\_train,\ X\_test\ =\ split(X\_all\_scaled)}\\
 \textbf{Why it\textquotesingle s wrong:} Data leakage --- test set statistics (mean, std) contaminate scaler, which then informs training.\\
 \textbf{Correct:} Split first, then fit preprocessors on training data only.
 
-\subsubsection{5. Confusing Correlation with Causation in Features}\label{5-confusing-correlation-with-causation-in-features}
+\subsection{5. Confusing Correlation with Causation in Features}\label{5-confusing-correlation-with-causation-in-features}
 
 \textbf{Mistake:} Including "number of hospital visits" as a feature to predict "health outcome" --- but hospital visits are caused by poor health, not the other way.\\
 \textbf{Why it\textquotesingle s wrong:} Feature may be a proxy for the label, causing leakage. Model may also be useless in production if the feature isn\textquotesingle t available.
 
-\subsubsection{6. Not Checking for Temporal Leakage}\label{6-not-checking-for-temporal-leakage}
+\subsection{6. Not Checking for Temporal Leakage}\label{6-not-checking-for-temporal-leakage}
 
 \textbf{Mistake:} Shuffling time-series data before splitting into train/test.\\
 \textbf{Why it\textquotesingle s wrong:} Test samples from time T may appear in training if data is shuffled. Model "sees the future."\\
 \textbf{Correct:} Always sort by time; train on past, validate on future.
 
-\subsubsection{7. Confusing Parameters vs. Hyperparameters}\label{7-confusing-parameters-vs-hyperparameters}
+\subsection{7. Confusing Parameters vs. Hyperparameters}\label{7-confusing-parameters-vs-hyperparameters}
 
 \textbf{Mistake:} "I tuned the number of training epochs using gradient descent."\\
 \textbf{Why it\textquotesingle s wrong:} Epochs is a hyperparameter --- it\textquotesingle s set before training and cannot be optimized by gradient descent.\\
 \textbf{Correct:} Parameters (weights) are learned via gradient descent. Hyperparameters (lr, layers, regularization strength) are tuned via cross-validation or search.
 
-\subsubsection{\texorpdfstring{8. Misinterpreting R\(^2\)}{8. Misinterpreting R\^{}2}}\label{8-misinterpreting-r2}
+\subsection{\texorpdfstring{8. Misinterpreting R\(^2\)}{8. Misinterpreting R\^{}2}}\label{8-misinterpreting-r2}
 
 \textbf{Mistake:} "R\(^2\) = 0.8 means we explain 80\% of variance, so the model is good."\\
 \textbf{Why it\textquotesingle s wrong:} R\(^2\) is relative to the mean baseline and sensitive to outliers. A model can have high R\(^2\) but terrible RMSE if the baseline variance is high. Also, R\(^2\) can be negative for poor models on test sets.
 
-\subsubsection{9. Reporting Only a Single Metric}\label{9-reporting-only-a-single-metric}
+\subsection{9. Reporting Only a Single Metric}\label{9-reporting-only-a-single-metric}
 
 \textbf{Mistake:} "The model achieves 0.93 F1."\\
 \textbf{Why it\textquotesingle s wrong:} F1 doesn\textquotesingle t tell you about calibration, runtime, interpretability, or whether the performance is stable across subgroups.\\
 \textbf{Correct:} Report a suite: accuracy, F1, PR-AUC, calibration curve. Disaggregate by important subgroups.
 
-\subsubsection{10. Treating Gradient Descent Convergence as Guaranteed}\label{10-treating-gradient-descent-convergence-as-guaranteed}
+\subsection{10. Treating Gradient Descent Convergence as Guaranteed}\label{10-treating-gradient-descent-convergence-as-guaranteed}
 
 \textbf{Mistake:} "Just run gradient descent long enough and it\textquotesingle ll find the optimal solution."\\
 \textbf{Why it\textquotesingle s wrong:} For non-convex loss surfaces (neural networks), gradient descent finds a local minimum or saddle point, not necessarily a global minimum. Learning rate, initialization, and batch size all affect which solution is reached.
 
-\subsection{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{Deep Learning}\label{deep-learning}
+\subsection{Deep Learning}\label{deep-learning}
 
 ML fundamentals are the foundation:
 
@@ -2033,7 +2117,7 @@ ML fundamentals are the foundation:
   \textbf{The loss surface:} Neural network losses are non-convex; modern optimizers (Adam, LARS, Shampoo) navigate these
 \end{itemize}
 
-\subsubsection{MLOps}\label{mlops}
+\subsection{MLOps}\label{mlops}
 
 \begin{itemize}
 \tightlist
@@ -2047,7 +2131,7 @@ ML fundamentals are the foundation:
   \textbf{Evaluation metrics:} A/B testing in production validates offline metric improvements translate to online gains
 \end{itemize}
 
-\subsubsection{System Design}\label{system-design}
+\subsection{System Design}\label{system-design}
 
 ML interviews often combine system design:
 
@@ -2063,7 +2147,7 @@ ML interviews often combine system design:
   \textbf{Evaluation at scale:} Online experiments (A/B tests), metric pipelines, experiment tracking
 \end{itemize}
 
-\subsubsection{Statistics}\label{statistics}
+\subsection{Statistics}\label{statistics}
 
 ML fundamentals ARE applied statistics:
 
@@ -2081,9 +2165,9 @@ ML fundamentals ARE applied statistics:
   \textbf{Evaluation:} Statistical significance testing (McNemar\textquotesingle s test, DeLong\textquotesingle s AUC comparison), confidence intervals
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
-\subsubsection{Before the Interview}\label{before-the-interview}
+\subsection{Before the Interview}\label{before-the-interview}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2095,7 +2179,7 @@ ML fundamentals ARE applied statistics:
   \textbf{Prepare concrete examples:} Have 2--3 real scenarios where you applied these concepts. "I noticed our model had high variance when I saw the train-val gap was 20\% AUC --- I added L2 regularization and the gap dropped to 3\%."
 \end{enumerate}
 
-\subsubsection{During the Interview}\label{during-the-interview}
+\subsection{During the Interview}\label{during-the-interview}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2112,7 +2196,7 @@ ML fundamentals ARE applied statistics:
   \textbf{Connect to production:} After discussing model training, say "In production, I\textquotesingle d also worry about {[}data drift/training-serving skew/retraining schedule{]}." Senior roles require production thinking.
 \end{enumerate}
 
-\subsubsection{Common Traps}\label{common-traps}
+\subsection{Common Traps}\label{common-traps}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2127,13 +2211,13 @@ ML fundamentals ARE applied statistics:
   \textbf{The "accuracy is great" trap:} Never lead with accuracy as the key metric without checking class balance. Saying "I achieved 99\% accuracy" on an imbalanced dataset signals a red flag to interviewers.
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 Machine Learning = learning a function f(x)\(\rightarrow\)y from data. Four paradigms: supervised (has labels), unsupervised (discovers structure), self-supervised (auto-generates labels from data itself), reinforcement (learns from reward signals). The ML lifecycle: data \(\rightarrow\) features \(\rightarrow\) model \(\rightarrow\) evaluate \(\rightarrow\) deploy \(\rightarrow\) monitor. Always split data into train/val/test --- test is touched once. Cross-validation gives robust performance estimates on small datasets. The fundamental tension: bias (too simple) vs. variance (too complex) --- total error = Bias\(^2\) + Variance + Noise. Regularization (L1, L2, dropout, early stopping) reduces variance. Evaluation depends on the task: classification uses accuracy/F1/ROC-AUC/PR-AUC; regression uses RMSE/MAE/R\(^2\). Feature engineering and scaling are critical preprocessing steps. Data leakage silently inflates performance. Class imbalance requires metric changes and resampling. Gradient descent optimizes parameters iteratively --- mini-batch is standard, Adam is the default optimizer. High dimensionality hurts all distance-based methods. Generalization on unseen data is the ultimate goal.
 
-\subsubsection{Key Points Checklist}\label{key-points-checklist}
+\subsection{Key Points Checklist}\label{key-points-checklist}
 
 \begin{itemize}
 \tightlist
@@ -2169,7 +2253,7 @@ Machine Learning = learning a function f(x)\(\rightarrow\)y from data. Four para
   R\(^2\) = 1 - (residual variance / total variance); 0 = mean baseline; \textless0 = worse than mean
 \end{itemize}
 
-\subsubsection{Cheat-Sheet Table}\label{cheat-sheet-table}
+\subsection{Cheat-Sheet Table}\label{cheat-sheet-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1544}}
@@ -2208,7 +2292,7 @@ Cross-Entropy & -\(\Sigma\)y\(\cdot\)log(ŷ) & Penalizes confident errors; train
 R\(^2\) & 1 - SS\_res/SS\_tot & 1=perfect; 0=mean baseline; \textless0=worse than baseline \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts (Ranked by Interview Frequency)}\label{most-important-concepts-ranked-by-interview-frequency}
+\subsection{Most Important Concepts (Ranked by Interview Frequency)}\label{most-important-concepts-ranked-by-interview-frequency}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

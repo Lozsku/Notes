@@ -63,13 +63,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Data Structures Deep Dive --- Coding Interviews}\label{data-structures-deep-dive--coding-interviews}
-
 \begin{quote}
 Dense reference: mechanics, complexities, code, diagrams, and interview takeaways in one place.
 \end{quote}
 
-\subsection{Overview}\label{overview}
+\section{Overview}\label{overview}
 
 Data structures are the substrate of every algorithm. Choosing the wrong one is the single most common reason candidates fail coding interviews --- the algorithm is right, but O(n) lookups in a list where a hash map would give O(1) makes the solution too slow. This file is organized as a working reference: read top-to-bottom once, then use the complexity table and decision guide during revision.
 
@@ -88,7 +86,7 @@ Data structures are the substrate of every algorithm. Choosing the wrong one is 
   Then pick the structure.
 \end{enumerate}
 
-\subsection{Master Complexity Table}\label{master-complexity-table}
+\section{Master Complexity Table}\label{master-complexity-table}
 
 All complexities are average-case unless marked. W = worst case.
 
@@ -144,13 +142,15 @@ LRU Cache & O(1) & O(1) & O(1) & O(1) & O(n) & Hash map + doubly linked list \\
 Bloom Filter & N/A & O(k) & O(k) & N/A & O(m) & k=hash funcs, probabilistic \\
 \end{longtable}
 
-\subsection{The Data Structures}\label{the-data-structures}
+\section{The Data Structures}\label{the-data-structures}
 
-\subsubsection{Arrays \& Dynamic Arrays}\label{arrays--dynamic-arrays}
+\subsection{Arrays \& Dynamic Arrays}\label{arrays--dynamic-arrays}
 
 \textbf{What it is:} Contiguous block of memory where each element sits at a fixed offset from the base address. Random access is O(1) because address = base + index * element\_size.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Static Array (size=6):
@@ -220,6 +220,8 @@ Delete & O(1) & O(n) & O(n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Two{-}pointer on sorted array}
@@ -246,11 +248,13 @@ Delete & O(1) & O(n) & O(n) \\
 
 \textbf{Real interview use-case:} Two Sum (hash map), Sliding Window Maximum, Kadane\textquotesingle s (max subarray), rotate array in-place, merge sorted arrays.
 
-\subsubsection{Strings}\label{strings}
+\subsection{Strings}\label{strings}
 
 \textbf{What it is:} Sequence of characters. In Python and Java, strings are \textbf{immutable} --- every concatenation creates a new object. In C++, \texttt{std::string} is mutable but each \texttt{+=} may reallocate.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Python string "hello":
@@ -301,6 +305,8 @@ Join & O(n) & One pass \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Always join, never += in loop}
@@ -341,11 +347,13 @@ Join & O(n) & One pass \\
 
 \textbf{Real interview use-case:} Longest substring without repeating characters, group anagrams, valid palindrome, minimum window substring, encode/decode strings.
 
-\subsubsection{Hash Tables}\label{hash-tables}
+\subsection{Hash Tables}\label{hash-tables}
 
 \textbf{What it is:} Maps keys to values in O(1) average by computing \texttt{hash(key)\ \%\ capacity} to find a bucket, then storing the key-value pair there.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Hash Table with Chaining (load factor = 0.75):
@@ -457,6 +465,8 @@ Delete & O(1) & O(n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict, Counter}
@@ -491,11 +501,13 @@ Delete & O(1) & O(n) \\
 
 \textbf{Real interview use-case:} Two Sum, subarray sum equals k, longest consecutive sequence, top K frequent elements, valid sudoku.
 
-\subsubsection{Linked Lists}\label{linked-lists}
+\subsection{Linked Lists}\label{linked-lists}
 
 \textbf{What it is:} Sequence of nodes where each node holds a value and a pointer to the next (singly) or both next and previous (doubly) nodes. Non-contiguous memory.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Singly Linked List:
@@ -580,6 +592,8 @@ Delete by ref & O(n) & O(1) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{class}\NormalTok{ ListNode:}
@@ -634,7 +648,7 @@ Delete by ref & O(n) & O(1) \\
 
 \textbf{Real interview use-case:} Reverse linked list, merge two sorted lists, detect cycle, reorder list, LRU cache.
 
-\subsubsection{Stacks \& Queues}\label{stacks--queues}
+\subsection{Stacks \& Queues}\label{stacks--queues}
 
 \textbf{What it is:}
 
@@ -653,6 +667,8 @@ Delete by ref & O(n) & O(1) \\
 \end{itemize}
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Stack (LIFO):
@@ -733,6 +749,8 @@ Search & O(n) & O(n) & O(n) & O(n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
@@ -788,11 +806,13 @@ Search & O(n) & O(n) & O(n) & O(n) \\
 
 \textbf{Real interview use-case:} Valid parentheses, min stack, daily temperatures, largest rectangle in histogram, sliding window maximum.
 
-\subsubsection{Trees}\label{trees}
+\subsection{Trees}\label{trees}
 
 \textbf{What it is:} Hierarchical, acyclic connected graph. Root at top, leaves at bottom.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Binary Tree (each node: up to 2 children):
@@ -886,6 +906,8 @@ In-order & O(n) & O(n) & O(n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{class}\NormalTok{ TreeNode:}
@@ -953,11 +975,13 @@ In-order & O(n) & O(n) & O(n) \\
 
 \textbf{Real interview use-case:} Validate BST, lowest common ancestor, diameter of binary tree, serialize/deserialize tree, path sum, kth smallest in BST.
 
-\subsubsection{Heaps / Priority Queues}\label{heaps--priority-queues}
+\subsection{Heaps / Priority Queues}\label{heaps--priority-queues}
 
 \textbf{What it is:} A complete binary tree stored as an array, where each parent satisfies the heap property (min-heap: parent \(\leq\) children; max-heap: parent \(\geq\) children). Top element is always the min (or max).
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Min-Heap (array representation):
@@ -1037,6 +1061,8 @@ Heapsort & O(n log n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \ImportTok{import}\NormalTok{ heapq}
@@ -1105,11 +1131,13 @@ Heapsort & O(n log n) \\
 
 \textbf{Real interview use-case:} Kth largest element, merge K sorted lists, task scheduler, find median from data stream, Dijkstra\textquotesingle s.
 
-\subsubsection{Tries (Prefix Trees)}\label{tries-prefix-trees}
+\subsection{Tries (Prefix Trees)}\label{tries-prefix-trees}
 
 \textbf{What it is:} A tree where each path from root to leaf spells a word, and each node represents one character. Shared prefixes share nodes.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Trie storing: ["cat", "car", "card", "care", "bat"]
@@ -1200,6 +1228,8 @@ Delete & O(m) & O(1) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{class}\NormalTok{ TrieNode:}
@@ -1245,11 +1275,13 @@ Delete & O(m) & O(1) \\
 
 \textbf{Real interview use-case:} Implement trie, word search II, replace words, design search autocomplete, map sum pairs.
 
-\subsubsection{Graphs}\label{graphs}
+\subsection{Graphs}\label{graphs}
 
 \textbf{What it is:} A set of vertices (nodes) connected by edges. Can be directed/undirected, weighted/unweighted, cyclic/acyclic.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Graph: 4 vertices, 4 edges (undirected)
@@ -1329,6 +1361,8 @@ Dijkstra & O((V+E)logV) & O(V\(^2\)logV) \\
 \end{itemize}
 
 \textbf{Key Python patterns:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1411,11 +1445,13 @@ Dijkstra & O((V+E)logV) & O(V\(^2\)logV) \\
 
 \textbf{Real interview use-case:} Number of islands, clone graph, course schedule, network delay time, Pacific Atlantic water flow, word ladder.
 
-\subsubsection{Union-Find / Disjoint Set}\label{union-find--disjoint-set}
+\subsection{Union-Find / Disjoint Set}\label{union-find--disjoint-set}
 
 \textbf{What it is:} Data structure to track which elements belong to the same connected component. Supports two operations: \texttt{find} (which component?) and \texttt{union} (merge components).
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Initial state (6 elements, each its own component):
@@ -1493,6 +1529,8 @@ Space & O(n) & O(n) & O(n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{class}\NormalTok{ UnionFind:}
@@ -1552,7 +1590,7 @@ Space & O(n) & O(n) & O(n) \\
 
 \textbf{Real interview use-case:} Number of provinces, redundant connection, accounts merge, satisfiability of equality equations.
 
-\subsubsection{LRU / LFU Cache Structures}\label{lru--lfu-cache-structures}
+\subsection{LRU / LFU Cache Structures}\label{lru--lfu-cache-structures}
 
 \textbf{What it is:}
 
@@ -1565,6 +1603,8 @@ Space & O(n) & O(n) & O(n) \\
 \end{itemize}
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 LRU Cache (capacity=3):
@@ -1617,6 +1657,8 @@ put & O(1) & O(1) \\
 \end{longtable}
 
 \textbf{Key Python patterns:}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1690,7 +1732,7 @@ put & O(1) & O(1) \\
 
 \textbf{Real interview use-case:} LRU cache (literal LeetCode 146), LFU cache (LeetCode 460), design Twitter, design browser history.
 
-\subsubsection{Segment Tree \& Fenwick Tree (BIT)}\label{segment-tree--fenwick-tree-bit}
+\subsection{Segment Tree \& Fenwick Tree (BIT)}\label{segment-tree--fenwick-tree-bit}
 
 \textbf{What it is:}
 
@@ -1703,6 +1745,8 @@ put & O(1) & O(1) \\
 \end{itemize}
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Array: [1, 3, 5, 7, 9, 11]  (0-indexed)
@@ -1780,6 +1824,8 @@ Space & O(n) & O(4n) & O(n) \\
 
 \textbf{Key Python patterns:}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Fenwick Tree (BIT) — prefix sum}
@@ -1836,11 +1882,13 @@ Space & O(n) & O(4n) & O(n) \\
 
 \textbf{Real interview use-case:} Range sum query (mutable), count of smaller numbers after self, reverse pairs, falling squares.
 
-\subsubsection{Bloom Filter}\label{bloom-filter}
+\subsection{Bloom Filter}\label{bloom-filter}
 
 \textbf{What it is:} A probabilistic, space-efficient data structure that answers "is X possibly in the set?" or "is X definitely NOT in the set?" --- with false positives but no false negatives.
 
 \textbf{Internal mechanics:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Bloom Filter (m=20 bits, k=3 hash functions):
@@ -1919,7 +1967,7 @@ Delete & N/A & - \\
 
 \textbf{Interview takeaway:} \textbf{Bloom filters trade accuracy for space and speed. False positives OK; false negatives are impossible. When an interviewer asks "how would you check if a URL was seen before using O(1) space?" --- bloom filter is the answer. Note: you can NOT delete from a standard bloom filter.}
 
-\subsection{Choosing the Right Data Structure}\label{choosing-the-right-data-structure}
+\section{Choosing the Right Data Structure}\label{choosing-the-right-data-structure}
 
 Decision table: "I need X \(\rightarrow\) use Y"
 
@@ -1966,9 +2014,9 @@ Detect cycle (directed graph) & DFS with in-stack tracking & Union-Find doesn\te
 Topological ordering & Kahn\textquotesingle s (BFS) or DFS & Works on DAGs only \\
 \end{longtable}
 
-\subsection{Language Notes}\label{language-notes}
+\section{Language Notes}\label{language-notes}
 
-\subsubsection{Python}\label{python}
+\subsection{Python}\label{python}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2821}}
@@ -1999,6 +2047,8 @@ Infinity & \texttt{float(\textquotesingle{}inf\textquotesingle{})} & \\
 Char to int & \texttt{ord(\textquotesingle{}a\textquotesingle{})} \(\rightarrow\) 97 & \texttt{chr(97)} \(\rightarrow\) \textquotesingle a\textquotesingle{} \\
 \end{longtable}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Common Python idioms}
@@ -2021,7 +2071,7 @@ Char to int & \texttt{ord(\textquotesingle{}a\textquotesingle{})} \(\rightarrow\
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Java}\label{java}
+\subsection{Java}\label{java}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2372}}
@@ -2051,6 +2101,8 @@ Queue & \texttt{ArrayDeque\textless{}T\textgreater{}} & Or \texttt{LinkedList\te
 Deque & \texttt{ArrayDeque\textless{}T\textgreater{}} & \\
 \end{longtable}
 
+\setcodelang{Java}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// Java idioms}
@@ -2073,7 +2125,7 @@ Deque & \texttt{ArrayDeque\textless{}T\textgreater{}} & \\
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{C++}\label{c}
+\subsection{C++}\label{c}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2381}}
@@ -2103,6 +2155,8 @@ Queue & \texttt{queue\textless{}T\textgreater{}} & \\
 Deque & \texttt{deque\textless{}T\textgreater{}} & \\
 \end{longtable}
 
+\setcodelang{C++}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{// C++ idioms}
@@ -2124,7 +2178,7 @@ Deque & \texttt{deque\textless{}T\textgreater{}} & \\
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2313}}
@@ -2156,9 +2210,9 @@ LRU Cache & Small whiteboard --- erase what was written longest ago for space \\
 Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away regulars \\
 \end{longtable}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Arrays}\label{arrays}
+\subsection{Arrays}\label{arrays}
 
 \begin{itemize}
 \tightlist
@@ -2180,7 +2234,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Merge Intervals (LC 56)
 \end{itemize}
 
-\subsubsection{Strings}\label{strings-1}
+\subsection{Strings}\label{strings-1}
 
 \begin{itemize}
 \tightlist
@@ -2200,7 +2254,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   String to Integer (atoi) (LC 8)
 \end{itemize}
 
-\subsubsection{Hash Maps/Sets}\label{hash-mapssets}
+\subsection{Hash Maps/Sets}\label{hash-mapssets}
 
 \begin{itemize}
 \tightlist
@@ -2218,7 +2272,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Find All Anagrams in a String (LC 438)
 \end{itemize}
 
-\subsubsection{Linked Lists}\label{linked-lists-1}
+\subsection{Linked Lists}\label{linked-lists-1}
 
 \begin{itemize}
 \tightlist
@@ -2236,7 +2290,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Merge K Sorted Lists (LC 23)
 \end{itemize}
 
-\subsubsection{Stacks/Queues}\label{stacksqueues}
+\subsection{Stacks/Queues}\label{stacksqueues}
 
 \begin{itemize}
 \tightlist
@@ -2254,7 +2308,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Evaluate Reverse Polish Notation (LC 150)
 \end{itemize}
 
-\subsubsection{Trees}\label{trees-1}
+\subsection{Trees}\label{trees-1}
 
 \begin{itemize}
 \tightlist
@@ -2278,7 +2332,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Diameter of Binary Tree (LC 543)
 \end{itemize}
 
-\subsubsection{Heaps}\label{heaps}
+\subsection{Heaps}\label{heaps}
 
 \begin{itemize}
 \tightlist
@@ -2294,7 +2348,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Merge K Sorted Lists (LC 23)
 \end{itemize}
 
-\subsubsection{Tries}\label{tries}
+\subsection{Tries}\label{tries}
 
 \begin{itemize}
 \tightlist
@@ -2308,7 +2362,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Design Search Autocomplete System (LC 642)
 \end{itemize}
 
-\subsubsection{Graphs}\label{graphs-1}
+\subsection{Graphs}\label{graphs-1}
 
 \begin{itemize}
 \tightlist
@@ -2330,7 +2384,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Cheapest Flights Within K Stops (LC 787) --- modified Dijkstra/Bellman-Ford
 \end{itemize}
 
-\subsubsection{Union-Find}\label{union-find}
+\subsection{Union-Find}\label{union-find}
 
 \begin{itemize}
 \tightlist
@@ -2344,7 +2398,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Satisfiability of Equality Equations (LC 990)
 \end{itemize}
 
-\subsubsection{LRU/LFU}\label{lrulfu}
+\subsection{LRU/LFU}\label{lrulfu}
 
 \begin{itemize}
 \tightlist
@@ -2354,7 +2408,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   LFU Cache (LC 460)
 \end{itemize}
 
-\subsubsection{Segment Tree / BIT}\label{segment-tree--bit}
+\subsection{Segment Tree / BIT}\label{segment-tree--bit}
 
 \begin{itemize}
 \tightlist
@@ -2366,7 +2420,7 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   Reverse Pairs (LC 493)
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2402,9 +2456,11 @@ Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away r
   \textbf{Passing arrays by reference and mutating them} --- In Python lists are passed by reference. If you need to preserve the original, copy with \texttt{arr{[}:{]}}.
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{Complexities to Memorize (Absolute Must)}\label{complexities-to-memorize-absolute-must}
+\subsection{Complexities to Memorize (Absolute Must)}\label{complexities-to-memorize-absolute-must}
+
+\setcodelang{}
 
 \begin{verbatim}
 Array access:     O(1)     | Hash map get/put: O(1) avg
@@ -2422,7 +2478,7 @@ String join:      O(n)     | String concat loop: O(n²) ← DANGER
 A = amortized
 \end{verbatim}
 
-\subsubsection{Decision Hooks (6 questions to ask every interview)}\label{decision-hooks-6-questions-to-ask-every-interview}
+\subsection{Decision Hooks (6 questions to ask every interview)}\label{decision-hooks-6-questions-to-ask-every-interview}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2441,7 +2497,7 @@ A = amortized
   \textbf{"Do I need prefix operations?"} \(\rightarrow\) Trie (strings) or Fenwick tree (numbers).
 \end{enumerate}
 
-\subsubsection{Quick Pattern Mapping}\label{quick-pattern-mapping}
+\subsection{Quick Pattern Mapping}\label{quick-pattern-mapping}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4906}}
@@ -2475,7 +2531,7 @@ Order + O(1) eviction & LRU (HashMap + DLL) \\
 Large-scale membership & Bloom filter \\
 \end{longtable}
 
-\subsubsection{The 5 Structures You MUST Be Able to Code From Scratch}\label{the-5-structures-you-must-be-able-to-code-from-scratch}
+\subsection{The 5 Structures You MUST Be Able to Code From Scratch}\label{the-5-structures-you-must-be-able-to-code-from-scratch}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2492,7 +2548,7 @@ Large-scale membership & Bloom filter \\
   \textbf{LRU Cache} (HashMap + doubly linked list)
 \end{enumerate}
 
-\subsubsection{Memory Aids}\label{memory-aids}
+\subsection{Memory Aids}\label{memory-aids}
 
 \begin{itemize}
 \tightlist

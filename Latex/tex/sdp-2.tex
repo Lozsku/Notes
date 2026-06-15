@@ -63,14 +63,12 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{System Design Interview --- Part 2: Advanced Problems}\label{system-design-interview--part-2-advanced-problems}
-
 Four fully worked FAANG-style system-design solutions. Each covers requirements,
 capacity math, API, data model, architecture, deep dives, scaling, and trade-offs.
 
-\subsection{1. Design a Video Streaming Service (YouTube / Netflix)}\label{1-design-a-video-streaming-service-youtube--netflix}
+\section{1. Design a Video Streaming Service (YouTube / Netflix)}\label{1-design-a-video-streaming-service-youtube--netflix}
 
-\subsubsection{1. Requirements}\label{1-requirements}
+\subsection{1. Requirements}\label{1-requirements}
 
 \textbf{Clarifying questions to ask:}
 
@@ -122,17 +120,23 @@ capacity math, API, data model, architecture, deep dives, scaling, and trade-off
   Scale: YouTube-tier --- 500 hours of video uploaded per minute; 1B+ DAU.
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation}
 
 \textbf{Users \& traffic:}
 
-\begin{verbatim}
-DAU             = 1 billion
-Avg watch time  = 30 min/day
-Videos uploaded = 500 hours/min = 30,000 hours/min raw footage
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DAU             }\OperatorTok{=} \DecValTok{1}\NormalTok{ billion}
+\NormalTok{Avg watch time  }\OperatorTok{=} \DecValTok{30} \BuiltInTok{min}\OperatorTok{/}\NormalTok{day}
+\NormalTok{Videos uploaded }\OperatorTok{=} \DecValTok{500}\NormalTok{ hours}\OperatorTok{/}\BuiltInTok{min} \OperatorTok{=} \DecValTok{30}\NormalTok{,}\DecValTok{000}\NormalTok{ hours}\OperatorTok{/}\BuiltInTok{min}\NormalTok{ raw footage}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Read QPS (playback requests):}
+
+\setcodelang{}
 
 \begin{verbatim}
 1B users × 5 video views/day = 5B views/day
@@ -141,12 +145,16 @@ Videos uploaded = 500 hours/min = 30,000 hours/min raw footage
 
 \textbf{Write QPS (uploads):}
 
+\setcodelang{}
+
 \begin{verbatim}
 500 hours/min ÷ 60 = ~8.3 hours/sec raw upload
 ~100 concurrent upload streams sustained at any time (most uploads are large, slow)
 \end{verbatim}
 
 \textbf{Storage (per year):}
+
+\setcodelang{}
 
 \begin{verbatim}
 Raw:         500 hr/min × 60 min/hr × 24 hr/day × 365 days = 262,800,000 hr/yr
@@ -157,6 +165,8 @@ Transcoded:  ~5 resolutions × 0.4× compression ratio each = ~2× raw
 
 \textbf{Bandwidth (outbound CDN):}
 
+\setcodelang{}
+
 \begin{verbatim}
 60K concurrent streams × avg 3 Mbps (720p) = 180 Gbps
 Peak (2× avg)                               = 360 Gbps served by CDN PoPs
@@ -164,41 +174,47 @@ Peak (2× avg)                               = 360 Gbps served by CDN PoPs
 
 \textbf{Cost hint:} At \$0.01/GB CDN egress, 180 Gbps \(\times\) 3600 s \(\times\) 24 h = \textasciitilde\$1.5 M/day --- hence CDN caching is existential.
 
-\subsubsection{3. API Design}\label{3-api-design}
+\subsection{3. API Design}\label{3-api-design}
 
-\begin{verbatim}
-# Upload
-POST   /v1/videos/initiate-upload
-       Body: { title, description, tags, category }
-       Returns: { upload_id, upload_url (signed S3) }
+\setcodelang{Python}
 
-PUT    /v1/videos/upload/{upload_id}/chunk
-       Headers: Content-Range, Content-Length
-       Body: <binary chunk>
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Upload}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{initiate}\OperatorTok{{-}}\NormalTok{upload}
+\NormalTok{       Body: \{ title, description, tags, category \}}
+\NormalTok{       Returns: \{ upload\_id, upload\_url (signed S3) \}}
 
-POST   /v1/videos/upload/{upload_id}/complete
-       Returns: { video_id, status: "processing" }
+\NormalTok{PUT    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{upload}\OperatorTok{/}\NormalTok{\{upload\_id\}}\OperatorTok{/}\NormalTok{chunk}
+\NormalTok{       Headers: Content}\OperatorTok{{-}}\NormalTok{Range, Content}\OperatorTok{{-}}\NormalTok{Length}
+\NormalTok{       Body: }\OperatorTok{\textless{}}\NormalTok{binary chunk}\OperatorTok{\textgreater{}}
 
-# Playback
-GET    /v1/videos/{video_id}
-       Returns: { metadata, manifest_url (HLS/DASH), thumbnail_url }
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{upload}\OperatorTok{/}\NormalTok{\{upload\_id\}}\OperatorTok{/}\NormalTok{complete}
+\NormalTok{       Returns: \{ video\_id, status: }\StringTok{"processing"}\NormalTok{ \}}
 
-GET    /v1/videos/{video_id}/manifest.m3u8   (served by CDN)
+\CommentTok{\# Playback}
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{\{video\_id\}}
+\NormalTok{       Returns: \{ metadata, manifest\_url (HLS}\OperatorTok{/}\NormalTok{DASH), thumbnail\_url \}}
 
-# Discovery
-GET    /v1/feed?user_id=&page_token=
-GET    /v1/search?q=&sort=relevance&page=
-GET    /v1/videos/{video_id}/recommendations
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{\{video\_id\}}\OperatorTok{/}\NormalTok{manifest.m3u8   (served by CDN)}
 
-# Engagement
-POST   /v1/videos/{video_id}/views      (fire-and-forget)
-POST   /v1/videos/{video_id}/likes
-POST   /v1/videos/{video_id}/comments
-\end{verbatim}
+\CommentTok{\# Discovery}
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{feed?user\_id}\OperatorTok{=\&}\NormalTok{page\_token}\OperatorTok{=}
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{search?q}\OperatorTok{=\&}\NormalTok{sort}\OperatorTok{=}\NormalTok{relevance}\OperatorTok{\&}\NormalTok{page}\OperatorTok{=}
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{\{video\_id\}}\OperatorTok{/}\NormalTok{recommendations}
 
-\subsubsection{4. Data Model}\label{4-data-model}
+\CommentTok{\# Engagement}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{\{video\_id\}}\OperatorTok{/}\NormalTok{views      (fire}\OperatorTok{{-}}\KeywordTok{and}\OperatorTok{{-}}\NormalTok{forget)}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{\{video\_id\}}\OperatorTok{/}\NormalTok{likes}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{videos}\OperatorTok{/}\NormalTok{\{video\_id\}}\OperatorTok{/}\NormalTok{comments}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{4. Data Model}\label{4-data-model}
 
 \textbf{Metadata DB --- PostgreSQL (sharded) or Spanner (global):}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -260,7 +276,9 @@ POST   /v1/videos/{video_id}/comments
   Lifecycle policy: raw deleted after 30 days if status=ready.
 \end{itemize}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture}
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
                        ┌──────────────┐
@@ -314,9 +332,9 @@ POST   /v1/videos/{video_id}/comments
   └──────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives}
+\subsection{6. Deep Dives}\label{6-deep-dives}
 
-\paragraph{6.1 Upload Pipeline \& Transcoding}\label{61-upload-pipeline--transcoding}
+\subsubsection{6.1 Upload Pipeline \& Transcoding}\label{61-upload-pipeline--transcoding}
 
 \textbf{Chunked Upload:}
 
@@ -353,6 +371,8 @@ POST   /v1/videos/{video_id}/comments
 
 \textbf{Resolution ladder (YouTube standard):}
 
+\setcodelang{}
+
 \begin{verbatim}
 2160p (4K)   → bitrate ~20 Mbps
 1080p        → ~8 Mbps
@@ -362,7 +382,7 @@ POST   /v1/videos/{video_id}/comments
 240p         → ~0.5 Mbps
 \end{verbatim}
 
-\paragraph{6.2 CDN Distribution}\label{62-cdn-distribution}
+\subsubsection{6.2 CDN Distribution}\label{62-cdn-distribution}
 
 \begin{itemize}
 \tightlist
@@ -378,7 +398,7 @@ POST   /v1/videos/{video_id}/comments
   \textbf{Cache hit ratio target:} \textgreater{} 95\% for popular videos. Long-tail videos miss to origin (cheap S3 GET).
 \end{itemize}
 
-\paragraph{6.3 Adaptive Bitrate Streaming --- HLS vs DASH}\label{63-adaptive-bitrate-streaming--hls-vs-dash}
+\subsubsection{6.3 Adaptive Bitrate Streaming --- HLS vs DASH}\label{63-adaptive-bitrate-streaming--hls-vs-dash}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1687}}
@@ -407,7 +427,9 @@ DASH (MPEG)
 
 \textbf{Key decision: Serve both HLS and DASH manifests from the same fMP4 segments (CMAF).} This halves storage vs maintaining two separate segment sets.
 
-\paragraph{6.4 Storage Tiers}\label{64-storage-tiers}
+\subsubsection{6.4 Storage Tiers}\label{64-storage-tiers}
+
+\setcodelang{}
 
 \begin{verbatim}
 Hot   (< 7 days old)   → S3 Standard          (fast GET, higher cost)
@@ -416,7 +438,7 @@ Cold  (> 90 days, < 1M views)  → S3 Glacier Instant Retrieval
 Archive (> 1yr, < 10K views)   → S3 Glacier Deep Archive (pennies/GB)
 \end{verbatim}
 
-\paragraph{6.5 Recommendations (brief)}\label{65-recommendations-brief}
+\subsubsection{6.5 Recommendations (brief)}\label{65-recommendations-brief}
 
 \begin{itemize}
 \tightlist
@@ -430,7 +452,7 @@ Archive (> 1yr, < 10K views)   → S3 Glacier Deep Archive (pennies/GB)
   \textbf{Cold start:} New videos bootstrapped with category/tag-based rules.
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3866}}
@@ -453,7 +475,7 @@ Recommendation latency & Pre-compute + cache feeds; async refresh \\
 Single-region failure & Multi-region S3 replication; CDN absorbs reads; DB cross-region replica \\
 \end{longtable}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2895}}
@@ -495,9 +517,9 @@ Storage tiering & All S3 Standard & Tiered (hot/warm/cold) & \textbf{Tiered} (10
   Transcoding is CPU-bound; scale it independently with Kafka consumer-lag autoscaling.
 \end{itemize}
 
-\subsection{2. Design a Ride-Hailing Service (Uber / Lyft)}\label{2-design-a-ride-hailing-service-uber--lyft}
+\section{2. Design a Ride-Hailing Service (Uber / Lyft)}\label{2-design-a-ride-hailing-service-uber--lyft}
 
-\subsubsection{1. Requirements}\label{1-requirements-1}
+\subsection{1. Requirements}\label{1-requirements-1}
 
 \textbf{Clarifying questions:}
 
@@ -549,60 +571,70 @@ Storage tiering & All S3 Standard & Tiered (hot/warm/cold) & \textbf{Tiered} (10
   Global scale: 5M+ concurrent drivers; 10M+ concurrent riders during peak.
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-1}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation-1}
 
-\begin{verbatim}
-Active drivers (peak global)   = 5 million
-Location update interval       = 4 s
-Location update QPS            = 5,000,000 / 4 = 1,250,000 writes/sec
+\setcodelang{Python}
 
-Active riders requesting rides = 500,000 concurrent
-Ride requests QPS              = 500,000 / 10s avg session = 50,000 QPS
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Active drivers (peak }\KeywordTok{global}\NormalTok{)   }\OperatorTok{=} \DecValTok{5}\NormalTok{ million}
+\NormalTok{Location update interval       }\OperatorTok{=} \DecValTok{4}\NormalTok{ s}
+\NormalTok{Location update QPS            }\OperatorTok{=} \DecValTok{5}\NormalTok{,}\DecValTok{000}\NormalTok{,}\DecValTok{000} \OperatorTok{/} \DecValTok{4} \OperatorTok{=} \DecValTok{1}\NormalTok{,}\DecValTok{250}\NormalTok{,}\DecValTok{000}\NormalTok{ writes}\OperatorTok{/}\NormalTok{sec}
 
-Trips per day                  = 25 million (Uber ~20M/day)
-Trip data per trip             = ~2 KB metadata + GPS trace ~50 KB
-Storage/yr                     = 25M × 52 KB × 365 = ~475 TB/yr
+\NormalTok{Active riders requesting rides }\OperatorTok{=} \DecValTok{500}\NormalTok{,}\DecValTok{000}\NormalTok{ concurrent}
+\NormalTok{Ride requests QPS              }\OperatorTok{=} \DecValTok{500}\NormalTok{,}\DecValTok{000} \OperatorTok{/} \DecValTok{10}\ErrorTok{s}\NormalTok{ avg session }\OperatorTok{=} \DecValTok{50}\NormalTok{,}\DecValTok{000}\NormalTok{ QPS}
 
-Location store size (in-memory):
-  5M drivers × (lat, lon, heading, timestamp, driver_id) = ~200 bytes each
-  = 5M × 200 B = 1 GB — fits in a large Redis cluster
-\end{verbatim}
+\NormalTok{Trips per day                  }\OperatorTok{=} \DecValTok{25}\NormalTok{ million (Uber }\OperatorTok{\textasciitilde{}}\DecValTok{20}\ErrorTok{M}\OperatorTok{/}\NormalTok{day)}
+\NormalTok{Trip data per trip             }\OperatorTok{=} \OperatorTok{\textasciitilde{}}\DecValTok{2}\NormalTok{ KB metadata }\OperatorTok{+}\NormalTok{ GPS trace }\OperatorTok{\textasciitilde{}}\DecValTok{50}\NormalTok{ KB}
+\NormalTok{Storage}\OperatorTok{/}\NormalTok{yr                     }\OperatorTok{=} \DecValTok{25}\ErrorTok{M}\NormalTok{ × }\DecValTok{52}\NormalTok{ KB × }\DecValTok{365} \OperatorTok{=} \OperatorTok{\textasciitilde{}}\DecValTok{475}\NormalTok{ TB}\OperatorTok{/}\NormalTok{yr}
 
-\subsubsection{3. API Design}\label{3-api-design-1}
+\NormalTok{Location store size (}\KeywordTok{in}\OperatorTok{{-}}\NormalTok{memory):}
+  \DecValTok{5}\ErrorTok{M}\NormalTok{ drivers × (lat, lon, heading, timestamp, driver\_id) }\OperatorTok{=} \OperatorTok{\textasciitilde{}}\DecValTok{200} \BuiltInTok{bytes}\NormalTok{ each}
+  \OperatorTok{=} \DecValTok{5}\ErrorTok{M}\NormalTok{ × }\DecValTok{200}\NormalTok{ B }\OperatorTok{=} \DecValTok{1}\NormalTok{ GB — fits }\KeywordTok{in}\NormalTok{ a large Redis cluster}
+\end{Highlighting}
+\end{Shaded}
 
-\begin{verbatim}
-# Rider
-POST   /v1/rides/estimate
-       Body: { pickup_lat, pickup_lon, dest_lat, dest_lon, ride_type }
-       Returns: { eta_s, fare_estimate, surge_multiplier }
+\subsection{3. API Design}\label{3-api-design-1}
 
-POST   /v1/rides/request
-       Body: { pickup_lat, pickup_lon, dest_lat, dest_lon, ride_type }
-       Returns: { ride_id, status: "searching" }
+\setcodelang{Python}
 
-GET    /v1/rides/{ride_id}
-       Returns: { status, driver_id, driver_eta_s, driver_location }
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Rider}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{rides}\OperatorTok{/}\NormalTok{estimate}
+\NormalTok{       Body: \{ pickup\_lat, pickup\_lon, dest\_lat, dest\_lon, ride\_type \}}
+\NormalTok{       Returns: \{ eta\_s, fare\_estimate, surge\_multiplier \}}
 
-DELETE /v1/rides/{ride_id}      (cancel)
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{rides}\OperatorTok{/}\NormalTok{request}
+\NormalTok{       Body: \{ pickup\_lat, pickup\_lon, dest\_lat, dest\_lon, ride\_type \}}
+\NormalTok{       Returns: \{ ride\_id, status: }\StringTok{"searching"}\NormalTok{ \}}
 
-# Driver
-PUT    /v1/drivers/{driver_id}/location
-       Body: { lat, lon, heading, speed, timestamp }
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{rides}\OperatorTok{/}\NormalTok{\{ride\_id\}}
+\NormalTok{       Returns: \{ status, driver\_id, driver\_eta\_s, driver\_location \}}
 
-PUT    /v1/drivers/{driver_id}/status
-       Body: { status: "available" | "busy" | "offline" }
+\NormalTok{DELETE }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{rides}\OperatorTok{/}\NormalTok{\{ride\_id\}      (cancel)}
 
-GET    /v1/drivers/{driver_id}/ride-offers   (long-poll or WebSocket push)
-POST   /v1/ride-offers/{offer_id}/accept
-POST   /v1/ride-offers/{offer_id}/reject
+\CommentTok{\# Driver}
+\NormalTok{PUT    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{drivers}\OperatorTok{/}\NormalTok{\{driver\_id\}}\OperatorTok{/}\NormalTok{location}
+\NormalTok{       Body: \{ lat, lon, heading, speed, timestamp \}}
 
-# Shared real-time (WebSocket)
-WS /v1/ws/ride/{ride_id}   (bidirectional: location pings, status events)
-\end{verbatim}
+\NormalTok{PUT    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{drivers}\OperatorTok{/}\NormalTok{\{driver\_id\}}\OperatorTok{/}\NormalTok{status}
+\NormalTok{       Body: \{ status: }\StringTok{"available"} \OperatorTok{|} \StringTok{"busy"} \OperatorTok{|} \StringTok{"offline"}\NormalTok{ \}}
 
-\subsubsection{4. Data Model}\label{4-data-model-1}
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{drivers}\OperatorTok{/}\NormalTok{\{driver\_id\}}\OperatorTok{/}\NormalTok{ride}\OperatorTok{{-}}\NormalTok{offers   (}\BuiltInTok{long}\OperatorTok{{-}}\NormalTok{poll }\KeywordTok{or}\NormalTok{ WebSocket push)}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{ride}\OperatorTok{{-}}\NormalTok{offers}\OperatorTok{/}\NormalTok{\{offer\_id\}}\OperatorTok{/}\NormalTok{accept}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{ride}\OperatorTok{{-}}\NormalTok{offers}\OperatorTok{/}\NormalTok{\{offer\_id\}}\OperatorTok{/}\NormalTok{reject}
+
+\CommentTok{\# Shared real{-}time (WebSocket)}
+\NormalTok{WS }\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{ws}\OperatorTok{/}\NormalTok{ride}\OperatorTok{/}\NormalTok{\{ride\_id\}   (bidirectional: location pings, status events)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{4. Data Model}\label{4-data-model-1}
 
 \textbf{Drivers (PostgreSQL):}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -618,6 +650,8 @@ WS /v1/ws/ride/{ride_id}   (bidirectional: location pings, status events)
 \end{Shaded}
 
 \textbf{Rides (PostgreSQL sharded by ride\_id):}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -642,16 +676,22 @@ WS /v1/ws/ride/{ride_id}   (bidirectional: location pings, status events)
 
 \textbf{Driver Locations (Redis / in-memory geo store):}
 
-\begin{verbatim}
-Key:   DRIVER_LOC:{driver_id}
-Value: { lat, lon, heading, updated_at }
-TTL:   30 s (stale if driver stops sending heartbeats)
+\setcodelang{Python}
 
-Geo index: Redis GEOADD city:{city_id}:drivers {lon} {lat} {driver_id}
-           Redis GEORADIUS for nearest-N lookup
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Key:   DRIVER\_LOC:\{driver\_id\}}
+\NormalTok{Value: \{ lat, lon, heading, updated\_at \}}
+\NormalTok{TTL:   }\DecValTok{30}\NormalTok{ s (stale }\ControlFlowTok{if}\NormalTok{ driver stops sending heartbeats)}
+
+\NormalTok{Geo index: Redis GEOADD city:\{city\_id\}:drivers \{lon\} \{lat\} \{driver\_id\}}
+\NormalTok{           Redis GEORADIUS }\ControlFlowTok{for}\NormalTok{ nearest}\OperatorTok{{-}}\NormalTok{N lookup}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Trip GPS traces (Cassandra or TimescaleDB):}
+
+\setcodelang{}
 
 \begin{verbatim}
 trip_locations (
@@ -663,7 +703,9 @@ trip_locations (
 ) — append-only, time-series access pattern
 \end{verbatim}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-1}
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture-1}
+
+\setcodelang{}
 
 \begin{verbatim}
   Rider App                          Driver App
@@ -715,9 +757,9 @@ trip_locations (
   └──────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives-1}
+\subsection{6. Deep Dives}\label{6-deep-dives-1}
 
-\paragraph{6.1 Geospatial Indexing --- Geohash vs Quadtree vs S2}\label{61-geospatial-indexing--geohash-vs-quadtree-vs-s2}
+\subsubsection{6.1 Geospatial Indexing --- Geohash vs Quadtree vs S2}\label{61-geospatial-indexing--geohash-vs-quadtree-vs-s2}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1574}}
@@ -761,7 +803,7 @@ Google S2
   \textbf{Why not S2?} Overkill for matching; S2 shines in complex polygon coverage (e.g., Uber H3 for analytics).
 \end{itemize}
 
-\paragraph{6.2 Driver-Rider Matching}\label{62-driver-rider-matching}
+\subsubsection{6.2 Driver-Rider Matching}\label{62-driver-rider-matching}
 
 \textbf{Algorithm:}
 
@@ -773,9 +815,13 @@ Google S2
 \item
   Score each driver:
 
-\begin{verbatim}
-score = w1 × (1 / ETA_to_pickup) + w2 × driver_rating + w3 × acceptance_rate
-\end{verbatim}
+  \setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{score }\OperatorTok{=}\NormalTok{ w1 × (}\DecValTok{1} \OperatorTok{/}\NormalTok{ ETA\_to\_pickup) }\OperatorTok{+}\NormalTok{ w2 × driver\_rating }\OperatorTok{+}\NormalTok{ w3 × acceptance\_rate}
+\end{Highlighting}
+\end{Shaded}
 \item
   Send offer to top-scored driver. Wait 10 s.
 \item
@@ -786,7 +832,7 @@ score = w1 × (1 / ETA_to_pickup) + w2 × driver_rating + w3 × acceptance_rate
 
 \textbf{Preventing double-assignment:} Use Postgres \texttt{SELECT\ FOR\ UPDATE} or Redis distributed lock (\texttt{SET\ driver:\{id\}:lock\ NX\ EX\ 15}) before assigning.
 
-\paragraph{6.3 Real-Time Location Updates}\label{63-real-time-location-updates}
+\subsubsection{6.3 Real-Time Location Updates}\label{63-real-time-location-updates}
 
 \begin{itemize}
 \tightlist
@@ -812,14 +858,18 @@ score = w1 × (1 / ETA_to_pickup) + w2 × driver_rating + w3 × acceptance_rate
   \end{itemize}
 \end{itemize}
 
-\paragraph{6.4 Surge Pricing}\label{64-surge-pricing}
+\subsubsection{6.4 Surge Pricing}\label{64-surge-pricing}
 
-\begin{verbatim}
-demand_cells[geohash6] = count of ride requests in last 5 min
-supply_cells[geohash6] = count of available drivers in cell
+\setcodelang{Python}
 
-surge_multiplier = max(1.0, demand / (supply × target_utilization_factor))
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{demand\_cells[geohash6] }\OperatorTok{=}\NormalTok{ count of ride requests }\KeywordTok{in}\NormalTok{ last }\DecValTok{5} \BuiltInTok{min}
+\NormalTok{supply\_cells[geohash6] }\OperatorTok{=}\NormalTok{ count of available drivers }\KeywordTok{in}\NormalTok{ cell}
+
+\NormalTok{surge\_multiplier }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(}\FloatTok{1.0}\NormalTok{, demand }\OperatorTok{/}\NormalTok{ (supply × target\_utilization\_factor))}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{itemize}
 \tightlist
@@ -833,7 +883,9 @@ surge_multiplier = max(1.0, demand / (supply × target_utilization_factor))
   \textbf{UI UX:} show surge visually (heatmap) and require explicit rider confirmation if multiplier \textgreater{} 1.5\(\times\).
 \end{itemize}
 
-\paragraph{6.5 Trip Lifecycle --- State Machine}\label{65-trip-lifecycle--state-machine}
+\subsubsection{6.5 Trip Lifecycle --- State Machine}\label{65-trip-lifecycle--state-machine}
+
+\setcodelang{}
 
 \begin{verbatim}
 REQUESTED ──► SEARCHING ──► DRIVER_ASSIGNED ──► DRIVER_EN_ROUTE
@@ -850,7 +902,7 @@ REQUESTED ──► SEARCHING ──► DRIVER_ASSIGNED ──► DRIVER_EN_ROUT
 
 State transitions are persisted in Postgres with timestamps. Events published to Kafka on each transition. Kafka consumers handle: notifications, billing trigger (on COMPLETED), analytics.
 
-\paragraph{6.6 ETA Calculation}\label{66-eta-calculation}
+\subsubsection{6.6 ETA Calculation}\label{66-eta-calculation}
 
 \begin{itemize}
 \tightlist
@@ -862,7 +914,7 @@ State transitions are persisted in Postgres with timestamps. Events published to
   \textbf{Pre-computed ETA surfaces:} city road graph stored in-memory (contraction hierarchies) for sub-100ms routing. Uber uses their own in-house routing (H3-based graph).
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-1}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-1}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3652}}
@@ -885,7 +937,7 @@ Driver double-booking & Redis NX lock on \texttt{driver\_id} during match; relea
 Surge pricing staleness & Short TTL (30 s) + frequent recalculation; eventual consistency OK \\
 \end{longtable}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-1}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary-1}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2617}}
@@ -928,9 +980,9 @@ Routing engine & Google Maps API & Self-hosted OSRM & \textbf{OSRM} at scale (co
   Surge pricing uses supply/demand ratio per geohash cell --- a simple but powerful formula.
 \end{itemize}
 
-\subsection{3. Design a Distributed Cache (like Redis/Memcached at Scale)}\label{3-design-a-distributed-cache-like-redismemcached-at-scale}
+\section{3. Design a Distributed Cache (like Redis/Memcached at Scale)}\label{3-design-a-distributed-cache-like-redismemcached-at-scale}
 
-\subsubsection{1. Requirements}\label{1-requirements-2}
+\subsection{1. Requirements}\label{1-requirements-2}
 
 \textbf{Clarifying questions:}
 
@@ -982,7 +1034,9 @@ Routing engine & Google Maps API & Self-hosted OSRM & \textbf{OSRM} at scale (co
   Scale to terabytes of cached data across a cluster.
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-2}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation-2}
+
+\setcodelang{}
 
 \begin{verbatim}
 Cached data size (working set)   = 10 TB
@@ -1002,9 +1056,11 @@ Memory per key overhead (Redis): ~70 bytes metadata + value size
   1B keys × 70 B overhead        = 70 GB overhead in cluster (significant at scale)
 \end{verbatim}
 
-\subsubsection{3. API Design}\label{3-api-design-2}
+\subsection{3. API Design}\label{3-api-design-2}
 
 \textbf{Client-facing (wire protocol --- Redis-compatible RESP):}
+
+\setcodelang{}
 
 \begin{verbatim}
 GET  <key>                   → value | (nil)
@@ -1019,6 +1075,8 @@ EXPIRE <key> <secs>          → 1 (success) | 0 (no such key)
 
 \textbf{Admin / Internal API:}
 
+\setcodelang{}
+
 \begin{verbatim}
 CLUSTER ADDNODE <host:port>  → join node to cluster
 CLUSTER FAILOVER             → trigger manual leader promotion
@@ -1026,9 +1084,11 @@ INFO                         → stats (memory, QPS, hit_rate, evictions)
 BGSAVE                       → async RDB snapshot
 \end{verbatim}
 
-\subsubsection{4. Data Model}\label{4-data-model-2}
+\subsection{4. Data Model}\label{4-data-model-2}
 
 \textbf{In-memory data structures:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Hash table: key → { value, type, TTL_expiry_ts, LRU_clock }
@@ -1043,6 +1103,8 @@ Value types:
 
 \textbf{Persistence (optional):}
 
+\setcodelang{}
+
 \begin{verbatim}
 RDB snapshot: point-in-time binary dump, every N seconds or M writes
 AOF (Append-Only File): write-ahead log, fsync policy:
@@ -1053,13 +1115,17 @@ AOF (Append-Only File): write-ahead log, fsync policy:
 
 \textbf{Cluster topology metadata:}
 
+\setcodelang{}
+
 \begin{verbatim}
 Cluster config (stored in every node):
   slot_assignments[0..16383] → node_id   (Redis uses 16384 hash slots)
   node_registry: { node_id, host, port, role: master|replica, slots }
 \end{verbatim}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-2}
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture-2}
+
+\setcodelang{}
 
 \begin{verbatim}
   Client Apps (thousands of instances)
@@ -1099,13 +1165,15 @@ Cluster config (stored in every node):
   └──────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives-2}
+\subsection{6. Deep Dives}\label{6-deep-dives-2}
 
-\paragraph{6.1 Consistent Hashing}\label{61-consistent-hashing}
+\subsubsection{6.1 Consistent Hashing}\label{61-consistent-hashing}
 
 \textbf{Problem:} Naive \texttt{hash(key)\ \%\ N} rehashes ALL keys when N changes (add/remove node).
 
 \textbf{Solution --- Consistent Hash Ring:}
+
+\setcodelang{}
 
 \begin{verbatim}
 Virtual ring: 0 to 2^32
@@ -1127,7 +1195,7 @@ key → hash(key) → position on ring → clockwise next node = owner
 
 \textbf{Key decision:} 150--200 virtual nodes per physical node balances load even with heterogeneous node sizes (weight vnodes by RAM). With 40 nodes \(\times\) 150 vnodes = 6,000 points on ring.
 
-\paragraph{6.2 Replication}\label{62-replication}
+\subsubsection{6.2 Replication}\label{62-replication}
 
 \begin{itemize}
 \tightlist
@@ -1143,7 +1211,7 @@ key → hash(key) → position on ring → clockwise next node = owner
   On master failure: replica with lowest replication lag is elected master (Raft-adjacent gossip vote).
 \end{itemize}
 
-\paragraph{6.3 Eviction Policies (LRU and Beyond)}\label{63-eviction-policies-lru-and-beyond}
+\subsubsection{6.3 Eviction Policies (LRU and Beyond)}\label{63-eviction-policies-lru-and-beyond}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1795}}
@@ -1183,7 +1251,7 @@ Use case
 
 \textbf{Key decision: Use \texttt{allkeys-lfu} for a general-purpose cache} --- LFU outperforms LRU when there are periodic scans that pollute the LRU queue with cold data.
 
-\paragraph{6.4 Cache Invalidation Strategies}\label{64-cache-invalidation-strategies}
+\subsubsection{6.4 Cache Invalidation Strategies}\label{64-cache-invalidation-strategies}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1990}}
@@ -1214,7 +1282,7 @@ Cons
 
 \textbf{Key decision: TTL + event-driven invalidation (CDC via Debezium/Kafka).} TTL covers eventual consistency; CDC invalidates on DB write for critical data.
 
-\paragraph{6.5 Hot Key Problem}\label{65-hot-key-problem}
+\subsubsection{6.5 Hot Key Problem}\label{65-hot-key-problem}
 
 \textbf{Problem:} A single key (e.g., a celebrity\textquotesingle s profile \texttt{user:12345}) gets 100K QPS --- overwhelming the one shard that owns it.
 
@@ -1233,7 +1301,7 @@ Cons
   \textbf{Detect \& alert:} Monitor per-key QPS in the client library; auto-promote to local cache.
 \end{enumerate}
 
-\paragraph{6.6 Cache Stampede (Thundering Herd)}\label{66-cache-stampede-thundering-herd}
+\subsubsection{6.6 Cache Stampede (Thundering Herd)}\label{66-cache-stampede-thundering-herd}
 
 \textbf{Problem:} Popular key expires \(\rightarrow\) 10K concurrent requests all miss \(\rightarrow\) all hit DB simultaneously \(\rightarrow\) DB overloaded.
 
@@ -1254,7 +1322,9 @@ Cons
 
 \textbf{Key decision: Stale-while-revalidate for most use cases} --- zero extra latency for users; background refresh handles expiry.
 
-\paragraph{6.7 Write Policies}\label{67-write-policies}
+\subsubsection{6.7 Write Policies}\label{67-write-policies}
+
+\setcodelang{}
 
 \begin{verbatim}
 Write-Through:   Client → Cache & DB (synchronous both)
@@ -1267,7 +1337,7 @@ Cache-Aside:     Client → DB directly; read-path populates cache
                  + DB authoritative  − Cold start cache misses
 \end{verbatim}
 
-\paragraph{6.8 Node Failure Handling}\label{68-node-failure-handling}
+\subsubsection{6.8 Node Failure Handling}\label{68-node-failure-handling}
 
 \begin{itemize}
 \tightlist
@@ -1281,7 +1351,7 @@ Cache-Aside:     Client → DB directly; read-path populates cache
   \textbf{Split brain prevention:} Requires majority of masters alive to accept writes. With 20 masters, lose 10 \(\rightarrow\) writes rejected (availability vs consistency trade-off).
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-2}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-2}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3133}}
@@ -1304,7 +1374,7 @@ Replication lag & \texttt{WAIT\ 1\ 100} for critical writes; monitor \texttt{rep
 Cross-datacenter replication & Redis Cluster doesn\textquotesingle t span DCs natively; use CRDT-based solutions or geo-replicas with eventual consistency \\
 \end{longtable}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-2}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary-2}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1959}}
@@ -1348,9 +1418,9 @@ Persistence & RDB only & AOF everysec & \textbf{AOF everysec} (\textless{} 1s lo
   Cache-aside is the most common pattern; write-through for critical financial data.
 \end{itemize}
 
-\subsection{4. Design a Web Crawler (Google-Scale)}\label{4-design-a-web-crawler-google-scale}
+\section{4. Design a Web Crawler (Google-Scale)}\label{4-design-a-web-crawler-google-scale}
 
-\subsubsection{1. Requirements}\label{1-requirements-3}
+\subsection{1. Requirements}\label{1-requirements-3}
 
 \textbf{Clarifying questions:}
 
@@ -1404,7 +1474,9 @@ Persistence & RDB only & AOF everysec & \textbf{AOF everysec} (\textless{} 1s lo
   Freshness: high-value pages (news) re-crawled hourly; static pages monthly.
 \end{itemize}
 
-\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-3}
+\subsection{2. Capacity Estimation}\label{2-capacity-estimation-3}
+
+\setcodelang{}
 
 \begin{verbatim}
 Target pages           = 10 billion
@@ -1426,56 +1498,66 @@ DNS lookups:
   DNS cache (TTL=300s) covers most; ~5 uncached DNS lookups/sec
 \end{verbatim}
 
-\subsubsection{3. API Design}\label{3-api-design-3}
+\subsection{3. API Design}\label{3-api-design-3}
 
 \textbf{Internal service APIs (not user-facing):}
 
-\begin{verbatim}
-# URL Frontier Service
-POST   /frontier/enqueue
-       Body: { url, priority, source_page, discovered_at }
-       Returns: { queued: true | false (already seen) }
+\setcodelang{Python}
 
-GET    /frontier/next?crawler_id=&batch_size=100
-       Returns: [{ url, fetch_after_ts }]  (respects politeness delay)
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# URL Frontier Service}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{frontier}\OperatorTok{/}\NormalTok{enqueue}
+\NormalTok{       Body: \{ url, priority, source\_page, discovered\_at \}}
+\NormalTok{       Returns: \{ queued: true }\OperatorTok{|}\NormalTok{ false (already seen) \}}
 
-POST   /frontier/done
-       Body: { url, status_code, crawled_at, content_hash }
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{frontier}\OperatorTok{/}\BuiltInTok{next}\NormalTok{?crawler\_id}\OperatorTok{=\&}\NormalTok{batch\_size}\OperatorTok{=}\DecValTok{100}
+\NormalTok{       Returns: [\{ url, fetch\_after\_ts \}]  (respects politeness delay)}
 
-# Content Store
-PUT    /content/{url_hash}
-       Body: { raw_html, headers, crawled_at, content_hash }
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{frontier}\OperatorTok{/}\NormalTok{done}
+\NormalTok{       Body: \{ url, status\_code, crawled\_at, content\_hash \}}
 
-GET    /content/{url_hash}
+\CommentTok{\# Content Store}
+\NormalTok{PUT    }\OperatorTok{/}\NormalTok{content}\OperatorTok{/}\NormalTok{\{url\_hash\}}
+\NormalTok{       Body: \{ raw\_html, headers, crawled\_at, content\_hash \}}
 
-# Robots.txt Cache
-GET    /robots?domain=example.com
-       Returns: { allowed_paths, disallowed_paths, crawl_delay_s, sitemap_urls }
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{content}\OperatorTok{/}\NormalTok{\{url\_hash\}}
 
-# Recrawl Scheduler
-POST   /recrawl/schedule
-       Body: { url, next_crawl_at, priority }
-\end{verbatim}
+\CommentTok{\# Robots.txt Cache}
+\NormalTok{GET    }\OperatorTok{/}\NormalTok{robots?domain}\OperatorTok{=}\NormalTok{example.com}
+\NormalTok{       Returns: \{ allowed\_paths, disallowed\_paths, crawl\_delay\_s, sitemap\_urls \}}
 
-\subsubsection{4. Data Model}\label{4-data-model-3}
+\CommentTok{\# Recrawl Scheduler}
+\NormalTok{POST   }\OperatorTok{/}\NormalTok{recrawl}\OperatorTok{/}\NormalTok{schedule}
+\NormalTok{       Body: \{ url, next\_crawl\_at, priority \}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{4. Data Model}\label{4-data-model-3}
 
 \textbf{URL Frontier (Priority Queue + Politeness Queue):}
 
-\begin{verbatim}
-frontier_urls (
-  url_hash        BIGINT  PRIMARY KEY,    -- xxHash64 of normalized URL
-  url             TEXT,
-  priority        FLOAT,                  -- higher = crawl sooner
-  domain          TEXT,
-  next_fetch_ts   TIMESTAMPTZ,            -- earliest time to fetch (politeness)
-  status          ENUM('pending','in_flight','done','error'),
-  retry_count     INT DEFAULT 0
-)
-Implemented as: Apache Kafka topics per priority band (high/medium/low)
-                + Redis ZSETs per domain for politeness scheduling
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{frontier\_urls (}
+\NormalTok{  url\_hash        BIGINT  PRIMARY KEY,    }\OperatorTok{{-}{-}}\NormalTok{ xxHash64 of normalized URL}
+\NormalTok{  url             TEXT,}
+\NormalTok{  priority        FLOAT,                  }\OperatorTok{{-}{-}}\NormalTok{ higher }\OperatorTok{=}\NormalTok{ crawl sooner}
+\NormalTok{  domain          TEXT,}
+\NormalTok{  next\_fetch\_ts   TIMESTAMPTZ,            }\OperatorTok{{-}{-}}\NormalTok{ earliest time to fetch (politeness)}
+\NormalTok{  status          ENUM(}\StringTok{\textquotesingle{}pending\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}in\_flight\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}done\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}error\textquotesingle{}}\NormalTok{),}
+\NormalTok{  retry\_count     INT DEFAULT }\DecValTok{0}
+\NormalTok{)}
+\NormalTok{Implemented }\ImportTok{as}\NormalTok{: Apache Kafka topics per priority band (high}\OperatorTok{/}\NormalTok{medium}\OperatorTok{/}\NormalTok{low)}
+                \OperatorTok{+}\NormalTok{ Redis ZSETs per domain }\ControlFlowTok{for}\NormalTok{ politeness scheduling}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Crawled Pages (blob + metadata):}
+
+\setcodelang{}
 
 \begin{verbatim}
 pages (
@@ -1492,6 +1574,8 @@ pages (
 
 \textbf{Seen URL Set (deduplication):}
 
+\setcodelang{}
+
 \begin{verbatim}
 Bloom Filter (in-memory, distributed):
   - 10B URLs, 0.1% false positive rate → ~14.4 GB
@@ -1501,11 +1585,15 @@ Bloom Filter (in-memory, distributed):
 
 \textbf{robots.txt Cache:}
 
+\setcodelang{}
+
 \begin{verbatim}
 robots_cache (domain → RobotsTxt object, TTL=24h) in Redis
 \end{verbatim}
 
-\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-3}
+\subsection{5. High-Level Architecture}\label{5-high-level-architecture-3}
+
+\setcodelang{}
 
 \begin{verbatim}
   Seed URLs
@@ -1561,11 +1649,13 @@ robots_cache (domain → RobotsTxt object, TTL=24h) in Redis
   └─────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{6. Deep Dives}\label{6-deep-dives-3}
+\subsection{6. Deep Dives}\label{6-deep-dives-3}
 
-\paragraph{6.1 URL Frontier --- Priority + Politeness}\label{61-url-frontier--priority--politeness}
+\subsubsection{6.1 URL Frontier --- Priority + Politeness}\label{61-url-frontier--priority--politeness}
 
 \textbf{Two-tier queue architecture (Mercator design):}
+
+\setcodelang{}
 
 \begin{verbatim}
 Front-end queues (priority):      Back-end queues (politeness):
@@ -1602,7 +1692,7 @@ Selector: reads from front-end queues proportionally to priority.
   Politeness tracking: \textbf{Redis sorted set} per domain --- \texttt{ZADD\ domain:example.com\ \{next\_fetch\_ts\}\ \{url\}}. Poller does \texttt{ZRANGEBYSCORE\ domain:*\ -inf\ now\ LIMIT\ 10} every second.
 \end{itemize}
 
-\paragraph{6.2 URL Deduplication --- Bloom Filter vs Exact Set}\label{62-url-deduplication--bloom-filter-vs-exact-set}
+\subsubsection{6.2 URL Deduplication --- Bloom Filter vs Exact Set}\label{62-url-deduplication--bloom-filter-vs-exact-set}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2469}}
@@ -1645,6 +1735,8 @@ False negatives
 
 \textbf{URL normalization before hashing:}
 
+\setcodelang{}
+
 \begin{verbatim}
 1. Lowercase scheme and host
 2. Remove default port (:80, :443)
@@ -1655,7 +1747,7 @@ False negatives
 7. Canonicalize: prefer canonical link rel tag in HTML
 \end{verbatim}
 
-\paragraph{6.3 DNS Resolution}\label{63-dns-resolution}
+\subsubsection{6.3 DNS Resolution}\label{63-dns-resolution}
 
 \textbf{Problem:} 1,000 pages/sec from 1,000 different domains = 1,000 DNS lookups/sec. Public DNS resolvers (8.8.8.8) rate-limit at \textasciitilde few hundred QPS.
 
@@ -1674,7 +1766,9 @@ False negatives
   \textbf{DNS blacklist:} Skip private IPs (SSRF protection: 10.0.0.0/8, 192.168.0.0/16, 127.0.0.1).
 \end{enumerate}
 
-\paragraph{6.4 robots.txt Compliance}\label{64-robotstxt-compliance}
+\subsubsection{6.4 robots.txt Compliance}\label{64-robotstxt-compliance}
+
+\setcodelang{}
 
 \begin{verbatim}
 For domain example.com:
@@ -1703,7 +1797,7 @@ Politeness: max(1s_default, Crawl-delay_from_robots)
   Different user-agent rules: use "Googlebot" or your crawler\textquotesingle s name.
 \end{itemize}
 
-\paragraph{6.5 Trap Avoidance}\label{65-trap-avoidance}
+\subsubsection{6.5 Trap Avoidance}\label{65-trap-avoidance}
 
 \textbf{Spider traps} generate infinite URLs (e.g., \texttt{/calendar/next?date=...} \(\rightarrow\) infinite future dates).
 
@@ -1724,7 +1818,9 @@ Mitigation:
   \textbf{Content hash dedup:} if page content SimHash is near-duplicate of already-crawled page \(\rightarrow\) skip storing, but do extract links (might have new ones).
 \end{enumerate}
 
-\paragraph{6.6 Near-Duplicate Detection (SimHash)}\label{66-near-duplicate-detection-simhash}
+\subsubsection{6.6 Near-Duplicate Detection (SimHash)}\label{66-near-duplicate-detection-simhash}
+
+\setcodelang{}
 
 \begin{verbatim}
 1. Extract tokens (words) from page HTML.
@@ -1738,7 +1834,7 @@ Two pages with SimHash Hamming distance ≤ 3 → near-duplicate.
 Storage: 8 bytes per page × 10B pages = 80 GB → manageable in distributed store.
 \end{verbatim}
 
-\paragraph{6.7 Distributed Coordination}\label{67-distributed-coordination}
+\subsubsection{6.7 Distributed Coordination}\label{67-distributed-coordination}
 
 \textbf{Problem:} 500 crawler nodes must not fetch the same URL concurrently.
 
@@ -1766,7 +1862,7 @@ Storage: 8 bytes per page × 10B pages = 80 GB → manageable in distributed sto
   Dead node\textquotesingle s \texttt{in\_flight} URLs requeued automatically after 60 s timeout.
 \end{itemize}
 
-\paragraph{6.8 Freshness \& Recrawl Scheduling}\label{68-freshness--recrawl-scheduling}
+\subsubsection{6.8 Freshness \& Recrawl Scheduling}\label{68-freshness--recrawl-scheduling}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2803}}
@@ -1804,7 +1900,7 @@ Newly discovered URL & Once (ASAP) & Not yet crawled \\
   \texttt{next\_crawl\_delay\ =\ max(min\_delay,\ last\_crawl\_interval\ ×\ (1\ -\ change\_rate\ +\ 0.1))}
 \end{itemize}
 
-\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-3}
+\subsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-3}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3554}}
@@ -1829,7 +1925,7 @@ Crawler node failure & Frontier requeues in\_flight URLs after heartbeat timeout
 Hot domains (Reddit, Twitter) & Per-domain rate limit enforced strictly; queue backs up, not domain \\
 \end{longtable}
 
-\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-3}
+\subsection{8. Trade-offs Summary}\label{8-trade-offs-summary-3}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1926}}

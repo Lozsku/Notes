@@ -24,13 +24,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{One-Page All-Topics Cheat Sheet (Night-Before Cram)}\label{one-page-all-topics-cheat-sheet-night-before-cram}
-
 \begin{quote}
 Dense, high-signal recall. For depth, open the per-topic file. Read top-to-bottom in \textasciitilde20 min.
 \end{quote}
 
-\subsection{1. Concurrency \& Multithreading}\label{1-concurrency--multithreading}
+\section{1. Concurrency \& Multithreading}\label{1-concurrency--multithreading}
 
 \begin{itemize}
 \tightlist
@@ -56,7 +54,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   \textbf{Takeaway}: "Shared mutable state + no synchronization = bug." Prefer immutability / message-passing.
 \end{itemize}
 
-\subsection{2. Operating Systems}\label{2-operating-systems}
+\section{2. Operating Systems}\label{2-operating-systems}
 
 \begin{itemize}
 \tightlist
@@ -80,7 +78,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   \textbf{Takeaway}: kernel/user mode + system calls = the privilege boundary; virtual memory = the great illusion.
 \end{itemize}
 
-\subsection{3. Computer Networks}\label{3-computer-networks}
+\section{3. Computer Networks}\label{3-computer-networks}
 
 \begin{itemize}
 \tightlist
@@ -106,7 +104,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   \textbf{"Type google.com \(\rightarrow\) ?"}: DNS \(\rightarrow\) TCP handshake \(\rightarrow\) TLS \(\rightarrow\) HTTP GET \(\rightarrow\) server \(\rightarrow\) render. Know every hop.
 \end{itemize}
 
-\subsection{4. Cloud \& Infrastructure}\label{4-cloud--infrastructure}
+\section{4. Cloud \& Infrastructure}\label{4-cloud--infrastructure}
 
 \begin{itemize}
 \tightlist
@@ -130,7 +128,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   K8s = "desired state" reconciliation loop. You declare; controllers converge.
 \end{itemize}
 
-\subsection{5. System Design}\label{5-system-design}
+\section{5. System Design}\label{5-system-design}
 
 \begin{itemize}
 \tightlist
@@ -156,7 +154,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   Always state assumptions + estimates + trade-offs out loud. Silence loses points.
 \end{itemize}
 
-\subsection{6. Low-Level Design (LLD)}\label{6-low-level-design-lld}
+\section{6. Low-Level Design (LLD)}\label{6-low-level-design-lld}
 
 \begin{itemize}
 \tightlist
@@ -198,7 +196,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   LLD approach: clarify \(\rightarrow\) nouns=classes, verbs=methods \(\rightarrow\) relationships \(\rightarrow\) apply patterns \(\rightarrow\) code core \(\rightarrow\) discuss extensibility. Don\textquotesingle t over-pattern.
 \end{itemize}
 
-\subsection{7. Distributed Systems}\label{7-distributed-systems}
+\section{7. Distributed Systems}\label{7-distributed-systems}
 
 \begin{itemize}
 \tightlist
@@ -226,7 +224,7 @@ Dense, high-signal recall. For depth, open the per-topic file. Read top-to-botto
   Real systems: DynamoDB/Cassandra = AP/tunable; Spanner = CP (TrueTime); etcd/ZK = consensus.
 \end{itemize}
 
-\subsection{8. Databases}\label{8-databases}
+\section{8. Databases}\label{8-databases}
 
 \begin{itemize}
 \tightlist
@@ -277,7 +275,7 @@ Serializable & & & \\
   Index = faster reads, slower writes + storage. Don\textquotesingle t index everything.
 \end{itemize}
 
-\subsection{9. Performance Engineering}\label{9-performance-engineering}
+\section{9. Performance Engineering}\label{9-performance-engineering}
 
 \begin{itemize}
 \tightlist
@@ -303,7 +301,7 @@ Serializable & & & \\
   "Service got 10\(\times\) slower" \(\rightarrow\) check recent deploys, metrics (USE/RED), profile, narrow CPU vs I/O vs lock contention vs downstream.
 \end{itemize}
 
-\subsection{10. Security Fundamentals}\label{10-security-fundamentals}
+\section{10. Security Fundamentals}\label{10-security-fundamentals}
 
 \begin{itemize}
 \tightlist
@@ -329,7 +327,7 @@ Serializable & & & \\
   "Design secure login": TLS + hashed/salted passwords + rate limiting + MFA + secure session/JWT + least privilege.
 \end{itemize}
 
-\subsection{11. Behavioral / Leadership / Googleyness}\label{11-behavioral--leadership--googleyness}
+\section{11. Behavioral / Leadership / Googleyness}\label{11-behavioral--leadership--googleyness}
 
 \begin{itemize}
 \tightlist
@@ -351,7 +349,7 @@ Serializable & & & \\
   Top mistakes: rambling, no metrics, "we" instead of "I", no failure story, blaming others. Be concise + structured + quantified.
 \end{itemize}
 
-\subsection{Cross-Topic Memory Hooks}\label{cross-topic-memory-hooks}
+\section{Cross-Topic Memory Hooks}\label{cross-topic-memory-hooks}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4383}}
@@ -374,7 +372,7 @@ Performance \(\leftrightarrow\) everything & Profiling + tail latency + caching 
 Security \(\leftrightarrow\) Networks/System Design & TLS, auth, secrets are non-functional requirements in every design \\
 \end{longtable}
 
-\subsection{The 12 Highest-Frequency Interview Concepts (memorize cold)}\label{the-12-highest-frequency-interview-concepts-memorize-cold}
+\section{The 12 Highest-Frequency Interview Concepts (memorize cold)}\label{the-12-highest-frequency-interview-concepts-memorize-cold}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

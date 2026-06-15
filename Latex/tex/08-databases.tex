@@ -63,13 +63,11 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{08 --- Databases}\label{08--databases}
-
 \begin{quote}
 \textbf{Audience:} FAANG-level deep mastery. First-principles explanations, crisp mnemonics, heavy interview focus.
 \end{quote}
 
-\subsection{Overview --- What It Is}\label{overview--what-it-is}
+\section{Overview --- What It Is}\label{overview--what-it-is}
 
 A \textbf{database} is a structured, persistent store of data with controlled access, concurrency management, and durability guarantees.
 
@@ -98,7 +96,7 @@ Examples
 \textbf{NewSQL} & SQL semantics + distributed scalability & Google Spanner, CockroachDB, TiDB \\
 \end{longtable}
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 \textbf{Core problem:} Applications need data to outlive the process that creates it. Without a database:
 
@@ -127,7 +125,7 @@ Databases solve four fundamental problems:
   \textbf{Integrity} --- Constraints (FK, UNIQUE, NOT NULL) prevent bad data
 \end{enumerate}
 
-\subsection{Why FAANG Cares (Company-Specific)}\label{why-faang-cares-company-specific}
+\section{Why FAANG Cares (Company-Specific)}\label{why-faang-cares-company-specific}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0623}}
@@ -155,13 +153,13 @@ Why They Care Deeply
 
 \textbf{Interview signal:} Knowing \emph{which company uses which DB and why} shows systems thinking, not just textbook knowledge.
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Relational Model}\label{relational-model}
+\subsection{Relational Model}\label{relational-model}
 
 Data organized in \textbf{relations (tables)}. A table is a set of tuples (rows). Each column has a declared type. \textbf{Primary key} uniquely identifies a row. \textbf{Foreign key} references another table\textquotesingle s PK, enforcing referential integrity.
 
-\subsubsection{Schema}\label{schema}
+\subsection{Schema}\label{schema}
 
 \begin{itemize}
 \tightlist
@@ -171,7 +169,7 @@ Data organized in \textbf{relations (tables)}. A table is a set of tuples (rows)
   \textbf{Schema-on-read (NoSQL):} No schema enforcement at write; application interprets at read. More flexible, more dangerous.
 \end{itemize}
 
-\subsubsection{CAP Theorem Applied to Databases}\label{cap-theorem-applied-to-databases}
+\subsection{CAP Theorem Applied to Databases}\label{cap-theorem-applied-to-databases}
 
 Under a \textbf{network partition}, choose two of three:
 
@@ -185,6 +183,8 @@ Under a \textbf{network partition}, choose two of three:
   \textbf{Partition Tolerance} --- System works despite dropped messages
 \end{itemize}
 
+\setcodelang{}
+
 \begin{verbatim}
 CAP Choices in Practice:
   CP (Consistent + Partition-tolerant): HBase, Zookeeper, Spanner
@@ -194,7 +194,7 @@ CAP Choices in Practice:
 
 \textbf{PACELC} extends CAP: even when no partition, there\textquotesingle s a latency vs consistency trade-off.
 
-\subsubsection{Normalization vs Denormalization}\label{normalization-vs-denormalization}
+\subsection{Normalization vs Denormalization}\label{normalization-vs-denormalization}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1299}}
@@ -236,9 +236,11 @@ Denormalization
 
 \textbf{Interview takeaway:} Most OLTP systems target 3NF. Most data warehouses intentionally denormalize (star/snowflake schema).
 
-\subsection{SQL Deep Dive}\label{sql-deep-dive}
+\section{SQL Deep Dive}\label{sql-deep-dive}
 
-\subsubsection{Joins --- Complete Reference}\label{joins--complete-reference}
+\subsection{Joins --- Complete Reference}\label{joins--complete-reference}
+
+\setcodelang{}
 
 \begin{verbatim}
 Tables:
@@ -253,7 +255,9 @@ Tables:
                40 | HR         ← no employee
 \end{verbatim}
 
-\paragraph{INNER JOIN --- Only matching rows}\label{inner-join--only-matching-rows}
+\subsubsection{INNER JOIN --- Only matching rows}\label{inner-join--only-matching-rows}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -262,6 +266,8 @@ Tables:
 \KeywordTok{INNER} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}\NormalTok{;}
 \end{Highlighting}
 \end{Shaded}
+
+\setcodelang{}
 
 \begin{verbatim}
 Result:
@@ -273,6 +279,8 @@ Result:
   [HR excluded — no employee in dept 40]
 \end{verbatim}
 
+\setcodelang{}
+
 \begin{verbatim}
 Venn diagram:
   employees ●●●●●●●●  departments
@@ -280,7 +288,9 @@ Venn diagram:
           ↑ only overlap
 \end{verbatim}
 
-\paragraph{LEFT JOIN --- All left rows + matching right (NULLs if no match)}\label{left-join--all-left-rows--matching-right-nulls-if-no-match}
+\subsubsection{LEFT JOIN --- All left rows + matching right (NULLs if no match)}\label{left-join--all-left-rows--matching-right-nulls-if-no-match}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -290,6 +300,8 @@ Venn diagram:
 \end{Highlighting}
 \end{Shaded}
 
+\setcodelang{}
+
 \begin{verbatim}
 Result:
   name    | dept_name
@@ -298,6 +310,8 @@ Result:
   Charlie | NULL          ← Charlie kept, dept is NULL
 \end{verbatim}
 
+\setcodelang{}
+
 \begin{verbatim}
 Venn diagram:
   [████████████████]  departments
@@ -305,7 +319,9 @@ Venn diagram:
   ↑ all of left side
 \end{verbatim}
 
-\paragraph{RIGHT JOIN --- All right rows + matching left}\label{right-join--all-right-rows--matching-left}
+\subsubsection{RIGHT JOIN --- All right rows + matching left}\label{right-join--all-right-rows--matching-left}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -316,6 +332,8 @@ Venn diagram:
 \end{Highlighting}
 \end{Shaded}
 
+\setcodelang{}
+
 \begin{verbatim}
 Result:
   name  | dept_name
@@ -324,7 +342,9 @@ Result:
   NULL  | HR           ← HR kept, employee is NULL
 \end{verbatim}
 
-\paragraph{FULL OUTER JOIN --- Union of LEFT + RIGHT}\label{full-outer-join--union-of-left--right}
+\subsubsection{FULL OUTER JOIN --- Union of LEFT + RIGHT}\label{full-outer-join--union-of-left--right}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -333,6 +353,8 @@ Result:
 \KeywordTok{FULL} \KeywordTok{OUTER} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}\NormalTok{;}
 \end{Highlighting}
 \end{Shaded}
+
+\setcodelang{}
 
 \begin{verbatim}
 Result:
@@ -343,7 +365,9 @@ Result:
   NULL    | HR
 \end{verbatim}
 
-\paragraph{\texorpdfstring{CROSS JOIN --- Cartesian product (M \(\times\) N rows)}{CROSS JOIN --- Cartesian product (M \textbackslash times N rows)}}\label{cross-join--cartesian-product-m-times-n-rows}
+\subsubsection{\texorpdfstring{CROSS JOIN --- Cartesian product (M \(\times\) N rows)}{CROSS JOIN --- Cartesian product (M \textbackslash times N rows)}}\label{cross-join--cartesian-product-m-times-n-rows}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -353,7 +377,9 @@ Result:
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{SELF JOIN --- Table joined with itself}\label{self-join--table-joined-with-itself}
+\subsubsection{SELF JOIN --- Table joined with itself}\label{self-join--table-joined-with-itself}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -364,7 +390,9 @@ Result:
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Anti-Join pattern (find rows with no match)}\label{anti-join-pattern-find-rows-with-no-match}
+\subsubsection{Anti-Join pattern (find rows with no match)}\label{anti-join-pattern-find-rows-with-no-match}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -377,11 +405,13 @@ Result:
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{CTEs (Common Table Expressions)}\label{ctes-common-table-expressions}
+\subsection{CTEs (Common Table Expressions)}\label{ctes-common-table-expressions}
 
 \textbf{Purpose:} Name a subquery so it can be referenced (and reused) within a larger query. Makes complex queries readable. Can be \textbf{recursive} for tree/graph traversal.
 
-\paragraph{Non-Recursive CTE Example}\label{non-recursive-cte-example}
+\subsubsection{Non-Recursive CTE Example}\label{non-recursive-cte-example}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -404,13 +434,17 @@ Result:
 \end{Highlighting}
 \end{Shaded}
 
+\setcodelang{}
+
 \begin{verbatim}
 Output (hypothetical):
   dept_name    | avg_sal | company_avg_sal
   Engineering  | 120000  | 95000
 \end{verbatim}
 
-\paragraph{Recursive CTE Example --- Org chart traversal}\label{recursive-cte-example--org-chart-traversal}
+\subsubsection{Recursive CTE Example --- Org chart traversal}\label{recursive-cte-example--org-chart-traversal}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -433,6 +467,8 @@ Output (hypothetical):
 \end{Highlighting}
 \end{Shaded}
 
+\setcodelang{}
+
 \begin{verbatim}
 Output:
   name    | depth
@@ -444,9 +480,11 @@ Output:
 
 \textbf{Interview takeaway:} Recursive CTEs are the standard SQL answer for hierarchical/tree data. Know the base case + recursive case pattern.
 
-\subsubsection{Window Functions}\label{window-functions}
+\subsection{Window Functions}\label{window-functions}
 
 \textbf{Key insight:} Window functions compute across a "window" of rows related to the current row, \textbf{without collapsing rows} like GROUP BY does.
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -468,6 +506,8 @@ Output:
 
 \textbf{Sample Data:}
 
+\setcodelang{}
+
 \begin{verbatim}
   name    | dept_id | salary
   Alice   | 10      | 120000
@@ -477,6 +517,8 @@ Output:
 \end{verbatim}
 
 \textbf{Output:}
+
+\setcodelang{}
 
 \begin{verbatim}
   name    | dept | salary | dept_rank | dense_rank | row_num | prev_salary | next_salary | dept_total | dept_avg  | running_total
@@ -499,6 +541,8 @@ Output:
 \end{itemize}
 
 \textbf{Common window function interview patterns:}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -526,7 +570,9 @@ Output:
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Query Execution Plan / EXPLAIN}\label{query-execution-plan--explain}
+\subsection{Query Execution Plan / EXPLAIN}\label{query-execution-plan--explain}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -578,11 +624,13 @@ Cost
   \textbf{cost=X..Y} \(\rightarrow\) startup cost .. total cost (planner estimates)
 \end{enumerate}
 
-\subsection{Indexing \& Internals}\label{indexing--internals}
+\section{Indexing \& Internals}\label{indexing--internals}
 
-\subsubsection{B-Tree vs B+Tree vs LSM-Tree}\label{b-tree-vs-btree-vs-lsm-tree}
+\subsection{B-Tree vs B+Tree vs LSM-Tree}\label{b-tree-vs-btree-vs-lsm-tree}
 
-\paragraph{B+Tree (Used in PostgreSQL, MySQL InnoDB, SQL Server)}\label{btree-used-in-postgresql-mysql-innodb-sql-server}
+\subsubsection{B+Tree (Used in PostgreSQL, MySQL InnoDB, SQL Server)}\label{btree-used-in-postgresql-mysql-innodb-sql-server}
+
+\setcodelang{}
 
 \begin{verbatim}
 Structure: All data in LEAF nodes only. Internal nodes = routing keys only.
@@ -624,7 +672,9 @@ Leaf nodes linked as a doubly-linked list → efficient range scans.
   B+Trees are strictly better for databases
 \end{itemize}
 
-\paragraph{LSM-Tree (Log-Structured Merge-Tree) --- Used in Cassandra, RocksDB, LevelDB, HBase}\label{lsm-tree-log-structured-merge-tree--used-in-cassandra-rocksdb-leveldb-hbase}
+\subsubsection{LSM-Tree (Log-Structured Merge-Tree) --- Used in Cassandra, RocksDB, LevelDB, HBase}\label{lsm-tree-log-structured-merge-tree--used-in-cassandra-rocksdb-leveldb-hbase}
+
+\setcodelang{}
 
 \begin{verbatim}
 Write path:
@@ -640,6 +690,8 @@ Write path:
 \end{verbatim}
 
 \textbf{Compaction:}
+
+\setcodelang{}
 
 \begin{verbatim}
   [file A: a=1, c=3, e=5]   [file B: b=2, c=4, d=6]
@@ -661,7 +713,7 @@ Write path:
   \textbf{Write amplification:} Data written multiple times during compaction
 \end{itemize}
 
-\paragraph{Comparison Table}\label{comparison-table}
+\subsubsection{Comparison Table}\label{comparison-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2436}}
@@ -689,11 +741,13 @@ LSM-Tree
 \textbf{Used by} & PostgreSQL, MySQL, SQLite & Cassandra, RocksDB, LevelDB, HBase \\
 \end{longtable}
 
-\subsubsection{Clustered vs Non-Clustered Index}\label{clustered-vs-non-clustered-index}
+\subsection{Clustered vs Non-Clustered Index}\label{clustered-vs-non-clustered-index}
 
-\paragraph{Clustered Index}\label{clustered-index}
+\subsubsection{Clustered Index}\label{clustered-index}
 
 \textbf{The actual table rows are stored in index order.} Only one per table.
+
+\setcodelang{}
 
 \begin{verbatim}
 Clustered Index (InnoDB Primary Key):
@@ -719,9 +773,11 @@ Clustered Index (InnoDB Primary Key):
   \textbf{UUID as PK is bad for InnoDB} --- random inserts cause constant page splits and fragmentation
 \end{itemize}
 
-\paragraph{Non-Clustered (Secondary) Index}\label{non-clustered-secondary-index}
+\subsubsection{Non-Clustered (Secondary) Index}\label{non-clustered-secondary-index}
 
 \textbf{Index is separate structure; leaf nodes contain key + pointer to actual row.}
+
+\setcodelang{}
 
 \begin{verbatim}
 Secondary Index on (salary):
@@ -737,6 +793,8 @@ Secondary Index on (salary):
 
 \textbf{Covering Index:} Index includes all columns the query needs --- no heap fetch required.
 
+\setcodelang{SQL}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{{-}{-} Query:}
@@ -750,9 +808,11 @@ Secondary Index on (salary):
 
 \textbf{Interview takeaway:} Secondary index lookup = 2 B+Tree traversals (secondary \(\rightarrow\) clustered). Covering index eliminates the second traversal. This is why you see "Index Only Scan" in EXPLAIN.
 
-\subsubsection{How Index Speeds Lookups}\label{how-index-speeds-lookups}
+\subsection{How Index Speeds Lookups}\label{how-index-speeds-lookups}
 
 Without index on \texttt{salary}:
+
+\setcodelang{}
 
 \begin{verbatim}
 SELECT * FROM employees WHERE salary = 90000;
@@ -761,6 +821,8 @@ SELECT * FROM employees WHERE salary = 90000;
 \end{verbatim}
 
 With B+Tree index on \texttt{salary}:
+
+\setcodelang{}
 
 \begin{verbatim}
   1. Start at root of B+Tree
@@ -781,9 +843,9 @@ With B+Tree index on \texttt{salary}:
   \texttt{gender} --- 2 distinct values \(\rightarrow\) low selectivity \(\rightarrow\) index often not used (full scan faster)
 \end{itemize}
 
-\subsection{ACID, Isolation Levels \& Locking}\label{acid-isolation-levels--locking}
+\section{ACID, Isolation Levels \& Locking}\label{acid-isolation-levels--locking}
 
-\subsubsection{ACID Properties}\label{acid-properties}
+\subsection{ACID Properties}\label{acid-properties}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1222}}
@@ -809,6 +871,8 @@ Implementation
 
 \textbf{WAL (Write-Ahead Log):}
 
+\setcodelang{}
+
 \begin{verbatim}
 Before modifying any page on disk:
   1. Write the change to the WAL (sequential, fast)
@@ -817,7 +881,7 @@ Before modifying any page on disk:
 On crash: replay WAL to reconstruct committed state
 \end{verbatim}
 
-\subsubsection{\texorpdfstring{THE Isolation Level \(\times\) Anomaly Matrix}{THE Isolation Level \textbackslash times Anomaly Matrix}}\label{the-isolation-level-times-anomaly-matrix}
+\subsection{\texorpdfstring{THE Isolation Level \(\times\) Anomaly Matrix}{THE Isolation Level \textbackslash times Anomaly Matrix}}\label{the-isolation-level-times-anomaly-matrix}
 
 This is \textbf{the most-asked DB theory question in FAANG interviews.}
 
@@ -851,9 +915,11 @@ Lost Update
 
 *MySQL InnoDB\textquotesingle s Repeatable Read also prevents phantom reads via gap locks (stronger than standard SQL spec)
 
-\paragraph{Anomaly Definitions}\label{anomaly-definitions}
+\subsubsection{Anomaly Definitions}\label{anomaly-definitions}
 
 \textbf{Dirty Read:} Reading uncommitted data from another transaction.
+
+\setcodelang{}
 
 \begin{verbatim}
 T1: UPDATE balance = 500 (not committed yet)
@@ -864,6 +930,8 @@ T2 used data that never existed!
 
 \textbf{Non-Repeatable Read:} Same query returns different results within same transaction.
 
+\setcodelang{}
+
 \begin{verbatim}
 T1: SELECT salary → 90000
 T2: UPDATE salary = 100000; COMMIT
@@ -871,6 +939,8 @@ T1: SELECT salary → 100000  ← DIFFERENT! Non-repeatable read
 \end{verbatim}
 
 \textbf{Phantom Read:} New rows appear in re-executed query.
+
+\setcodelang{}
 
 \begin{verbatim}
 T1: SELECT * WHERE salary > 80000 → 5 rows
@@ -880,28 +950,36 @@ T1: SELECT * WHERE salary > 80000 → 6 rows  ← PHANTOM!
 
 \textbf{Lost Update:} Two transactions both read a value, both update it; one update is lost.
 
-\begin{verbatim}
-T1: read balance=1000, compute 1000+100=1100
-T2: read balance=1000, compute 1000+200=1200, write 1200; COMMIT
-T1: write 1100; COMMIT
-Balance = 1100 — T2's +200 is LOST!
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{MVCC (Multi-Version Concurrency Control)}\label{mvcc-multi-version-concurrency-control}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{T1: read balance}\OperatorTok{=}\DecValTok{1000}\NormalTok{, compute }\DecValTok{1000}\OperatorTok{+}\DecValTok{100}\OperatorTok{=}\DecValTok{1100}
+\NormalTok{T2: read balance}\OperatorTok{=}\DecValTok{1000}\NormalTok{, compute }\DecValTok{1000}\OperatorTok{+}\DecValTok{200}\OperatorTok{=}\DecValTok{1200}\NormalTok{, write }\DecValTok{1200}\OperatorTok{;}\NormalTok{ COMMIT}
+\NormalTok{T1: write }\DecValTok{1100}\OperatorTok{;}\NormalTok{ COMMIT}
+\NormalTok{Balance }\OperatorTok{=} \DecValTok{1100}\NormalTok{ — T2}\StringTok{\textquotesingle{}s +200 is LOST!}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{MVCC (Multi-Version Concurrency Control)}\label{mvcc-multi-version-concurrency-control}
 
 \textbf{Key insight:} Instead of locking rows for reads, keep \textbf{multiple versions} of each row. Readers see a consistent snapshot; writers create new versions without blocking readers.
 
-\begin{verbatim}
-PostgreSQL MVCC (simplified):
-  Row has: xmin (created by tx), xmax (deleted/updated by tx)
+\setcodelang{Python}
 
-  INSERT (tx 100): row {xmin=100, xmax=NULL, data="Alice, 90000"}
-  UPDATE (tx 200): old row {xmin=100, xmax=200, data="Alice, 90000"}
-                   new row {xmin=200, xmax=NULL, data="Alice, 100000"}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PostgreSQL MVCC (simplified):}
+\NormalTok{  Row has: xmin (created by tx), xmax (deleted}\OperatorTok{/}\NormalTok{updated by tx)}
 
-  Tx 150 (started before tx 200): sees old row (xmin=100 < 150, xmax=200 > 150)
-  Tx 250 (started after tx 200 commits): sees new row (xmin=200 < 250)
-\end{verbatim}
+\NormalTok{  INSERT (tx }\DecValTok{100}\NormalTok{): row \{xmin}\OperatorTok{=}\DecValTok{100}\NormalTok{, xmax}\OperatorTok{=}\NormalTok{NULL, data}\OperatorTok{=}\StringTok{"Alice, 90000"}\NormalTok{\}}
+\NormalTok{  UPDATE (tx }\DecValTok{200}\NormalTok{): old row \{xmin}\OperatorTok{=}\DecValTok{100}\NormalTok{, xmax}\OperatorTok{=}\DecValTok{200}\NormalTok{, data}\OperatorTok{=}\StringTok{"Alice, 90000"}\NormalTok{\}}
+\NormalTok{                   new row \{xmin}\OperatorTok{=}\DecValTok{200}\NormalTok{, xmax}\OperatorTok{=}\NormalTok{NULL, data}\OperatorTok{=}\StringTok{"Alice, 100000"}\NormalTok{\}}
+
+\NormalTok{  Tx }\DecValTok{150}\NormalTok{ (started before tx }\DecValTok{200}\NormalTok{): sees old row (xmin}\OperatorTok{=}\DecValTok{100} \OperatorTok{\textless{}} \DecValTok{150}\NormalTok{, xmax}\OperatorTok{=}\DecValTok{200} \OperatorTok{\textgreater{}} \DecValTok{150}\NormalTok{)}
+\NormalTok{  Tx }\DecValTok{250}\NormalTok{ (started after tx }\DecValTok{200}\NormalTok{ commits): sees new row (xmin}\OperatorTok{=}\DecValTok{200} \OperatorTok{\textless{}} \DecValTok{250}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Benefits:}
 
@@ -917,7 +995,7 @@ PostgreSQL MVCC (simplified):
 
 \textbf{Downside:} Dead versions accumulate \(\rightarrow\) PostgreSQL\textquotesingle s \textbf{VACUUM} process cleans them up.
 
-\subsubsection{Optimistic vs Pessimistic Locking}\label{optimistic-vs-pessimistic-locking}
+\subsection{Optimistic vs Pessimistic Locking}\label{optimistic-vs-pessimistic-locking}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1601}}
@@ -943,6 +1021,8 @@ Optimistic Locking
 \textbf{Implementation} & \texttt{SELECT\ ...\ FOR\ UPDATE}, \texttt{LOCK\ TABLE} & Version column, compare-and-swap \\
 \end{longtable}
 
+\setcodelang{SQL}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{{-}{-} Pessimistic locking}
@@ -962,9 +1042,11 @@ Optimistic Locking
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Deadlocks in Databases}\label{deadlocks-in-databases}
+\subsection{Deadlocks in Databases}\label{deadlocks-in-databases}
 
 \textbf{Deadlock:} Transaction A waits for lock held by B; B waits for lock held by A. Circular wait.
+
+\setcodelang{}
 
 \begin{verbatim}
 T1: LOCK row 1 → waiting for row 2 lock (held by T2)
@@ -991,7 +1073,7 @@ T2: LOCK row 2 → waiting for row 1 lock (held by T1)
 
 \textbf{Interview takeaway:} Deadlock = circular dependency in the wait-for graph. DB detects and kills one victim. Application must retry on deadlock error.
 
-\subsubsection{Lock Types}\label{lock-types}
+\subsection{Lock Types}\label{lock-types}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2376}}
@@ -1020,9 +1102,11 @@ Usage
 \textbf{Next-key lock} & Row + gap & = row lock + gap lock & InnoDB default in RR \\
 \end{longtable}
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{B+Tree Structure (Full ASCII)}\label{btree-structure-full-ascii}
+\subsection{B+Tree Structure (Full ASCII)}\label{btree-structure-full-ascii}
+
+\setcodelang{}
 
 \begin{verbatim}
                            ┌──────────────┐
@@ -1042,7 +1126,9 @@ Usage
                             Leaf linked list (→) enables range scans
 \end{verbatim}
 
-\subsubsection{LSM-Tree Compaction Flow}\label{lsm-tree-compaction-flow}
+\subsection{LSM-Tree Compaction Flow}\label{lsm-tree-compaction-flow}
+
+\setcodelang{}
 
 \begin{verbatim}
   Writes arrive:
@@ -1070,7 +1156,9 @@ Usage
   Bloom filters on each SSTable to skip misses quickly
 \end{verbatim}
 
-\subsubsection{Replication Topology}\label{replication-topology}
+\subsection{Replication Topology}\label{replication-topology}
+
+\setcodelang{}
 
 \begin{verbatim}
 LEADER-FOLLOWER (Master-Slave):
@@ -1103,7 +1191,9 @@ LEADERLESS (Dynamo-style):
   e.g., N=3, W=2, R=2: sloppy quorum
 \end{verbatim}
 
-\subsubsection{Sharding / Partitioning}\label{sharding--partitioning}
+\subsection{Sharding / Partitioning}\label{sharding--partitioning}
+
+\setcodelang{}
 
 \begin{verbatim}
 RANGE PARTITIONING:
@@ -1137,9 +1227,9 @@ CONSISTENT HASHING:
   └───────────────────────────────────────┘
 \end{verbatim}
 
-\subsection{NoSQL Deep Dive}\label{nosql-deep-dive}
+\section{NoSQL Deep Dive}\label{nosql-deep-dive}
 
-\subsubsection{When to Pick Which Database}\label{when-to-pick-which-database}
+\subsection{When to Pick Which Database}\label{when-to-pick-which-database}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3502}}
@@ -1166,7 +1256,7 @@ Analytics/reporting & \textbf{Redshift/BigQuery (OLAP)} & Columnar storage, mass
 Global low-latency KV & \textbf{DynamoDB} & Managed, auto-scale, single-digit ms \\
 \end{longtable}
 
-\subsubsection{NoSQL Families Comparison}\label{nosql-families-comparison}
+\subsection{NoSQL Families Comparison}\label{nosql-families-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0818}}
@@ -1199,7 +1289,9 @@ Examples
 \textbf{Graph} & nodes + edges & traversal, path finding & vertical (harder to shard) & ACID usually & Neo4j, Neptune, JanusGraph \\
 \end{longtable}
 
-\subsubsection{Cassandra Architecture}\label{cassandra-architecture}
+\subsection{Cassandra Architecture}\label{cassandra-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 Data model: Table → Partition Key → Clustering Keys → Columns
@@ -1227,7 +1319,7 @@ CREATE TABLE events (
 
 \textbf{Tunable consistency:} Application chooses per-operation. \textbf{Interview takeaway:} This is Cassandra\textquotesingle s biggest feature --- tune for your SLA.
 
-\subsubsection{DynamoDB}\label{dynamodb}
+\subsection{DynamoDB}\label{dynamodb}
 
 \begin{itemize}
 \tightlist
@@ -1243,14 +1335,18 @@ CREATE TABLE events (
   \textbf{Single-table design:} Multiple entity types in one table (over-loaded keys pattern)
 \end{itemize}
 
-\begin{verbatim}
-PK               | SK               | data
-USER#alice       | PROFILE          | {name, email}
-USER#alice       | ORDER#2024-01-01 | {items, total}
-PRODUCT#widget   | META             | {price, desc}
-\end{verbatim}
+\setcodelang{Python}
 
-\subsubsection{MongoDB}\label{mongodb}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PK               }\OperatorTok{|}\NormalTok{ SK               }\OperatorTok{|}\NormalTok{ data}
+\NormalTok{USER}\CommentTok{\#alice       | PROFILE          | \{name, email\}}
+\NormalTok{USER}\CommentTok{\#alice       | ORDER\#2024{-}01{-}01 | \{items, total\}}
+\NormalTok{PRODUCT}\CommentTok{\#widget   | META             | \{price, desc\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{MongoDB}\label{mongodb}
 
 \begin{itemize}
 \tightlist
@@ -1266,7 +1362,7 @@ PRODUCT#widget   | META             | {price, desc}
   \textbf{No joins} (use \texttt{\$lookup} but it\textquotesingle s expensive); denormalize or use references
 \end{itemize}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1284,7 +1380,7 @@ PRODUCT#widget   | META             | {price, desc}
   \textbf{Facebook social graph:} TAO (custom graph KV store on top of MySQL). Read-heavy, eventually consistent, huge scale. Each edge/node cached in Memcached layer.
 \end{enumerate}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One great library --- every concept is a shelf, a catalogue card, or a librarian\textquotesingle s routine.}
 
@@ -1324,9 +1420,9 @@ Analogy
 \textbf{NoSQL} & A flexible scrapbook section where patrons paste in newspaper clippings, maps, and sticky notes --- no rigid card format required, but you cannot run the same catalogue queries you would on a bound volume \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{ACID}\label{acid}
+\subsection{ACID}\label{acid}
 
 \textbf{"A Consistent Isolation Delivers"}
 
@@ -1342,7 +1438,7 @@ Analogy
   \textbf{D}urability --- Committed = permanent
 \end{itemize}
 
-\subsubsection{Isolation Levels (weakest to strongest)}\label{isolation-levels-weakest-to-strongest}
+\subsection{Isolation Levels (weakest to strongest)}\label{isolation-levels-weakest-to-strongest}
 
 \textbf{"Read Uncommitted Criminals Repeatedly Steal"} \(\rightarrow\) RU, RC, RR, S
 
@@ -1371,7 +1467,7 @@ Analogy
   S adds: no \textbf{P}hantoms (mnemonic: \textbf{S}erial stops \textbf{P}hantoms)
 \end{itemize}
 
-\subsubsection{Joins Memory Aid}\label{joins-memory-aid}
+\subsection{Joins Memory Aid}\label{joins-memory-aid}
 
 \textbf{"INNER only matches, LEFT keeps left, RIGHT keeps right, FULL keeps all"}
 
@@ -1381,7 +1477,7 @@ Analogy
   Think of Venn diagrams: INNER = intersection, LEFT = left circle, RIGHT = right circle, FULL = union
 \end{itemize}
 
-\subsubsection{B+Tree vs LSM Choice}\label{btree-vs-lsm-choice}
+\subsection{B+Tree vs LSM Choice}\label{btree-vs-lsm-choice}
 
 \textbf{"B+Tree Reads, LSM Writes"}
 
@@ -1393,7 +1489,7 @@ Analogy
   LSM: \textbf{L}oves \textbf{S}equential \textbf{M}assive writes
 \end{itemize}
 
-\subsubsection{Window Function Rank Types}\label{window-function-rank-types}
+\subsection{Window Function Rank Types}\label{window-function-rank-types}
 
 \textbf{"RANK has Gaps, DENSE doesn\textquotesingle t, ROW always unique"}
 
@@ -1407,17 +1503,19 @@ Analogy
   1, 2, 3, \textbf{4} \(\rightarrow\) ROW\_NUMBER (always distinct)
 \end{itemize}
 
-\subsubsection{NoSQL Family by Access Pattern}\label{nosql-family-by-access-pattern}
+\subsection{NoSQL Family by Access Pattern}\label{nosql-family-by-access-pattern}
 
 \textbf{"KV=Speed, Doc=Flexible, Column=Scale, Graph=Traverse"}
 
-\subsubsection{CAP Theorem}\label{cap-theorem}
+\subsection{CAP Theorem}\label{cap-theorem}
 
 \textbf{"Consistent systems Pause during partitions; Available systems Accept stale data"}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{SQL Query Questions (Frequently Asked)}\label{sql-query-questions-frequently-asked}
+\subsection{SQL Query Questions (Frequently Asked)}\label{sql-query-questions-frequently-asked}
+
+\setcodelang{SQL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1472,7 +1570,7 @@ Analogy
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{System-Level DB Questions}\label{system-level-db-questions}
+\subsection{System-Level DB Questions}\label{system-level-db-questions}
 
 \textbf{Q: How does PostgreSQL handle a SELECT query internally?}
 
@@ -1567,7 +1665,7 @@ Don\textquotesingle t add index when:
   \textbf{Causal consistency:} Operations with causal dependencies are ordered
 \end{itemize}
 
-\subsubsection{Follow-Up Questions Interviewers Love}\label{follow-up-questions-interviewers-love}
+\subsection{Follow-Up Questions Interviewers Love}\label{follow-up-questions-interviewers-love}
 
 \begin{itemize}
 \tightlist
@@ -1581,9 +1679,9 @@ Don\textquotesingle t add index when:
   "How does Cassandra handle a write if one replica is down?" \(\rightarrow\) Hinted handoff: write stored at coordinator with hint, replayed when node recovers.
 \end{itemize}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{Index Trade-offs}\label{index-trade-offs}
+\subsection{Index Trade-offs}\label{index-trade-offs}
 
 \textbf{Write amplification with indexes:}
 
@@ -1611,6 +1709,8 @@ Don\textquotesingle t add index when:
 
 \textbf{Partial indexes:}
 
+\setcodelang{SQL}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{{-}{-} Only index active users — much smaller, faster}
@@ -1620,6 +1720,8 @@ Don\textquotesingle t add index when:
 
 \textbf{Expression indexes:}
 
+\setcodelang{SQL}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{{-}{-} Enable case{-}insensitive search efficiently}
@@ -1628,7 +1730,7 @@ Don\textquotesingle t add index when:
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Write vs Read Optimization}\label{write-vs-read-optimization}
+\subsection{Write vs Read Optimization}\label{write-vs-read-optimization}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1971}}
@@ -1648,9 +1750,11 @@ Strategies
 \textbf{Both} & CQRS (Command Query Responsibility Segregation) --- separate write/read models \\
 \end{longtable}
 
-\subsubsection{Hot Partitions}\label{hot-partitions}
+\subsection{Hot Partitions}\label{hot-partitions}
 
 \textbf{Problem:} If partition key is not chosen carefully, one partition gets all traffic.
+
+\setcodelang{}
 
 \begin{verbatim}
 Bad: partition by creation_date (all today's traffic on one node)
@@ -1673,7 +1777,7 @@ Good: partition by user_id hash (even distribution)
   Adaptive/compound partition keys
 \end{enumerate}
 
-\subsubsection{Replication Lag}\label{replication-lag}
+\subsection{Replication Lag}\label{replication-lag}
 
 \textbf{Problem:} Leader accepts write; follower replication is async; brief window of stale data on follower.
 
@@ -1691,7 +1795,7 @@ Good: partition by user_id hash (even distribution)
   Semi-synchronous replication: at least 1 replica must ack before commit
 \end{itemize}
 
-\subsubsection{Query Optimization Workflow}\label{query-optimization-workflow}
+\subsection{Query Optimization Workflow}\label{query-optimization-workflow}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1712,7 +1816,7 @@ Good: partition by user_id hash (even distribution)
   \textbf{Hardware} --- more RAM for buffer cache, faster disk, read replicas
 \end{enumerate}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1738,7 +1842,7 @@ Good: partition by user_id hash (even distribution)
   \textbf{Forgetting VACUUM in PostgreSQL} --- MVCC creates dead tuples; without vacuum, table bloat kills performance.
 \end{enumerate}
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2400}}
@@ -1763,7 +1867,7 @@ Connection
 \textbf{Storage} & Sequential vs random I/O, SSD vs HDD impact on LSM vs B+Tree, WAL, page layout \\
 \end{longtable}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1789,9 +1893,9 @@ Connection
   \textbf{Always mention trade-offs.} "We can improve read latency by adding an index, but that increases write latency and storage. Given this is read-heavy workload at 95:5 ratio, the trade-off is worth it."
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \textbf{SQL:} Relational model + ACID + schema-on-write. Joins combine tables. CTEs name subqueries. Window functions compute over rows without collapsing.
 
@@ -1805,7 +1909,7 @@ Connection
 
 \textbf{NoSQL:} KV=speed, Document=flexibility, Column-family=write-scale, Graph=traversal. Choose based on access pattern.
 
-\subsubsection{Key Numbers to Know}\label{key-numbers-to-know}
+\subsection{Key Numbers to Know}\label{key-numbers-to-know}
 
 \begin{itemize}
 \tightlist
@@ -1823,7 +1927,7 @@ Connection
   Index seek cost: O(log n); full scan: O(n)
 \end{itemize}
 
-\subsubsection{Most Important Concepts for Interviews}\label{most-important-concepts-for-interviews}
+\subsection{Most Important Concepts for Interviews}\label{most-important-concepts-for-interviews}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
@@ -1853,7 +1957,7 @@ Why Important
 10 & When to use SQL vs which NoSQL & Architecture decision questions \\
 \end{longtable}
 
-\subsubsection{Cheat-Sheet Summary Table}\label{cheat-sheet-summary-table}
+\subsection{Cheat-Sheet Summary Table}\label{cheat-sheet-summary-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4236}}

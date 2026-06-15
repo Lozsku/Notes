@@ -63,16 +63,14 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{DSA Coding Patterns \& Reusable Templates}\label{dsa-coding-patterns--reusable-templates}
-
 \begin{quote}
 The "when you see X \(\rightarrow\) use Y" trigger guide for FAANG coding rounds.
 Dense, copy-pasteable, built for fast recognition and last-minute revision.
 \end{quote}
 
-\subsection{Overview}\label{overview}
+\section{Overview}\label{overview}
 
-\subsubsection{How to Use This File}\label{how-to-use-this-file}
+\subsection{How to Use This File}\label{how-to-use-this-file}
 
 \begin{itemize}
 \tightlist
@@ -84,23 +82,27 @@ Dense, copy-pasteable, built for fast recognition and last-minute revision.
   \textbf{Night before}: skim the Revision Cheat Sheet (§7).
 \end{itemize}
 
-\subsubsection{Universal Problem-Solving Workflow}\label{universal-problem-solving-workflow}
+\subsection{Universal Problem-Solving Workflow}\label{universal-problem-solving-workflow}
 
-\begin{verbatim}
-1. CLARIFY    — constraints (N size), edge cases, return type, mutate or not?
-2. EXAMPLES   — run 2-3 examples by hand, including edge cases
-3. BRUTE FORCE— state it out loud, give its complexity
-4. OPTIMIZE   — identify the bottleneck; apply pattern recognition
-5. CODE       — write clean code with variable names that tell the story
-6. TEST       — trace through your examples + edge cases on the code
-7. COMPLEXITY — state time and space, justify each term
-\end{verbatim}
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FloatTok{1.}\NormalTok{ CLARIFY    — constraints (N size), edge cases, }\ControlFlowTok{return} \BuiltInTok{type}\NormalTok{, mutate }\KeywordTok{or} \KeywordTok{not}\NormalTok{?}
+\FloatTok{2.}\NormalTok{ EXAMPLES   — run }\DecValTok{2}\OperatorTok{{-}}\DecValTok{3}\NormalTok{ examples by hand, including edge cases}
+\FloatTok{3.}\NormalTok{ BRUTE FORCE— state it out loud, give its complexity}
+\FloatTok{4.}\NormalTok{ OPTIMIZE   — identify the bottleneck}\OperatorTok{;} \BuiltInTok{apply}\NormalTok{ pattern recognition}
+\FloatTok{5.}\NormalTok{ CODE       — write clean code }\ControlFlowTok{with}\NormalTok{ variable names that tell the story}
+\FloatTok{6.}\NormalTok{ TEST       — trace through your examples }\OperatorTok{+}\NormalTok{ edge cases on the code}
+\FloatTok{7.}\NormalTok{ COMPLEXITY — state time }\KeywordTok{and}\NormalTok{ space, justify each term}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{quote}
 \textbf{Rule of thumb}: always state brute force before optimizing. Interviewers reward structured thinking over jumping to solutions.
 \end{quote}
 
-\subsection{Pattern Recognition Cheat Table}\label{pattern-recognition-cheat-table}
+\section{Pattern Recognition Cheat Table}\label{pattern-recognition-cheat-table}
 
 \begin{quote}
 The most important section. Map the problem\textquotesingle s key phrases to a pattern before writing a single line of code.
@@ -150,9 +152,9 @@ Locally optimal choice leads to global optimum & \textbf{Greedy} \\
 XOR, AND, OR, bit shift tricks, unique element & \textbf{Bit Manipulation} \\
 \end{longtable}
 
-\subsection{The Patterns}\label{the-patterns}
+\section{The Patterns}\label{the-patterns}
 
-\subsubsection{Two Pointers}\label{two-pointers}
+\subsection{Two Pointers}\label{two-pointers}
 
 \textbf{Trigger / When to Use}
 
@@ -164,6 +166,8 @@ XOR, AND, OR, bit shift tricks, unique element & \textbf{Bit Manipulation} \\
 Use two indices that move toward each other (or in the same direction) to eliminate the need for a nested loop. Works on sorted input or with a logical invariant.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -218,7 +222,7 @@ Use two indices that move toward each other (or in the same direction) to elimin
   Off-by-one: \texttt{left\ \textless{}\ right} vs \texttt{left\ \textless{}=\ right}.
 \end{itemize}
 
-\subsubsection{Sliding Window (Fixed + Variable)}\label{sliding-window-fixed--variable}
+\subsection{Sliding Window (Fixed + Variable)}\label{sliding-window-fixed--variable}
 
 \textbf{Trigger / When to Use}
 
@@ -230,6 +234,8 @@ Use two indices that move toward each other (or in the same direction) to elimin
 Maintain a window \texttt{{[}left,\ right{]}} over the sequence. Expand right to grow; shrink left when the constraint is violated. Avoids recomputing the full window from scratch each step.
 
 \textbf{Template --- Fixed Window (size K)}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -244,6 +250,8 @@ Maintain a window \texttt{{[}left,\ right{]}} over the sequence. Expand right to
 \end{Shaded}
 
 \textbf{Template --- Variable Window}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -294,7 +302,7 @@ Maintain a window \texttt{{[}left,\ right{]}} over the sequence. Expand right to
   Variable window: forgetting to delete keys with count 0 (artificially inflates distinct count).
 \end{itemize}
 
-\subsubsection{Fast \& Slow Pointers (Cycle Detection)}\label{fast--slow-pointers-cycle-detection}
+\subsection{Fast \& Slow Pointers (Cycle Detection)}\label{fast--slow-pointers-cycle-detection}
 
 \textbf{Trigger / When to Use}
 
@@ -306,6 +314,8 @@ Maintain a window \texttt{{[}left,\ right{]}} over the sequence. Expand right to
 Two pointers move at different speeds (fast = 2 steps, slow = 1 step). If there\textquotesingle s a cycle they must meet. Without a cycle, fast reaches the end first.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -376,7 +386,7 @@ Two pointers move at different speeds (fast = 2 steps, slow = 1 step). If there\
   Find Duplicate: the array must be treated as a linked list (index \(\rightarrow\) value \(\rightarrow\) next index).
 \end{itemize}
 
-\subsubsection{Merge Intervals}\label{merge-intervals}
+\subsection{Merge Intervals}\label{merge-intervals}
 
 \textbf{Trigger / When to Use}
 
@@ -388,6 +398,8 @@ Two pointers move at different speeds (fast = 2 steps, slow = 1 step). If there\
 Sort intervals by start time. Walk through; if the current interval overlaps the last merged one, merge by extending the end. Otherwise, append as new.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -449,7 +461,7 @@ Sort intervals by start time. Walk through; if the current interval overlaps the
   Mutating the original list element; use \texttt{merged{[}-1{]}{[}1{]}\ =\ max(...)}.
 \end{itemize}
 
-\subsubsection{Cyclic Sort}\label{cyclic-sort}
+\subsection{Cyclic Sort}\label{cyclic-sort}
 
 \textbf{Trigger / When to Use}
 
@@ -461,6 +473,8 @@ Sort intervals by start time. Walk through; if the current interval overlaps the
 Each number belongs at index \texttt{num\ -\ 1}. Walk the array; if \texttt{arr{[}i{]}} is not at its correct index, swap it there. After one pass, scan for misplaced numbers.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -521,7 +535,7 @@ Each number belongs at index \texttt{num\ -\ 1}. Walk the array; if \texttt{arr{
   Range \texttt{{[}0,\ N-1{]}} vs \texttt{{[}1,\ N{]}} --- adjust \texttt{correct} index accordingly.
 \end{itemize}
 
-\subsubsection{In-place Linked List Reversal}\label{in-place-linked-list-reversal}
+\subsection{In-place Linked List Reversal}\label{in-place-linked-list-reversal}
 
 \textbf{Trigger / When to Use}
 
@@ -533,6 +547,8 @@ Each number belongs at index \texttt{num\ -\ 1}. Walk the array; if \texttt{arr{
 Iteratively redirect \texttt{next} pointers using three pointers: \texttt{prev}, \texttt{curr}, \texttt{next\_node}. No extra space needed.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -618,7 +634,7 @@ Iteratively redirect \texttt{next} pointers using three pointers: \texttt{prev},
   Not attaching the dummy node\textquotesingle s tail to the remaining list after reversal.
 \end{itemize}
 
-\subsubsection{BFS (Tree + Grid + Graph)}\label{bfs-tree--grid--graph}
+\subsection{BFS (Tree + Grid + Graph)}\label{bfs-tree--grid--graph}
 
 \textbf{Trigger / When to Use}
 
@@ -630,6 +646,8 @@ Iteratively redirect \texttt{next} pointers using three pointers: \texttt{prev},
 Explore nodes level by level using a queue. Guarantees shortest path in unweighted graphs. Track visited set to avoid revisiting.
 
 \textbf{Template --- Tree Level-Order}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -655,6 +673,8 @@ Explore nodes level by level using a queue. Guarantees shortest path in unweight
 
 \textbf{Template --- Grid BFS}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ bfs\_grid(grid, start\_r, start\_c):}
@@ -677,6 +697,8 @@ Explore nodes level by level using a queue. Guarantees shortest path in unweight
 \end{Shaded}
 
 \textbf{Template --- Graph BFS}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -725,7 +747,7 @@ Explore nodes level by level using a queue. Guarantees shortest path in unweight
   Forgetting to handle disconnected graphs (multiple BFS starts or check all nodes).
 \end{itemize}
 
-\subsubsection{DFS (Tree + Grid + Graph)}\label{dfs-tree--grid--graph}
+\subsection{DFS (Tree + Grid + Graph)}\label{dfs-tree--grid--graph}
 
 \textbf{Trigger / When to Use}
 
@@ -737,6 +759,8 @@ Explore nodes level by level using a queue. Guarantees shortest path in unweight
 Recursively (or with explicit stack) explore as far as possible down one branch before backtracking. Mark visited to prevent cycles.
 
 \textbf{Template --- Tree DFS}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -760,6 +784,8 @@ Recursively (or with explicit stack) explore as far as possible down one branch 
 
 \textbf{Template --- Grid DFS}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{def}\NormalTok{ dfs\_grid(grid, r, c, visited):}
@@ -775,6 +801,8 @@ Recursively (or with explicit stack) explore as far as possible down one branch 
 \end{Shaded}
 
 \textbf{Template --- Graph DFS / Cycle Detection}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -824,7 +852,7 @@ Recursively (or with explicit stack) explore as far as possible down one branch 
   Not restoring visited state when you need to explore all paths (use backtracking instead).
 \end{itemize}
 
-\subsubsection{Backtracking}\label{backtracking}
+\subsection{Backtracking}\label{backtracking}
 
 \textbf{Trigger / When to Use}
 
@@ -836,6 +864,8 @@ Recursively (or with explicit stack) explore as far as possible down one branch 
 Build candidates incrementally. At each step, check if candidate is still valid. If not, prune and backtrack. If complete, record solution.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -896,7 +926,7 @@ Build candidates incrementally. At each step, check if candidate is still valid.
   Missing pruning conditions \(\rightarrow\) TLE on large inputs.
 \end{itemize}
 
-\subsubsection{Subsets / Permutations / Combinations}\label{subsets--permutations--combinations}
+\subsection{Subsets / Permutations / Combinations}\label{subsets--permutations--combinations}
 
 \textbf{Trigger / When to Use}
 
@@ -908,6 +938,8 @@ Build candidates incrementally. At each step, check if candidate is still valid.
 For subsets: at each element, decide include or exclude. For permutations: at each position, try all unused elements. Backtracking framework handles both.
 
 \textbf{Template --- Subsets}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -930,6 +962,8 @@ For subsets: at each element, decide include or exclude. For permutations: at ea
 \end{Shaded}
 
 \textbf{Template --- Permutations}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -990,7 +1024,7 @@ For subsets: at each element, decide include or exclude. For permutations: at ea
   Forgetting \texttt{list(current)} copy when appending.
 \end{itemize}
 
-\subsubsection{Binary Search (+ On Answer / Monotonic Predicate)}\label{binary-search--on-answer--monotonic-predicate}
+\subsection{Binary Search (+ On Answer / Monotonic Predicate)}\label{binary-search--on-answer--monotonic-predicate}
 
 \textbf{Trigger / When to Use}
 
@@ -1002,6 +1036,8 @@ For subsets: at each element, decide include or exclude. For permutations: at ea
 Halve the search space each iteration by comparing the midpoint. "Binary search on answer": define a predicate \texttt{feasible(x)} that is monotonically True/False over the answer space, then binary search on that space.
 
 \textbf{Template --- Classic}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1031,6 +1067,8 @@ Halve the search space each iteration by comparing the midpoint. "Binary search 
 \end{Shaded}
 
 \textbf{Template --- On Answer}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1080,7 +1118,7 @@ Halve the search space each iteration by comparing the midpoint. "Binary search 
   Binary search on answer: define \texttt{feasible} correctly (monotonic), and set \texttt{hi} to a valid upper bound.
 \end{itemize}
 
-\subsubsection{Top-K / Heap}\label{top-k--heap}
+\subsection{Top-K / Heap}\label{top-k--heap}
 
 \textbf{Trigger / When to Use}
 
@@ -1092,6 +1130,8 @@ Halve the search space each iteration by comparing the midpoint. "Binary search 
 Use a min-heap of size K for "top K largest" (smaller elements get evicted). Use a max-heap for "bottom K smallest". \texttt{heapq} in Python is a min-heap; negate values for max-heap.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1150,7 +1190,7 @@ Use a min-heap of size K for "top K largest" (smaller elements get evicted). Use
   For Kth largest, min-heap of size K is more memory-efficient than sorting.
 \end{itemize}
 
-\subsubsection{K-way Merge}\label{k-way-merge}
+\subsection{K-way Merge}\label{k-way-merge}
 
 \textbf{Trigger / When to Use}
 
@@ -1162,6 +1202,8 @@ Use a min-heap of size K for "top K largest" (smaller elements get evicted). Use
 Use a min-heap with one element from each list. Pop the minimum, push the next element from that list. Repeat.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1222,7 +1264,7 @@ Use a min-heap with one element from each list. Pop the minimum, push the next e
   Don\textquotesingle t push \texttt{None} into the heap when a list is exhausted.
 \end{itemize}
 
-\subsubsection{Two Heaps (Median of Stream)}\label{two-heaps-median-of-stream}
+\subsection{Two Heaps (Median of Stream)}\label{two-heaps-median-of-stream}
 
 \textbf{Trigger / When to Use}
 
@@ -1234,6 +1276,8 @@ Use a min-heap with one element from each list. Pop the minimum, push the next e
 Maintain a max-heap for the lower half and a min-heap for the upper half. Always balance sizes so they differ by at most 1. Median is the top of the larger heap (or average of both tops).
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1288,7 +1332,7 @@ Maintain a max-heap for the lower half and a min-heap for the upper half. Always
   Sliding window median needs lazy deletion (mark removed elements, skip when popped).
 \end{itemize}
 
-\subsubsection{Monotonic Stack}\label{monotonic-stack}
+\subsection{Monotonic Stack}\label{monotonic-stack}
 
 \textbf{Trigger / When to Use}
 
@@ -1300,6 +1344,8 @@ Maintain a max-heap for the lower half and a min-heap for the upper half. Always
 Maintain a stack that is strictly increasing or decreasing. When a new element violates the order, pop elements (they\textquotesingle ve found their "next greater/smaller" answer).
 
 \textbf{Template --- Next Greater Element}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1367,7 +1413,7 @@ Maintain a stack that is strictly increasing or decreasing. When a new element v
   Histogram: store (start\_index, height) not just height, to track span.
 \end{itemize}
 
-\subsubsection{Prefix Sum}\label{prefix-sum}
+\subsection{Prefix Sum}\label{prefix-sum}
 
 \textbf{Trigger / When to Use}
 
@@ -1379,6 +1425,8 @@ Maintain a stack that is strictly increasing or decreasing. When a new element v
 \texttt{prefix{[}i{]}} = sum of first \texttt{i} elements. Range sum \texttt{{[}l,\ r{]}} = \texttt{prefix{[}r+1{]}\ -\ prefix{[}l{]}}. For count of subarrays summing to K, use a hashmap of prefix sums seen so far.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1435,7 +1483,7 @@ Maintain a stack that is strictly increasing or decreasing. When a new element v
   Negative numbers are fine; this works regardless.
 \end{itemize}
 
-\subsubsection{Union-Find (DSU)}\label{union-find-dsu}
+\subsection{Union-Find (DSU)}\label{union-find-dsu}
 
 \textbf{Trigger / When to Use}
 
@@ -1447,6 +1495,8 @@ Maintain a stack that is strictly increasing or decreasing. When a new element v
 Each element points to a parent. \texttt{find(x)} returns root of x\textquotesingle s component (with path compression). \texttt{union(x,\ y)} merges components (with rank/size to keep tree flat).
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1506,7 +1556,7 @@ Each element points to a parent. \texttt{find(x)} returns root of x\textquotesin
   Off-by-one with node numbering (0-indexed vs 1-indexed).
 \end{itemize}
 
-\subsubsection{Topological Sort}\label{topological-sort}
+\subsection{Topological Sort}\label{topological-sort}
 
 \textbf{Trigger / When to Use}
 
@@ -1518,6 +1568,8 @@ Each element points to a parent. \texttt{find(x)} returns root of x\textquotesin
 \textbf{Kahn\textquotesingle s algorithm (BFS)}: compute in-degrees, start with 0 in-degree nodes, process each and reduce neighbors\textquotesingle{} in-degrees. \textbf{DFS-based}: finish time ordering --- DFS, push to stack on exit, reverse the stack.
 
 \textbf{Template --- Kahn\textquotesingle s (BFS)}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1543,6 +1595,8 @@ Each element points to a parent. \texttt{find(x)} returns root of x\textquotesin
 \end{Shaded}
 
 \textbf{Template --- DFS-based}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1598,7 +1652,7 @@ Each element points to a parent. \texttt{find(x)} returns root of x\textquotesin
   Alien Dictionary: adjacent characters in each word define edges; must check invalid input (longer word before shorter prefix \(\rightarrow\) return "").
 \end{itemize}
 
-\subsubsection{Trie}\label{trie}
+\subsection{Trie}\label{trie}
 
 \textbf{Trigger / When to Use}
 
@@ -1610,6 +1664,8 @@ Each element points to a parent. \texttt{find(x)} returns root of x\textquotesin
 A tree where each node represents a character. Each root-to-leaf path spells a word. Supports O(L) insert/search (L = word length) regardless of dictionary size.
 
 \textbf{Template}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1675,7 +1731,7 @@ A tree where each node represents a character. Each root-to-leaf path spells a w
   Word Search II: prune the Trie as words are found to avoid revisiting.
 \end{itemize}
 
-\subsubsection{Dynamic Programming}\label{dynamic-programming}
+\subsection{Dynamic Programming}\label{dynamic-programming}
 
 \textbf{Trigger / When to Use}
 
@@ -1686,9 +1742,11 @@ A tree where each node represents a character. Each root-to-leaf path spells a w
 \textbf{Core Idea}
 Break problem into subproblems; store results (memoization/tabulation). Key: define \texttt{dp{[}i{]}} or \texttt{dp{[}i{]}{[}j{]}} precisely, write the recurrence, identify base cases.
 
-\paragraph{DP --- 0/1 Knapsack}\label{dp--01-knapsack}
+\subsubsection{DP --- 0/1 Knapsack}\label{dp--01-knapsack}
 
 \textbf{Trigger}: "pick or skip" each item, capacity constraint, maximize/count value.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1717,9 +1775,11 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Classic}: 0/1 Knapsack, Subset Sum (LeetCode 416), Partition Equal Subset Sum (LeetCode 416), Target Sum (LeetCode 494).
 
-\paragraph{DP --- Unbounded Knapsack}\label{dp--unbounded-knapsack}
+\subsubsection{DP --- Unbounded Knapsack}\label{dp--unbounded-knapsack}
 
 \textbf{Trigger}: "unlimited copies" of each item, coin change (any number of coins).
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1746,9 +1806,11 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Key difference from 0/1}: iterate \texttt{w} forward (allows reuse of same item).
 
-\paragraph{DP --- LCS (Longest Common Subsequence)}\label{dp--lcs-longest-common-subsequence}
+\subsubsection{DP --- LCS (Longest Common Subsequence)}\label{dp--lcs-longest-common-subsequence}
 
 \textbf{Trigger}: two strings/sequences, longest common subsequence, edit distance, shortest common supersequence.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1780,9 +1842,11 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Classic}: LCS (LeetCode 1143), Edit Distance (LeetCode 72), Shortest Common Supersequence (LeetCode 1092).
 
-\paragraph{DP --- LIS (Longest Increasing Subsequence)}\label{dp--lis-longest-increasing-subsequence}
+\subsubsection{DP --- LIS (Longest Increasing Subsequence)}\label{dp--lis-longest-increasing-subsequence}
 
 \textbf{Trigger}: longest strictly increasing subsequence, patience sorting, number of LIS.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1812,9 +1876,11 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Classic}: Longest Increasing Subsequence (LeetCode 300), Russian Doll Envelopes (LeetCode 354), Number of LIS (LeetCode 673).
 
-\paragraph{DP --- Matrix / Grid DP}\label{dp--matrix--grid-dp}
+\subsubsection{DP --- Matrix / Grid DP}\label{dp--matrix--grid-dp}
 
 \textbf{Trigger}: grid, min path sum, unique paths, count paths, max square of 1s.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1848,9 +1914,11 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Classic}: Unique Paths (LeetCode 62), Minimum Path Sum (LeetCode 64), Maximal Square (LeetCode 221), Dungeon Game (LeetCode 174).
 
-\paragraph{DP --- Interval DP}\label{dp--interval-dp}
+\subsubsection{DP --- Interval DP}\label{dp--interval-dp}
 
 \textbf{Trigger}: merge stones, burst balloons, matrix chain multiplication, palindrome partitioning.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1873,9 +1941,11 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Classic}: Burst Balloons (LeetCode 312), Minimum Cost to Merge Stones (LeetCode 1000), Strange Printer (LeetCode 664).
 
-\paragraph{DP --- Subsequences / Strings}\label{dp--subsequences--strings}
+\subsubsection{DP --- Subsequences / Strings}\label{dp--subsequences--strings}
 
 \textbf{Trigger}: count distinct subsequences, palindromic subsequences, word break.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1907,7 +1977,7 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 
 \textbf{Classic}: Distinct Subsequences (LeetCode 115), Word Break (LeetCode 139), Palindromic Substrings (LeetCode 647).
 
-\subsubsection{Greedy}\label{greedy}
+\subsection{Greedy}\label{greedy}
 
 \textbf{Trigger / When to Use}
 
@@ -1919,6 +1989,8 @@ Break problem into subproblems; store results (memoization/tabulation). Key: def
 Make the locally optimal choice at each step. Prove (or intuit) that no better global solution exists. Common proof technique: "exchange argument" --- show swapping any element for the greedy choice can only improve or maintain the solution.
 
 \textbf{Template --- Interval Scheduling Maximization}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1982,7 +2054,7 @@ Make the locally optimal choice at each step. Prove (or intuit) that no better g
   When greedy fails, fall back to DP.
 \end{itemize}
 
-\subsubsection{Bit Manipulation}\label{bit-manipulation}
+\subsection{Bit Manipulation}\label{bit-manipulation}
 
 \textbf{Trigger / When to Use}
 
@@ -1994,6 +2066,8 @@ Make the locally optimal choice at each step. Prove (or intuit) that no better g
 Exploit binary properties: XOR cancels duplicates, AND/OR extract/set bits, shifting multiplies/divides by powers of 2.
 
 \textbf{Key Tricks}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2073,9 +2147,9 @@ Exploit binary properties: XOR cancels duplicates, AND/OR extract/set bits, shif
   Bitmask DP: remember \texttt{1\ \textless{}\textless{}\ n} can be large; check constraints.
 \end{itemize}
 
-\subsection{Complexity Quick Reference}\label{complexity-quick-reference}
+\section{Complexity Quick Reference}\label{complexity-quick-reference}
 
-\subsubsection{Big-O of Common Data Structure Operations}\label{big-o-of-common-data-structure-operations}
+\subsection{Big-O of Common Data Structure Operations}\label{big-o-of-common-data-structure-operations}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2007}}
@@ -2115,7 +2189,7 @@ Min/Max & O(N) & O(N) & O(N) & O(log N) & O(1) & O(1) \\
 
 *Amortized for dynamic array. **Given a pointer to the node.
 
-\subsubsection{Common Algorithm Complexities}\label{common-algorithm-complexities}
+\subsection{Common Algorithm Complexities}\label{common-algorithm-complexities}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -2144,7 +2218,7 @@ Union-Find & O(\(\alpha\)(N)) per op & O(N) \\
 Trie insert/search & O(L) & O(L) \\
 \end{longtable}
 
-\subsubsection{Acceptable Complexity vs Input Size N}\label{acceptable-complexity-vs-input-size-n}
+\subsection{Acceptable Complexity vs Input Size N}\label{acceptable-complexity-vs-input-size-n}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1847}}
@@ -2178,9 +2252,9 @@ N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
 \textbf{Rule}: Assume \textasciitilde10\^{}8 simple operations per second for Python (10\^{}9 for C++). Multiply complexity by constant factors; Python is \textasciitilde5-10x slower than C++.
 \end{quote}
 
-\subsection{Interview Communication Tips}\label{interview-communication-tips}
+\section{Interview Communication Tips}\label{interview-communication-tips}
 
-\subsubsection{Before You Code}\label{before-you-code}
+\subsection{Before You Code}\label{before-you-code}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2197,7 +2271,7 @@ N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
   \textbf{Think aloud} while optimizing: "I notice the array is sorted, so maybe we can binary search... or use two pointers..."
 \end{enumerate}
 
-\subsubsection{While Coding}\label{while-coding}
+\subsection{While Coding}\label{while-coding}
 
 \begin{itemize}
 \tightlist
@@ -2211,7 +2285,7 @@ N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
   \textbf{Don\textquotesingle t go silent} for more than 30 seconds; narrate your thought process.
 \end{itemize}
 
-\subsubsection{After Coding}\label{after-coding}
+\subsection{After Coding}\label{after-coding}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2226,7 +2300,7 @@ N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
   \textbf{Ask if they want you to optimize} before jumping to a different approach.
 \end{enumerate}
 
-\subsubsection{Recovery Tactics}\label{recovery-tactics}
+\subsection{Recovery Tactics}\label{recovery-tactics}
 
 \begin{itemize}
 \tightlist
@@ -2238,7 +2312,7 @@ N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
   Bug? "Let me re-trace this test case to find where it diverges."
 \end{itemize}
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4258}}
@@ -2269,9 +2343,9 @@ Fix
 \textbf{Mutating input} & Ask "can I modify the input?" or work on a copy \\
 \end{longtable}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{The 20 Must-Know Patterns}\label{the-20-must-know-patterns}
+\subsection{The 20 Must-Know Patterns}\label{the-20-must-know-patterns}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
@@ -2311,7 +2385,9 @@ Pattern
 20 & \textbf{Bit Manipulation} & XOR / AND / shifts \(\rightarrow\) bitmask tricks \\
 \end{longtable}
 
-\subsubsection{Decision Tree (30-second pattern picker)}\label{decision-tree-30-second-pattern-picker}
+\subsection{Decision Tree (30-second pattern picker)}\label{decision-tree-30-second-pattern-picker}
+
+\setcodelang{}
 
 \begin{verbatim}
 Is array sorted or can we sort it?
@@ -2333,7 +2409,9 @@ Is array sorted or can we sort it?
     └── XOR / bits / unique? → Bit Manipulation
 \end{verbatim}
 
-\subsubsection{Quick Complexity Reminder}\label{quick-complexity-reminder}
+\subsection{Quick Complexity Reminder}\label{quick-complexity-reminder}
+
+\setcodelang{}
 
 \begin{verbatim}
 O(1)       → hash map lookup, heap top

@@ -63,18 +63,18 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Cloud \& Infrastructure --- FAANG Interview Mastery}\label{cloud--infrastructure--faang-interview-mastery}
-
 \begin{quote}
 \textbf{Audience:} Engineer with core SWE knowledge targeting senior/staff roles at FAANG.
 \textbf{Strategy:} Build mental models first, then layer in every detail interviewers test.
 \end{quote}
 
-\subsection{Overview --- What It Is}\label{overview--what-it-is}
+\section{Overview --- What It Is}\label{overview--what-it-is}
 
 Cloud \& Infrastructure is the discipline of \textbf{packaging, deploying, operating, and observing software at scale} across pools of compute, network, and storage resources --- without owning physical hardware.
 
 The stack from atoms to apps:
+
+\setcodelang{}
 
 \begin{verbatim}
 Physical Hardware  →  Hypervisor / OS Kernel
@@ -94,9 +94,9 @@ Infrastructure as Code (Terraform / CloudFormation)
 
 Key players: \textbf{AWS, GCP, Azure} (IaaS/PaaS/SaaS providers), \textbf{Docker} (container runtime), \textbf{Kubernetes} (orchestrator), \textbf{Istio/Envoy} (service mesh), \textbf{Terraform} (IaC), \textbf{Prometheus/Grafana} (observability).
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
-\subsubsection{The Pre-Cloud Problem}\label{the-pre-cloud-problem}
+\subsection{The Pre-Cloud Problem}\label{the-pre-cloud-problem}
 
 Before containers and cloud:
 
@@ -114,7 +114,7 @@ Before containers and cloud:
   \textbf{On-call nightmares} --- no standardized way to observe what was broken.
 \end{itemize}
 
-\subsubsection{The Solutions That Emerged}\label{the-solutions-that-emerged}
+\subsection{The Solutions That Emerged}\label{the-solutions-that-emerged}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3013}}
@@ -137,9 +137,9 @@ Observability gap & Metrics, structured logs, distributed traces \\
 Config drift & GitOps + Infrastructure as Code \\
 \end{longtable}
 
-\subsection{Why FAANG Cares (Company-Specific)}\label{why-faang-cares-company-specific}
+\section{Why FAANG Cares (Company-Specific)}\label{why-faang-cares-company-specific}
 
-\subsubsection{Google}\label{google}
+\subsection{Google}\label{google}
 
 \begin{itemize}
 \tightlist
@@ -149,7 +149,7 @@ Config drift & GitOps + Infrastructure as Code \\
   Interviews: expect deep K8s internals questions ("explain the scheduler"), Borg vs K8s design decisions, SRE concepts (SLO/error budget --- Google coined them).
 \end{itemize}
 
-\subsubsection{Meta (Facebook)}\label{meta-facebook}
+\subsection{Meta (Facebook)}\label{meta-facebook}
 
 \begin{itemize}
 \tightlist
@@ -161,7 +161,7 @@ Config drift & GitOps + Infrastructure as Code \\
   Interview focus: large-scale distributed systems, custom orchestration trade-offs.
 \end{itemize}
 
-\subsubsection{Amazon (AWS)}\label{amazon-aws}
+\subsection{Amazon (AWS)}\label{amazon-aws}
 
 \begin{itemize}
 \tightlist
@@ -173,7 +173,7 @@ Config drift & GitOps + Infrastructure as Code \\
   Interview focus: IaC (CloudFormation/CDK), service reliability, cost optimization.
 \end{itemize}
 
-\subsubsection{Apple}\label{apple}
+\subsection{Apple}\label{apple}
 
 \begin{itemize}
 \tightlist
@@ -183,7 +183,7 @@ Config drift & GitOps + Infrastructure as Code \\
   Prioritizes \textbf{security} and \textbf{privacy} in infrastructure decisions.
 \end{itemize}
 
-\subsubsection{Netflix}\label{netflix}
+\subsection{Netflix}\label{netflix}
 
 \begin{itemize}
 \tightlist
@@ -195,13 +195,15 @@ Config drift & GitOps + Infrastructure as Code \\
 
 \textbf{Interview Takeaway:} \textbf{K8s = Google\textquotesingle s gift from Borg. SRE/SLO = Google concept. Chaos engineering = Netflix. AWS Well-Architected = Amazon.}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{Containers vs Virtual Machines}\label{containers-vs-virtual-machines}
+\subsection{Containers vs Virtual Machines}\label{containers-vs-virtual-machines}
 
-\paragraph{Virtual Machines --- First Principles}\label{virtual-machines--first-principles}
+\subsubsection{Virtual Machines --- First Principles}\label{virtual-machines--first-principles}
 
 A \textbf{hypervisor} runs on bare metal and creates isolated virtual hardware environments. Each VM gets its own kernel, OS, and binaries.
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────┐
@@ -232,9 +234,11 @@ A \textbf{hypervisor} runs on bare metal and creates isolated virtual hardware e
   \textbf{Size:} GBs (full OS included).
 \end{itemize}
 
-\paragraph{Containers --- First Principles}\label{containers--first-principles}
+\subsubsection{Containers --- First Principles}\label{containers--first-principles}
 
 Containers share the \textbf{host OS kernel} but isolate processes using two Linux kernel features: \textbf{namespaces} and \textbf{cgroups}.
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────────────────────────────┐
@@ -263,7 +267,7 @@ Containers share the \textbf{host OS kernel} but isolate processes using two Lin
   \textbf{Isolation:} weaker than VMs (kernel shared); container escape = privilege escalation on host.
 \end{itemize}
 
-\paragraph{Containers vs VMs --- Full Comparison}\label{containers-vs-vms--full-comparison}
+\subsubsection{Containers vs VMs --- Full Comparison}\label{containers-vs-vms--full-comparison}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2250}}
@@ -292,9 +296,9 @@ Density (per host) & 100s of containers & 10s of VMs \\
 Use case & Microservices, CI/CD & Multi-tenant, legacy lift-and-shift \\
 \end{longtable}
 
-\subsubsection{Container Internals}\label{container-internals}
+\subsection{Container Internals}\label{container-internals}
 
-\paragraph{Linux Namespaces}\label{linux-namespaces}
+\subsubsection{Linux Namespaces}\label{linux-namespaces}
 
 Namespaces partition Linux kernel resources so each container sees its own isolated view.
 
@@ -326,7 +330,7 @@ Example
 
 \textbf{How to verify:} \texttt{ls\ -la\ /proc/self/ns/} on any Linux machine shows your current namespaces.
 
-\paragraph{Control Groups (cgroups)}\label{control-groups-cgroups}
+\subsubsection{Control Groups (cgroups)}\label{control-groups-cgroups}
 
 cgroups \textbf{limit and account for} resource usage. Without cgroups, one container could starve all others.
 
@@ -348,6 +352,8 @@ Resources controlled by cgroups:
 
 cgroup hierarchy:
 
+\setcodelang{}
+
 \begin{verbatim}
 /sys/fs/cgroup/
   ├── cpu/
@@ -363,9 +369,11 @@ cgroup hierarchy:
 
 \textbf{Interview Takeaway:} \textbf{Namespaces = what you can see. cgroups = what you can use.}
 
-\paragraph{Union Filesystems (OverlayFS)}\label{union-filesystems-overlayfs}
+\subsubsection{Union Filesystems (OverlayFS)}\label{union-filesystems-overlayfs}
 
 Docker images are \textbf{layered}. Each layer is a diff (like a git commit). At runtime, layers are stacked using \textbf{OverlayFS} (or older: AUFS, devicemapper).
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────────┐  ← Container Layer (read-write, ephemeral)
@@ -399,9 +407,11 @@ OverlayFS terms:
 
 \textbf{Why this matters:} Multiple containers share base layers on disk. A 500 MB base image shared by 50 containers costs 500 MB + 50 \(\times\) (small diff), not 50 \(\times\) 500 MB.
 
-\subsubsection{Docker Deep Dive}\label{docker-deep-dive}
+\subsection{Docker Deep Dive}\label{docker-deep-dive}
 
-\paragraph{Docker Architecture}\label{docker-architecture}
+\subsubsection{Docker Architecture}\label{docker-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────┐
@@ -431,7 +441,9 @@ OverlayFS terms:
 
 \textbf{OCI (Open Container Initiative):} Standardizes image format and runtime spec. Any OCI-compliant runtime (runc, crun, gVisor\textquotesingle s runsc) can run OCI images.
 
-\paragraph{Dockerfile Best Practices}\label{dockerfile-best-practices}
+\subsubsection{Dockerfile Best Practices}\label{dockerfile-best-practices}
+
+\setcodelang{Dockerfile}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -471,7 +483,7 @@ Key practices:
   \textbf{.dockerignore:} exclude \texttt{.git}, \texttt{node\_modules}, test files
 \end{itemize}
 
-\paragraph{Docker Networking}\label{docker-networking}
+\subsubsection{Docker Networking}\label{docker-networking}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1492}}
@@ -496,9 +508,11 @@ Use Case
 \textbf{macvlan} & Container appears as physical NIC on LAN & Network appliances \\
 \end{longtable}
 
-\subsubsection{Kubernetes Architecture}\label{kubernetes-architecture}
+\subsection{Kubernetes Architecture}\label{kubernetes-architecture}
 
-\paragraph{The Big Picture}\label{the-big-picture}
+\subsubsection{The Big Picture}\label{the-big-picture}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -535,7 +549,7 @@ Use Case
 └─────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\paragraph{Control Plane Components}\label{control-plane-components}
+\subsubsection{Control Plane Components}\label{control-plane-components}
 
 \textbf{1. kube-apiserver}
 
@@ -625,7 +639,7 @@ Namespace controller & Handles namespace deletion cleanup \\
   Manages: cloud load balancers (for Services type=LoadBalancer), cloud routes, cloud volumes.
 \end{itemize}
 
-\paragraph{Worker Node Components}\label{worker-node-components}
+\subsubsection{Worker Node Components}\label{worker-node-components}
 
 \textbf{kubelet}
 
@@ -661,9 +675,9 @@ Namespace controller & Handles namespace deletion cleanup \\
   kubelet talks CRI; any conformant runtime works: containerd (default), CRI-O, Docker (via dockershim --- deprecated K8s 1.24).
 \end{itemize}
 
-\subsubsection{Kubernetes Workload Resources}\label{kubernetes-workload-resources}
+\subsection{Kubernetes Workload Resources}\label{kubernetes-workload-resources}
 
-\paragraph{Pod}\label{pod}
+\subsubsection{Pod}\label{pod}
 
 Smallest deployable unit. One or more containers sharing:
 
@@ -676,6 +690,8 @@ Smallest deployable unit. One or more containers sharing:
 \item
   \textbf{Volumes} (mounted into each container independently)
 \end{itemize}
+
+\setcodelang{YAML}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -713,9 +729,11 @@ Smallest deployable unit. One or more containers sharing:
   \textbf{Best practice:} always set requests; set memory limits; be careful with CPU limits (throttling causes latency, not kill).
 \end{itemize}
 
-\paragraph{Deployment}\label{deployment}
+\subsubsection{Deployment}\label{deployment}
 
 Manages ReplicaSets for rolling updates and rollbacks.
+
+\setcodelang{}
 
 \begin{verbatim}
 Deployment
@@ -728,7 +746,7 @@ Deployment
 
 Update strategy: \texttt{RollingUpdate} with \texttt{maxSurge} and \texttt{maxUnavailable} controls.
 
-\paragraph{Services}\label{services}
+\subsubsection{Services}\label{services}
 
 Stable virtual IP + DNS name in front of a dynamic set of pods (selected by label selectors).
 
@@ -755,9 +773,11 @@ Use Case
 \textbf{Headless} (ClusterIP: None) & Returns pod IPs directly, no VIP & StatefulSets, service discovery by DNS \\
 \end{longtable}
 
-\paragraph{Ingress}\label{ingress}
+\subsubsection{Ingress}\label{ingress}
 
 Layer 7 (HTTP/HTTPS) routing into the cluster. Requires an \textbf{Ingress Controller} (nginx-ingress, AWS ALB Ingress, Traefik).
+
+\setcodelang{}
 
 \begin{verbatim}
 Internet → LoadBalancer → Ingress Controller → Service → Pods
@@ -768,7 +788,7 @@ Internet → LoadBalancer → Ingress Controller → Service → Pods
                           - TLS termination
 \end{verbatim}
 
-\paragraph{ConfigMaps and Secrets}\label{configmaps-and-secrets}
+\subsubsection{ConfigMaps and Secrets}\label{configmaps-and-secrets}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0916}}
@@ -805,7 +825,7 @@ Consumption methods:
   \textbf{Volume mounts:} mounted as files (auto-updates when CM/Secret changes)
 \end{itemize}
 
-\paragraph{StatefulSets}\label{statefulsets}
+\subsubsection{StatefulSets}\label{statefulsets}
 
 For stateful apps (databases, Kafka, ZooKeeper). Provides:
 
@@ -821,11 +841,11 @@ For stateful apps (databases, Kafka, ZooKeeper). Provides:
   \textbf{Persistent Volume Claims per pod:} each pod gets its own PVC (not shared)
 \end{itemize}
 
-\paragraph{DaemonSet}\label{daemonset}
+\subsubsection{DaemonSet}\label{daemonset}
 
 Ensures one pod runs on \textbf{every node} (or nodes matching a nodeSelector). Use cases: log collectors (Fluentd), metrics agents (node-exporter), network plugins (Calico, Cilium).
 
-\paragraph{Jobs and CronJobs}\label{jobs-and-cronjobs}
+\subsubsection{Jobs and CronJobs}\label{jobs-and-cronjobs}
 
 \begin{itemize}
 \tightlist
@@ -835,11 +855,13 @@ Ensures one pod runs on \textbf{every node} (or nodes matching a nodeSelector). 
   \textbf{CronJob:} schedules Jobs on cron schedule. Creates a Job object on schedule.
 \end{itemize}
 
-\subsubsection{Kubernetes Scheduling and Autoscaling}\label{kubernetes-scheduling-and-autoscaling}
+\subsection{Kubernetes Scheduling and Autoscaling}\label{kubernetes-scheduling-and-autoscaling}
 
-\paragraph{Scheduling Deep Dive}\label{scheduling-deep-dive}
+\subsubsection{Scheduling Deep Dive}\label{scheduling-deep-dive}
 
 The scheduler\textquotesingle s decision tree:
+
+\setcodelang{}
 
 \begin{verbatim}
 1. FilterPhase (eliminate nodes):
@@ -874,19 +896,25 @@ The scheduler\textquotesingle s decision tree:
   Effects: \texttt{NoSchedule} (don\textquotesingle t place new pods), \texttt{PreferNoSchedule} (soft), \texttt{NoExecute} (evict existing pods)
 \end{itemize}
 
-\begin{verbatim}
-# Taint a node for GPU workloads only
-kubectl taint nodes gpu-node-1 hardware=gpu:NoSchedule
+\setcodelang{Python}
 
-# Pod that tolerates it
-tolerations:
-- key: "hardware"
-  operator: "Equal"
-  value: "gpu"
-  effect: "NoSchedule"
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Taint a node for GPU workloads only}
+\NormalTok{kubectl taint nodes gpu}\OperatorTok{{-}}\NormalTok{node}\OperatorTok{{-}}\DecValTok{1}\NormalTok{ hardware}\OperatorTok{=}\NormalTok{gpu:NoSchedule}
+
+\CommentTok{\# Pod that tolerates it}
+\NormalTok{tolerations:}
+\OperatorTok{{-}}\NormalTok{ key: }\StringTok{"hardware"}
+\NormalTok{  operator: }\StringTok{"Equal"}
+\NormalTok{  value: }\StringTok{"gpu"}
+\NormalTok{  effect: }\StringTok{"NoSchedule"}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Pod Affinity/Anti-Affinity:}
+
+\setcodelang{YAML}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -899,9 +927,11 @@ tolerations:
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{Horizontal Pod Autoscaler (HPA)}\label{horizontal-pod-autoscaler-hpa}
+\subsubsection{Horizontal Pod Autoscaler (HPA)}\label{horizontal-pod-autoscaler-hpa}
 
 Scales \textbf{number of pod replicas} based on metrics.
+
+\setcodelang{}
 
 \begin{verbatim}
             ┌─────────────────────────────────────────┐
@@ -929,13 +959,15 @@ Metrics API │  target: CPU 50%                        │
   Scale-down: conservative (default: 5 min) to prevent flapping.
 \end{itemize}
 
-\paragraph{Vertical Pod Autoscaler (VPA)}\label{vertical-pod-autoscaler-vpa}
+\subsubsection{Vertical Pod Autoscaler (VPA)}\label{vertical-pod-autoscaler-vpa}
 
 Adjusts \textbf{CPU/memory requests and limits} per pod (not replica count). Requires pod restart (no in-place update until VPA v1 goes GA). Use HPA for scaling, VPA for right-sizing.
 
-\paragraph{Cluster Autoscaler}\label{cluster-autoscaler}
+\subsubsection{Cluster Autoscaler}\label{cluster-autoscaler}
 
 Scales \textbf{number of nodes} in the cluster.
+
+\setcodelang{}
 
 \begin{verbatim}
 Pod pending (no node with enough resources)
@@ -951,9 +983,9 @@ Scale-down: node is underutilized (\textless50\% requested) for 10+ minutes \(\r
 
 \textbf{Interview Takeaway:} \textbf{HPA scales pods. VPA sizes pods. Cluster Autoscaler scales nodes. Use HPA + Cluster Autoscaler together; VPA conflicts with HPA on CPU/memory.}
 
-\subsubsection{Service Mesh (Istio / Envoy)}\label{service-mesh-istio--envoy}
+\subsection{Service Mesh (Istio / Envoy)}\label{service-mesh-istio--envoy}
 
-\paragraph{Why Service Meshes Exist}\label{why-service-meshes-exist}
+\subsubsection{Why Service Meshes Exist}\label{why-service-meshes-exist}
 
 In microservice architectures with 100s of services, cross-cutting concerns repeat in every service:
 
@@ -974,7 +1006,9 @@ In microservice architectures with 100s of services, cross-cutting concerns repe
 Without mesh: each team reimplements in their SDK/library (fragile, polyglot nightmare).
 With mesh: \textbf{extracted to infrastructure layer} --- language-agnostic, zero code changes.
 
-\paragraph{Sidecar Pattern}\label{sidecar-pattern}
+\subsubsection{Sidecar Pattern}\label{sidecar-pattern}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────┐
@@ -1005,7 +1039,7 @@ With mesh: \textbf{extracted to infrastructure layer} --- language-agnostic, zer
 
 \textbf{Traffic Interception:} Istio uses \texttt{istio-init} init container to install iptables rules that redirect all inbound/outbound traffic through Envoy on port 15001/15006. The app itself is completely unaware.
 
-\paragraph{Envoy Proxy Internals}\label{envoy-proxy-internals}
+\subsubsection{Envoy Proxy Internals}\label{envoy-proxy-internals}
 
 Envoy is the data-plane component (the actual sidecar). Key concepts:
 
@@ -1023,7 +1057,7 @@ Envoy is the data-plane component (the actual sidecar). Key concepts:
 
 xDS API: Envoy connects to control plane (Istiod) and dynamically receives updates for Listeners, Routes, Clusters, Endpoints without restarts.
 
-\paragraph{Istio Features}\label{istio-features}
+\subsubsection{Istio Features}\label{istio-features}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2294}}
@@ -1047,9 +1081,9 @@ How It Works
 \textbf{Ingress Gateway} & Envoy at cluster edge (replaces Ingress for L7) \\
 \end{longtable}
 
-\subsubsection{CI/CD Pipelines}\label{cicd-pipelines}
+\subsection{CI/CD Pipelines}\label{cicd-pipelines}
 
-\paragraph{What CI/CD Means}\label{what-cicd-means}
+\subsubsection{What CI/CD Means}\label{what-cicd-means}
 
 \begin{itemize}
 \tightlist
@@ -1061,7 +1095,9 @@ How It Works
   \textbf{CD (Continuous Deployment):} Every passing change automatically deploys to production (no manual gate).
 \end{itemize}
 
-\paragraph{Typical CI/CD Pipeline}\label{typical-cicd-pipeline}
+\subsubsection{Typical CI/CD Pipeline}\label{typical-cicd-pipeline}
+
+\setcodelang{}
 
 \begin{verbatim}
 Developer pushes code
@@ -1093,7 +1129,9 @@ Developer pushes code
 
 Tools: GitHub Actions, GitLab CI, Jenkins, CircleCI, Tekton (K8s-native), ArgoCD (GitOps CD).
 
-\paragraph{Deployment Strategies}\label{deployment-strategies}
+\subsubsection{Deployment Strategies}\label{deployment-strategies}
+
+\setcodelang{}
 
 \begin{verbatim}
 BLUE-GREEN DEPLOYMENT
@@ -1167,9 +1205,11 @@ Use Case
 
 \textbf{Interview Takeaway:} \textbf{Canary = validate on real traffic subset. Blue-green = instant switchover. Rolling = gradual in-place. FAANG uses canary most for production.}
 
-\paragraph{GitOps}\label{gitops}
+\subsubsection{GitOps}\label{gitops}
 
 Git is the single source of truth for desired cluster state. CD tool (ArgoCD, Flux) watches git repo and syncs cluster to match.
+
+\setcodelang{}
 
 \begin{verbatim}
 Dev pushes Helm chart / K8s manifests to Git
@@ -1186,17 +1226,19 @@ Cluster reaches desired state
 
 Benefits: Auditability (git log = deployment log), easy rollback (git revert), separation of CI (build) and CD (deploy).
 
-\subsubsection{Infrastructure as Code}\label{infrastructure-as-code}
+\subsection{Infrastructure as Code}\label{infrastructure-as-code}
 
-\paragraph{Why IaC}\label{why-iac}
+\subsubsection{Why IaC}\label{why-iac}
 
 Manual cloud console clicks: not reproducible, not reviewable, not auditable, can\textquotesingle t be version-controlled. IaC solves all four.
 
-\paragraph{Terraform}\label{terraform}
+\subsubsection{Terraform}\label{terraform}
 
 HashiCorp\textquotesingle s \textbf{cloud-agnostic} IaC tool using HCL (HashiCorp Configuration Language).
 
 \textbf{Core Workflow:}
+
+\setcodelang{}
 
 \begin{verbatim}
 terraform init     → download providers, set up backend
@@ -1234,6 +1276,8 @@ terraform destroy  → tear everything down
 \item
   \textbf{Remote state:} \texttt{terraform\_remote\_state} data source to read outputs from other stacks.
 \end{itemize}
+
+\setcodelang{HCL}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1279,17 +1323,19 @@ CDK equivalent & CDK for Terraform (CDKTF) & AWS CDK (TypeScript/Python \(\right
 
 \textbf{Interview Takeaway:} \textbf{Terraform = multi-cloud, HCL, manage your own state. CloudFormation = AWS-only, native integration, AWS manages state.}
 
-\paragraph{Pulumi}\label{pulumi}
+\subsubsection{Pulumi}\label{pulumi}
 
 Code-first IaC (TypeScript, Python, Go) --- same model as Terraform but uses real programming languages. Good for complex conditional logic.
 
-\paragraph{Ansible}\label{ansible}
+\subsubsection{Ansible}\label{ansible}
 
 Configuration management (not primarily resource provisioning). Agentless, SSH-based, idempotent playbooks. Good for OS-level config, not cloud resource lifecycle.
 
-\subsubsection{Monitoring, Logging, and Observability}\label{monitoring-logging-and-observability}
+\subsection{Monitoring, Logging, and Observability}\label{monitoring-logging-and-observability}
 
-\paragraph{The Three Pillars of Observability}\label{the-three-pillars-of-observability}
+\subsubsection{The Three Pillars of Observability}\label{the-three-pillars-of-observability}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1336,7 +1382,9 @@ Cost Profile
 
 \textbf{They are complementary, not competing.} Alert on metric \(\rightarrow\) look at logs \(\rightarrow\) follow trace to find root cause.
 
-\paragraph{Prometheus Architecture}\label{prometheus-architecture}
+\subsubsection{Prometheus Architecture}\label{prometheus-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
                         ┌──────────────────┐
@@ -1371,6 +1419,8 @@ Cost Profile
 
 \textbf{PromQL examples:}
 
+\setcodelang{PromQL}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{\# Request rate over 5m}
@@ -1393,7 +1443,9 @@ Cost Profile
 \textbar{} \textbf{Histogram} \textbar{} Samples in predefined buckets; compute percentiles \textbar{} \texttt{http\_request\_duration\_seconds\_bucket} \textbar{}
 \textbar{} \textbf{Summary} \textbar{} Pre-computed quantiles at scrape time \textbar{} (less flexible, avoid) \textbar{}
 
-\paragraph{Distributed Tracing}\label{distributed-tracing}
+\subsubsection{Distributed Tracing}\label{distributed-tracing}
+
+\setcodelang{}
 
 \begin{verbatim}
 User Request
@@ -1433,7 +1485,9 @@ Waterfall view:
   \textbf{Tail-based sampling:} collect all spans, decide at trace end (catches all errors, expensive).
 \end{itemize}
 
-\paragraph{Structured Logging}\label{structured-logging}
+\subsubsection{Structured Logging}\label{structured-logging}
+
+\setcodelang{JSON}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1455,13 +1509,15 @@ Structured (JSON) logs enable: fast indexing, efficient queries, correlation wit
 
 Log aggregation pipeline:
 
+\setcodelang{}
+
 \begin{verbatim}
 App → Fluentd/Vector/Filebeat → Kafka (buffer) → Elasticsearch/Loki → Kibana/Grafana
 \end{verbatim}
 
-\subsubsection{SLI / SLO / SLA / Error Budgets}\label{sli--slo--sla--error-budgets}
+\subsection{SLI / SLO / SLA / Error Budgets}\label{sli--slo--sla--error-budgets}
 
-\paragraph{Definitions}\label{definitions}
+\subsubsection{Definitions}\label{definitions}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2412}}
@@ -1487,6 +1543,8 @@ Example
 
 \textbf{The relationship:}
 
+\setcodelang{}
+
 \begin{verbatim}
 SLI is measured
     ↓
@@ -1499,7 +1557,7 @@ If budget exhausted → freeze new deployments, focus on reliability
 SLA is the external commitment (SLO with teeth)
 \end{verbatim}
 
-\paragraph{Common SLIs}\label{common-slis}
+\subsubsection{Common SLIs}\label{common-slis}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2151}}
@@ -1520,20 +1578,24 @@ Storage & Durability (\% data retained), read latency \\
 Streaming & Consumer lag, throughput (messages/s) \\
 \end{longtable}
 
-\paragraph{Error Budget Math}\label{error-budget-math}
+\subsubsection{Error Budget Math}\label{error-budget-math}
 
-\begin{verbatim}
-SLO: 99.9% availability
-Error budget: 100% - 99.9% = 0.1%
+\setcodelang{Python}
 
-In 30 days:
-30 × 24 × 60 = 43,200 minutes total
-0.1% × 43,200 = 43.2 minutes of allowed downtime/month
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SLO: }\FloatTok{99.9}\OperatorTok{\%}\NormalTok{ availability}
+\NormalTok{Error budget: }\DecValTok{100}\OperatorTok{\%} \OperatorTok{{-}} \FloatTok{99.9}\OperatorTok{\%} \OperatorTok{=} \FloatTok{0.1}\OperatorTok{\%}
 
-In 1 year:
-365 × 24 × 60 = 525,600 minutes
-0.1% × 525,600 = 525.6 minutes ≈ 8.76 hours/year
-\end{verbatim}
+\NormalTok{In }\DecValTok{30}\NormalTok{ days:}
+\DecValTok{30}\NormalTok{ × }\DecValTok{24}\NormalTok{ × }\DecValTok{60} \OperatorTok{=} \DecValTok{43}\NormalTok{,}\DecValTok{200}\NormalTok{ minutes total}
+\FloatTok{0.1}\OperatorTok{\%}\NormalTok{ × }\DecValTok{43}\NormalTok{,}\DecValTok{200} \OperatorTok{=} \FloatTok{43.2}\NormalTok{ minutes of allowed downtime}\OperatorTok{/}\NormalTok{month}
+
+\NormalTok{In }\DecValTok{1}\NormalTok{ year:}
+\DecValTok{365}\NormalTok{ × }\DecValTok{24}\NormalTok{ × }\DecValTok{60} \OperatorTok{=} \DecValTok{525}\NormalTok{,}\DecValTok{600}\NormalTok{ minutes}
+\FloatTok{0.1}\OperatorTok{\%}\NormalTok{ × }\DecValTok{525}\NormalTok{,}\DecValTok{600} \OperatorTok{=} \FloatTok{525.6}\NormalTok{ minutes ≈ }\FloatTok{8.76}\NormalTok{ hours}\OperatorTok{/}\NormalTok{year}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Reliability tiers:}
 \textbar{} Nines \textbar{} Availability \textbar{} Annual Downtime \textbar{}
@@ -1557,7 +1619,9 @@ In 1 year:
 
 \textbf{Interview Takeaway:} \textbf{SLO is your internal target. SLA is your external promise. Error budget = 100\% - SLO; it\textquotesingle s how much you can mess up. When budget is gone, stop shipping features.}
 
-\subsubsection{Cloud Service Models}\label{cloud-service-models}
+\subsection{Cloud Service Models}\label{cloud-service-models}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1613,9 +1677,11 @@ Time-to-value
 
 \textbf{FaaS (Serverless):} AWS Lambda, GCP Cloud Functions. Pay per invocation. Auto-scales to zero. Cold start latency. Great for event-driven, bursty workloads.
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{Container vs VM --- Side by Side}\label{container-vs-vm--side-by-side}
+\subsection{Container vs VM --- Side by Side}\label{container-vs-vm--side-by-side}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────┐     ┌──────────────────────────────┐
@@ -1639,7 +1705,9 @@ Time-to-value
    GBs, minutes, full isolation    MBs, milliseconds, shared kernel
 \end{verbatim}
 
-\subsubsection{Docker Image Layers}\label{docker-image-layers}
+\subsection{Docker Image Layers}\label{docker-image-layers}
+
+\setcodelang{}
 
 \begin{verbatim}
 docker pull python:3.11-slim
@@ -1669,7 +1737,9 @@ lower2 (ro) ← COPY requirements.txt
 lower1 (ro) ← FROM python:3.11-slim
 \end{verbatim}
 
-\subsubsection{Kubernetes Cluster Architecture (Detailed)}\label{kubernetes-cluster-architecture-detailed}
+\subsection{Kubernetes Cluster Architecture (Detailed)}\label{kubernetes-cluster-architecture-detailed}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -1727,7 +1797,9 @@ Network: CNI plugin (Calico, Flannel, Cilium) sets up pod networking
 Storage: CSI plugin (EBS, GCE PD) provisions PersistentVolumes
 \end{verbatim}
 
-\subsubsection{Service Mesh Sidecar Architecture}\label{service-mesh-sidecar-architecture}
+\subsection{Service Mesh Sidecar Architecture}\label{service-mesh-sidecar-architecture}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -1762,7 +1834,9 @@ App → iptables redirect → Envoy sidecar (:15006)
                              → emit metric/span
 \end{verbatim}
 
-\subsubsection{CI/CD Pipeline}\label{cicd-pipeline}
+\subsection{CI/CD Pipeline}\label{cicd-pipeline}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -1800,7 +1874,9 @@ App → iptables redirect → Envoy sidecar (:15006)
 └────────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsubsection{Observability Pipeline}\label{observability-pipeline}
+\subsection{Observability Pipeline}\label{observability-pipeline}
+
+\setcodelang{}
 
 \begin{verbatim}
 ┌───────────────────────────────────────────────────────────────────────┐
@@ -1848,29 +1924,29 @@ App → iptables redirect → Envoy sidecar (:15006)
 └───────────────────────────────────────────────────────────────────────┘
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
-\subsubsection{\texorpdfstring{Google: Borg \(\rightarrow\) Kubernetes}{Google: Borg \textbackslash rightarrow Kubernetes}}\label{google-borg-rightarrow-kubernetes}
+\subsection{\texorpdfstring{Google: Borg \(\rightarrow\) Kubernetes}{Google: Borg \textbackslash rightarrow Kubernetes}}\label{google-borg-rightarrow-kubernetes}
 
 Google ran Borg (container orchestration) internally since \textasciitilde2003. When containerizing Gmail, Search, and Maps, they packed 2--3 tasks per machine (vs 1 VM per machine), cutting infrastructure costs by 50--70\%. In 2014, Google open-sourced Kubernetes as a reimagined, user-friendly Borg. By commoditizing container orchestration, Google leveled AWS\textquotesingle s early head start in cloud infrastructure.
 
-\subsubsection{Netflix: Chaos Engineering}\label{netflix-chaos-engineering}
+\subsection{Netflix: Chaos Engineering}\label{netflix-chaos-engineering}
 
 Netflix runs 100\% on AWS. They operate 700+ microservices. To build confidence in their distributed system\textquotesingle s resilience, they created Chaos Monkey --- a tool that randomly terminates production EC2 instances during business hours. If you can\textquotesingle t handle random failures in prod, you\textquotesingle ll panic at 3am. Chaos Monkey evolved into the Simian Army (Chaos Gorilla terminates availability zones, Latency Monkey injects delays).
 
-\subsubsection{\texorpdfstring{Amazon Prime Video: Microservices \(\rightarrow\) Monolith (2023)}{Amazon Prime Video: Microservices \textbackslash rightarrow Monolith (2023)}}\label{amazon-prime-video-microservices-rightarrow-monolith-2023}
+\subsection{\texorpdfstring{Amazon Prime Video: Microservices \(\rightarrow\) Monolith (2023)}{Amazon Prime Video: Microservices \textbackslash rightarrow Monolith (2023)}}\label{amazon-prime-video-microservices-rightarrow-monolith-2023}
 
 Prime Video moved a monitoring system from serverless microservices (distributed Step Functions + S3) back to a single monolith. Cost dropped 90\%. \textbf{Lesson:} Microservices aren\textquotesingle t always the answer --- they add distributed systems complexity and cost. Use them when you need independent scaling or team autonomy.
 
-\subsubsection{Shopify: Kubernetes Auto-Scaling on Black Friday}\label{shopify-kubernetes-auto-scaling-on-black-friday}
+\subsection{Shopify: Kubernetes Auto-Scaling on Black Friday}\label{shopify-kubernetes-auto-scaling-on-black-friday}
 
 Shopify uses Kubernetes HPA + Cluster Autoscaler to handle 10--20\(\times\) traffic spikes on Black Friday. They pre-scale (manually set replicas higher before the event) AND rely on HPA for real-time response. Their load tests simulate peak traffic weeks in advance, using observability (Prometheus + Grafana) to catch bottlenecks.
 
-\subsubsection{Stripe: Canary Deployments}\label{stripe-canary-deployments}
+\subsection{Stripe: Canary Deployments}\label{stripe-canary-deployments}
 
 Stripe deploys hundreds of times per day. Every production deploy goes through a multi-stage canary: 0.1\% \(\rightarrow\) 1\% \(\rightarrow\) 10\% \(\rightarrow\) 100\%. Each stage has automatic metric analysis (error rate, latency) with automated rollback. This allows fast iteration without catastrophic incidents.
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One shipping port --- every concept is a container, a crane, or a berth in the same terminal.}
 
@@ -1905,9 +1981,9 @@ Distributed trace & The container\textquotesingle s full journey log: the gate s
 IaC (Terraform) & The terminal\textquotesingle s master construction blueprint: instead of building each berth, crane, and road by hand, the harbour engineer submits the blueprint to the construction system which provisions an identical layout on demand --- \texttt{terraform\ plan} shows which berths will change before a single pile is driven, and the same blueprint can stamp out a second terminal in a different harbour without starting from scratch \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{Kubernetes Components: "EAS-CSK"}\label{kubernetes-components-eas-csk}
+\subsection{Kubernetes Components: "EAS-CSK"}\label{kubernetes-components-eas-csk}
 
 \textbf{E}tcd, \textbf{A}PI-server, \textbf{S}cheduler, \textbf{C}ontroller Manager, \textbf{S}cheduler (worker: \textbf{K}ubelet, kube-proxy)
 
@@ -1927,37 +2003,37 @@ Control plane: \textbf{"EACH Controller Schedules"}
   \textbf{S}cheduler
 \end{itemize}
 
-\subsubsection{Namespace types: "PUMNIC+T"}\label{namespace-types-pumnict}
+\subsection{Namespace types: "PUMNIC+T"}\label{namespace-types-pumnict}
 
 \textbf{P}ID, \textbf{U}TS, \textbf{M}ount, \textbf{N}et, \textbf{I}PC, \textbf{C}group, \textbf{T}ime (user)
 
-\subsubsection{Three Pillars of Observability: "MLT"}\label{three-pillars-of-observability-mlt}
+\subsection{Three Pillars of Observability: "MLT"}\label{three-pillars-of-observability-mlt}
 
 \textbf{M}etrics (what happened), \textbf{L}ogs (why), \textbf{T}races (where)
 
 Or: \textbf{"Every alert needs MLT"} --- Metrics alert \(\rightarrow\) Logs for why \(\rightarrow\) Traces for where
 
-\subsubsection{Deployment Strategies: "BCR-R"}\label{deployment-strategies-bcr-r}
+\subsection{Deployment Strategies: "BCR-R"}\label{deployment-strategies-bcr-r}
 
 \textbf{B}lue-green (instant cutover), \textbf{C}anary (gradual real traffic), \textbf{R}olling (in-place), \textbf{R}ecreate (with downtime)
 
 Remember by risk level: Recreate = most risky (downtime), Rolling = medium (partial overlap), Canary = low (limited blast radius), Blue-Green = safest rollback.
 
-\subsubsection{\texorpdfstring{SLI/SLO/SLA: "Indicator \(\rightarrow\) Objective \(\rightarrow\) Agreement"}{SLI/SLO/SLA: "Indicator \textbackslash rightarrow Objective \textbackslash rightarrow Agreement"}}\label{slislosla-indicator-rightarrow-objective-rightarrow-agreement}
+\subsection{\texorpdfstring{SLI/SLO/SLA: "Indicator \(\rightarrow\) Objective \(\rightarrow\) Agreement"}{SLI/SLO/SLA: "Indicator \textbackslash rightarrow Objective \textbackslash rightarrow Agreement"}}\label{slislosla-indicator-rightarrow-objective-rightarrow-agreement}
 
 I measure the \textbf{Indicator} \(\rightarrow\) I set an \textbf{Objective} \(\rightarrow\) I sign an \textbf{Agreement} with the customer.
 Error budget = SLO headroom = "how much you can mess up."
 
-\subsubsection{Service Types K8s: "CLNE-H"}\label{service-types-k8s-clne-h}
+\subsection{Service Types K8s: "CLNE-H"}\label{service-types-k8s-clne-h}
 
 \textbf{C}lusterIP \(\rightarrow\) \textbf{L}oadBalancer \(\rightarrow\) \textbf{N}odePort \(\rightarrow\) \textbf{E}xternalName \(\rightarrow\) \textbf{H}eadless
 Or remember by audience: Cluster=internal, LoadBalancer=external-cloud, NodePort=external-bare-metal.
 
-\subsubsection{\texorpdfstring{Docker Image Layer Order: "FROM \(\rightarrow\) WORK \(\rightarrow\) COPY-deps \(\rightarrow\) RUN \(\rightarrow\) COPY-app"}{Docker Image Layer Order: "FROM \textbackslash rightarrow WORK \textbackslash rightarrow COPY-deps \textbackslash rightarrow RUN \textbackslash rightarrow COPY-app"}}\label{docker-image-layer-order-from-rightarrow-work-rightarrow-copy-deps-rightarrow-run-rightarrow-copy-app}
+\subsection{\texorpdfstring{Docker Image Layer Order: "FROM \(\rightarrow\) WORK \(\rightarrow\) COPY-deps \(\rightarrow\) RUN \(\rightarrow\) COPY-app"}{Docker Image Layer Order: "FROM \textbackslash rightarrow WORK \textbackslash rightarrow COPY-deps \textbackslash rightarrow RUN \textbackslash rightarrow COPY-app"}}\label{docker-image-layer-order-from-rightarrow-work-rightarrow-copy-deps-rightarrow-run-rightarrow-copy-app}
 
 Stable \(\rightarrow\) Volatile (put things that change least at top of Dockerfile).
 
-\subsubsection{Metrics types: "CGH-S" (Counter, Gauge, Histogram, Summary)}\label{metrics-types-cgh-s-counter-gauge-histogram-summary}
+\subsection{Metrics types: "CGH-S" (Counter, Gauge, Histogram, Summary)}\label{metrics-types-cgh-s-counter-gauge-histogram-summary}
 
 \begin{itemize}
 \tightlist
@@ -1971,14 +2047,14 @@ Stable \(\rightarrow\) Volatile (put things that change least at top of Dockerfi
   \textbf{S}ummaries are summarized (pre-computed, less flexible --- avoid)
 \end{itemize}
 
-\subsubsection{\texorpdfstring{IaC: "T = Terra(multi) \(\rightarrow\) CFN = Amazon-native"}{IaC: "T = Terra(multi) \textbackslash rightarrow CFN = Amazon-native"}}\label{iac-t--terramulti-rightarrow-cfn--amazon-native}
+\subsection{\texorpdfstring{IaC: "T = Terra(multi) \(\rightarrow\) CFN = Amazon-native"}{IaC: "T = Terra(multi) \textbackslash rightarrow CFN = Amazon-native"}}\label{iac-t--terramulti-rightarrow-cfn--amazon-native}
 
 \textbf{T}erraform = multi-cloud, HCL. \textbf{C}loudFormation = AWS-only, JSON/YAML.
 "\textbf{T}erraform \textbf{T}ravels everywhere; \textbf{C}loudFormation \textbf{C}an\textquotesingle t leave AWS."
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Q1: What is the difference between a container and a virtual machine?}\label{q1-what-is-the-difference-between-a-container-and-a-virtual-machine}
+\subsection{Q1: What is the difference between a container and a virtual machine?}\label{q1-what-is-the-difference-between-a-container-and-a-virtual-machine}
 
 \textbf{Model Answer:}
 Containers and VMs both isolate workloads, but they differ in depth of isolation and overhead. A VM runs a full guest OS on top of a hypervisor, which virtualizes hardware. Each VM has its own kernel, so isolation is strong but overhead is high --- GBs of image, seconds to boot, significant memory for the guest OS.
@@ -1997,7 +2073,7 @@ The tradeoff: containers have weaker isolation. A kernel vulnerability can poten
   \textbf{Kata Containers:} lightweight VMs with OCI-compatible interface --- VM isolation with container experience.
 \end{itemize}
 
-\subsubsection{Q2: Walk me through how Kubernetes schedules a pod.}\label{q2-walk-me-through-how-kubernetes-schedules-a-pod}
+\subsection{Q2: Walk me through how Kubernetes schedules a pod.}\label{q2-walk-me-through-how-kubernetes-schedules-a-pod}
 
 \textbf{Model Answer:}
 When you create a pod, it starts with \texttt{nodeName:\ ""}. The kube-scheduler watches the API server for unscheduled pods.
@@ -2018,7 +2094,7 @@ The scheduler picks the highest-scoring node and writes \texttt{nodeName} back t
   Pod stays in \texttt{Pending} state. Cluster Autoscaler detects unschedulable pods and provisions a new node. Once the node registers, the scheduler places the pod.
 \end{itemize}
 
-\subsubsection{Q3: Explain the difference between a Deployment and a StatefulSet.}\label{q3-explain-the-difference-between-a-deployment-and-a-statefulset}
+\subsection{Q3: Explain the difference between a Deployment and a StatefulSet.}\label{q3-explain-the-difference-between-a-deployment-and-a-statefulset}
 
 \textbf{Model Answer:}
 Both manage sets of pods, but they handle pod identity and storage differently.
@@ -2035,7 +2111,7 @@ A \textbf{StatefulSet} manages stateful pods. It guarantees: stable pod names (p
   Each Cassandra pod needs a unique identity (node name), stable storage (SSTable files), and stable network address (for gossip protocol between nodes). StatefulSet provides all three.
 \end{itemize}
 
-\subsubsection{Q4: How does a Service Mesh work? Why use it instead of client-side libraries?}\label{q4-how-does-a-service-mesh-work-why-use-it-instead-of-client-side-libraries}
+\subsection{Q4: How does a Service Mesh work? Why use it instead of client-side libraries?}\label{q4-how-does-a-service-mesh-work-why-use-it-instead-of-client-side-libraries}
 
 \textbf{Model Answer:}
 A service mesh moves cross-cutting concerns (retries, timeouts, circuit breaking, mTLS, observability) out of application code into the infrastructure layer, using sidecar proxies.
@@ -2054,7 +2130,7 @@ Downsides: latency overhead per hop (\textasciitilde1-5ms), operational complexi
   mTLS = mutual TLS: both client and server authenticate each other with certificates. Istiod acts as a certificate authority, issuing X.509 certs with SPIFFE IDs (e.g., \texttt{spiffe://cluster.local/ns/default/sa/my-service}) to each workload. Envoy uses these certs for mTLS handshakes transparently.
 \end{itemize}
 
-\subsubsection{Q5: Explain canary vs blue-green deployments. When would you choose each?}\label{q5-explain-canary-vs-blue-green-deployments-when-would-you-choose-each}
+\subsection{Q5: Explain canary vs blue-green deployments. When would you choose each?}\label{q5-explain-canary-vs-blue-green-deployments-when-would-you-choose-each}
 
 \textbf{Model Answer:}
 Both enable zero-downtime deployments, but differ in how traffic is shifted.
@@ -2077,7 +2153,7 @@ Choose canary when: you want to validate with real production traffic, you can t
   Via multiple Deployments with different labels + weighted Ingress (nginx, Istio VirtualService with weight). Istio makes it cleanest: \texttt{weight:\ 10} on v2 subset, \texttt{weight:\ 90} on v1.
 \end{itemize}
 
-\subsubsection{Q6: What are the three pillars of observability? How do they relate?}\label{q6-what-are-the-three-pillars-of-observability-how-do-they-relate}
+\subsection{Q6: What are the three pillars of observability? How do they relate?}\label{q6-what-are-the-three-pillars-of-observability-how-do-they-relate}
 
 \textbf{Model Answer:}
 Metrics, Logs, and Traces are the three pillars.
@@ -2090,7 +2166,7 @@ Metrics, Logs, and Traces are the three pillars.
 
 In practice: Prometheus alerts on high error rate (metric) \(\rightarrow\) engineer looks at Elasticsearch logs for failing requests (log) \(\rightarrow\) finds a TraceID in the log \(\rightarrow\) pulls that trace in Jaeger to see exactly which downstream service is broken (trace). They\textquotesingle re complementary --- each answers a different question.
 
-\subsubsection{Q7: What are SLOs and error budgets? How do you use them?}\label{q7-what-are-slos-and-error-budgets-how-do-you-use-them}
+\subsection{Q7: What are SLOs and error budgets? How do you use them?}\label{q7-what-are-slos-and-error-budgets-how-do-you-use-them}
 
 \textbf{Model Answer:}
 An SLO (Service Level Objective) is an internal reliability target: "99.9\% of requests to /checkout will complete in \textless200ms over a rolling 30-day window." The SLI (Service Level Indicator) is the measurement: actual p99 latency ratio.
@@ -2109,7 +2185,7 @@ The power: it depoliticizes "can we deploy?" --- it\textquotesingle s no longer 
   SLO is an internal target you\textquotesingle re engineering toward. SLA is the external contract with customers, typically with financial penalties. SLAs are usually set lower than SLOs (SLO=99.9\%, SLA=99.5\%) so you have a buffer.
 \end{itemize}
 
-\subsubsection{Q8: How does Terraform manage state? What problems can arise?}\label{q8-how-does-terraform-manage-state-what-problems-can-arise}
+\subsection{Q8: How does Terraform manage state? What problems can arise?}\label{q8-how-does-terraform-manage-state-what-problems-can-arise}
 
 \textbf{Model Answer:}
 Terraform maintains a state file (\texttt{terraform.tfstate}) that maps your HCL resource declarations to real cloud resources. This lets Terraform know what it created, what\textquotesingle s changed, and what needs to be destroyed.
@@ -2139,9 +2215,9 @@ Problems with state:
   CloudFormation: AWS-native, AWS manages state, automatic rollback on failure, verbose JSON/YAML. Terraform: multi-cloud, you manage state, HCL is cleaner, huge module ecosystem. Pulumi: use TypeScript/Python/Go --- good when complex conditional logic is needed.
 \end{itemize}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{Kubernetes at Scale: What Actually Breaks}\label{kubernetes-at-scale-what-actually-breaks}
+\subsection{Kubernetes at Scale: What Actually Breaks}\label{kubernetes-at-scale-what-actually-breaks}
 
 \textbf{etcd performance:} At 5000 nodes with 50 pods each = 250,000 pod objects. etcd can become a bottleneck. Kubernetes API server uses watch caching (API server caches etcd data; clients watch API server, not etcd directly). Still: large clusters need etcd performance tuning (SSDs, defragmentation, compaction).
 
@@ -2151,7 +2227,7 @@ Problems with state:
 
 \textbf{Scheduler throughput:} Default scheduler handles \textasciitilde1000 pod scheduling decisions/second. At hyperscale: custom schedulers, batch scheduling (Volcano), or scheduler extenders.
 
-\subsubsection{Service Mesh Overhead and Alternatives}\label{service-mesh-overhead-and-alternatives}
+\subsection{Service Mesh Overhead and Alternatives}\label{service-mesh-overhead-and-alternatives}
 
 Istio adds \textasciitilde1-5ms latency per hop and \textasciitilde10-15\% CPU overhead on sidecars. At Netflix scale (billions of requests/day), this is significant.
 
@@ -2167,7 +2243,7 @@ Alternatives:
   \textbf{Per-service library with common standards:} large orgs like Twitter (Finagle) and Netflix (Ribbon/Hystrix) used fat client libraries before service mesh was mature.
 \end{itemize}
 
-\subsubsection{Multi-Cluster and Multi-Region Kubernetes}\label{multi-cluster-and-multi-region-kubernetes}
+\subsection{Multi-Cluster and Multi-Region Kubernetes}\label{multi-cluster-and-multi-region-kubernetes}
 
 \textbf{Why multiple clusters:} blast radius containment, regional isolation, team autonomy, different security domains (prod/non-prod), Kubernetes version upgrades (rolling clusters).
 
@@ -2175,7 +2251,7 @@ Alternatives:
 
 \textbf{GitOps at scale:} ArgoCD ApplicationSets generate ArgoCD Applications dynamically for each cluster/environment. One Git repo, many clusters.
 
-\subsubsection{Observability: What Interviewers Miss}\label{observability-what-interviewers-miss}
+\subsection{Observability: What Interviewers Miss}\label{observability-what-interviewers-miss}
 
 \textbf{The cardinality trap:} Prometheus stores every unique label combination as a separate time series. Label \texttt{user\_id} on a metric with 10 million users = 10 million time series \(\rightarrow\) OOM. Never put high-cardinality labels (user IDs, request IDs) on metrics. Use traces for per-request detail.
 
@@ -2183,7 +2259,7 @@ Alternatives:
 
 \textbf{Exemplars:} Prometheus exemplars link metrics to traces. When a histogram records a high-latency sample, an exemplar stores the TraceID for that specific request. In Grafana: click the high-latency bar in the histogram \(\rightarrow\) jump directly to the trace. This closes the metrics-to-traces gap.
 
-\subsubsection{Platform Engineering vs DevOps vs SRE}\label{platform-engineering-vs-devops-vs-sre}
+\subsection{Platform Engineering vs DevOps vs SRE}\label{platform-engineering-vs-devops-vs-sre}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1804}}
@@ -2205,7 +2281,7 @@ Focus
 
 Platform engineering is the evolved, product-thinking version of DevOps --- treating internal developers as customers.
 
-\subsubsection{Cost Optimization in K8s}\label{cost-optimization-in-k8s}
+\subsection{Cost Optimization in K8s}\label{cost-optimization-in-k8s}
 
 \textbf{Right-sizing:} Most teams over-provision resource requests (fear of OOM kills). VPA in recommendation mode (not enforcement) gives data-driven suggestions without forcing restarts.
 
@@ -2213,51 +2289,51 @@ Platform engineering is the evolved, product-thinking version of DevOps --- trea
 
 \textbf{Cluster bin-packing:} Kubernetes default scheduler doesn\textquotesingle t optimize for cost; it spreads load (LeastAllocated). Descheduler (a separate K8s component) can rebalance pods onto fewer nodes during off-peak, enabling cluster autoscaler to scale down idle nodes.
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
-\subsubsection{Mistake 1: Confusing Docker with Kubernetes}\label{mistake-1-confusing-docker-with-kubernetes}
+\subsection{Mistake 1: Confusing Docker with Kubernetes}\label{mistake-1-confusing-docker-with-kubernetes}
 
 "I use Docker to run Kubernetes" --- wrong. Docker is a container runtime (one of many). Kubernetes uses containerd (or CRI-O), not Docker directly, since K8s 1.24 deprecated the dockershim. You can build Docker images and run them on Kubernetes, but they\textquotesingle re separate layers.
 
-\subsubsection{Mistake 2: Not Knowing etcd\textquotesingle s Role}\label{mistake-2-not-knowing-etcds-role}
+\subsection{Mistake 2: Not Knowing etcd\textquotesingle s Role}\label{mistake-2-not-knowing-etcds-role}
 
 Many candidates say "Kubernetes stores state in its database" without knowing it\textquotesingle s etcd, or that it\textquotesingle s a Raft-based distributed key-value store, or that it\textquotesingle s the ONLY component kubelets don\textquotesingle t talk to directly (all through API server).
 
-\subsubsection{Mistake 3: Conflating Secrets with Security}\label{mistake-3-conflating-secrets-with-security}
+\subsection{Mistake 3: Conflating Secrets with Security}\label{mistake-3-conflating-secrets-with-security}
 
 "Kubernetes Secrets are encrypted" --- wrong. They\textquotesingle re base64-encoded by default. Encryption at rest requires explicit \texttt{EncryptionConfiguration} on the API server. Production systems use external secret managers (Vault, AWS Secrets Manager with External Secrets Operator).
 
-\subsubsection{Mistake 4: HPA + VPA on Same Metric Conflict}\label{mistake-4-hpa--vpa-on-same-metric-conflict}
+\subsection{Mistake 4: HPA + VPA on Same Metric Conflict}\label{mistake-4-hpa--vpa-on-same-metric-conflict}
 
 Using HPA and VPA both targeting CPU/memory on the same Deployment causes conflicts. HPA scales replicas based on per-pod CPU; VPA adjusts per-pod CPU requests. Use HPA for scaling, VPA for right-sizing, and don\textquotesingle t target the same resource metric with both.
 
-\subsubsection{Mistake 5: High-Cardinality Prometheus Labels}\label{mistake-5-high-cardinality-prometheus-labels}
+\subsection{Mistake 5: High-Cardinality Prometheus Labels}\label{mistake-5-high-cardinality-prometheus-labels}
 
 Adding user\_id, request\_id, or other high-cardinality labels to Prometheus metrics causes a time-series explosion (cardinality bomb) that OOMs your Prometheus. For per-request data, use traces.
 
-\subsubsection{Mistake 6: Forgetting Resource Requests in Pods}\label{mistake-6-forgetting-resource-requests-in-pods}
+\subsection{Mistake 6: Forgetting Resource Requests in Pods}\label{mistake-6-forgetting-resource-requests-in-pods}
 
 Running pods without \texttt{resources.requests} means the scheduler places pods on nodes without knowing actual needs. Result: noisy neighbor problems, OOM kills, unpredictable performance. Always set requests.
 
-\subsubsection{Mistake 7: Misunderstanding Rolling Update Safety}\label{mistake-7-misunderstanding-rolling-update-safety}
+\subsection{Mistake 7: Misunderstanding Rolling Update Safety}\label{mistake-7-misunderstanding-rolling-update-safety}
 
 A rolling update with \texttt{maxUnavailable:\ 0,\ maxSurge:\ 1} ensures no downtime but takes longer. Many candidates don\textquotesingle t realize that if the new pods crash immediately, the rollout stalls --- it won\textquotesingle t remove old pods if new ones aren\textquotesingle t ready. They assume rolling updates auto-rollback; they don\textquotesingle t (you need \texttt{kubectl\ rollout\ undo} or a GitOps tool).
 
-\subsubsection{Mistake 8: SLO = SLA = Uptime = 99.9\%}\label{mistake-8-slo--sla--uptime--999}
+\subsection{Mistake 8: SLO = SLA = Uptime = 99.9\%}\label{mistake-8-slo--sla--uptime--999}
 
 SLO is internal, SLA is external. SLIs aren\textquotesingle t just availability --- they can be latency, throughput, correctness. Error budgets aren\textquotesingle t just "downtime minutes" --- they\textquotesingle re burned by any SLO violation (high latency counts). Getting these distinctions right signals SRE maturity.
 
-\subsubsection{Mistake 9: IaC Doesn\textquotesingle t Mean No Drift}\label{mistake-9-iac-doesnt-mean-no-drift}
+\subsection{Mistake 9: IaC Doesn\textquotesingle t Mean No Drift}\label{mistake-9-iac-doesnt-mean-no-drift}
 
 IaC prevents initial drift but doesn\textquotesingle t prevent subsequent manual changes. Need: CI enforcement (no console access to prod), Terraform drift detection (\texttt{terraform\ plan} in CI), and possibly tools like Driftctl that detect out-of-band changes.
 
-\subsubsection{Mistake 10: Blue-Green Always Better than Canary}\label{mistake-10-blue-green-always-better-than-canary}
+\subsection{Mistake 10: Blue-Green Always Better than Canary}\label{mistake-10-blue-green-always-better-than-canary}
 
 Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover period and doesn\textquotesingle t validate with real user traffic. Canary is more complex but validates with real traffic and has precise rollback. The best engineers can articulate the trade-offs for specific scenarios.
 
-\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{System Design}\label{system-design}
+\subsection{System Design}\label{system-design}
 
 \begin{itemize}
 \tightlist
@@ -2271,7 +2347,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   \textbf{Load balancing:} kube-proxy (L4), Ingress (L7), Istio (L7 with header-based routing). FAANG question: what happens when you need sticky sessions? \(\rightarrow\) use consistent hash in Istio or application-level session affinity.
 \end{itemize}
 
-\subsubsection{Distributed Systems}\label{distributed-systems}
+\subsection{Distributed Systems}\label{distributed-systems}
 
 \begin{itemize}
 \tightlist
@@ -2285,7 +2361,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   \textbf{Idempotency:} K8s controllers are designed to be idempotent --- running the same reconciliation loop twice produces the same result. This enables safe crash recovery.
 \end{itemize}
 
-\subsubsection{Networking}\label{networking}
+\subsection{Networking}\label{networking}
 
 \begin{itemize}
 \tightlist
@@ -2299,7 +2375,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   \textbf{Network policies:} K8s NetworkPolicy resources control pod-to-pod traffic (default: allow all). Enforced by CNI plugin (Calico, Cilium). Zero-trust network: default deny, explicit allow.
 \end{itemize}
 
-\subsubsection{Performance}\label{performance}
+\subsection{Performance}\label{performance}
 
 \begin{itemize}
 \tightlist
@@ -2313,9 +2389,9 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   \textbf{Resource contention:} Without resource requests, pods can compete for CPU/memory on the same node. Use LimitRanges (namespace-level defaults) and ResourceQuotas (namespace-level ceilings).
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
-\subsubsection{What Google Looks For (SRE/Infrastructure interviews)}\label{what-google-looks-for-sreinfrastructure-interviews}
+\subsection{What Google Looks For (SRE/Infrastructure interviews)}\label{what-google-looks-for-sreinfrastructure-interviews}
 
 \begin{itemize}
 \tightlist
@@ -2329,7 +2405,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   Operations at scale: what breaks at 10,000 nodes? How do you debug a cluster with 10,000 pods all crashing?
 \end{itemize}
 
-\subsubsection{What Meta Looks For}\label{what-meta-looks-for}
+\subsection{What Meta Looks For}\label{what-meta-looks-for}
 
 \begin{itemize}
 \tightlist
@@ -2343,7 +2419,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   Deep networking knowledge (BGP, ECMP, spine-leaf topology at data center scale).
 \end{itemize}
 
-\subsubsection{What Amazon (AWS) Looks For}\label{what-amazon-aws-looks-for}
+\subsection{What Amazon (AWS) Looks For}\label{what-amazon-aws-looks-for}
 
 \begin{itemize}
 \tightlist
@@ -2355,7 +2431,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   Leadership Principles applied to tech decisions (Bias for Action, Frugality, Operational Excellence).
 \end{itemize}
 
-\subsubsection{What Netflix Looks For}\label{what-netflix-looks-for}
+\subsection{What Netflix Looks For}\label{what-netflix-looks-for}
 
 \begin{itemize}
 \tightlist
@@ -2367,7 +2443,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   Blast radius minimization --- design for failure, not just for the happy path.
 \end{itemize}
 
-\subsubsection{Universal FAANG Tips}\label{universal-faang-tips}
+\subsection{Universal FAANG Tips}\label{universal-faang-tips}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2403,9 +2479,9 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   \textbf{GitOps is default.} For deployment questions, propose ArgoCD/Flux for CD. "We\textquotesingle d store manifests in Git, ArgoCD would sync to the cluster. Any change is auditable and rollback is a git revert."
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \textbf{Containers} pack apps with their dependencies (not the OS) using Linux \textbf{namespaces} (isolation) and \textbf{cgroups} (resource limits). They\textquotesingle re faster and lighter than VMs. Docker images are layered via \textbf{OverlayFS} with copy-on-write.
 
@@ -2423,7 +2499,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
 
 \textbf{SLO/Error Budget:} SLO = internal target. SLA = external contract. Error Budget = 100\% - SLO. When budget exhausted \(\rightarrow\) freeze features, fix reliability.
 
-\subsubsection{Key Points --- The Must-Remembers}\label{key-points--the-must-remembers}
+\subsection{Key Points --- The Must-Remembers}\label{key-points--the-must-remembers}
 
 \begin{itemize}
 \tightlist
@@ -2455,7 +2531,7 @@ Blue-green is simpler and cleaner but costs 2\(\times\) for the switchover perio
   \textbf{eBPF (Cilium) = future of K8s networking; replaces iptables + sidecar mesh}
 \end{itemize}
 
-\subsubsection{Cheat Sheet Table}\label{cheat-sheet-table}
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1624}}
@@ -2500,7 +2576,7 @@ eBPF & Kernel-level networking, replaces iptables & "Cilium: O(1) lookup, no sid
 GitOps & Git = desired state; ArgoCD syncs cluster & "git revert = rollback; git log = deploy history" \\
 \end{longtable}
 
-\subsubsection{The Most Important Concepts (Rank-Ordered for FAANG)}\label{the-most-important-concepts-rank-ordered-for-faang}
+\subsection{The Most Important Concepts (Rank-Ordered for FAANG)}\label{the-most-important-concepts-rank-ordered-for-faang}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

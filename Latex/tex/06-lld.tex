@@ -63,16 +63,14 @@
 {\hypersetup{hidelinks}\tableofcontents}
 \clearpage
 
-\section{Low-Level Design (LLD) / Object-Oriented Design}\label{low-level-design-lld--object-oriented-design}
-
-\subsection{Comprehensive Interview-Prep Guide}\label{comprehensive-interview-prep-guide}
+\section{Comprehensive Interview-Prep Guide}\label{comprehensive-interview-prep-guide}
 
 \begin{quote}
 \textbf{Target}: FAANG interviews requiring class-level design, OOP mastery, and design pattern fluency.
 \textbf{Format}: Deep learning + quick-revision sections. Revisit the cheat sheet before every interview.
 \end{quote}
 
-\subsection{Overview --- What It Is}\label{overview--what-it-is}
+\section{Overview --- What It Is}\label{overview--what-it-is}
 
 \textbf{Low-Level Design (LLD)} is the art of translating a feature requirement into a concrete, maintainable class structure. Where High-Level Design (HLD) asks \emph{"what boxes talk to each other?"}, LLD asks \emph{"what does each box look like inside?"}.
 
@@ -94,7 +92,7 @@ LLD covers:
 
 Think of LLD as \textbf{architecture at the function and class level}, just like an engineer laying out rooms inside a building (vs. HLD which decides the city block).
 
-\subsection{Why It Exists}\label{why-it-exists}
+\section{Why It Exists}\label{why-it-exists}
 
 Software without deliberate design rots. Symptoms of bad LLD:
 
@@ -132,7 +130,7 @@ What It Means
 \textbf{Readable} & Code reads like prose; intent is obvious \\
 \end{longtable}
 
-\subsection{Why FAANG Cares}\label{why-faang-cares}
+\section{Why FAANG Cares}\label{why-faang-cares}
 
 \textbf{Amazon} --- Bar raisers explicitly look for OOD clarity. Leadership Principle "Insist on Highest Standards" maps directly to clean class design. Expect to design systems like a parking lot, library, or food-ordering system end-to-end.
 
@@ -161,11 +159,11 @@ What It Means
   Do you write \textbf{clean, idiomatic code} with meaningful names?
 \end{enumerate}
 
-\subsection{The LLD Interview Framework}\label{the-lld-interview-framework}
+\section{The LLD Interview Framework}\label{the-lld-interview-framework}
 
 Follow this seven-step process in every LLD interview. It signals structure and prevents blank-page panic.
 
-\subsubsection{Step 1: Clarify Requirements (2--3 min)}\label{step-1-clarify-requirements-23-min}
+\subsection{Step 1: Clarify Requirements (2--3 min)}\label{step-1-clarify-requirements-23-min}
 
 Ask functional and constraint questions:
 
@@ -183,7 +181,7 @@ Ask functional and constraint questions:
 
 \textbf{Goal}: Narrow scope. You can\textquotesingle t design what you don\textquotesingle t understand.
 
-\subsubsection{Step 2: Identify Entities / Nouns (2 min)}\label{step-2-identify-entities--nouns-2-min}
+\subsection{Step 2: Identify Entities / Nouns (2 min)}\label{step-2-identify-entities--nouns-2-min}
 
 Extract nouns from the requirements. Each noun is a candidate class.
 
@@ -193,7 +191,7 @@ Extract nouns from the requirements. Each noun is a candidate class.
 
 \textbf{Goal}: Build your initial class inventory.
 
-\subsubsection{Step 3: Identify Relationships (2 min)}\label{step-3-identify-relationships-2-min}
+\subsection{Step 3: Identify Relationships (2 min)}\label{step-3-identify-relationships-2-min}
 
 For each pair of entities, ask:
 
@@ -209,7 +207,7 @@ For each pair of entities, ask:
 
 \textbf{Goal}: Draw arrows. Sketch rough UML.
 
-\subsubsection{Step 4: Class Diagram (3--5 min)}\label{step-4-class-diagram-35-min}
+\subsection{Step 4: Class Diagram (3--5 min)}\label{step-4-class-diagram-35-min}
 
 Sketch on whiteboard:
 
@@ -225,7 +223,7 @@ Sketch on whiteboard:
 
 Say aloud: \emph{"I\textquotesingle ll keep this diagram minimal now and fill in details when I code."}
 
-\subsubsection{Step 5: Apply Patterns (1--2 min)}\label{step-5-apply-patterns-12-min}
+\subsection{Step 5: Apply Patterns (1--2 min)}\label{step-5-apply-patterns-12-min}
 
 Scan your diagram for pattern opportunities:
 
@@ -243,7 +241,7 @@ Scan your diagram for pattern opportunities:
 
 \textbf{Don\textquotesingle t force patterns.} Say: \emph{"I\textquotesingle m considering Strategy here because the ticket pricing algorithm may vary."}
 
-\subsubsection{Step 6: Code Core Classes (10--15 min)}\label{step-6-code-core-classes-1015-min}
+\subsection{Step 6: Code Core Classes (10--15 min)}\label{step-6-code-core-classes-1015-min}
 
 Code the most important 2--3 classes fully. Show:
 
@@ -259,7 +257,7 @@ Code the most important 2--3 classes fully. Show:
 
 Prioritize \textbf{readability over completeness}.
 
-\subsubsection{Step 7: Discuss Extensibility (2--3 min)}\label{step-7-discuss-extensibility-23-min}
+\subsection{Step 7: Discuss Extensibility (2--3 min)}\label{step-7-discuss-extensibility-23-min}
 
 Proactively say:
 
@@ -273,15 +271,17 @@ Proactively say:
 
 \textbf{This step separates senior candidates from junior ones.}
 
-\subsection{Core Concepts}\label{core-concepts}
+\section{Core Concepts}\label{core-concepts}
 
-\subsubsection{OOP Four Pillars}\label{oop-four-pillars}
+\subsection{OOP Four Pillars}\label{oop-four-pillars}
 
-\paragraph{Encapsulation}\label{encapsulation}
+\subsubsection{Encapsulation}\label{encapsulation}
 
 \textbf{Definition}: Bundle data and the methods that operate on it; hide internal state; expose only a controlled interface.
 
 \textbf{Why}: Protects invariants. A \texttt{BankAccount} shouldn\textquotesingle t let outsiders directly set \texttt{balance\ =\ -1000}.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -307,9 +307,11 @@ Proactively say:
 
 \textbf{Interview Takeaway}: Encapsulation = \emph{"Tell, don\textquotesingle t ask."} Objects manage their own state; callers invoke behavior, not data.
 
-\paragraph{Abstraction}\label{abstraction}
+\subsubsection{Abstraction}\label{abstraction}
 
 \textbf{Definition}: Expose \emph{what} an object does, not \emph{how} it does it. Hide implementation details behind an interface or abstract class.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -329,9 +331,11 @@ Proactively say:
 
 \textbf{Interview Takeaway}: Abstraction lets you swap implementations (Stripe \(\rightarrow\) PayPal) without touching calling code. Think \emph{interface contracts}.
 
-\paragraph{Inheritance}\label{inheritance}
+\subsubsection{Inheritance}\label{inheritance}
 
 \textbf{Definition}: A class (child) inherits attributes and behaviors of another class (parent), extending or overriding them.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -355,7 +359,7 @@ Proactively say:
 
 \textbf{Interview Takeaway}: Use inheritance for \emph{IS-A} relationships where the child truly specializes the parent. Prefer \textbf{composition} when you\textquotesingle re tempted by code reuse alone.
 
-\paragraph{Polymorphism}\label{polymorphism}
+\subsubsection{Polymorphism}\label{polymorphism}
 
 \textbf{Definition}: One interface, many forms. The same method call behaves differently depending on the actual object type at runtime.
 
@@ -369,6 +373,8 @@ Two flavors:
   \textbf{Runtime (overriding)}: subclass replaces parent method
 \end{itemize}
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{vehicles: }\BuiltInTok{list}\NormalTok{[Vehicle] }\OperatorTok{=}\NormalTok{ [Car(), Truck(), ElectricCar()]}
@@ -379,7 +385,7 @@ Two flavors:
 
 \textbf{Interview Takeaway}: Polymorphism eliminates type-checking \texttt{if\ isinstance(x,\ Car)} chains. Code against the interface; let the runtime dispatch.
 
-\subsubsection{SOLID Principles}\label{solid-principles}
+\subsection{SOLID Principles}\label{solid-principles}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0611}}
@@ -407,7 +413,9 @@ Smell It Prevents
 \textbf{D} & Dependency Inversion & Depend on abstractions, not concretions & Hard coupling to third-party libraries \\
 \end{longtable}
 
-\paragraph{S --- Single Responsibility Principle (SRP)}\label{s--single-responsibility-principle-srp}
+\subsubsection{S --- Single Responsibility Principle (SRP)}\label{s--single-responsibility-principle-srp}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -429,7 +437,9 @@ Smell It Prevents
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{O --- Open/Closed Principle (OCP)}\label{o--openclosed-principle-ocp}
+\subsubsection{O --- Open/Closed Principle (OCP)}\label{o--openclosed-principle-ocp}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -455,7 +465,9 @@ Smell It Prevents
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{L --- Liskov Substitution Principle (LSP)}\label{l--liskov-substitution-principle-lsp}
+\subsubsection{L --- Liskov Substitution Principle (LSP)}\label{l--liskov-substitution-principle-lsp}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -476,7 +488,9 @@ Smell It Prevents
 
 \textbf{LSP rule}: If you find yourself throwing \texttt{NotImplementedError} or doing nothing in an overridden method, it\textquotesingle s an LSP violation.
 
-\paragraph{I --- Interface Segregation Principle (ISP)}\label{i--interface-segregation-principle-isp}
+\subsubsection{I --- Interface Segregation Principle (ISP)}\label{i--interface-segregation-principle-isp}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -509,7 +523,9 @@ Smell It Prevents
 \end{Highlighting}
 \end{Shaded}
 
-\paragraph{D --- Dependency Inversion Principle (DIP)}\label{d--dependency-inversion-principle-dip}
+\subsubsection{D --- Dependency Inversion Principle (DIP)}\label{d--dependency-inversion-principle-dip}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -531,7 +547,7 @@ Smell It Prevents
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Composition vs. Inheritance}\label{composition-vs-inheritance}
+\subsection{Composition vs. Inheritance}\label{composition-vs-inheritance}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2209}}
@@ -557,6 +573,8 @@ Composition
 
 \textbf{Rule}: \emph{Favor composition over inheritance} (GoF, Item 18 in Effective Java).
 
+\setcodelang{Python}
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Inheritance{-}heavy — brittle}
@@ -575,7 +593,7 @@ Composition
 
 \textbf{When inheritance IS right}: genuine IS-A + you want to expose the full parent API + hierarchy is shallow (\(\leq\) 2 levels).
 
-\subsubsection{Coupling and Cohesion}\label{coupling-and-cohesion}
+\subsection{Coupling and Cohesion}\label{coupling-and-cohesion}
 
 \textbf{Coupling} = degree to which one module depends on another.
 
@@ -599,7 +617,7 @@ Composition
 
 \textbf{Golden Rule}: \textbf{High cohesion + Loose coupling = maintainable software.}
 
-\subsubsection{DRY / KISS / YAGNI}\label{dry--kiss--yagni}
+\subsection{DRY / KISS / YAGNI}\label{dry--kiss--yagni}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0894}}
@@ -625,13 +643,13 @@ Anti-pattern it prevents
 \textbf{YAGNI} & You Ain\textquotesingle t Gonna Need It & Don\textquotesingle t build features until they\textquotesingle re needed & Speculative generality, unused code \\
 \end{longtable}
 
-\subsection{Design Patterns}\label{design-patterns}
+\section{Design Patterns}\label{design-patterns}
 
 Design patterns are \textbf{named solutions to recurring design problems}. They are not libraries --- they\textquotesingle re vocabulary and blueprints.
 
 \textbf{Source}: Gang of Four (GoF) --- \emph{Design Patterns: Elements of Reusable Object-Oriented Software} (1994).
 
-\subsubsection{Pattern Summary Table}\label{pattern-summary-table}
+\subsection{Pattern Summary Table}\label{pattern-summary-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1533}}
@@ -670,13 +688,15 @@ Template Method & Behavioral & Define skeleton; subclasses fill in steps & Game 
 Iterator & Behavioral & Sequential access without exposing internals & Collection traversal \\
 \end{longtable}
 
-\subsubsection{Creational Patterns}\label{creational-patterns}
+\subsection{Creational Patterns}\label{creational-patterns}
 
-\paragraph{Singleton}\label{singleton}
+\subsubsection{Singleton}\label{singleton}
 
 \textbf{Intent}: Ensure only one instance of a class exists and provide a global access point.
 
 \textbf{When to use}: Logger, configuration, thread pool, connection pool --- resources that must be shared and have exactly one owner.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -709,11 +729,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Pitfall}: Hard to unit test (global state). In interviews, mention using dependency injection instead of Singleton for testability.
 
-\paragraph{Factory Method}\label{factory-method}
+\subsubsection{Factory Method}\label{factory-method}
 
 \textbf{Intent}: Define an interface for creating an object, but let subclasses decide which class to instantiate.
 
 \textbf{When to use}: When the exact type to create isn\textquotesingle t known until subclass decision, or you want to decouple creation from usage.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -744,11 +766,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: \texttt{Calendar.getInstance()} in Java, Django ORM \texttt{objects.create()}.
 
-\paragraph{Abstract Factory}\label{abstract-factory}
+\subsubsection{Abstract Factory}\label{abstract-factory}
 
 \textbf{Intent}: Create families of related objects without specifying their concrete classes.
 
 \textbf{When to use}: When your system must be independent of how its products are created, and you want to enforce that products from the same family are used together.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -788,11 +812,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{vs Factory Method}: Factory Method creates ONE product; Abstract Factory creates a FAMILY of related products.
 
-\paragraph{Builder}\label{builder}
+\subsubsection{Builder}\label{builder}
 
 \textbf{Intent}: Construct a complex object step by step, separating construction from representation.
 
 \textbf{When to use}: When an object has many optional parameters, or its construction requires multiple steps.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -833,11 +859,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Java \texttt{StringBuilder}, \texttt{HttpRequest.Builder}, Lombok \texttt{@Builder}, SQL query builders.
 
-\paragraph{Prototype}\label{prototype}
+\subsubsection{Prototype}\label{prototype}
 
 \textbf{Intent}: Create new objects by copying (cloning) an existing object.
 
 \textbf{When to use}: When object creation is expensive (DB call, heavy computation) and you want to clone a cached version.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -861,13 +889,15 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Undo/redo in editors, spawning enemy waves in games, \texttt{Object.clone()} in Java.
 
-\subsubsection{Structural Patterns}\label{structural-patterns}
+\subsection{Structural Patterns}\label{structural-patterns}
 
-\paragraph{Adapter}\label{adapter}
+\subsubsection{Adapter}\label{adapter}
 
 \textbf{Intent}: Convert the interface of a class into another interface that clients expect. Makes incompatible interfaces work together.
 
 \textbf{When to use}: Integrating third-party libraries, legacy code, or two systems with different interfaces.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -898,11 +928,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Java \texttt{InputStreamReader} (adapts \texttt{InputStream} to \texttt{Reader}), power plug adapters.
 
-\paragraph{Decorator}\label{decorator}
+\subsubsection{Decorator}\label{decorator}
 
 \textbf{Intent}: Attach additional responsibilities to an object dynamically, as an alternative to subclassing.
 
 \textbf{When to use}: Adding features (logging, caching, compression, authentication) without modifying the original class.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -941,11 +973,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{vs Inheritance}: Decorator wraps at runtime; inheritance is fixed at compile time. Decorators compose; subclasses explode combinatorially.
 
-\paragraph{Facade}\label{facade}
+\subsubsection{Facade}\label{facade}
 
 \textbf{Intent}: Provide a simplified interface to a complex subsystem.
 
 \textbf{When to use}: When a subsystem has many moving parts and clients don\textquotesingle t need all that complexity.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -979,7 +1013,7 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: \texttt{slf4j} logging facade, AWS SDK clients, REST API that wraps microservices.
 
-\paragraph{Proxy}\label{proxy}
+\subsubsection{Proxy}\label{proxy}
 
 \textbf{Intent}: Provide a surrogate that controls access to another object.
 
@@ -996,6 +1030,8 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 \item
   \textbf{Caching Proxy}: cache results
 \end{itemize}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1028,11 +1064,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Spring AOP proxies, Hibernate lazy loading, \texttt{java.lang.reflect.Proxy}.
 
-\paragraph{Composite}\label{composite}
+\subsubsection{Composite}\label{composite}
 
 \textbf{Intent}: Compose objects into tree structures to represent part-whole hierarchies. Treat individual objects and compositions uniformly.
 
 \textbf{When to use}: File systems (file/folder), UI component trees, org charts.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1069,13 +1107,15 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Behavioral Patterns}\label{behavioral-patterns}
+\subsection{Behavioral Patterns}\label{behavioral-patterns}
 
-\paragraph{Strategy}\label{strategy}
+\subsubsection{Strategy}\label{strategy}
 
 \textbf{Intent}: Define a family of algorithms, encapsulate each, and make them interchangeable.
 
 \textbf{When to use}: Multiple ways to do the same task that should be swappable at runtime (sort orders, payment methods, compression algorithms).
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1110,11 +1150,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: \texttt{java.util.Comparator}, payment processors, compression codecs.
 
-\paragraph{Observer}\label{observer}
+\subsubsection{Observer}\label{observer}
 
 \textbf{Intent}: Define a one-to-many dependency so that when one object changes state, all dependents are notified automatically.
 
 \textbf{When to use}: Event systems, MVC (model notifies views), pub/sub, real-time dashboards.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1162,11 +1204,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Java \texttt{EventListener}, React state management, Django signals, \texttt{Observable} in RxJava.
 
-\paragraph{Command}\label{command}
+\subsubsection{Command}\label{command}
 
 \textbf{Intent}: Encapsulate a request as an object, allowing parameterization, queuing, logging, and undo/redo.
 
 \textbf{When to use}: Undo/redo, transactional operations, job queues, macro recording.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1203,11 +1247,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Git commits (undo = revert), database transactions, UI action history.
 
-\paragraph{State}\label{state}
+\subsubsection{State}\label{state}
 
 \textbf{Intent}: Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.
 
 \textbf{When to use}: Order lifecycle (PENDING \(\rightarrow\) PAID \(\rightarrow\) SHIPPED \(\rightarrow\) DELIVERED), traffic lights, vending machine.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1249,11 +1295,13 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{vs if-else}: State eliminates massive \texttt{if\ self.status\ ==\ "pending":\ ...\ elif\ self.status\ ==\ "paid"} chains. Each state is its own class.
 
-\paragraph{Template Method}\label{template-method}
+\subsubsection{Template Method}\label{template-method}
 
 \textbf{Intent}: Define the skeleton of an algorithm in a base class; defer specific steps to subclasses.
 
 \textbf{When to use}: Algorithms with a fixed structure but variable steps (data export, game loops, test frameworks).
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1290,9 +1338,11 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{vs Strategy}: Template Method uses inheritance to vary steps; Strategy uses composition to swap the whole algorithm.
 
-\paragraph{Iterator}\label{iterator}
+\subsubsection{Iterator}\label{iterator}
 
 \textbf{Intent}: Provide a sequential access mechanism to elements of a collection without exposing the underlying structure.
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1310,9 +1360,11 @@ Iterator & Behavioral & Sequential access without exposing internals & Collectio
 
 \textbf{Real example}: Python \texttt{iter()}/\texttt{\_\_iter\_\_}, Java \texttt{Iterator\textless{}T\textgreater{}}, database cursors.
 
-\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+\section{Architecture / Diagrams}\label{architecture--diagrams}
 
-\subsubsection{UML Class Diagram Notation Cheat-Sheet}\label{uml-class-diagram-notation-cheat-sheet}
+\subsection{UML Class Diagram Notation Cheat-Sheet}\label{uml-class-diagram-notation-cheat-sheet}
+
+\setcodelang{}
 
 \begin{verbatim}
 Relationship       Notation (ASCII)       Meaning
@@ -1325,7 +1377,7 @@ Dependency         A - - - - - > B         A uses B temporarily (method arg)
 Realization        A - - - - - ▷ B         A implements interface B
 \end{verbatim}
 
-\subsubsection{UML Relationship Table}\label{uml-relationship-table}
+\subsection{UML Relationship Table}\label{uml-relationship-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1306}}
@@ -1354,7 +1406,9 @@ Example
 \textbf{Realization} & \texttt{-\ -▷} & Implements interface & MySQLDB realizes Database \\
 \end{longtable}
 
-\subsubsection{Parking Lot ASCII Class Diagram}\label{parking-lot-ascii-class-diagram}
+\subsection{Parking Lot ASCII Class Diagram}\label{parking-lot-ascii-class-diagram}
+
+\setcodelang{}
 
 \begin{verbatim}
 +------------------+        +-------------------+
@@ -1395,7 +1449,9 @@ Example
 +-------------------+
 \end{verbatim}
 
-\subsubsection{Multiplicity Notation}\label{multiplicity-notation}
+\subsection{Multiplicity Notation}\label{multiplicity-notation}
+
+\setcodelang{}
 
 \begin{verbatim}
 1       exactly one
@@ -1405,9 +1461,9 @@ Example
 2..5    specific range
 \end{verbatim}
 
-\subsection{Real-World Examples}\label{real-world-examples}
+\section{Real-World Examples}\label{real-world-examples}
 
-\subsubsection{Design a Parking Lot}\label{design-a-parking-lot}
+\subsection{Design a Parking Lot}\label{design-a-parking-lot}
 
 \textbf{Requirements (clarified)}: Multi-floor, multiple spot types (compact/large/handicapped), entry/exit gates, ticket system, payment.
 
@@ -1426,6 +1482,8 @@ Example
 \item
   \textbf{Observer}: Notify display boards when spot count changes
 \end{itemize}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1494,7 +1552,7 @@ Example
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Design an Elevator System}\label{design-an-elevator-system}
+\subsection{Design an Elevator System}\label{design-an-elevator-system}
 
 \textbf{Key entities}: \texttt{ElevatorSystem}, \texttt{Elevator}, \texttt{Floor}, \texttt{Request} (internal/external), \texttt{ElevatorController}, \texttt{Door}, \texttt{Display}
 
@@ -1512,6 +1570,8 @@ Example
 
 \textbf{Core state machine}:
 
+\setcodelang{}
+
 \begin{verbatim}
 IDLE → MOVING_UP → DOORS_OPEN → IDLE
      → MOVING_DOWN → DOORS_OPEN → IDLE
@@ -1519,7 +1579,7 @@ IDLE → MOVING_UP → DOORS_OPEN → IDLE
 
 \textbf{Key design decision}: Should \texttt{Elevator} know about scheduling? No --- use a \texttt{Scheduler} (SRP + Strategy). \texttt{Elevator} follows orders; \texttt{Scheduler} decides which requests to fulfill in what order.
 
-\subsubsection{Design a Vending Machine}\label{design-a-vending-machine}
+\subsection{Design a Vending Machine}\label{design-a-vending-machine}
 
 \textbf{Key entities}: \texttt{VendingMachine}, \texttt{Item}, \texttt{Slot}, \texttt{CoinSlot}, \texttt{Display}, \texttt{VendingState}
 
@@ -1537,13 +1597,15 @@ IDLE → MOVING_UP → DOORS_OPEN → IDLE
 
 \textbf{State transitions}:
 
+\setcodelang{}
+
 \begin{verbatim}
 IDLE ──(insertCoin)──> HAS_MONEY ──(selectItem)──> DISPENSING ──(dispense)──> IDLE
                     ──(cancel)──> IDLE
 IDLE ──(selectItem)──> "Insert coin first"
 \end{verbatim}
 
-\subsubsection{Design a Library Management System}\label{design-a-library-management-system}
+\subsection{Design a Library Management System}\label{design-a-library-management-system}
 
 \textbf{Key entities}: \texttt{Library}, \texttt{Book}, \texttt{BookItem} (physical copy), \texttt{Member}, \texttt{Librarian}, \texttt{Loan}, \texttt{Reservation}, \texttt{Catalog}, \texttt{Search}
 
@@ -1561,7 +1623,7 @@ IDLE ──(selectItem)──> "Insert coin first"
   \textbf{Factory}: Create different \texttt{Member} types (Student, Faculty, Guest)
 \end{itemize}
 
-\subsection{Real-Life Analogies}\label{real-life-analogies}
+\section{Real-Life Analogies}\label{real-life-analogies}
 
 \emph{One smart home --- every principle and pattern is a switch, a socket, or a system in the same house.}
 
@@ -1605,9 +1667,9 @@ Real-Life Analogy
 \textbf{Iterator} & The electrician\textquotesingle s walkthrough --- she moves from socket to socket around every room in a fixed sequence without needing a floor-plan in her hand; the house exposes one \texttt{nextSocket()} cursor \\
 \end{longtable}
 
-\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
 
-\subsubsection{SOLID Expanded Mnemonic}\label{solid-expanded-mnemonic}
+\subsection{SOLID Expanded Mnemonic}\label{solid-expanded-mnemonic}
 
 \textbf{"Some Old Lions Don\textquotesingle t Invert"}
 
@@ -1634,7 +1696,7 @@ Memory Hook
 \textbf{D} & Dependency Inversion & \textbf{D}on\textquotesingle t call us, we\textquotesingle ll call you (Hollywood principle) \\
 \end{longtable}
 
-\subsubsection{Design Pattern Memory Aids}\label{design-pattern-memory-aids}
+\subsection{Design Pattern Memory Aids}\label{design-pattern-memory-aids}
 
 \textbf{Creational --- "SAFBP" (So A Factory Builds Prototypes)}
 
@@ -1660,7 +1722,7 @@ Memory Hook
   \textbf{C}hain of Responsibility, \textbf{C}ommand, \textbf{I}terator, \textbf{M}ediator, \textbf{M}emento, \textbf{O}bserver, \textbf{S}tate, \textbf{S}trategy, \textbf{T}emplate Method, \textbf{V}isitor
 \end{itemize}
 
-\subsubsection{Pattern "When to Use" Quick Recall}\label{pattern-when-to-use-quick-recall}
+\subsection{Pattern "When to Use" Quick Recall}\label{pattern-when-to-use-quick-recall}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6863}}
@@ -1693,9 +1755,9 @@ Pattern
 "Sequential collection traversal" & Iterator \\
 \end{longtable}
 
-\subsection{Common Interview Questions}\label{common-interview-questions}
+\section{Common Interview Questions}\label{common-interview-questions}
 
-\subsubsection{Classic LLD Prompts}\label{classic-lld-prompts}
+\subsection{Classic LLD Prompts}\label{classic-lld-prompts}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2642}}
@@ -1725,7 +1787,7 @@ Design a Movie Ticket System & Factory, Strategy, Observer & Cinema, Show, Seat,
 Design a Ride-sharing App & Observer, Strategy, State & Driver, Rider, Trip, Location \\
 \end{longtable}
 
-\subsubsection{Approach for Each}\label{approach-for-each}
+\subsection{Approach for Each}\label{approach-for-each}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1744,7 +1806,7 @@ Design a Ride-sharing App & Observer, Strategy, State & Driver, Rider, Trip, Loc
   \textbf{Extensibility}: "If requirement X changes, I\textquotesingle d..."
 \end{enumerate}
 
-\subsubsection{Follow-Up Questions to Expect}\label{follow-up-questions-to-expect}
+\subsection{Follow-Up Questions to Expect}\label{follow-up-questions-to-expect}
 
 \begin{itemize}
 \tightlist
@@ -1760,9 +1822,9 @@ Design a Ride-sharing App & Observer, Strategy, State & Driver, Rider, Trip, Loc
   "How would you test this design?" (\textbf{testability, DI})
 \end{itemize}
 
-\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
 
-\subsubsection{When NOT to Use a Pattern}\label{when-not-to-use-a-pattern}
+\subsection{When NOT to Use a Pattern}\label{when-not-to-use-a-pattern}
 
 \textbf{Patterns have costs.} Know when to skip them:
 
@@ -1787,7 +1849,7 @@ Command & Simple one-shot operations with no undo requirement \\
 State & Only 2-3 states that rarely change (if-else is clearer) \\
 \end{longtable}
 
-\subsubsection{Over-Engineering Warning Signs}\label{over-engineering-warning-signs}
+\subsection{Over-Engineering Warning Signs}\label{over-engineering-warning-signs}
 
 \begin{itemize}
 \tightlist
@@ -1803,7 +1865,7 @@ State & Only 2-3 states that rarely change (if-else is clearer) \\
   \textbf{God classes}: \texttt{OrderManager} that does 20 things
 \end{itemize}
 
-\subsubsection{Extensibility vs. Simplicity Trade-off}\label{extensibility-vs-simplicity-trade-off}
+\subsection{Extensibility vs. Simplicity Trade-off}\label{extensibility-vs-simplicity-trade-off}
 
 \textbf{Open/Closed is not free.} Every abstraction adds indirection. Ask:
 
@@ -1817,7 +1879,7 @@ State & Only 2-3 states that rarely change (if-else is clearer) \\
 
 \textbf{Rule of Three}: Introduce an abstraction after the third time you need to vary it. Not before.
 
-\subsubsection{Thread Safety in Patterns}\label{thread-safety-in-patterns}
+\subsection{Thread Safety in Patterns}\label{thread-safety-in-patterns}
 
 \begin{itemize}
 \tightlist
@@ -1830,6 +1892,8 @@ State & Only 2-3 states that rarely change (if-else is clearer) \\
 \item
   \textbf{Proxy (caching)}: Cache invalidation must be synchronized.
 \end{itemize}
+
+\setcodelang{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1850,11 +1914,11 @@ State & Only 2-3 states that rarely change (if-else is clearer) \\
 \end{Highlighting}
 \end{Shaded}
 
-\subsubsection{Dependency Injection Container Pattern}\label{dependency-injection-container-pattern}
+\subsection{Dependency Injection Container Pattern}\label{dependency-injection-container-pattern}
 
 In production code, instead of hard-coding \texttt{new\ MySQLDB()} everywhere, use a DI container (Spring, Guice, Python\textquotesingle s \texttt{dependency\_injector}). \textbf{In interviews}, manually inject via constructor --- it signals DI awareness.
 
-\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
@@ -1884,17 +1948,17 @@ Anemic model (all logic in services) & Not OOP thinking & Put behavior in the ri
 Forget to mention thread safety & Incomplete for concurrent systems & Always ask "is this multi-threaded?" \\
 \end{longtable}
 
-\subsection{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
 
-\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) High-Level Design (HLD)}{LLD \textbackslash leftrightarrow High-Level Design (HLD)}}\label{lld-leftrightarrow-high-level-design-hld}
+\subsection{\texorpdfstring{LLD \(\leftrightarrow\) High-Level Design (HLD)}{LLD \textbackslash leftrightarrow High-Level Design (HLD)}}\label{lld-leftrightarrow-high-level-design-hld}
 
 LLD happens \textbf{inside} the boxes of HLD. In HLD you say "Order Service"; in LLD you design what classes are inside Order Service. In interviews, LLD is usually a stepping stone to HLD discussions.
 
-\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Clean Code}{LLD \textbackslash leftrightarrow Clean Code}}\label{lld-leftrightarrow-clean-code}
+\subsection{\texorpdfstring{LLD \(\leftrightarrow\) Clean Code}{LLD \textbackslash leftrightarrow Clean Code}}\label{lld-leftrightarrow-clean-code}
 
 Clean Code principles (meaningful names, small functions, no magic numbers) are the micro-level expression of SOLID/DRY. A class with perfect SOLID compliance can still be unreadable if method names are cryptic.
 
-\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Concurrency}{LLD \textbackslash leftrightarrow Concurrency}}\label{lld-leftrightarrow-concurrency}
+\subsection{\texorpdfstring{LLD \(\leftrightarrow\) Concurrency}{LLD \textbackslash leftrightarrow Concurrency}}\label{lld-leftrightarrow-concurrency}
 
 Patterns need thread-safety consideration:
 
@@ -1910,7 +1974,7 @@ Patterns need thread-safety consideration:
   \textbf{Flyweight}: Shared state must be immutable or synchronized
 \end{itemize}
 
-\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Testing}{LLD \textbackslash leftrightarrow Testing}}\label{lld-leftrightarrow-testing}
+\subsection{\texorpdfstring{LLD \(\leftrightarrow\) Testing}{LLD \textbackslash leftrightarrow Testing}}\label{lld-leftrightarrow-testing}
 
 Good LLD makes testing easy:
 
@@ -1926,7 +1990,7 @@ Good LLD makes testing easy:
   \textbf{Composition} \(\rightarrow\) components testable in isolation
 \end{itemize}
 
-\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Databases / ORM}{LLD \textbackslash leftrightarrow Databases / ORM}}\label{lld-leftrightarrow-databases--orm}
+\subsection{\texorpdfstring{LLD \(\leftrightarrow\) Databases / ORM}{LLD \textbackslash leftrightarrow Databases / ORM}}\label{lld-leftrightarrow-databases--orm}
 
 \begin{itemize}
 \tightlist
@@ -1938,7 +2002,7 @@ Good LLD makes testing easy:
   Unit of Work pattern: groups DB operations into a transaction
 \end{itemize}
 
-\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+\section{FAANG Interview Tips}\label{faang-interview-tips}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1964,9 +2028,9 @@ Good LLD makes testing easy:
   \textbf{Amazon-specific}: Map your design to Leadership Principles. "Dive Deep" = knowing pattern internals. "Insist on Highest Standards" = clean code. "Invent and Simplify" = choosing the right pattern, not the most complex one.
 \end{enumerate}
 
-\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
 
-\subsubsection{10-Minute Summary}\label{10-minute-summary}
+\subsection{10-Minute Summary}\label{10-minute-summary}
 
 \textbf{OOP}: Encapsulate state \(\rightarrow\) Abstract interfaces \(\rightarrow\) Inherit only IS-A \(\rightarrow\) Polymorphism for dispatch.
 
@@ -1980,7 +2044,7 @@ Good LLD makes testing easy:
 
 \textbf{Interview Steps}: Clarify \(\rightarrow\) Entities \(\rightarrow\) Relationships \(\rightarrow\) Class Diagram \(\rightarrow\) Patterns \(\rightarrow\) Code \(\rightarrow\) Extensibility.
 
-\subsubsection{Key Concepts at a Glance}\label{key-concepts-at-a-glance}
+\subsection{Key Concepts at a Glance}\label{key-concepts-at-a-glance}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2500}}
@@ -2018,7 +2082,7 @@ Proxy & Control access / lazy load \\
 Composite & Tree structures, uniform treatment \\
 \end{longtable}
 
-\subsubsection{Quick Cheat-Sheet Table}\label{quick-cheat-sheet-table}
+\subsection{Quick Cheat-Sheet Table}\label{quick-cheat-sheet-table}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2841}}
@@ -2077,7 +2141,7 @@ Template Method & Fix skeleton, vary steps & Export pipeline, game loop \\
 Iterator & Traverse collection uniformly & Collections, cursors \\
 \end{longtable}
 
-\subsubsection{Most Important Concepts (Rank-Ordered for FAANG)}\label{most-important-concepts-rank-ordered-for-faang}
+\subsection{Most Important Concepts (Rank-Ordered for FAANG)}\label{most-important-concepts-rank-ordered-for-faang}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
