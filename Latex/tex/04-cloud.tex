@@ -94,6 +94,8 @@ Infrastructure as Code (Terraform / CloudFormation)
 
 Key players: \textbf{AWS, GCP, Azure} (IaaS/PaaS/SaaS providers), \textbf{Docker} (container runtime), \textbf{Kubernetes} (orchestrator), \textbf{Istio/Envoy} (service mesh), \textbf{Terraform} (IaC), \textbf{Prometheus/Grafana} (observability).
 
+\visualfigure{../figures/04-cloud/02-shared-responsibility.pdf}{Moving from IaaS to SaaS hands more of the stack to the provider. Knowing the boundary tells you what you must still secure, patch and scale yourself.}
+
 \section{Why It Exists}\label{why-it-exists}
 
 \subsection{The Pre-Cloud Problem}\label{the-pre-cloud-problem}
@@ -1988,6 +1990,8 @@ Prime Video moved a monitoring system from serverless microservices (distributed
 
 \subsection{Shopify: Kubernetes Auto-Scaling on Black Friday}\label{shopify-kubernetes-auto-scaling-on-black-friday}
 
+\visualfigure{../figures/04-cloud/01-autoscaling.pdf}{Static peak provisioning wastes capacity (red area) most of the day. Autoscaling tracks demand in steps, trading a little headroom for large cost savings.}
+
 Shopify uses Kubernetes HPA + Cluster Autoscaler to handle 10--20\(\times\) traffic spikes on Black Friday. They pre-scale (manually set replicas higher before the event) AND rely on HPA for real-time response. Their load tests simulate peak traffic weeks in advance, using observability (Prometheus + Grafana) to catch bottlenecks.
 
 \subsection{Stripe: Canary Deployments}\label{stripe-canary-deployments}
@@ -2676,9 +2680,4 @@ GitOps & Git = desired state; ArgoCD syncs cluster & "git revert = rollback; git
 
 \emph{Last updated: 2026-06-14 \textbar{} Topic: Cloud \& Infrastructure \textbar{} Level: FAANG Senior/Staff}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/04-cloud/01-autoscaling.pdf}{Static peak provisioning wastes capacity (red area) most of the day. Autoscaling tracks demand in steps, trading a little headroom for large cost savings.}
-\visualfigure{../figures/04-cloud/02-shared-responsibility.pdf}{Moving from IaaS to SaaS hands more of the stack to the provider. Knowing the boundary tells you what you must still secure, patch and scale yourself.}
 \end{document}

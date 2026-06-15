@@ -389,6 +389,8 @@ Embedding: E[5023] = [0.23, -0.14, 0.87, ..., 0.02]  # d_model dimensions
 
 \subsection{Self-Attention --- The Core Mechanism}\label{self-attention--the-core-mechanism}
 
+\visualfigure{../figures/aiml-04-tf/01-attention.pdf}{Each query token forms a weighted average over all tokens via softmax(QK$^{\mathsf{T}}$/$\surd$d). Rows sum to 1 — the model learns which context positions matter.}
+
 \textbf{The fundamental idea}: for each token, compute a weighted sum of all token representations, where weights reflect relevance.
 
 \subsubsection{Query, Key, Value (Q, K, V)}\label{query-key-value-q-k-v}
@@ -575,6 +577,8 @@ Encodes position by rotating Q and K vectors. Relative position naturally falls 
 Add a linear bias to attention scores based on distance: score -= m * \textbar i - j\textbar. Simple, extrapolates well, no learned parameters.
 
 \subsection{The Full Transformer Block}\label{the-full-transformer-block}
+
+\visualfigure{../figures/aiml-04-tf/02-transformer-block.pdf}{A transformer layer = self-attention (mix information across tokens) + a position-wise MLP, each wrapped in a residual connection and LayerNorm. Stack N of them.}
 
 \subsubsection{Encoder Block}\label{encoder-block}
 
@@ -2634,9 +2638,4 @@ Best when & Production, large team & Research, smaller teams \\
 
 \emph{Last updated: 2026-06-14 \textbar{} Path: AI-ML/04-transformers-and-llms.md}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/aiml-04-tf/01-attention.pdf}{Each query token forms a weighted average over all tokens via softmax(QK$^{\mathsf{T}}$/$\surd$d). Rows sum to 1 — the model learns which context positions matter.}
-\visualfigure{../figures/aiml-04-tf/02-transformer-block.pdf}{A transformer layer = self-attention (mix information across tokens) + a position-wise MLP, each wrapped in a residual connection and LayerNorm. Stack N of them.}
 \end{document}

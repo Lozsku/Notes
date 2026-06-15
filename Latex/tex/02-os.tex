@@ -526,6 +526,8 @@ Thread context switches are cheaper: same address space \(\rightarrow\) no page 
 
 \subsection{Scheduling Algorithms}\label{scheduling-algorithms}
 
+\visualfigure{../figures/02-os/01-scheduling-gantt.pdf}{FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches.}
+
 The scheduler decides which ready process runs next. Different goals: maximize CPU utilization, minimize wait time, maximize throughput, minimize response time, ensure fairness.
 
 \textbf{Key metrics:}
@@ -1109,6 +1111,8 @@ Virtual address: (segment#, offset)
 Modern systems use \textbf{segmentation + paging} (x86-64 still technically has segments but with flat 0-base model, effectively disabled). Segments provide the logical view; paging handles the physical allocation.
 
 \subsection{Memory Management}\label{memory-management}
+
+\visualfigure{../figures/02-os/02-memory-hierarchy.pdf}{Each level trades capacity for speed by orders of magnitude. Performance comes from keeping the working set in the fastest tier that fits — the basis of caching.}
 
 \textbf{Physical memory management:} The kernel uses a \textbf{buddy system} allocator to manage physical frames. Free memory is maintained in lists of power-of-2-sized blocks. Allocation finds the smallest block that fits; deallocation merges adjacent buddies.
 
@@ -2239,9 +2243,4 @@ cgroups & Limit CPU/memory per process group & Foundation of containers \\
   \textbf{System calls + kernel/user mode} --- architecture foundation
 \end{enumerate}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/02-os/01-scheduling-gantt.pdf}{FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches.}
-\visualfigure{../figures/02-os/02-memory-hierarchy.pdf}{Each level trades capacity for speed by orders of magnitude. Performance comes from keeping the working set in the fastest tier that fits — the basis of caching.}
 \end{document}

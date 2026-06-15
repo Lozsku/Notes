@@ -92,6 +92,8 @@ Algorithmic thinking is the foundation of every coding interview. You are not ju
 
 \subsection{Big-O / Big-Theta / Big-Omega}\label{big-o--big-theta--big-omega}
 
+\visualfigure{../figures/dsa-03-algos/01-big-o-growth.pdf}{Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n$^2$); exponential is infeasible past ~n=30.}
+
 Complexity notation describes \textbf{how resource usage scales with input size}, not actual runtime.
 
 \begin{longtable}[]{@{}
@@ -414,6 +416,8 @@ n \textgreater{} 10\^{}8 & O(log n) or O(1) & Binary search, math formulas \\
 \section{Algorithms}\label{algorithms}
 
 \subsection{Sorting}\label{sorting}
+
+\visualfigure{../figures/dsa-03-algos/02-sorting-complexity.pdf}{No single sort wins everywhere: merge sort is stable and worst-case O(n log n) but needs O(n) space; quicksort is faster in practice but O(n$^2$) worst case.}
 
 \subsubsection{Comparison-Based Sorts}\label{comparison-based-sorts}
 
@@ -2877,9 +2881,4 @@ Minimum spanning tree & Kruskal (sparse) / Prim (dense) \\
   \textbf{Recursion:} trust the recursion --- define what it returns, use it correctly
 \end{enumerate}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/dsa-03-algos/01-big-o-growth.pdf}{Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n$^2$); exponential is infeasible past ~n=30.}
-\visualfigure{../figures/dsa-03-algos/02-sorting-complexity.pdf}{No single sort wins everywhere: merge sort is stable and worst-case O(n log n) but needs O(n) space; quicksort is faster in practice but O(n$^2$) worst case.}
 \end{document}

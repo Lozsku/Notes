@@ -857,6 +857,12 @@ Google S2
   \textbf{Location Service} writes to Redis \texttt{GEOADD} (O(log N)) --- 1.25M writes/sec requires Redis Cluster with 10--20 shards.
 \item
   \textbf{Sharding:} partition by \texttt{city\_id} or geohash prefix (level 2 \(\approx\) 630 km cells \(\rightarrow\) \textasciitilde100 world cells \(\rightarrow\) manageable shards).
+\end{itemize}
+
+\visualfigure{../figures/sdp-2/01-sharding-replication.pdf}{Sharding partitions data by key to scale writes across nodes; replication copies each shard for read scaling and failover. Most large datastores combine both.}
+
+\begin{itemize}
+\tightlist
 \item
   Driver location also published to \textbf{Kafka} topic \texttt{driver.location} for:
 
@@ -2028,8 +2034,4 @@ Crawl scheduling & Fixed interval & Adaptive (change-rate based) & \textbf{Adapt
 
 \emph{End of Part 2 --- Advanced System Design Problems}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/sdp-2/01-sharding-replication.pdf}{Sharding partitions data by key to scale writes across nodes; replication copies each shard for read scaling and failover. Most large datastores combine both.}
 \end{document}

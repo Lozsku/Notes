@@ -196,6 +196,8 @@ To double throughput: either halve latency, or double concurrency (up to the bot
 
 \subsection{Percentiles --- p50, p90, p99, p99.9}\label{percentiles--p50-p90-p99-p999}
 
+\visualfigure{../figures/09-performance/02-tail-latency.pdf}{A handful of slow requests barely move the mean but dominate user experience. Track p95/p99, not averages — at scale, the tail is what every user eventually hits.}
+
 Averages lie. A system averaging 10 ms response time might have:
 
 \begin{itemize}
@@ -843,6 +845,8 @@ Focus
 \textbf{Interview takeaway: USE tells you where hardware is constrained. RED tells you what users experience. Use both at different layers.}
 
 \subsection{The Memory Hierarchy (Latency Numbers Every Engineer Should Know)}\label{the-memory-hierarchy-latency-numbers-every-engineer-should-know}
+
+\visualfigure{../figures/09-performance/01-latency-ladder.pdf}{Orders of magnitude separate cache, memory, SSD, disk and network. Designing for performance means counting which tier each operation touches.}
 
 \setcodelang{}
 
@@ -1804,9 +1808,4 @@ Connection pool & Reuse TCP connections & DB: \textasciitilde100-300 max connect
 
 \emph{Last updated: 2026-06-14 \textbar{} Topic: Performance Engineering \textbar{} Level: FAANG Senior}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/09-performance/01-latency-ladder.pdf}{Orders of magnitude separate cache, memory, SSD, disk and network. Designing for performance means counting which tier each operation touches.}
-\visualfigure{../figures/09-performance/02-tail-latency.pdf}{A handful of slow requests barely move the mean but dominate user experience. Track p95/p99, not averages — at scale, the tail is what every user eventually hits.}
 \end{document}

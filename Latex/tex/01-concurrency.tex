@@ -408,6 +408,8 @@ A race condition occurs when program correctness depends on the relative timing 
 
 \subsection{Deadlock}\label{deadlock}
 
+\visualfigure{../figures/01-concurrency/02-deadlock.pdf}{Deadlock needs all four Coffman conditions at once; the tell-tale sign is a cycle in the wait-for graph. Break any one condition (e.g. lock ordering) to prevent it.}
+
 \textbf{Definition:} Two or more threads permanently block each other, each waiting for a resource held by another.
 
 \setcodelang{}
@@ -1531,6 +1533,8 @@ Executors.newWorkStealingPool():   ForkJoinPool, work-stealing deques per thread
 
 \subsection{1. Amdahl\textquotesingle s Law --- Theoretical Speedup Limit}\label{1-amdahls-law--theoretical-speedup-limit}
 
+\visualfigure{../figures/01-concurrency/01-amdahls-law.pdf}{Amdahl's Law: maximum speedup is capped by the serial fraction. Even at 95\% parallel, 256 cores yield only ~17x — the serial 5\% dominates.}
+
 \setcodelang{}
 
 \begin{verbatim}
@@ -1990,9 +1994,4 @@ async/await & Cooperative coroutines on event loop & \texttt{await\ asyncio.gath
 \emph{End of Concurrency \& Multithreading Study Notes}
 \emph{Estimated study time: 3-4 hours for deep read, 10 minutes for cheat sheet revision}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/01-concurrency/01-amdahls-law.pdf}{Amdahl's Law: maximum speedup is capped by the serial fraction. Even at 95\% parallel, 256 cores yield only ~17x — the serial 5\% dominates.}
-\visualfigure{../figures/01-concurrency/02-deadlock.pdf}{Deadlock needs all four Coffman conditions at once; the tell-tale sign is a cycle in the wait-for graph. Break any one condition (e.g. lock ordering) to prevent it.}
 \end{document}

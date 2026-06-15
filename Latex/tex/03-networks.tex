@@ -153,6 +153,8 @@ Specific Concern
 
 \subsection{1. OSI Model vs TCP/IP Model}\label{1-osi-model-vs-tcpip-model}
 
+\visualfigure{../figures/03-networks/01-osi-stack.pdf}{Each layer adds a header and treats the layer above as opaque payload. Interview framing: name the layer, its addressing unit, and a protocol.}
+
 \subsubsection{OSI Model (7 Layers)}\label{osi-model-7-layers}
 
 The \textbf{Open Systems Interconnection} model is a conceptual framework --- not an implementation. It exists to give engineers a common vocabulary.
@@ -1358,6 +1360,8 @@ Browser                                 Server
 
 \subsection{TCP 3-Way Handshake}\label{tcp-3-way-handshake}
 
+\visualfigure{../figures/03-networks/02-tcp-handshake.pdf}{TCP opens with SYN / SYN-ACK / ACK to agree on sequence numbers, then tears down with a four-way FIN/ACK exchange. This reliability is what UDP trades away for speed.}
+
 \setcodelang{}
 
 \begin{verbatim}
@@ -2235,9 +2239,4 @@ IP & 3 & --- & Binary & Packets & --- & Routing \\
   \textbf{CORS mechanism} --- front-end + API integration, security questions
 \end{enumerate}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/03-networks/01-osi-stack.pdf}{Each layer adds a header and treats the layer above as opaque payload. Interview framing: name the layer, its addressing unit, and a protocol.}
-\visualfigure{../figures/03-networks/02-tcp-handshake.pdf}{TCP opens with SYN / SYN-ACK / ACK to agree on sequence numbers, then tears down with a four-way FIN/ACK exchange. This reliability is what UDP trades away for speed.}
 \end{document}

@@ -644,6 +644,8 @@ Cost
 
 \subsection{B-Tree vs B+Tree vs LSM-Tree}\label{b-tree-vs-btree-vs-lsm-tree}
 
+\visualfigure{../figures/08-databases/01-btree.pdf}{B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap.}
+
 \subsubsection{B+Tree (Used in PostgreSQL, MySQL InnoDB, SQL Server)}\label{btree-used-in-postgresql-mysql-innodb-sql-server}
 
 \setcodelang{}
@@ -865,6 +867,8 @@ With B+Tree index on \texttt{salary}:
 \end{itemize}
 
 \section{ACID, Isolation Levels \& Locking}\label{acid-isolation-levels--locking}
+
+\visualfigure{../figures/08-databases/02-isolation-levels.pdf}{Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed.}
 
 \subsection{ACID Properties}\label{acid-properties}
 
@@ -2063,9 +2067,4 @@ Deadlock resolution? & DB kills victim; application retries \\
 Index not used by planner? & Check selectivity, stale stats, OR conditions, functions on column \\
 \end{longtable}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/08-databases/01-btree.pdf}{B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap.}
-\visualfigure{../figures/08-databases/02-isolation-levels.pdf}{Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed.}
 \end{document}

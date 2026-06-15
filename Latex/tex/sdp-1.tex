@@ -576,6 +576,8 @@ Custom aliases & \textbf{Supported (rate-limited)} & Not supported & Product dif
 
 \section{2. Design a Rate Limiter}\label{2-design-a-rate-limiter}
 
+\visualfigure{../figures/sdp-1/01-token-bucket.pdf}{A bucket refills at a steady rate up to a capacity. Each request spends a token; an empty bucket throttles. This smooths traffic while allowing short bursts.}
+
 \subsection{1. Requirements}\label{1-requirements-1}
 
 \textbf{Clarifying questions to ask the interviewer:}
@@ -2142,8 +2144,4 @@ Media & \textbf{S3 + CDN (URL in message)} & In-message blob & Media over WebSoc
 
 \emph{End of Part 1 --- Foundational System Design Problems.}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/sdp-1/01-token-bucket.pdf}{A bucket refills at a steady rate up to a capacity. Each request spends a token; an empty bucket throttles. This smooths traffic while allowing short bursts.}
 \end{document}

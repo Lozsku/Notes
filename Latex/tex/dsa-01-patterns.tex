@@ -171,6 +171,8 @@ XOR, AND, OR, bit shift tricks, unique element & \textbf{Bit Manipulation} \\
 
 \subsection{Two Pointers}\label{two-pointers}
 
+\visualfigure{../figures/dsa-01-patterns/02-two-pointers.pdf}{On sorted input, two pointers from both ends turn an O(n$^2$) pair-search into O(n): move the pointer that brings the sum toward the target.}
+
 \textbf{Trigger / When to Use}
 
 \begin{quote}
@@ -238,6 +240,8 @@ Use two indices that move toward each other (or in the same direction) to elimin
 \end{itemize}
 
 \subsection{Sliding Window (Fixed + Variable)}\label{sliding-window-fixed--variable}
+
+\visualfigure{../figures/dsa-01-patterns/01-sliding-window.pdf}{Instead of recomputing each window from scratch (O(n$\cdot$k)), slide the window: add the entering element and drop the leaving one, achieving O(n).}
 
 \textbf{Trigger / When to Use}
 
@@ -2474,9 +2478,4 @@ O(N!)      → permutations
 
 \emph{Last updated: 2026-06-14 \textbar{} Covers \textasciitilde25 patterns with 100+ LeetCode problems}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/dsa-01-patterns/01-sliding-window.pdf}{Instead of recomputing each window from scratch (O(n$\cdot$k)), slide the window: add the entering element and drop the leaving one, achieving O(n).}
-\visualfigure{../figures/dsa-01-patterns/02-two-pointers.pdf}{On sorted input, two pointers from both ends turn an O(n$^2$) pair-search into O(n): move the pointer that brings the sum toward the target.}
 \end{document}

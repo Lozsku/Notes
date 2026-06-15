@@ -455,6 +455,8 @@ Use Case
 
 \subsection{The Bias--Variance Tradeoff}\label{the-biasvariance-tradeoff}
 
+\visualfigure{../figures/aiml-01-fund/01-bias-variance.pdf}{Total generalization error decomposes into bias$^2$ + variance + irreducible noise. Minimizing it means balancing model capacity, not maximizing fit.}
+
 \textbf{The fundamental tension in ML.} Every model lives on this spectrum.
 
 \textbf{Total Error = Bias\(^2\) + Variance + Irreducible Noise}
@@ -768,6 +770,8 @@ Val loss:      ↘↘↘↘↘↘↗↗↗↗↗
 
 \subsubsection{The Confusion Matrix}\label{the-confusion-matrix}
 
+\visualfigure{../figures/aiml-01-fund/02-confusion-matrix.pdf}{Every classifier error is a false positive or false negative. Precision penalizes FPs, recall penalizes FNs — which matters more depends on the cost of each mistake.}
+
 For binary classification (Positive = class of interest, e.g., Fraud):
 
 \setcodelang{}
@@ -851,6 +855,8 @@ When to Prioritize
 \textbf{Interview Classic:} "Would you use precision or recall for a cancer detection model?" Answer: \textbf{Recall} --- a false negative (missed cancer) is far more harmful than a false positive (unnecessary biopsy). But also: optimize Precision at high Recall using PR-AUC.
 
 \subsubsection{ROC-AUC vs PR-AUC}\label{roc-auc-vs-pr-auc}
+
+\visualfigure{../figures/aiml-01-fund/01-roc-pr.pdf}{ROC summarizes ranking quality across thresholds; PR is more informative under heavy class imbalance, where a high AUC can still hide poor precision.}
 
 \textbf{ROC Curve:} Plot TPR (Recall) vs FPR at all thresholds.
 
@@ -2028,6 +2034,8 @@ LOO (Leave-One-Out): each sample is the validation set once. Gives nearly unbias
 
 \subsection{1. The Learning Curve as a Diagnostic Tool}\label{1-the-learning-curve-as-a-diagnostic-tool}
 
+\visualfigure{../figures/aiml-01-fund/02-learning-curves.pdf}{A large train–validation gap that closes with more data signals variance; high error on both that more data won't fix signals bias.}
+
 Beyond just looking at final metrics, senior engineers analyze learning curves --- performance vs. training set size:
 
 \setcodelang{}
@@ -2390,9 +2398,4 @@ R\(^2\) & 1 - SS\_res/SS\_tot & 1=perfect; 0=mean baseline; \textless0=worse tha
 
 \emph{Last updated: June 2026 \textbar{} Next: \texttt{02-supervised-learning-algorithms.md}}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/aiml-01-fund/01-bias-variance.pdf}{Total generalization error decomposes into bias$^2$ + variance + irreducible noise. Minimizing it means balancing model capacity, not maximizing fit.}
-\visualfigure{../figures/aiml-01-fund/02-learning-curves.pdf}{A large train–validation gap that closes with more data signals variance; high error on both that more data won't fix signals bias.}
 \end{document}

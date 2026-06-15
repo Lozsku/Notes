@@ -233,6 +233,8 @@ Why It Bites You
 
 \subsection{CAP Theorem}\label{cap-theorem}
 
+\visualfigure{../figures/07-distributed/01-cap-theorem.pdf}{When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable.}
+
 \textbf{Statement (Brewer, 2000; formalized by Gilbert \& Lynch, 2002):}
 
 \begin{quote}
@@ -331,6 +333,8 @@ Cosmos DB & Tunable & Tunable & All categories depending on config \\
 \textbf{Interview takeaway:} "CAP is about rare partition events. PACELC is about the trade-off you make on every operation. Most high-traffic systems choose AP/EL --- they prefer low latency and availability over strong consistency."
 
 \subsection{Consistency Models}\label{consistency-models}
+
+\visualfigure{../figures/07-distributed/02-consistency-spectrum.pdf}{Consistency is a dial, not a switch. Stronger models are easier to reason about but cost availability and latency under partitions — pick per use-case.}
 
 From strongest to weakest:
 
@@ -2168,9 +2172,4 @@ Exactly-once: complex, within Kafka only → use idempotency keys end-to-end
 
 \emph{Study tip: For each major concept, be able to (1) define it in one sentence, (2) give a real system example, (3) explain the trade-off, and (4) describe a failure scenario. This structure works for any distributed systems question.}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/07-distributed/01-cap-theorem.pdf}{When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable.}
-\visualfigure{../figures/07-distributed/02-consistency-spectrum.pdf}{Consistency is a dial, not a switch. Stronger models are easier to reason about but cost availability and latency under partitions — pick per use-case.}
 \end{document}

@@ -210,6 +210,8 @@ Each layer: \texttt{h\ =\ f(W·h\_prev\ +\ b)}
 
 \subsection{Activation Functions}\label{activation-functions}
 
+\visualfigure{../figures/aiml-03-dl/01-activations.pdf}{Nonlinearities let networks model non-linear functions. ReLU/GELU dominate deep nets (cheap, no saturation for x>0); sigmoid/tanh saturate and can vanish gradients.}
+
 Activation functions introduce \textbf{non-linearity} --- without them, stacking layers collapses to a single linear transformation (\texttt{W3\ *\ W2\ *\ W1\ *\ x\ =\ W\_combined\ *\ x}).
 
 \subsubsection{Sigmoid}\label{sigmoid}
@@ -564,6 +566,8 @@ Backpropagation is \textbf{automatic differentiation applied to a computational 
 Optimizers determine \textbf{how} gradient information is used to update weights.
 
 \subsubsection{SGD (Stochastic Gradient Descent)}\label{sgd-stochastic-gradient-descent}
+
+\visualfigure{../figures/aiml-03-dl/02-gradient-descent.pdf}{Each step moves opposite the gradient. Elongated (ill-conditioned) valleys make vanilla gradient descent zig-zag across the steep axis — motivating momentum, RMSProp and Adam.}
 
 \setcodelang{Python}
 
@@ -2418,9 +2422,4 @@ Gradients vanishing & ReLU, residual connections, BatchNorm, He init \\
 
 \emph{This document covers \textasciitilde95\% of deep learning questions encountered in FAANG ML engineer and research scientist interviews. Review the Core Concepts section actively (write code, derive formulas) rather than passively reading.}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/aiml-03-dl/01-activations.pdf}{Nonlinearities let networks model non-linear functions. ReLU/GELU dominate deep nets (cheap, no saturation for x>0); sigmoid/tanh saturate and can vanish gradients.}
-\visualfigure{../figures/aiml-03-dl/02-gradient-descent.pdf}{Each step moves opposite the gradient. Elongated (ill-conditioned) valleys make vanilla gradient descent zig-zag across the steep axis — motivating momentum, RMSProp and Adam.}
 \end{document}

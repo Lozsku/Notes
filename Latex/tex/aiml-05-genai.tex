@@ -410,6 +410,8 @@ Parameterized prompts that fill in variables at runtime. The production primitiv
 
 \subsection{Retrieval-Augmented Generation (RAG)}\label{retrieval-augmented-generation-rag}
 
+\visualfigure{../figures/aiml-05-genai/01-rag-pipeline.pdf}{RAG embeds the query, retrieves the most similar chunks from a vector store, and injects them into the prompt — grounding the LLM in current, citable facts.}
+
 RAG is the most important pattern in production LLM systems. It solves the two biggest LLM problems:
 
 \begin{enumerate}
@@ -2680,8 +2682,4 @@ COST LEVERS:
 5. Streaming (perceived latency wins, not actual)
 \end{verbatim}
 
-\clearpage
-\section{Visual Reference}
-\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
-\visualfigure{../figures/aiml-05-genai/01-rag-pipeline.pdf}{RAG embeds the query, retrieves the most similar chunks from a vector store, and injects them into the prompt — grounding the LLM in current, citable facts.}
 \end{document}
