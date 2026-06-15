@@ -1,0 +1,2515 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Data Structures}
+\newcommand{\ThemeKicker}{DSA Track}
+\newcommand{\ThemeNumber}{02}
+
+\usepackage{interviewstyle}
+\setthemecolor{be123c}{fb7185}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{Data Structures Deep Dive --- Coding Interviews}\label{data-structures-deep-dive--coding-interviews}
+
+\begin{quote}
+Dense reference: mechanics, complexities, code, diagrams, and interview takeaways in one place.
+\end{quote}
+
+\subsection{Overview}\label{overview}
+
+Data structures are the substrate of every algorithm. Choosing the wrong one is the single most common reason candidates fail coding interviews --- the algorithm is right, but O(n) lookups in a list where a hash map would give O(1) makes the solution too slow. This file is organized as a working reference: read top-to-bottom once, then use the complexity table and decision guide during revision.
+
+\textbf{Mental model for selection:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  What operations do I need? (search, insert, delete, min/max, range, prefix?)
+\item
+  What are the frequency/order constraints? (random access? FIFO? LIFO? sorted?)
+\item
+  What are the acceptable complexities?
+\item
+  Then pick the structure.
+\end{enumerate}
+
+\subsection{Master Complexity Table}\label{master-complexity-table}
+
+All complexities are average-case unless marked. W = worst case.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1875}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1071}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1071}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1071}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0804}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.3571}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Data Structure
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Access
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Search
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Insert
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Delete
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Space
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Array (static) & O(1) & O(n) & O(n) & O(n) & O(n) & Insert/delete shifts elements \\
+Dynamic Array (list) & O(1) & O(n) & O(1) amort & O(n) & O(n) & Append amortized O(1) \\
+String (immutable) & O(1) & O(n) & O(n) & O(n) & O(n) & Concat is O(n); use StringBuilder \\
+Hash Table & N/A & O(1) & O(1) & O(1) & O(n) & W: O(n) with all collisions \\
+Singly Linked List & O(n) & O(n) & O(1) head & O(n) & O(n) & O(1) if you have the node reference \\
+Doubly Linked List & O(n) & O(n) & O(1) ends & O(1)* & O(n) & *O(1) if node ref known \\
+Stack & O(n) & O(n) & O(1) push & O(1) pop & O(n) & Top access O(1) \\
+Queue & O(n) & O(n) & O(1) enq & O(1) deq & O(n) & Front access O(1) \\
+Deque & O(1) ends & O(n) & O(1) ends & O(1) ends & O(n) & Both ends O(1) \\
+BST (balanced) & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Unbalanced: O(n) worst \\
+BST (unbalanced) & O(n) W & O(n) W & O(n) W & O(n) W & O(n) & Degenerate = linked list \\
+AVL Tree & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Strict balance; fast lookup \\
+Red-Black Tree & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Looser balance; fast insert/delete \\
+Binary Heap (min/max) & O(1) top & O(n) & O(log n) & O(log n) & O(n) & Build heap: O(n) \\
+Trie & O(m) & O(m) & O(m) & O(m) & O(n*m) & m = key length \\
+Graph (adj list) & O(V+E) & O(V+E) & O(1) & O(E) & O(V+E) & Sparse graphs \\
+Graph (adj matrix) & O(1) & O(1) edge & O(1) & O(1) & O(V\^{}2) & Dense graphs \\
+Union-Find & O(\(\alpha\)(n)) & O(\(\alpha\)(n)) & O(\(\alpha\)(n)) & - & O(n) & \(\alpha\) = inverse Ackermann, \(\approx\) O(1) \\
+Segment Tree & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Range queries + point updates \\
+Fenwick Tree (BIT) & O(log n) & O(log n) & O(log n) & O(log n) & O(n) & Simpler than segment tree \\
+LRU Cache & O(1) & O(1) & O(1) & O(1) & O(n) & Hash map + doubly linked list \\
+Bloom Filter & N/A & O(k) & O(k) & N/A & O(m) & k=hash funcs, probabilistic \\
+\end{longtable}
+
+\subsection{The Data Structures}\label{the-data-structures}
+
+\subsubsection{Arrays \& Dynamic Arrays}\label{arrays--dynamic-arrays}
+
+\textbf{What it is:} Contiguous block of memory where each element sits at a fixed offset from the base address. Random access is O(1) because address = base + index * element\_size.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Static Array (size=6):
+Index:  [0]  [1]  [2]  [3]  [4]  [5]
+Value:  [10] [20] [30] [40] [50] [60]
+         ^                         ^
+         base addr                 base + 5*sizeof(int)
+
+Dynamic Array (Python list) — amortized resize:
+size=4, capacity=4:   [1][2][3][4][ ][ ][ ][ ]  ← capacity doubles on overflow
+Append 5 → capacity=8:[1][2][3][4][5][ ][ ][ ]
+Append cost analysis (n appends):
+  - n-1 cheap appends: O(1) each
+  - ~log(n) doublings: cost 1+2+4+...+n = 2n copies total
+  - Amortized per append: 2n / n = O(1) ✓
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2948}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2260}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1966}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2826}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Avg
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Worst
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Access & O(1) & O(1) & O(1) \\
+Search & O(1) & O(n) & O(n) \\
+Append & O(1) & O(1) & O(n) \\
+Insert & O(1) & O(n) & O(n) \\
+Delete & O(1) & O(n) & O(n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Random access by index is needed
+\item
+  Data is mostly read; writes are appends
+\item
+  Cache locality matters (iteration speed)
+\end{itemize}
+
+\textbf{When NOT to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Frequent mid-list insertions/deletions (use linked list or deque)
+\item
+  Need fast search (use hash map or BST)
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Two{-}pointer on sorted array}
+\NormalTok{left, right }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+\ControlFlowTok{while}\NormalTok{ left }\OperatorTok{\textless{}}\NormalTok{ right:}
+\NormalTok{    s }\OperatorTok{=}\NormalTok{ arr[left] }\OperatorTok{+}\NormalTok{ arr[right]}
+    \ControlFlowTok{if}\NormalTok{ s }\OperatorTok{==}\NormalTok{ target: }\ControlFlowTok{return}\NormalTok{ [left, right]}
+    \ControlFlowTok{elif}\NormalTok{ s }\OperatorTok{\textless{}}\NormalTok{ target: left }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{else}\NormalTok{: right }\OperatorTok{{-}=} \DecValTok{1}
+
+\CommentTok{\# Sliding window}
+\NormalTok{window\_sum }\OperatorTok{=} \BuiltInTok{sum}\NormalTok{(arr[:k])}
+\NormalTok{max\_sum }\OperatorTok{=}\NormalTok{ window\_sum}
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(k, }\BuiltInTok{len}\NormalTok{(arr)):}
+\NormalTok{    window\_sum }\OperatorTok{+=}\NormalTok{ arr[i] }\OperatorTok{{-}}\NormalTok{ arr[i }\OperatorTok{{-}}\NormalTok{ k]}
+\NormalTok{    max\_sum }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_sum, window\_sum)}
+
+\CommentTok{\# In{-}place reversal}
+\NormalTok{arr[i], arr[j] }\OperatorTok{=}\NormalTok{ arr[j], arr[i]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Arrays are the default. When the problem says "return sorted" or "in-place", think array + two pointers. When you need to insert/delete mid-sequence often, question whether an array is right.}
+
+\textbf{Real interview use-case:} Two Sum (hash map), Sliding Window Maximum, Kadane\textquotesingle s (max subarray), rotate array in-place, merge sorted arrays.
+
+\subsubsection{Strings}\label{strings}
+
+\textbf{What it is:} Sequence of characters. In Python and Java, strings are \textbf{immutable} --- every concatenation creates a new object. In C++, \texttt{std::string} is mutable but each \texttt{+=} may reallocate.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Python string "hello":
+  h | e | l | l | o
+  Each character is a Unicode code point (Python 3: variable width internally)
+  id("hello" + "x") != id("hello")  ← new object every concat
+
+String concatenation cost in a loop (naïve):
+  for i in range(n): result += s[i]
+  Iteration 1: copy 1 char    → O(1)
+  Iteration 2: copy 2 chars   → O(2)
+  ...
+  Iteration n: copy n chars   → O(n)
+  Total: O(1+2+...+n) = O(n²)  ← DISASTER for large n
+
+String Builder pattern:
+  parts = []
+  for c in chars: parts.append(c)   ← O(1) amortized each
+  result = "".join(parts)            ← O(n) one pass
+  Total: O(n)  ✓
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2474}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2371}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5155}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Complexity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Note
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Index access & O(1) & \\
+Slice s{[}i:j{]} & O(j-i) & Creates new string \\
+Concatenate & O(n+m) & Both strings copied \\
+Find/search & O(n*m) & Naive; KMP/Z gives O(n+m) \\
+Comparison & O(n) & Character by character \\
+Join & O(n) & One pass \\
+\end{longtable}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Always join, never += in loop}
+\NormalTok{result }\OperatorTok{=} \StringTok{""}\NormalTok{.join(list\_of\_chars)}
+
+\CommentTok{\# Reverse a string}
+\NormalTok{rev }\OperatorTok{=}\NormalTok{ s[::}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+
+\CommentTok{\# Check palindrome}
+\KeywordTok{def}\NormalTok{ is\_palindrome(s):}
+\NormalTok{    s }\OperatorTok{=}\NormalTok{ s.lower()}
+\NormalTok{    l, r }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(s) }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ l }\OperatorTok{\textless{}}\NormalTok{ r:}
+        \ControlFlowTok{while}\NormalTok{ l }\OperatorTok{\textless{}}\NormalTok{ r }\KeywordTok{and} \KeywordTok{not}\NormalTok{ s[l].isalnum(): l }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{while}\NormalTok{ l }\OperatorTok{\textless{}}\NormalTok{ r }\KeywordTok{and} \KeywordTok{not}\NormalTok{ s[r].isalnum(): r }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ s[l] }\OperatorTok{!=}\NormalTok{ s[r]: }\ControlFlowTok{return} \VariableTok{False}
+\NormalTok{        l }\OperatorTok{+=} \DecValTok{1}\OperatorTok{;}\NormalTok{ r }\OperatorTok{{-}=} \DecValTok{1}
+    \ControlFlowTok{return} \VariableTok{True}
+
+\CommentTok{\# Anagram check}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ Counter}
+\NormalTok{Counter(s) }\OperatorTok{==}\NormalTok{ Counter(t)}
+
+\CommentTok{\# Sliding window on string (distinct chars)}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict}
+\NormalTok{freq }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{int}\NormalTok{)}
+\NormalTok{l }\OperatorTok{=} \DecValTok{0}
+\ControlFlowTok{for}\NormalTok{ r, c }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(s):}
+\NormalTok{    freq[c] }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{while} \BuiltInTok{len}\NormalTok{(freq) }\OperatorTok{\textgreater{}}\NormalTok{ k:}
+\NormalTok{        freq[s[l]] }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ freq[s[l]] }\OperatorTok{==} \DecValTok{0}\NormalTok{: }\KeywordTok{del}\NormalTok{ freq[s[l]]}
+\NormalTok{        l }\OperatorTok{+=} \DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Never concatenate strings in a loop. Use \texttt{"".join(parts)}. For pattern matching, think sliding window + frequency map. Anagram/permutation problems \(\rightarrow\) character frequency counter.}
+
+\textbf{Real interview use-case:} Longest substring without repeating characters, group anagrams, valid palindrome, minimum window substring, encode/decode strings.
+
+\subsubsection{Hash Tables}\label{hash-tables}
+
+\textbf{What it is:} Maps keys to values in O(1) average by computing \texttt{hash(key)\ \%\ capacity} to find a bucket, then storing the key-value pair there.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Hash Table with Chaining (load factor = 0.75):
+
+  Buckets:
+  [0] → None
+  [1] → ("apple", 5) → ("grape", 2) → None   ← collision! same bucket
+  [2] → ("banana", 3) → None
+  [3] → None
+  [4] → ("cherry", 7) → None
+  ...
+
+  hash("apple")  % 8 = 1
+  hash("grape")  % 8 = 1   ← collision → chain extends
+  hash("banana") % 8 = 2
+
+Open Addressing (linear probing):
+  [0]: empty
+  [1]: ("apple", 5)
+  [2]: ("grape", 2)   ← collision at 1, probe to 2
+  [3]: ("banana", 3)
+  ...
+
+Load Factor (α) = n / capacity
+  α < 0.7: few collisions, O(1) expected
+  α > 0.9: many collisions → O(n) worst
+  → resize (rehash all) when α threshold exceeded
+  Python dict resizes at 2/3 full → rehash to 2x capacity
+
+Good Hash Function Properties:
+  1. Deterministic (same key → same hash)
+  2. Uniform distribution (minimize collisions)
+  3. Fast to compute
+  4. Avalanche effect (small key change → big hash change)
+\end{verbatim}
+
+\textbf{Collision resolution comparison:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2083}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3611}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4306}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pro
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Con
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Chaining & Simple, works at high load & Extra memory for pointers \\
+Linear probing & Cache-friendly & Clustering degrades performance \\
+Quadratic probe & Less clustering & May not probe all slots \\
+Double hashing & Best distribution & Two hash functions needed \\
+\end{longtable}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3030}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4066}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2904}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Average
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Worst
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Search & O(1) & O(n) \\
+Insert & O(1) & O(n) \\
+Delete & O(1) & O(n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  O(1) lookup by key
+\item
+  Counting frequencies
+\item
+  Caching / memoization
+\item
+  Deduplication
+\end{itemize}
+
+\textbf{When NOT to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Need sorted order (use BST/sorted array)
+\item
+  Keys not hashable (use tree map)
+\item
+  Memory is very tight
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict, Counter}
+
+\CommentTok{\# Frequency count}
+\NormalTok{freq }\OperatorTok{=}\NormalTok{ Counter(}\StringTok{"anagram"}\NormalTok{)            }\CommentTok{\# Counter(\{\textquotesingle{}a\textquotesingle{}: 3, \textquotesingle{}n\textquotesingle{}: 1, ...\})}
+
+\CommentTok{\# Default dict avoids KeyError}
+\NormalTok{graph }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{list}\NormalTok{)}
+\NormalTok{graph[}\StringTok{\textquotesingle{}A\textquotesingle{}}\NormalTok{].append(}\StringTok{\textquotesingle{}B\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# Two Sum O(n)}
+\KeywordTok{def}\NormalTok{ two\_sum(nums, target):}
+\NormalTok{    seen }\OperatorTok{=}\NormalTok{ \{\}}
+    \ControlFlowTok{for}\NormalTok{ i, n }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+\NormalTok{        complement }\OperatorTok{=}\NormalTok{ target }\OperatorTok{{-}}\NormalTok{ n}
+        \ControlFlowTok{if}\NormalTok{ complement }\KeywordTok{in}\NormalTok{ seen:}
+            \ControlFlowTok{return}\NormalTok{ [seen[complement], i]}
+\NormalTok{        seen[n] }\OperatorTok{=}\NormalTok{ i}
+
+\CommentTok{\# Grouping anagrams}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict}
+\KeywordTok{def}\NormalTok{ group\_anagrams(strs):}
+\NormalTok{    groups }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{list}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ s }\KeywordTok{in}\NormalTok{ strs:}
+\NormalTok{        groups[}\BuiltInTok{tuple}\NormalTok{(}\BuiltInTok{sorted}\NormalTok{(s))].append(s)}
+    \ControlFlowTok{return} \BuiltInTok{list}\NormalTok{(groups.values())}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Hash map is your first tool when you need O(1) lookup. "Two pointer O(n\(^2\))? Can we trade space for time?" \(\rightarrow\) hash map. Watch out: dict keys must be hashable (no lists as keys; use tuples).}
+
+\textbf{Real interview use-case:} Two Sum, subarray sum equals k, longest consecutive sequence, top K frequent elements, valid sudoku.
+
+\subsubsection{Linked Lists}\label{linked-lists}
+
+\textbf{What it is:} Sequence of nodes where each node holds a value and a pointer to the next (singly) or both next and previous (doubly) nodes. Non-contiguous memory.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Singly Linked List:
+  head
+   ↓
+  [1|•]→[2|•]→[3|•]→[4|•]→None
+   node   next pointer
+
+Doubly Linked List:
+  head                              tail
+   ↓                                ↓
+None←[•|1|•]↔[•|2|•]↔[•|3|•]↔[•|4|•]→None
+     prev val next
+
+Insert at head (O(1)):
+  new_node.next = head
+  head = new_node
+
+Insert at tail (O(1) with tail pointer):
+  tail.next = new_node
+  tail = new_node
+
+Delete node (given reference, doubly linked, O(1)):
+  node.prev.next = node.next
+  node.next.prev = node.prev
+
+Delete node (singly linked, given reference only, O(n)):
+  Must traverse from head to find predecessor
+  → trick: copy next node's value into current, delete next
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4360}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2820}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2820}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Singly LL
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Doubly LL
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Access by index & O(n) & O(n) \\
+Search & O(n) & O(n) \\
+Insert at head & O(1) & O(1) \\
+Insert at tail & O(n)/O(1) & O(1) \\
+Insert at middle & O(n) & O(n) \\
+Delete at head & O(1) & O(1) \\
+Delete by ref & O(n) & O(1) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Frequent insertions/deletions at head or known positions
+\item
+  Implementing stacks, queues, LRU cache
+\item
+  When you don\textquotesingle t need random access
+\end{itemize}
+
+\textbf{When NOT to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Random access needed (use array)
+\item
+  Memory is tight (each node has pointer overhead)
+\item
+  Cache performance critical (non-contiguous = cache misses)
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ ListNode:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, val}\OperatorTok{=}\DecValTok{0}\NormalTok{, }\BuiltInTok{next}\OperatorTok{=}\VariableTok{None}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.val }\OperatorTok{=}\NormalTok{ val}
+        \VariableTok{self}\NormalTok{.}\BuiltInTok{next} \OperatorTok{=} \BuiltInTok{next}
+
+\CommentTok{\# Reverse a linked list (iterative)}
+\KeywordTok{def}\NormalTok{ reverse(head):}
+\NormalTok{    prev }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    curr }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ curr:}
+\NormalTok{        nxt }\OperatorTok{=}\NormalTok{ curr.}\BuiltInTok{next}
+\NormalTok{        curr.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ prev}
+\NormalTok{        prev }\OperatorTok{=}\NormalTok{ curr}
+\NormalTok{        curr }\OperatorTok{=}\NormalTok{ nxt}
+    \ControlFlowTok{return}\NormalTok{ prev}
+
+\CommentTok{\# Floyd\textquotesingle{}s cycle detection}
+\KeywordTok{def}\NormalTok{ has\_cycle(head):}
+\NormalTok{    slow }\OperatorTok{=}\NormalTok{ fast }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ fast }\KeywordTok{and}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{:}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{.}\BuiltInTok{next}
+        \ControlFlowTok{if}\NormalTok{ slow }\KeywordTok{is}\NormalTok{ fast:}
+            \ControlFlowTok{return} \VariableTok{True}
+    \ControlFlowTok{return} \VariableTok{False}
+
+\CommentTok{\# Find middle (slow/fast pointers)}
+\KeywordTok{def}\NormalTok{ find\_middle(head):}
+\NormalTok{    slow }\OperatorTok{=}\NormalTok{ fast }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ fast }\KeywordTok{and}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{:}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{.}\BuiltInTok{next}
+    \ControlFlowTok{return}\NormalTok{ slow}
+
+\CommentTok{\# Dummy node pattern (simplifies edge cases)}
+\KeywordTok{def}\NormalTok{ delete\_nth\_from\_end(head, n):}
+\NormalTok{    dummy }\OperatorTok{=}\NormalTok{ ListNode(}\DecValTok{0}\NormalTok{, head)}
+\NormalTok{    fast }\OperatorTok{=}\NormalTok{ slow }\OperatorTok{=}\NormalTok{ dummy}
+    \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}
+    \ControlFlowTok{while}\NormalTok{ fast:}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{    slow.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}\NormalTok{.}\BuiltInTok{next}
+    \ControlFlowTok{return}\NormalTok{ dummy.}\BuiltInTok{next}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Always use a dummy head node to avoid null checks at head. Slow/fast pointer solves cycle detection, middle finding, and nth-from-end in one pass. Linked list problems are usually just pointer manipulation --- draw it out.}
+
+\textbf{Real interview use-case:} Reverse linked list, merge two sorted lists, detect cycle, reorder list, LRU cache.
+
+\subsubsection{Stacks \& Queues}\label{stacks--queues}
+
+\textbf{What it is:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Stack}: LIFO (Last In, First Out). Like a stack of plates.
+\item
+  \textbf{Queue}: FIFO (First In, First Out). Like a line at a store.
+\item
+  \textbf{Deque}: Double-ended queue; insert/delete at both ends O(1).
+\item
+  \textbf{Monotonic stack/queue}: Stack/queue that maintains monotone order for range queries.
+\item
+  \textbf{Circular buffer}: Fixed-size ring buffer for queue; avoids shifting.
+\end{itemize}
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Stack (LIFO):
+  Push 1,2,3:  [1]→[2]→[3]   ← top is 3
+  Pop:         [1]→[2]        ← returns 3
+
+Queue (FIFO) using circular buffer:
+  Capacity=5, head=0, tail=0
+  Enqueue 1,2,3:
+    [1][2][3][ ][ ]   head=0, tail=3
+  Dequeue:
+    [ ][2][3][ ][ ]   head=1, tail=3
+  Enqueue 4,5:
+    [ ][2][3][4][5]   head=1, tail=0 (wrapped!)
+  → indices mod capacity: (tail+1) % cap
+
+Monotonic Stack (next greater element):
+  arr = [2, 1, 5, 3, 4]
+  Stack tracks indices of elements waiting for their "next greater"
+  i=0: push 0       stack=[0]         (arr[0]=2)
+  i=1: 1<2, push 1  stack=[0,1]       (arr[1]=1)
+  i=2: 5>1, pop 1→ans[1]=5, 5>2 pop 0→ans[0]=5, push 2
+                    stack=[2]
+  i=3: 3<5, push 3  stack=[2,3]
+  i=4: 4>3, pop 3→ans[3]=4, 4<5 push 4
+                    stack=[2,4]
+  Remaining: no greater element → -1
+  ans = [5, 5, -1, 4, -1]
+
+Deque (collections.deque in Python):
+  appendleft / popleft  → O(1)
+  append / pop          → O(1)
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3168}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1139}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1139}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1139}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3416}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stack
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Queue
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Deque
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Monotonic Stack
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Push/Enqueue & O(1) & O(1) & O(1) & O(1) amort \\
+Pop/Dequeue & O(1) & O(1) & O(1) & O(1) amort \\
+Peek (top/front) & O(1) & O(1) & O(1) & O(1) \\
+Search & O(n) & O(n) & O(n) & O(n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Stack: DFS, expression parsing, undo operations, backtracking
+\item
+  Queue: BFS, task scheduling, sliding window with deque
+\item
+  Monotonic stack: next greater/smaller element, largest rectangle in histogram
+\item
+  Deque: sliding window maximum, palindrome check
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+
+\CommentTok{\# Stack (use list, pop from end)}
+\NormalTok{stack }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{stack.append(x)    }\CommentTok{\# push}
+\NormalTok{stack.pop()        }\CommentTok{\# pop O(1)}
+\NormalTok{stack[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]          }\CommentTok{\# peek}
+
+\CommentTok{\# Queue (use deque for O(1) dequeue)}
+\NormalTok{q }\OperatorTok{=}\NormalTok{ deque()}
+\NormalTok{q.append(x)        }\CommentTok{\# enqueue}
+\NormalTok{q.popleft()        }\CommentTok{\# dequeue O(1)}
+
+\CommentTok{\# BFS template}
+\KeywordTok{def}\NormalTok{ bfs(root):}
+\NormalTok{    q }\OperatorTok{=}\NormalTok{ deque([root])}
+    \ControlFlowTok{while}\NormalTok{ q:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ q.popleft()}
+        \ControlFlowTok{for}\NormalTok{ child }\KeywordTok{in}\NormalTok{ node.children:}
+\NormalTok{            q.append(child)}
+
+\CommentTok{\# Monotonic stack — next greater element}
+\KeywordTok{def}\NormalTok{ next\_greater(nums):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(nums)}
+\NormalTok{    ans }\OperatorTok{=}\NormalTok{ [}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ []  }\CommentTok{\# indices}
+    \ControlFlowTok{for}\NormalTok{ i, num }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+        \ControlFlowTok{while}\NormalTok{ stack }\KeywordTok{and}\NormalTok{ nums[stack[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]] }\OperatorTok{\textless{}}\NormalTok{ num:}
+\NormalTok{            idx }\OperatorTok{=}\NormalTok{ stack.pop()}
+\NormalTok{            ans[idx] }\OperatorTok{=}\NormalTok{ num}
+\NormalTok{        stack.append(i)}
+    \ControlFlowTok{return}\NormalTok{ ans}
+
+\CommentTok{\# Sliding window maximum (monotonic deque)}
+\KeywordTok{def}\NormalTok{ sliding\_max(nums, k):}
+\NormalTok{    dq }\OperatorTok{=}\NormalTok{ deque()   }\CommentTok{\# indices, decreasing values}
+\NormalTok{    res }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ i, num }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+        \ControlFlowTok{while}\NormalTok{ dq }\KeywordTok{and}\NormalTok{ nums[dq[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]] }\OperatorTok{\textless{}}\NormalTok{ num:}
+\NormalTok{            dq.pop()}
+\NormalTok{        dq.append(i)}
+        \ControlFlowTok{if}\NormalTok{ dq[}\DecValTok{0}\NormalTok{] }\OperatorTok{==}\NormalTok{ i }\OperatorTok{{-}}\NormalTok{ k:  }\CommentTok{\# out of window}
+\NormalTok{            dq.popleft()}
+        \ControlFlowTok{if}\NormalTok{ i }\OperatorTok{\textgreater{}=}\NormalTok{ k }\OperatorTok{{-}} \DecValTok{1}\NormalTok{:}
+\NormalTok{            res.append(nums[dq[}\DecValTok{0}\NormalTok{]])}
+    \ControlFlowTok{return}\NormalTok{ res}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Monotonic stack is the pattern for "next greater/smaller element" and "largest rectangle" problems. BFS always uses a queue. For sliding window max/min, use a monotonic deque. Never use \texttt{list.pop(0)} for queues --- it\textquotesingle s O(n); use \texttt{deque.popleft()}.}
+
+\textbf{Real interview use-case:} Valid parentheses, min stack, daily temperatures, largest rectangle in histogram, sliding window maximum.
+
+\subsubsection{Trees}\label{trees}
+
+\textbf{What it is:} Hierarchical, acyclic connected graph. Root at top, leaves at bottom.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Binary Tree (each node: up to 2 children):
+           1
+          / \
+         2   3
+        / \   \
+       4   5   6
+
+BST (Binary Search Tree): left < root < right
+           8
+          / \
+         3   10
+        / \    \
+       1   6   14
+          / \  /
+         4   7 13
+
+BST invariant: for any node N:
+  - All nodes in left subtree < N.val
+  - All nodes in right subtree > N.val
+  → In-order traversal gives sorted sequence!
+
+BST Search:
+  Find 6: start at 8 → 6<8 go left → 3 → 6>3 go right → 6 ✓
+  O(h) where h = height. Balanced: h=log n. Skewed: h=n.
+
+Balanced Tree (AVL) — height constraint:
+  Balance factor = height(left) - height(right)
+  Must be in {-1, 0, 1} for every node
+  Rotation on violation:
+    Left-Left: right rotate
+    Right-Right: left rotate
+    Left-Right: left rotate then right rotate
+    Right-Left: right rotate then left rotate
+
+Red-Black Tree (less strict, used in Java TreeMap):
+  Properties:
+  1. Every node is red or black
+  2. Root is black
+  3. Red nodes have black children
+  4. All paths from node to null have same # black nodes
+  → Height ≤ 2*log(n+1) guaranteed
+
+Tree Traversals:
+  Pre-order:  root → left → right   [1,2,4,5,3,6]
+  In-order:   left → root → right   [4,2,5,1,3,6] ← sorted for BST!
+  Post-order: left → right → root   [4,5,2,6,3,1]
+  Level-order: BFS level by level   [1,2,3,4,5,6]
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1514}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2611}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3046}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2829}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Balanced BST
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Unbalanced BST
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+AVL / RB Tree
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Search & O(log n) & O(n) & O(log n) \\
+Insert & O(log n) & O(n) & O(log n) \\
+Delete & O(log n) & O(n) & O(log n) \\
+Min/Max & O(log n) & O(n) & O(log n) \\
+In-order & O(n) & O(n) & O(n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  BST: sorted data with dynamic insertions/deletions
+\item
+  AVL/RB: guaranteed O(log n) when data can be adversarial
+\item
+  Any tree: hierarchical relationships, recursive decomposition
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ TreeNode:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, val}\OperatorTok{=}\DecValTok{0}\NormalTok{, left}\OperatorTok{=}\VariableTok{None}\NormalTok{, right}\OperatorTok{=}\VariableTok{None}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.val }\OperatorTok{=}\NormalTok{ val}
+        \VariableTok{self}\NormalTok{.left }\OperatorTok{=}\NormalTok{ left}
+        \VariableTok{self}\NormalTok{.right }\OperatorTok{=}\NormalTok{ right}
+
+\CommentTok{\# In{-}order traversal (recursive)}
+\KeywordTok{def}\NormalTok{ inorder(root):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ root: }\ControlFlowTok{return}\NormalTok{ []}
+    \ControlFlowTok{return}\NormalTok{ inorder(root.left) }\OperatorTok{+}\NormalTok{ [root.val] }\OperatorTok{+}\NormalTok{ inorder(root.right)}
+
+\CommentTok{\# In{-}order traversal (iterative — important for interviews)}
+\KeywordTok{def}\NormalTok{ inorder\_iter(root):}
+\NormalTok{    result, stack }\OperatorTok{=}\NormalTok{ [], []}
+\NormalTok{    curr }\OperatorTok{=}\NormalTok{ root}
+    \ControlFlowTok{while}\NormalTok{ curr }\KeywordTok{or}\NormalTok{ stack:}
+        \ControlFlowTok{while}\NormalTok{ curr:}
+\NormalTok{            stack.append(curr)}
+\NormalTok{            curr }\OperatorTok{=}\NormalTok{ curr.left}
+\NormalTok{        curr }\OperatorTok{=}\NormalTok{ stack.pop()}
+\NormalTok{        result.append(curr.val)}
+\NormalTok{        curr }\OperatorTok{=}\NormalTok{ curr.right}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Height of tree}
+\KeywordTok{def}\NormalTok{ height(root):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ root: }\ControlFlowTok{return} \DecValTok{0}
+    \ControlFlowTok{return} \DecValTok{1} \OperatorTok{+} \BuiltInTok{max}\NormalTok{(height(root.left), height(root.right))}
+
+\CommentTok{\# Check if BST is valid}
+\KeywordTok{def}\NormalTok{ is\_valid\_bst(root, lo}\OperatorTok{=}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}{-}inf\textquotesingle{}}\NormalTok{), hi}\OperatorTok{=}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ root: }\ControlFlowTok{return} \VariableTok{True}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ (lo }\OperatorTok{\textless{}}\NormalTok{ root.val }\OperatorTok{\textless{}}\NormalTok{ hi): }\ControlFlowTok{return} \VariableTok{False}
+    \ControlFlowTok{return}\NormalTok{ (is\_valid\_bst(root.left, lo, root.val) }\KeywordTok{and}
+\NormalTok{            is\_valid\_bst(root.right, root.val, hi))}
+
+\CommentTok{\# LCA (Lowest Common Ancestor) in BST}
+\KeywordTok{def}\NormalTok{ lca\_bst(root, p, q):}
+    \ControlFlowTok{if}\NormalTok{ p.val }\OperatorTok{\textless{}}\NormalTok{ root.val }\KeywordTok{and}\NormalTok{ q.val }\OperatorTok{\textless{}}\NormalTok{ root.val:}
+        \ControlFlowTok{return}\NormalTok{ lca\_bst(root.left, p, q)}
+    \ControlFlowTok{if}\NormalTok{ p.val }\OperatorTok{\textgreater{}}\NormalTok{ root.val }\KeywordTok{and}\NormalTok{ q.val }\OperatorTok{\textgreater{}}\NormalTok{ root.val:}
+        \ControlFlowTok{return}\NormalTok{ lca\_bst(root.right, p, q)}
+    \ControlFlowTok{return}\NormalTok{ root}
+
+\CommentTok{\# Level order traversal}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+\KeywordTok{def}\NormalTok{ level\_order(root):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ root: }\ControlFlowTok{return}\NormalTok{ []}
+\NormalTok{    result, q }\OperatorTok{=}\NormalTok{ [], deque([root])}
+    \ControlFlowTok{while}\NormalTok{ q:}
+\NormalTok{        level }\OperatorTok{=}\NormalTok{ []}
+        \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(q)):}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ q.popleft()}
+\NormalTok{            level.append(node.val)}
+            \ControlFlowTok{if}\NormalTok{ node.left: q.append(node.left)}
+            \ControlFlowTok{if}\NormalTok{ node.right: q.append(node.right)}
+\NormalTok{        result.append(level)}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{BST in-order = sorted. Use recursion with min/max bounds for BST validation, not just left \textless{} root \textless{} right (common bug). Diameter of tree = longest path through any node = max(left\_depth + right\_depth) over all nodes.}
+
+\textbf{Real interview use-case:} Validate BST, lowest common ancestor, diameter of binary tree, serialize/deserialize tree, path sum, kth smallest in BST.
+
+\subsubsection{Heaps / Priority Queues}\label{heaps--priority-queues}
+
+\textbf{What it is:} A complete binary tree stored as an array, where each parent satisfies the heap property (min-heap: parent \(\leq\) children; max-heap: parent \(\geq\) children). Top element is always the min (or max).
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Min-Heap (array representation):
+         1
+        / \
+       3   5
+      / \ / \
+     7  4 8  9
+
+Array: [1, 3, 5, 7, 4, 8, 9]
+Index:  0  1  2  3  4  5  6
+
+Index relationships:
+  Parent(i)      = (i-1) // 2
+  Left child(i)  = 2*i + 1
+  Right child(i) = 2*i + 2
+
+Sift Up (after insert at end):
+  Insert 2: append → [1,3,5,7,4,8,9,2]
+  Compare 2 with parent (index 3): arr[3]=7 > 2 → swap
+  → [1,3,5,2,4,8,9,7]
+  Compare 2 with parent (index 1): arr[1]=3 > 2 → swap
+  → [1,2,5,3,4,8,9,7]
+  Compare 2 with parent (index 0): arr[0]=1 < 2 → stop ✓
+
+Sift Down (after extracting root — put last element at root):
+  Extract 1: put 7 at root → [7,2,5,3,4,8,9]
+  Compare 7 with children 2,5: min child=2 → swap
+  → [2,7,5,3,4,8,9]
+  Compare 7 with children 3,4: min child=3 → swap
+  → [2,3,5,7,4,8,9]
+  7 has no children → stop ✓
+
+Build Heap (heapify) from arbitrary array — O(n):
+  Start sifting down from last non-leaf (n//2 - 1) to root
+  Counterintuitive: O(n) not O(n log n) because most nodes are near leaves
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5238}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4762}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Get min/max & O(1) \\
+Insert & O(log n) \\
+Extract min & O(log n) \\
+Build heap & O(n) \\
+Search & O(n) \\
+Heapsort & O(n log n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Get the min/max repeatedly (priority queues)
+\item
+  Top K elements (use heap of size K)
+\item
+  Merge K sorted lists
+\item
+  Dijkstra\textquotesingle s shortest path
+\item
+  Median maintenance (two heaps)
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ heapq}
+
+\CommentTok{\# Min{-}heap (default)}
+\NormalTok{heap }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{heapq.heappush(heap, }\DecValTok{3}\NormalTok{)}
+\NormalTok{heapq.heappush(heap, }\DecValTok{1}\NormalTok{)}
+\NormalTok{heapq.heappush(heap, }\DecValTok{2}\NormalTok{)}
+\NormalTok{heapq.heappop(heap)    }\CommentTok{\# returns 1}
+
+\CommentTok{\# Max{-}heap: negate values}
+\NormalTok{max\_heap }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{heapq.heappush(max\_heap, }\OperatorTok{{-}}\DecValTok{3}\NormalTok{)}
+\NormalTok{heapq.heappush(max\_heap, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{)}
+\OperatorTok{{-}}\NormalTok{heapq.heappop(max\_heap)   }\CommentTok{\# returns 3}
+
+\CommentTok{\# Build heap in O(n)}
+\NormalTok{nums }\OperatorTok{=}\NormalTok{ [}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{9}\NormalTok{]}
+\NormalTok{heapq.heapify(nums)}
+
+\CommentTok{\# Top K elements}
+\KeywordTok{def}\NormalTok{ top\_k(nums, k):}
+    \ControlFlowTok{return}\NormalTok{ heapq.nlargest(k, nums)   }\CommentTok{\# O(n log k)}
+
+\CommentTok{\# Top K using min{-}heap of size k (space efficient)}
+\KeywordTok{def}\NormalTok{ top\_k\_heap(nums, k):}
+\NormalTok{    heap }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ n }\KeywordTok{in}\NormalTok{ nums:}
+\NormalTok{        heapq.heappush(heap, n)}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(heap) }\OperatorTok{\textgreater{}}\NormalTok{ k:}
+\NormalTok{            heapq.heappop(heap)}
+    \ControlFlowTok{return} \BuiltInTok{sorted}\NormalTok{(heap, reverse}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+\CommentTok{\# Merge K sorted lists}
+\KeywordTok{def}\NormalTok{ merge\_k\_lists(lists):}
+\NormalTok{    heap }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ i, lst }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(lists):}
+        \ControlFlowTok{if}\NormalTok{ lst:}
+\NormalTok{            heapq.heappush(heap, (lst[}\DecValTok{0}\NormalTok{], i, }\DecValTok{0}\NormalTok{))}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ heap:}
+\NormalTok{        val, i, j }\OperatorTok{=}\NormalTok{ heapq.heappop(heap)}
+\NormalTok{        result.append(val)}
+        \ControlFlowTok{if}\NormalTok{ j }\OperatorTok{+} \DecValTok{1} \OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(lists[i]):}
+\NormalTok{            heapq.heappush(heap, (lists[i][j}\OperatorTok{+}\DecValTok{1}\NormalTok{], i, j}\OperatorTok{+}\DecValTok{1}\NormalTok{))}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Median maintenance (two heaps)}
+\KeywordTok{class}\NormalTok{ MedianFinder:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.lo }\OperatorTok{=}\NormalTok{ []   }\CommentTok{\# max{-}heap (negate)}
+        \VariableTok{self}\NormalTok{.hi }\OperatorTok{=}\NormalTok{ []   }\CommentTok{\# min{-}heap}
+    \KeywordTok{def}\NormalTok{ add\_num(}\VariableTok{self}\NormalTok{, num):}
+\NormalTok{        heapq.heappush(}\VariableTok{self}\NormalTok{.lo, }\OperatorTok{{-}}\NormalTok{num)}
+\NormalTok{        heapq.heappush(}\VariableTok{self}\NormalTok{.hi, }\OperatorTok{{-}}\NormalTok{heapq.heappop(}\VariableTok{self}\NormalTok{.lo))}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.hi) }\OperatorTok{\textgreater{}} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.lo):}
+\NormalTok{            heapq.heappush(}\VariableTok{self}\NormalTok{.lo, }\OperatorTok{{-}}\NormalTok{heapq.heappop(}\VariableTok{self}\NormalTok{.hi))}
+    \KeywordTok{def}\NormalTok{ find\_median(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.lo) }\OperatorTok{\textgreater{}} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.hi): }\ControlFlowTok{return} \OperatorTok{{-}}\VariableTok{self}\NormalTok{.lo[}\DecValTok{0}\NormalTok{]}
+        \ControlFlowTok{return}\NormalTok{ (}\OperatorTok{{-}}\VariableTok{self}\NormalTok{.lo[}\DecValTok{0}\NormalTok{] }\OperatorTok{+} \VariableTok{self}\NormalTok{.hi[}\DecValTok{0}\NormalTok{]) }\OperatorTok{/} \FloatTok{2.0}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Python only has min-heap via heapq; negate values for max-heap. \texttt{heapify} is O(n). Top K smallest: use max-heap of size K and push out the max when size exceeds K. Top K largest: use min-heap of size K.}
+
+\textbf{Real interview use-case:} Kth largest element, merge K sorted lists, task scheduler, find median from data stream, Dijkstra\textquotesingle s.
+
+\subsubsection{Tries (Prefix Trees)}\label{tries-prefix-trees}
+
+\textbf{What it is:} A tree where each path from root to leaf spells a word, and each node represents one character. Shared prefixes share nodes.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Trie storing: ["cat", "car", "card", "care", "bat"]
+
+          root
+         /    \
+        c      b
+        |      |
+        a      a
+       / \      \
+      t   r      t
+     (*)  |      (*)
+         / \
+        d   e
+       (*)  (*)
+
+(*) = is_end marker
+
+Node structure:
+  children: dict[char → TrieNode]  (or array[26])
+  is_end: bool
+
+Insert "card":
+  root → c (create if absent)
+       → a (create if absent)
+       → r (exists, reuse)
+       → d (create)
+       mark d.is_end = True
+
+Search "care":
+  root → c → a → r → e → is_end? True ✓
+
+StartsWith "ca":
+  root → c → a → exists? True ✓ (prefix search)
+
+Space: each node uses O(ALPHA) where ALPHA=26 for lowercase
+  n strings of avg length m: O(n*m) nodes worst case
+  (better than storing all strings if many shared prefixes)
+\end{verbatim}
+
+\textbf{Complexity (m = length of key):}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4914}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2260}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2826}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Space
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Insert & O(m) & O(m) \\
+Search & O(m) & O(1) \\
+StartsWith & O(m) & O(1) \\
+Delete & O(m) & O(1) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Autocomplete / prefix search
+\item
+  Spell checking
+\item
+  IP routing tables
+\item
+  Word search in a grid
+\end{itemize}
+
+\textbf{When NOT to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Simple key-value lookup (use hash map)
+\item
+  Keys are not strings or have no shared prefixes
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ TrieNode:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.children }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.is\_end }\OperatorTok{=} \VariableTok{False}
+
+\KeywordTok{class}\NormalTok{ Trie:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.root }\OperatorTok{=}\NormalTok{ TrieNode()}
+
+    \KeywordTok{def}\NormalTok{ insert(}\VariableTok{self}\NormalTok{, word: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.root}
+        \ControlFlowTok{for}\NormalTok{ ch }\KeywordTok{in}\NormalTok{ word:}
+            \ControlFlowTok{if}\NormalTok{ ch }\KeywordTok{not} \KeywordTok{in}\NormalTok{ node.children:}
+\NormalTok{                node.children[ch] }\OperatorTok{=}\NormalTok{ TrieNode()}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ node.children[ch]}
+\NormalTok{        node.is\_end }\OperatorTok{=} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ search(}\VariableTok{self}\NormalTok{, word: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.root}
+        \ControlFlowTok{for}\NormalTok{ ch }\KeywordTok{in}\NormalTok{ word:}
+            \ControlFlowTok{if}\NormalTok{ ch }\KeywordTok{not} \KeywordTok{in}\NormalTok{ node.children:}
+                \ControlFlowTok{return} \VariableTok{False}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ node.children[ch]}
+        \ControlFlowTok{return}\NormalTok{ node.is\_end}
+
+    \KeywordTok{def}\NormalTok{ starts\_with(}\VariableTok{self}\NormalTok{, prefix: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.root}
+        \ControlFlowTok{for}\NormalTok{ ch }\KeywordTok{in}\NormalTok{ prefix:}
+            \ControlFlowTok{if}\NormalTok{ ch }\KeywordTok{not} \KeywordTok{in}\NormalTok{ node.children:}
+                \ControlFlowTok{return} \VariableTok{False}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ node.children[ch]}
+        \ControlFlowTok{return} \VariableTok{True}
+
+\CommentTok{\# Word search II (trie + DFS backtracking)}
+\CommentTok{\# Build trie from word list, then DFS on board}
+\CommentTok{\# When we reach a trie end node, we found a word}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Trie is the answer to "find all words with prefix X" or "word search on a grid with a word list". For word search II (board + word list), build a trie from words and run DFS on the board --- this prunes early when no prefix matches.}
+
+\textbf{Real interview use-case:} Implement trie, word search II, replace words, design search autocomplete, map sum pairs.
+
+\subsubsection{Graphs}\label{graphs}
+
+\textbf{What it is:} A set of vertices (nodes) connected by edges. Can be directed/undirected, weighted/unweighted, cyclic/acyclic.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Graph: 4 vertices, 4 edges (undirected)
+  0 --- 1
+  |   / |
+  |  /  |
+  | /   |
+  2 --- 3
+
+Adjacency List (preferred for sparse graphs):
+  {
+    0: [1, 2],
+    1: [0, 2, 3],
+    2: [0, 1, 3],
+    3: [1, 2]
+  }
+  Space: O(V + E)
+  Check edge (u,v): O(degree(u))
+  Get neighbors: O(degree(u))
+
+Adjacency Matrix (preferred for dense graphs):
+      0  1  2  3
+  0 [ 0  1  1  0 ]
+  1 [ 1  0  1  1 ]
+  2 [ 1  1  0  1 ]
+  3 [ 0  1  1  0 ]
+  Space: O(V²)
+  Check edge (u,v): O(1)
+  Get neighbors: O(V)
+
+Weighted adjacency list:
+  {0: [(1, 4), (2, 1)], ...}  ← (neighbor, weight)
+
+Types:
+  Undirected: edges go both ways
+  Directed (Digraph): edges have direction
+  DAG: Directed Acyclic Graph (used in topological sort)
+  Tree: connected undirected graph with V-1 edges
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4198}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2963}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2840}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Adj List
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Adj Matrix
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Space & O(V+E) & O(V\(^2\)) \\
+Add vertex & O(1) & O(V\(^2\)) \\
+Add edge & O(1) & O(1) \\
+Remove edge & O(E) & O(1) \\
+Check edge (u,v) & O(degree) & O(1) \\
+Get all neighbors & O(degree) & O(V) \\
+BFS/DFS & O(V+E) & O(V\(^2\)) \\
+Dijkstra & O((V+E)logV) & O(V\(^2\)logV) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Adj List: default, sparse graphs, BFS/DFS heavy
+\item
+  Adj Matrix: dense graphs, need O(1) edge existence check, Floyd-Warshall
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict, deque}
+
+\CommentTok{\# Build graph}
+\NormalTok{graph }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{list}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ u, v }\KeywordTok{in}\NormalTok{ edges:}
+\NormalTok{    graph[u].append(v)}
+\NormalTok{    graph[v].append(u)  }\CommentTok{\# undirected}
+
+\CommentTok{\# BFS (shortest path in unweighted graph)}
+\KeywordTok{def}\NormalTok{ bfs(graph, start, end):}
+\NormalTok{    visited }\OperatorTok{=}\NormalTok{ \{start\}}
+\NormalTok{    q }\OperatorTok{=}\NormalTok{ deque([(start, }\DecValTok{0}\NormalTok{)])}
+    \ControlFlowTok{while}\NormalTok{ q:}
+\NormalTok{        node, dist }\OperatorTok{=}\NormalTok{ q.popleft()}
+        \ControlFlowTok{if}\NormalTok{ node }\OperatorTok{==}\NormalTok{ end: }\ControlFlowTok{return}\NormalTok{ dist}
+        \ControlFlowTok{for}\NormalTok{ nei }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ nei }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                visited.add(nei)}
+\NormalTok{                q.append((nei, dist }\OperatorTok{+} \DecValTok{1}\NormalTok{))}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+
+\CommentTok{\# DFS (iterative)}
+\KeywordTok{def}\NormalTok{ dfs(graph, start):}
+\NormalTok{    visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ [start]}
+    \ControlFlowTok{while}\NormalTok{ stack:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ stack.pop()}
+        \ControlFlowTok{if}\NormalTok{ node }\KeywordTok{in}\NormalTok{ visited: }\ControlFlowTok{continue}
+\NormalTok{        visited.add(node)}
+        \ControlFlowTok{for}\NormalTok{ nei }\KeywordTok{in}\NormalTok{ graph[node]:}
+\NormalTok{            stack.append(nei)}
+
+\CommentTok{\# DFS (recursive)}
+\KeywordTok{def}\NormalTok{ dfs\_rec(node, visited, graph):}
+\NormalTok{    visited.add(node)}
+    \ControlFlowTok{for}\NormalTok{ nei }\KeywordTok{in}\NormalTok{ graph[node]:}
+        \ControlFlowTok{if}\NormalTok{ nei }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{            dfs\_rec(nei, visited, graph)}
+
+\CommentTok{\# Topological sort (Kahn\textquotesingle{}s algorithm, BFS{-}based)}
+\KeywordTok{def}\NormalTok{ topo\_sort(n, edges):}
+\NormalTok{    graph }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{list}\NormalTok{)}
+\NormalTok{    in\_degree }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+    \ControlFlowTok{for}\NormalTok{ u, v }\KeywordTok{in}\NormalTok{ edges:}
+\NormalTok{        graph[u].append(v)}
+\NormalTok{        in\_degree[v] }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{    q }\OperatorTok{=}\NormalTok{ deque(i }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n) }\ControlFlowTok{if}\NormalTok{ in\_degree[i] }\OperatorTok{==} \DecValTok{0}\NormalTok{)}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ q:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ q.popleft()}
+\NormalTok{        order.append(node)}
+        \ControlFlowTok{for}\NormalTok{ nei }\KeywordTok{in}\NormalTok{ graph[node]:}
+\NormalTok{            in\_degree[nei] }\OperatorTok{{-}=} \DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ in\_degree[nei] }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+\NormalTok{                q.append(nei)}
+    \ControlFlowTok{return}\NormalTok{ order }\ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(order) }\OperatorTok{==}\NormalTok{ n }\ControlFlowTok{else}\NormalTok{ []  }\CommentTok{\# empty = cycle exists}
+
+\CommentTok{\# Dijkstra\textquotesingle{}s (single source shortest path)}
+\ImportTok{import}\NormalTok{ heapq}
+\KeywordTok{def}\NormalTok{ dijkstra(graph, start):}
+\NormalTok{    dist }\OperatorTok{=}\NormalTok{ \{node: }\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ node }\KeywordTok{in}\NormalTok{ graph\}}
+\NormalTok{    dist[start] }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    heap }\OperatorTok{=}\NormalTok{ [(}\DecValTok{0}\NormalTok{, start)]}
+    \ControlFlowTok{while}\NormalTok{ heap:}
+\NormalTok{        d, node }\OperatorTok{=}\NormalTok{ heapq.heappop(heap)}
+        \ControlFlowTok{if}\NormalTok{ d }\OperatorTok{\textgreater{}}\NormalTok{ dist[node]: }\ControlFlowTok{continue}
+        \ControlFlowTok{for}\NormalTok{ nei, weight }\KeywordTok{in}\NormalTok{ graph[node]:}
+\NormalTok{            new\_d }\OperatorTok{=}\NormalTok{ d }\OperatorTok{+}\NormalTok{ weight}
+            \ControlFlowTok{if}\NormalTok{ new\_d }\OperatorTok{\textless{}}\NormalTok{ dist[nei]:}
+\NormalTok{                dist[nei] }\OperatorTok{=}\NormalTok{ new\_d}
+\NormalTok{                heapq.heappush(heap, (new\_d, nei))}
+    \ControlFlowTok{return}\NormalTok{ dist}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{BFS for shortest path in unweighted graph. Dijkstra for weighted (non-negative). Detect cycle in directed graph: DFS with in-stack tracking. Topological sort only valid for DAGs. "Number of islands" = number of DFS/BFS calls on unvisited cells.}
+
+\textbf{Real interview use-case:} Number of islands, clone graph, course schedule, network delay time, Pacific Atlantic water flow, word ladder.
+
+\subsubsection{Union-Find / Disjoint Set}\label{union-find--disjoint-set}
+
+\textbf{What it is:} Data structure to track which elements belong to the same connected component. Supports two operations: \texttt{find} (which component?) and \texttt{union} (merge components).
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Initial state (6 elements, each its own component):
+  parent = [0, 1, 2, 3, 4, 5]
+  rank   = [0, 0, 0, 0, 0, 0]
+
+Union(0, 1): find roots → 0,1; rank equal → make 1 child of 0
+  parent = [0, 0, 2, 3, 4, 5]
+  rank   = [1, 0, 0, 0, 0, 0]
+
+Union(2, 3):
+  parent = [0, 0, 2, 2, 4, 5]
+
+Union(0, 2): find roots → 0, 2; rank[0]=1 > rank[2]=0 → 2 under 0
+  parent = [0, 0, 0, 2, 4, 5]   ← 2's parent is now 0
+
+Path Compression during find(3):
+  find(3): parent[3]=2, parent[2]=0, parent[0]=0 → root=0
+  Compress: set parent[3]=0, parent[2]=0 directly
+  parent = [0, 0, 0, 0, 4, 5]   ← next find(3) is O(1)
+
+After path compression and union by rank:
+  find and union are effectively O(α(n)) ≈ O(1)
+  where α = inverse Ackermann function
+  α(n) < 5 for any practical n
+
+Visual after several unions:
+  Component 1: {0,1,2,3}  ← tree rooted at 0
+  Component 2: {4}
+  Component 3: {5}
+       0
+      /|\
+     1 2 3   ← after path compression, flat tree
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0986}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1134}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2949}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4931}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Naive
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Union by Rank
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
++ Path Compression
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Find & O(n) & O(log n) & O(\(\alpha\)(n)) \(\approx\) O(1) \\
+Union & O(n) & O(log n) & O(\(\alpha\)(n)) \(\approx\) O(1) \\
+Space & O(n) & O(n) & O(n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Connected components (dynamic)
+\item
+  Detect cycles in undirected graph
+\item
+  Kruskal\textquotesingle s minimum spanning tree
+\item
+  Grouping problems ("same group as")
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ UnionFind:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, n):}
+        \VariableTok{self}\NormalTok{.parent }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(n))}
+        \VariableTok{self}\NormalTok{.rank }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+        \VariableTok{self}\NormalTok{.components }\OperatorTok{=}\NormalTok{ n}
+
+    \KeywordTok{def}\NormalTok{ find(}\VariableTok{self}\NormalTok{, x):}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.parent[x] }\OperatorTok{!=}\NormalTok{ x:}
+            \VariableTok{self}\NormalTok{.parent[x] }\OperatorTok{=} \VariableTok{self}\NormalTok{.find(}\VariableTok{self}\NormalTok{.parent[x])  }\CommentTok{\# path compression}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.parent[x]}
+
+    \KeywordTok{def}\NormalTok{ union(}\VariableTok{self}\NormalTok{, x, y):}
+\NormalTok{        rx, ry }\OperatorTok{=} \VariableTok{self}\NormalTok{.find(x), }\VariableTok{self}\NormalTok{.find(y)}
+        \ControlFlowTok{if}\NormalTok{ rx }\OperatorTok{==}\NormalTok{ ry: }\ControlFlowTok{return} \VariableTok{False}  \CommentTok{\# already connected}
+        \CommentTok{\# Union by rank}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.rank[rx] }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.rank[ry]:}
+\NormalTok{            rx, ry }\OperatorTok{=}\NormalTok{ ry, rx}
+        \VariableTok{self}\NormalTok{.parent[ry] }\OperatorTok{=}\NormalTok{ rx}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.rank[rx] }\OperatorTok{==} \VariableTok{self}\NormalTok{.rank[ry]:}
+            \VariableTok{self}\NormalTok{.rank[rx] }\OperatorTok{+=} \DecValTok{1}
+        \VariableTok{self}\NormalTok{.components }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{return} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ connected(}\VariableTok{self}\NormalTok{, x, y):}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.find(x) }\OperatorTok{==} \VariableTok{self}\NormalTok{.find(y)}
+
+\CommentTok{\# Example: count components in graph}
+\KeywordTok{def}\NormalTok{ count\_components(n, edges):}
+\NormalTok{    uf }\OperatorTok{=}\NormalTok{ UnionFind(n)}
+    \ControlFlowTok{for}\NormalTok{ u, v }\KeywordTok{in}\NormalTok{ edges:}
+\NormalTok{        uf.union(u, v)}
+    \ControlFlowTok{return}\NormalTok{ uf.components}
+
+\CommentTok{\# Detect cycle in undirected graph}
+\KeywordTok{def}\NormalTok{ has\_cycle(n, edges):}
+\NormalTok{    uf }\OperatorTok{=}\NormalTok{ UnionFind(n)}
+    \ControlFlowTok{for}\NormalTok{ u, v }\KeywordTok{in}\NormalTok{ edges:}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ uf.union(u, v):  }\CommentTok{\# already in same component}
+            \ControlFlowTok{return} \VariableTok{True}
+    \ControlFlowTok{return} \VariableTok{False}
+
+\CommentTok{\# Kruskal\textquotesingle{}s MST}
+\KeywordTok{def}\NormalTok{ kruskal(n, edges):}
+\NormalTok{    uf }\OperatorTok{=}\NormalTok{ UnionFind(n)}
+\NormalTok{    edges.sort(key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ e: e[}\DecValTok{2}\NormalTok{])  }\CommentTok{\# sort by weight}
+\NormalTok{    mst\_cost }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ u, v, w }\KeywordTok{in}\NormalTok{ edges:}
+        \ControlFlowTok{if}\NormalTok{ uf.union(u, v):}
+\NormalTok{            mst\_cost }\OperatorTok{+=}\NormalTok{ w}
+    \ControlFlowTok{return}\NormalTok{ mst\_cost}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Always implement both path compression AND union by rank. Without both, you don\textquotesingle t get the near-O(1) guarantee. Union-Find cannot efficiently handle edge deletion --- if you need that, use Link-Cut Trees (not interview scope).}
+
+\textbf{Real interview use-case:} Number of provinces, redundant connection, accounts merge, satisfiability of equality equations.
+
+\subsubsection{LRU / LFU Cache Structures}\label{lru--lfu-cache-structures}
+
+\textbf{What it is:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{LRU (Least Recently Used)}: Evicts the item not accessed for the longest time. O(1) get and put.
+\item
+  \textbf{LFU (Least Frequently Used)}: Evicts the item used fewest times (break ties by LRU). O(1) all operations.
+\end{itemize}
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+LRU Cache (capacity=3):
+  Internals: HashMap + Doubly Linked List
+  Map: key → node (O(1) access)
+  DLL: most recent at front, least recent at tail
+
+  get(1): move node 1 to front
+  put(4): if full, remove tail (LRU), insert at front, update map
+
+  State after put(1), put(2), put(3):
+    [3] ↔ [2] ↔ [1] ← tail (LRU)
+     ↑
+    head (MRU)
+
+  get(1): move 1 to head
+    [1] ↔ [3] ↔ [2] ← tail (LRU)
+
+  put(4): evict tail (2), add 4 at head
+    [4] ↔ [1] ↔ [3]
+
+LFU Cache (capacity=3):
+  Internals: HashMap(key→(val,freq)) + HashMap(freq→DLL of keys)
+             + min_freq tracker
+  On access: increment freq, move to freq+1 list
+  On evict: remove LRU from min_freq list
+  Trickier: when min_freq list empties, min_freq++
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+LRU
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+LFU
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+get & O(1) & O(1) \\
+put & O(1) & O(1) \\
+\end{longtable}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ OrderedDict}
+
+\CommentTok{\# LRU using OrderedDict (move\_to\_end trick)}
+\KeywordTok{class}\NormalTok{ LRUCache:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, capacity: }\BuiltInTok{int}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.cap }\OperatorTok{=}\NormalTok{ capacity}
+        \VariableTok{self}\NormalTok{.cache }\OperatorTok{=}\NormalTok{ OrderedDict()  }\CommentTok{\# key → value, ordered by access time}
+
+    \KeywordTok{def}\NormalTok{ get(}\VariableTok{self}\NormalTok{, key: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{int}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.cache: }\ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+        \VariableTok{self}\NormalTok{.cache.move\_to\_end(key)  }\CommentTok{\# mark as most recently used}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.cache[key]}
+
+    \KeywordTok{def}\NormalTok{ put(}\VariableTok{self}\NormalTok{, key: }\BuiltInTok{int}\NormalTok{, value: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{in} \VariableTok{self}\NormalTok{.cache:}
+            \VariableTok{self}\NormalTok{.cache.move\_to\_end(key)}
+        \VariableTok{self}\NormalTok{.cache[key] }\OperatorTok{=}\NormalTok{ value}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.cache) }\OperatorTok{\textgreater{}} \VariableTok{self}\NormalTok{.cap:}
+            \VariableTok{self}\NormalTok{.cache.popitem(last}\OperatorTok{=}\VariableTok{False}\NormalTok{)  }\CommentTok{\# remove LRU (first item)}
+
+\CommentTok{\# LRU from scratch (HashMap + DLL) — what interviewers actually want}
+\KeywordTok{class}\NormalTok{ DLLNode:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, key}\OperatorTok{=}\DecValTok{0}\NormalTok{, val}\OperatorTok{=}\DecValTok{0}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.key }\OperatorTok{=}\NormalTok{ key}
+        \VariableTok{self}\NormalTok{.val }\OperatorTok{=}\NormalTok{ val}
+        \VariableTok{self}\NormalTok{.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{None}
+
+\KeywordTok{class}\NormalTok{ LRUCacheManual:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, capacity):}
+        \VariableTok{self}\NormalTok{.cap }\OperatorTok{=}\NormalTok{ capacity}
+        \VariableTok{self}\NormalTok{.cache }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.head }\OperatorTok{=}\NormalTok{ DLLNode()   }\CommentTok{\# dummy head (MRU side)}
+        \VariableTok{self}\NormalTok{.tail }\OperatorTok{=}\NormalTok{ DLLNode()   }\CommentTok{\# dummy tail (LRU side)}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{self}\NormalTok{.tail}
+        \VariableTok{self}\NormalTok{.tail.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.head}
+
+    \KeywordTok{def}\NormalTok{ \_remove(}\VariableTok{self}\NormalTok{, node):}
+\NormalTok{        node.prev.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node.}\BuiltInTok{next}
+\NormalTok{        node.}\BuiltInTok{next}\NormalTok{.prev }\OperatorTok{=}\NormalTok{ node.prev}
+
+    \KeywordTok{def}\NormalTok{ \_insert\_front(}\VariableTok{self}\NormalTok{, node):}
+\NormalTok{        node.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next}
+\NormalTok{        node.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.head}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next}\NormalTok{.prev }\OperatorTok{=}\NormalTok{ node}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node}
+
+    \KeywordTok{def}\NormalTok{ get(}\VariableTok{self}\NormalTok{, key):}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.cache: }\ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.cache[key]}
+        \VariableTok{self}\NormalTok{.\_remove(node)}
+        \VariableTok{self}\NormalTok{.\_insert\_front(node)}
+        \ControlFlowTok{return}\NormalTok{ node.val}
+
+    \KeywordTok{def}\NormalTok{ put(}\VariableTok{self}\NormalTok{, key, val):}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{in} \VariableTok{self}\NormalTok{.cache:}
+            \VariableTok{self}\NormalTok{.\_remove(}\VariableTok{self}\NormalTok{.cache[key])}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ DLLNode(key, val)}
+        \VariableTok{self}\NormalTok{.cache[key] }\OperatorTok{=}\NormalTok{ node}
+        \VariableTok{self}\NormalTok{.\_insert\_front(node)}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.cache) }\OperatorTok{\textgreater{}} \VariableTok{self}\NormalTok{.cap:}
+\NormalTok{            lru }\OperatorTok{=} \VariableTok{self}\NormalTok{.tail.prev}
+            \VariableTok{self}\NormalTok{.\_remove(lru)}
+            \KeywordTok{del} \VariableTok{self}\NormalTok{.cache[lru.key]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{LRU = HashMap + DLL with dummy head and tail. The dummy nodes eliminate all edge-case null checks. LFU is significantly harder --- use HashMap(key\(\rightarrow\)freq) + HashMap(freq\(\rightarrow\)OrderedDict) + min\_freq variable.}
+
+\textbf{Real interview use-case:} LRU cache (literal LeetCode 146), LFU cache (LeetCode 460), design Twitter, design browser history.
+
+\subsubsection{Segment Tree \& Fenwick Tree (BIT)}\label{segment-tree--fenwick-tree-bit}
+
+\textbf{What it is:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Segment Tree}: Tree where each node stores aggregate (sum/min/max) over a range. Supports range queries and point/range updates in O(log n).
+\item
+  \textbf{Fenwick Tree (Binary Indexed Tree)}: Array-based structure using binary representation for prefix sums. Simpler to implement; less general.
+\end{itemize}
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Array: [1, 3, 5, 7, 9, 11]  (0-indexed)
+
+Segment Tree (sum):
+                  [36: 0-5]
+                 /           \
+        [9: 0-2]              [27: 3-5]
+        /       \             /        \
+   [4: 0-1]  [5: 2-2]  [16: 3-4]  [11: 5-5]
+    /    \               /     \
+[1:0-0][3:1-1]      [7:3-3][9:4-4]
+
+Query sum(1,4): decompose into [1-2] and [3-4] → 8 + 16 = 24
+Update arr[2] = 10: update leaf, propagate to root → O(log n)
+Space: O(4n) for array representation
+
+Fenwick Tree (BIT) for prefix sums:
+  Index:   1  2  3  4  5  6
+  arr:    [1, 3, 5, 7, 9,11]
+  BIT:    [1, 4, 5,16, 9,20]  ← each stores sum of specific range
+
+  BIT[i] = sum of arr[i - lowbit(i) + 1 ... i]
+  lowbit(i) = i & (-i)  ← isolates least significant bit
+
+  Prefix sum query(5):
+    i=5 (101): add BIT[5]=9, i=5-(5&-5)=4
+    i=4 (100): add BIT[4]=16, i=4-(4&-4)=0 → stop
+    Total: 9+16=25 ✓ (but wait: 1+3+5+7+9=25 ✓)
+
+  Update(3, delta=2): propagate up
+    i=3: BIT[3]+=2, i=3+(3&-3)=4
+    i=4: BIT[4]+=2, i=4+(4&-4)=8 > n → stop
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2297}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2421}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2641}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2641}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Naive Array
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Segment Tree
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fenwick Tree
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Build & O(n) & O(n) & O(n log n) \\
+Point update & O(1) & O(log n) & O(log n) \\
+Range update & O(n) & O(log n) & O(log n) \\
+Range query & O(n) & O(log n) & O(log n) \\
+Space & O(n) & O(4n) & O(n) \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Segment tree: range min/max queries, lazy propagation for range updates
+\item
+  Fenwick tree: only prefix sums needed; cleaner code
+\item
+  Both: dynamic range queries where array is mutated
+\end{itemize}
+
+\textbf{Key Python patterns:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Fenwick Tree (BIT) — prefix sum}
+\KeywordTok{class}\NormalTok{ BIT:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, n):}
+        \VariableTok{self}\NormalTok{.n }\OperatorTok{=}\NormalTok{ n}
+        \VariableTok{self}\NormalTok{.tree }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{)  }\CommentTok{\# 1{-}indexed}
+
+    \KeywordTok{def}\NormalTok{ update(}\VariableTok{self}\NormalTok{, i, delta):    }\CommentTok{\# add delta to position i}
+        \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}=} \VariableTok{self}\NormalTok{.n:}
+            \VariableTok{self}\NormalTok{.tree[i] }\OperatorTok{+=}\NormalTok{ delta}
+\NormalTok{            i }\OperatorTok{+=}\NormalTok{ i }\OperatorTok{\&}\NormalTok{ (}\OperatorTok{{-}}\NormalTok{i)          }\CommentTok{\# move to parent}
+
+    \KeywordTok{def}\NormalTok{ query(}\VariableTok{self}\NormalTok{, i):            }\CommentTok{\# prefix sum [1..i]}
+\NormalTok{        s }\OperatorTok{=} \DecValTok{0}
+        \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{:}
+\NormalTok{            s }\OperatorTok{+=} \VariableTok{self}\NormalTok{.tree[i]}
+\NormalTok{            i }\OperatorTok{{-}=}\NormalTok{ i }\OperatorTok{\&}\NormalTok{ (}\OperatorTok{{-}}\NormalTok{i)          }\CommentTok{\# move to ancestor}
+        \ControlFlowTok{return}\NormalTok{ s}
+
+    \KeywordTok{def}\NormalTok{ range\_query(}\VariableTok{self}\NormalTok{, l, r):   }\CommentTok{\# sum [l..r]}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.query(r) }\OperatorTok{{-}} \VariableTok{self}\NormalTok{.query(l }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Segment Tree (iterative, cleaner)}
+\KeywordTok{class}\NormalTok{ SegmentTree:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, nums):}
+        \VariableTok{self}\NormalTok{.n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(nums)}
+        \VariableTok{self}\NormalTok{.tree }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (}\DecValTok{2} \OperatorTok{*} \VariableTok{self}\NormalTok{.n)}
+        \CommentTok{\# Build}
+        \ControlFlowTok{for}\NormalTok{ i, v }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+            \VariableTok{self}\NormalTok{.tree[}\VariableTok{self}\NormalTok{.n }\OperatorTok{+}\NormalTok{ i] }\OperatorTok{=}\NormalTok{ v}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\VariableTok{self}\NormalTok{.n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{):}
+            \VariableTok{self}\NormalTok{.tree[i] }\OperatorTok{=} \VariableTok{self}\NormalTok{.tree[}\DecValTok{2}\OperatorTok{*}\NormalTok{i] }\OperatorTok{+} \VariableTok{self}\NormalTok{.tree[}\DecValTok{2}\OperatorTok{*}\NormalTok{i}\OperatorTok{+}\DecValTok{1}\NormalTok{]}
+
+    \KeywordTok{def}\NormalTok{ update(}\VariableTok{self}\NormalTok{, i, val):}
+\NormalTok{        i }\OperatorTok{+=} \VariableTok{self}\NormalTok{.n}
+        \VariableTok{self}\NormalTok{.tree[i] }\OperatorTok{=}\NormalTok{ val}
+        \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textgreater{}} \DecValTok{1}\NormalTok{:}
+\NormalTok{            i }\OperatorTok{//=} \DecValTok{2}
+            \VariableTok{self}\NormalTok{.tree[i] }\OperatorTok{=} \VariableTok{self}\NormalTok{.tree[}\DecValTok{2}\OperatorTok{*}\NormalTok{i] }\OperatorTok{+} \VariableTok{self}\NormalTok{.tree[}\DecValTok{2}\OperatorTok{*}\NormalTok{i}\OperatorTok{+}\DecValTok{1}\NormalTok{]}
+
+    \KeywordTok{def}\NormalTok{ query(}\VariableTok{self}\NormalTok{, l, r):         }\CommentTok{\# sum [l, r) half{-}open}
+\NormalTok{        res }\OperatorTok{=} \DecValTok{0}
+\NormalTok{        l }\OperatorTok{+=} \VariableTok{self}\NormalTok{.n}\OperatorTok{;}\NormalTok{ r }\OperatorTok{+=} \VariableTok{self}\NormalTok{.n}
+        \ControlFlowTok{while}\NormalTok{ l }\OperatorTok{\textless{}}\NormalTok{ r:}
+            \ControlFlowTok{if}\NormalTok{ l }\OperatorTok{\&} \DecValTok{1}\NormalTok{: res }\OperatorTok{+=} \VariableTok{self}\NormalTok{.tree[l]}\OperatorTok{;}\NormalTok{ l }\OperatorTok{+=} \DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ r }\OperatorTok{\&} \DecValTok{1}\NormalTok{: r }\OperatorTok{{-}=} \DecValTok{1}\OperatorTok{;}\NormalTok{ res }\OperatorTok{+=} \VariableTok{self}\NormalTok{.tree[r]}
+\NormalTok{            l }\OperatorTok{//=} \DecValTok{2}\OperatorTok{;}\NormalTok{ r }\OperatorTok{//=} \DecValTok{2}
+        \ControlFlowTok{return}\NormalTok{ res}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{Fenwick tree is simpler to code and sufficient for prefix sum + point update problems. Use segment tree when you need range updates or range min/max. The "count of smaller numbers after self" problem \(\rightarrow\) BIT is the elegant solution.}
+
+\textbf{Real interview use-case:} Range sum query (mutable), count of smaller numbers after self, reverse pairs, falling squares.
+
+\subsubsection{Bloom Filter}\label{bloom-filter}
+
+\textbf{What it is:} A probabilistic, space-efficient data structure that answers "is X possibly in the set?" or "is X definitely NOT in the set?" --- with false positives but no false negatives.
+
+\textbf{Internal mechanics:}
+
+\begin{verbatim}
+Bloom Filter (m=20 bits, k=3 hash functions):
+
+  Initial state:
+  [0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0][0]
+
+  Insert "cat" (hash1=3, hash2=7, hash3=15):
+  [0][0][0][1][0][0][0][1][0][0][0][0][0][0][0][1][0][0][0][0]
+                  ↑               ↑               ↑
+
+  Insert "dog" (hash1=3, hash2=10, hash3=17):
+  [0][0][0][1][0][0][0][1][0][0][1][0][0][0][0][1][0][1][0][0]
+  Note: bit 3 now set by both "cat" and "dog"!
+
+  Query "cat": check bits 3,7,15 → all 1 → POSSIBLY in set ✓
+  Query "hat": hash1=3, hash2=10, hash3=17 → all 1 → POSSIBLY in set ✗ FALSE POSITIVE!
+  Query "xyz": hash1=1 → 0 → DEFINITELY NOT in set ✓
+
+  False positive probability ≈ (1 - e^(-kn/m))^k
+  where n=items inserted, m=bit array size, k=hash functions
+
+  Key: no false negatives (if bloom says NO, it's definitely NO)
+       cannot delete items (counter-based bloom filters can)
+       cannot enumerate stored elements
+\end{verbatim}
+
+\textbf{Complexity:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3670}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2813}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3517}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Op
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Space
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Insert & O(k) & O(m) \\
+Query & O(k) & O(1) \\
+Delete & N/A & - \\
+\end{longtable}
+
+\textbf{When to use:}
+
+\begin{itemize}
+\tightlist
+\item
+  Cache pre-filtering: "has this URL been seen before?" before hitting DB
+\item
+  Distributed systems: "does key exist on this node?" before network call
+\item
+  Spell checkers: fast "not a word" filter
+\item
+  HBase/Cassandra: skip SSTable reads for non-existent keys
+\end{itemize}
+
+\textbf{Ties to systems:}
+
+\begin{itemize}
+\tightlist
+\item
+  Cassandra uses bloom filters to avoid unnecessary disk I/O
+\item
+  Google Chrome used bloom filter for Safe Browsing URL blacklist
+\item
+  Bitcoin uses bloom filters in SPV (Simplified Payment Verification)
+\end{itemize}
+
+\textbf{Interview takeaway:} \textbf{Bloom filters trade accuracy for space and speed. False positives OK; false negatives are impossible. When an interviewer asks "how would you check if a URL was seen before using O(1) space?" --- bloom filter is the answer. Note: you can NOT delete from a standard bloom filter.}
+
+\subsection{Choosing the Right Data Structure}\label{choosing-the-right-data-structure}
+
+Decision table: "I need X \(\rightarrow\) use Y"
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3696}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2935}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3370}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Need
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+O(1) access by index & Array / List & Contiguous memory \\
+O(1) key-value lookup & Hash Map & Hash function \\
+Ordered key-value, range queries & BST / Sorted Map & In-order traversal \\
+Get min/max repeatedly & Heap & Root always min/max \\
+Get kth smallest/largest & Heap of size k & O(n log k) \\
+Prefix search / autocomplete & Trie & Shared prefix compression \\
+LIFO (undo, recursion) & Stack & Push/pop from one end \\
+FIFO (BFS, scheduling) & Queue / Deque & Enqueue/dequeue O(1) \\
+Sliding window max/min & Monotonic Deque & Maintain monotone order \\
+Next greater/smaller element & Monotonic Stack & Classic pattern \\
+Connected components & Union-Find & Near-O(1) union/find \\
+Shortest path (unweighted) & BFS (Queue) & Level-by-level expansion \\
+Shortest path (weighted, non-neg) & Dijkstra (Heap) & Greedy + priority queue \\
+Shortest path (negative weights) & Bellman-Ford & DP approach \\
+All pairs shortest path & Floyd-Warshall & O(V\(^3\)) DP \\
+Range sum query + updates & Fenwick Tree / Segment Tree & O(log n) both \\
+Range min/max query + updates & Segment Tree & BIT can\textquotesingle t do min/max \\
+O(1) LRU eviction & HashMap + DLL & O(1) access + O(1) order \\
+Membership test, space-constrained & Bloom Filter & Probabilistic, tiny space \\
+Count frequencies & HashMap / Counter & Hash map with integer values \\
+Find duplicates & HashSet or sorting & O(n) with hash, O(n log n) sort \\
+Merge k sorted sequences & Min-Heap of k elements & O(n log k) \\
+Detect cycle (undirected graph) & Union-Find & Simpler than DFS coloring \\
+Detect cycle (directed graph) & DFS with in-stack tracking & Union-Find doesn\textquotesingle t work here \\
+Topological ordering & Kahn\textquotesingle s (BFS) or DFS & Works on DAGs only \\
+\end{longtable}
+
+\subsection{Language Notes}\label{language-notes}
+
+\subsubsection{Python}\label{python}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2821}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3462}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3718}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Need
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Python
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Dynamic array & \texttt{list} & \texttt{append} O(1) amortized \\
+Hash map & \texttt{dict} & \texttt{defaultdict(list/int/set)} \\
+Hash set & \texttt{set} & \texttt{add}, \texttt{in} O(1) \\
+Ordered map (by key) & \texttt{sortedcontainers.SortedList} & Not stdlib; use \texttt{bisect} + list \\
+Min heap & \texttt{heapq} (module) & Negate for max heap \\
+Queue / Deque & \texttt{collections.deque} & \texttt{appendleft}, \texttt{popleft} O(1) \\
+Counter & \texttt{collections.Counter} & \texttt{most\_common(k)} \\
+LRU built-in & \texttt{collections.OrderedDict} & \texttt{move\_to\_end}, \texttt{popitem} \\
+Bisect (sorted insert) & \texttt{bisect.bisect\_left/right} & Binary search on sorted list \\
+Infinity & \texttt{float(\textquotesingle{}inf\textquotesingle{})} & \\
+Char to int & \texttt{ord(\textquotesingle{}a\textquotesingle{})} \(\rightarrow\) 97 & \texttt{chr(97)} \(\rightarrow\) \textquotesingle a\textquotesingle{} \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Common Python idioms}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict, Counter, deque, OrderedDict}
+\ImportTok{import}\NormalTok{ heapq}
+\ImportTok{from}\NormalTok{ bisect }\ImportTok{import}\NormalTok{ bisect\_left, bisect\_right, insort}
+
+\CommentTok{\# Heap with custom key (push tuples)}
+\NormalTok{heapq.heappush(heap, (priority, item))}
+
+\CommentTok{\# Sorted list simulation with bisect}
+\ImportTok{import}\NormalTok{ bisect}
+\NormalTok{sorted\_list }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{bisect.insort(sorted\_list, }\DecValTok{5}\NormalTok{)         }\CommentTok{\# insert and maintain order}
+\NormalTok{idx }\OperatorTok{=}\NormalTok{ bisect.bisect\_left(sorted\_list, }\DecValTok{5}\NormalTok{)  }\CommentTok{\# binary search}
+
+\CommentTok{\# defaultdict prevents KeyError}
+\NormalTok{graph }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{list}\NormalTok{)}
+\NormalTok{count }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{int}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Java}\label{java}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2372}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2135}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5492}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Need
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Java Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Dynamic array & \texttt{ArrayList\textless{}T\textgreater{}} & \texttt{add()} O(1) amortized \\
+Hash map & \texttt{HashMap\textless{}K,V\textgreater{}} & Not ordered \\
+Ordered map (by key) & \texttt{TreeMap\textless{}K,V\textgreater{}} & Red-Black tree, O(log n) ops \\
+Ordered set & \texttt{TreeSet\textless{}T\textgreater{}} & Red-Black tree \\
+Hash set & \texttt{HashSet\textless{}T\textgreater{}} & \\
+Linked hash map & \texttt{LinkedHashMap\textless{}K,V\textgreater{}} & Insertion-order iteration (LRU) \\
+Min/Max heap & \texttt{PriorityQueue\textless{}T\textgreater{}} & Min by default; pass \texttt{Comparator.reverseOrder()} for max \\
+Stack & \texttt{Deque\textless{}T\textgreater{}} as stack & Prefer \texttt{ArrayDeque} over \texttt{Stack} \\
+Queue & \texttt{ArrayDeque\textless{}T\textgreater{}} & Or \texttt{LinkedList\textless{}T\textgreater{}} \\
+Deque & \texttt{ArrayDeque\textless{}T\textgreater{}} & \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Java idioms}
+\BuiltInTok{PriorityQueue}\OperatorTok{\textless{}}\BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ minHeap }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{PriorityQueue}\OperatorTok{\textless{}\textgreater{}();}
+\BuiltInTok{PriorityQueue}\OperatorTok{\textless{}}\BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ maxHeap }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{PriorityQueue}\OperatorTok{\textless{}\textgreater{}(}\BuiltInTok{Collections}\OperatorTok{.}\FunctionTok{reverseOrder}\OperatorTok{());}
+
+\BuiltInTok{Map}\OperatorTok{\textless{}}\BuiltInTok{String}\OperatorTok{,} \BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ map }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{HashMap}\OperatorTok{\textless{}\textgreater{}();}
+\NormalTok{map}\OperatorTok{.}\FunctionTok{getOrDefault}\OperatorTok{(}\NormalTok{key}\OperatorTok{,} \DecValTok{0}\OperatorTok{);}
+\NormalTok{map}\OperatorTok{.}\FunctionTok{computeIfAbsent}\OperatorTok{(}\NormalTok{key}\OperatorTok{,}\NormalTok{ k }\OperatorTok{{-}\textgreater{}} \KeywordTok{new} \BuiltInTok{ArrayList}\OperatorTok{\textless{}\textgreater{}()).}\FunctionTok{add}\OperatorTok{(}\NormalTok{val}\OperatorTok{);}
+
+\BuiltInTok{Deque}\OperatorTok{\textless{}}\BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ stack }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{ArrayDeque}\OperatorTok{\textless{}\textgreater{}();}  \CommentTok{// use as stack}
+\NormalTok{stack}\OperatorTok{.}\FunctionTok{push}\OperatorTok{(}\DecValTok{1}\OperatorTok{);}\NormalTok{ stack}\OperatorTok{.}\FunctionTok{pop}\OperatorTok{();}\NormalTok{ stack}\OperatorTok{.}\FunctionTok{peek}\OperatorTok{();}
+
+\BuiltInTok{Queue}\OperatorTok{\textless{}}\BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ queue }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{ArrayDeque}\OperatorTok{\textless{}\textgreater{}();}  \CommentTok{// use as queue}
+\NormalTok{queue}\OperatorTok{.}\FunctionTok{offer}\OperatorTok{(}\DecValTok{1}\OperatorTok{);}\NormalTok{ queue}\OperatorTok{.}\FunctionTok{poll}\OperatorTok{();}\NormalTok{ queue}\OperatorTok{.}\FunctionTok{peek}\OperatorTok{();}
+
+\BuiltInTok{TreeMap}\OperatorTok{\textless{}}\BuiltInTok{Integer}\OperatorTok{,} \BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ ordered }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{TreeMap}\OperatorTok{\textless{}\textgreater{}();}
+\NormalTok{ordered}\OperatorTok{.}\FunctionTok{floorKey}\OperatorTok{(}\NormalTok{x}\OperatorTok{);}    \CommentTok{// largest key ≤ x}
+\NormalTok{ordered}\OperatorTok{.}\FunctionTok{ceilingKey}\OperatorTok{(}\NormalTok{x}\OperatorTok{);}  \CommentTok{// smallest key ≥ x}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{C++}\label{c}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2381}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4524}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3095}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Need
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+C++ Container
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Dynamic array & \texttt{vector\textless{}T\textgreater{}} & \texttt{push\_back} O(1) amortized \\
+Hash map & \texttt{unordered\_map\textless{}K,V\textgreater{}} & O(1) avg \\
+Ordered map (by key) & \texttt{map\textless{}K,V\textgreater{}} & Red-Black tree, O(log n) \\
+Hash set & \texttt{unordered\_set\textless{}T\textgreater{}} & \\
+Ordered set & \texttt{set\textless{}T\textgreater{}} & + \texttt{lower\_bound}, \texttt{upper\_bound} \\
+Priority queue (max) & \texttt{priority\_queue\textless{}T\textgreater{}} & Max by default \\
+Priority queue (min) & \texttt{priority\_queue\textless{}T,vector\textless{}T\textgreater{},greater\textless{}T\textgreater{}\textgreater{}} & \\
+Stack & \texttt{stack\textless{}T\textgreater{}} & \\
+Queue & \texttt{queue\textless{}T\textgreater{}} & \\
+Deque & \texttt{deque\textless{}T\textgreater{}} & \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// C++ idioms}
+\PreprocessorTok{\#include }\ImportTok{\textless{}bits/stdc++.h\textgreater{}}
+\KeywordTok{using} \KeywordTok{namespace}\NormalTok{ std}\OperatorTok{;}
+
+\NormalTok{unordered\_map}\OperatorTok{\textless{}}\DataTypeTok{int}\OperatorTok{,}\DataTypeTok{int}\OperatorTok{\textgreater{}}\NormalTok{ freq}\OperatorTok{;}
+\NormalTok{freq}\OperatorTok{[}\NormalTok{x}\OperatorTok{]++;}  \CommentTok{// default{-}initializes to 0}
+
+\CommentTok{// Min heap}
+\NormalTok{priority\_queue}\OperatorTok{\textless{}}\DataTypeTok{int}\OperatorTok{,}\NormalTok{ vector}\OperatorTok{\textless{}}\DataTypeTok{int}\OperatorTok{\textgreater{},}\NormalTok{ greater}\OperatorTok{\textless{}}\DataTypeTok{int}\OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ minHeap}\OperatorTok{;}
+
+\CommentTok{// Ordered set with lower\_bound}
+\NormalTok{set}\OperatorTok{\textless{}}\DataTypeTok{int}\OperatorTok{\textgreater{}}\NormalTok{ s}\OperatorTok{;}
+\KeywordTok{auto}\NormalTok{ it }\OperatorTok{=}\NormalTok{ s}\OperatorTok{.}\NormalTok{lower\_bound}\OperatorTok{(}\NormalTok{x}\OperatorTok{);}  \CommentTok{// O(log n)}
+
+\CommentTok{// Sort with custom comparator}
+\NormalTok{sort}\OperatorTok{(}\NormalTok{v}\OperatorTok{.}\NormalTok{begin}\OperatorTok{(),}\NormalTok{ v}\OperatorTok{.}\NormalTok{end}\OperatorTok{(),} \OperatorTok{[](}\KeywordTok{auto}\OperatorTok{\&}\NormalTok{ a}\OperatorTok{,} \KeywordTok{auto}\OperatorTok{\&}\NormalTok{ b}\OperatorTok{)\{} \ControlFlowTok{return}\NormalTok{ a}\OperatorTok{[}\DecValTok{0}\OperatorTok{]} \OperatorTok{\textless{}}\NormalTok{ b}\OperatorTok{[}\DecValTok{0}\OperatorTok{];} \OperatorTok{\});}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Real-Life Analogies}\label{real-life-analogies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2313}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7687}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Data Structure
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Array & Numbered mailboxes in a row --- access box 42 instantly \\
+Hash Map & Library card catalog --- look up by title, get shelf location \\
+Linked List & Train cars --- each car knows only the next car \\
+Stack & Stack of plates --- only access the top \\
+Queue & Queue at a bank --- first in, first served \\
+Deque & Train that can board/exit from both ends \\
+BST & Phone book --- organized so you can binary search \\
+Heap & Priority ER room --- most critical patient always treated first \\
+Trie & Autocomplete on your phone --- shared prefix saves space \\
+Graph & Road map --- cities are nodes, roads are edges \\
+Union-Find & Social groups --- merging friend circles \\
+Segment Tree & Population pyramid --- sum over any age range quickly \\
+Fenwick Tree & Odometer with clever bit tricks for partial sums \\
+LRU Cache & Small whiteboard --- erase what was written longest ago for space \\
+Bloom Filter & Bouncer list --- might let someone in wrongly, never turns away regulars \\
+\end{longtable}
+
+\subsection{Common Interview Questions}\label{common-interview-questions}
+
+\subsubsection{Arrays}\label{arrays}
+
+\begin{itemize}
+\tightlist
+\item
+  Two Sum (LeetCode 1)
+\item
+  Best Time to Buy and Sell Stock (LC 121)
+\item
+  Maximum Subarray / Kadane\textquotesingle s (LC 53)
+\item
+  Container With Most Water (LC 11)
+\item
+  Trapping Rain Water (LC 42)
+\item
+  Rotate Array (LC 189)
+\item
+  Product of Array Except Self (LC 238)
+\item
+  Merge Intervals (LC 56)
+\end{itemize}
+
+\subsubsection{Strings}\label{strings-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Longest Substring Without Repeating Characters (LC 3)
+\item
+  Minimum Window Substring (LC 76)
+\item
+  Group Anagrams (LC 49)
+\item
+  Valid Palindrome (LC 125)
+\item
+  Encode and Decode Strings (LC 271)
+\item
+  Longest Palindromic Substring (LC 5)
+\item
+  String to Integer (atoi) (LC 8)
+\end{itemize}
+
+\subsubsection{Hash Maps/Sets}\label{hash-mapssets}
+
+\begin{itemize}
+\tightlist
+\item
+  Two Sum (LC 1)
+\item
+  Top K Frequent Elements (LC 347)
+\item
+  Longest Consecutive Sequence (LC 128)
+\item
+  Subarray Sum Equals K (LC 560)
+\item
+  Valid Sudoku (LC 36)
+\item
+  Find All Anagrams in a String (LC 438)
+\end{itemize}
+
+\subsubsection{Linked Lists}\label{linked-lists-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Reverse Linked List (LC 206)
+\item
+  Merge Two Sorted Lists (LC 21)
+\item
+  Linked List Cycle (LC 141)
+\item
+  Reorder List (LC 143)
+\item
+  Remove Nth Node From End (LC 19)
+\item
+  Merge K Sorted Lists (LC 23)
+\end{itemize}
+
+\subsubsection{Stacks/Queues}\label{stacksqueues}
+
+\begin{itemize}
+\tightlist
+\item
+  Valid Parentheses (LC 20)
+\item
+  Min Stack (LC 155)
+\item
+  Daily Temperatures (LC 739)
+\item
+  Largest Rectangle in Histogram (LC 84)
+\item
+  Sliding Window Maximum (LC 239)
+\item
+  Evaluate Reverse Polish Notation (LC 150)
+\end{itemize}
+
+\subsubsection{Trees}\label{trees-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Maximum Depth of Binary Tree (LC 104)
+\item
+  Invert Binary Tree (LC 226)
+\item
+  Same Tree (LC 100)
+\item
+  Binary Tree Level Order Traversal (LC 102)
+\item
+  Validate Binary Search Tree (LC 98)
+\item
+  Lowest Common Ancestor of BST (LC 235)
+\item
+  Kth Smallest Element in BST (LC 230)
+\item
+  Serialize and Deserialize Binary Tree (LC 297)
+\item
+  Diameter of Binary Tree (LC 543)
+\end{itemize}
+
+\subsubsection{Heaps}\label{heaps}
+
+\begin{itemize}
+\tightlist
+\item
+  Kth Largest Element in an Array (LC 215)
+\item
+  K Closest Points to Origin (LC 973)
+\item
+  Find Median from Data Stream (LC 295)
+\item
+  Task Scheduler (LC 621)
+\item
+  Merge K Sorted Lists (LC 23)
+\end{itemize}
+
+\subsubsection{Tries}\label{tries}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement Trie (LC 208)
+\item
+  Word Search II (LC 212)
+\item
+  Replace Words (LC 648)
+\item
+  Design Search Autocomplete System (LC 642)
+\end{itemize}
+
+\subsubsection{Graphs}\label{graphs-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Number of Islands (LC 200)
+\item
+  Clone Graph (LC 133)
+\item
+  Pacific Atlantic Water Flow (LC 417)
+\item
+  Course Schedule (LC 207) --- cycle detection
+\item
+  Number of Connected Components (LC 323)
+\item
+  Word Ladder (LC 127) --- BFS shortest path
+\item
+  Network Delay Time (LC 743) --- Dijkstra
+\item
+  Cheapest Flights Within K Stops (LC 787) --- modified Dijkstra/Bellman-Ford
+\end{itemize}
+
+\subsubsection{Union-Find}\label{union-find}
+
+\begin{itemize}
+\tightlist
+\item
+  Number of Provinces (LC 547)
+\item
+  Redundant Connection (LC 684)
+\item
+  Accounts Merge (LC 721)
+\item
+  Satisfiability of Equality Equations (LC 990)
+\end{itemize}
+
+\subsubsection{LRU/LFU}\label{lrulfu}
+
+\begin{itemize}
+\tightlist
+\item
+  LRU Cache (LC 146)
+\item
+  LFU Cache (LC 460)
+\end{itemize}
+
+\subsubsection{Segment Tree / BIT}\label{segment-tree--bit}
+
+\begin{itemize}
+\tightlist
+\item
+  Range Sum Query --- Mutable (LC 307)
+\item
+  Count of Smaller Numbers After Self (LC 315)
+\item
+  Reverse Pairs (LC 493)
+\end{itemize}
+
+\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Using \texttt{list.pop(0)} for queues} --- It\textquotesingle s O(n). Always use \texttt{collections.deque} and \texttt{popleft()}.
+\item
+  \textbf{String concatenation in loops} --- \texttt{result\ +=\ s} inside a loop is O(n\(^2\)). Use \texttt{"".join(parts)}.
+\item
+  \textbf{Not handling the empty/single-element edge case} --- For linked lists, trees, arrays. Check \texttt{if\ not\ root}, \texttt{if\ not\ nums}, \texttt{if\ len(nums)\ \textless{}\ 2} early.
+\item
+  \textbf{BST validation using only local \texttt{left\ \textless{}\ root\ \textless{}\ right}} --- This misses nodes in subtrees. Pass bounds \texttt{(lo,\ hi)} down the recursion.
+\item
+  \textbf{Modifying a collection while iterating it} --- Causes RuntimeError. Copy or collect indices first.
+\item
+  \textbf{Forgetting to mark nodes visited before enqueuing (BFS)} --- Leads to exponential revisits. Mark visited when you enqueue, not when you dequeue.
+\item
+  \textbf{Using a set as a hash map key} --- Sets are unhashable. Use \texttt{frozenset} or \texttt{tuple(sorted(...))}.
+\item
+  \textbf{Forgetting Python\textquotesingle s \texttt{heapq} is min-heap only} --- For max-heap, push \texttt{-val} and negate on pop.
+\item
+  \textbf{O(n\(^2\)) nested loop when O(n) hash map exists} --- When you write two nested loops looking for a pair, always ask: "can I precompute what I\textquotesingle m looking for?"
+\item
+  \textbf{Not using dummy head node for linked lists} --- Head deletion becomes a special case. Dummy head eliminates it.
+\item
+  \textbf{Recursion without memoization} --- Fibonacci, path counting, etc. naturally revisit subproblems. Add \texttt{@lru\_cache} or a memo dict.
+\item
+  \textbf{Union-Find without path compression} --- Without it, find is O(n). Always compress.
+\item
+  \textbf{Assuming \texttt{dict} maintains insertion order in Python 2} --- It doesn\textquotesingle t. Python 3.7+ guarantees it; don\textquotesingle t rely on this in cross-version code.
+\item
+  \textbf{Off-by-one in sliding window} --- When window is \texttt{{[}l,\ r{]}}, size is \texttt{r\ -\ l\ +\ 1}. Sketch a small example before coding.
+\item
+  \textbf{Passing arrays by reference and mutating them} --- In Python lists are passed by reference. If you need to preserve the original, copy with \texttt{arr{[}:{]}}.
+\end{enumerate}
+
+\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsubsection{Complexities to Memorize (Absolute Must)}\label{complexities-to-memorize-absolute-must}
+
+\begin{verbatim}
+Array access:     O(1)     | Hash map get/put: O(1) avg
+Array search:     O(n)     | BST search:       O(log n) balanced
+Append to list:   O(1) A   | Heap push/pop:    O(log n)
+List insert/del:  O(n)     | Build heap:       O(n)  ← non-obvious!
+Trie ops:         O(m)     | Segment tree:     O(log n) query/update
+BFS/DFS:          O(V+E)   | Union-Find:       O(α(n)) ≈ O(1)
+Dijkstra:         O((V+E)log V)
+Heapsort:         O(n log n)
+Sort:             O(n log n)
+Binary search:    O(log n)
+String join:      O(n)     | String concat loop: O(n²) ← DANGER
+
+A = amortized
+\end{verbatim}
+
+\subsubsection{Decision Hooks (6 questions to ask every interview)}\label{decision-hooks-6-questions-to-ask-every-interview}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{"Do I need O(1) lookup?"} \(\rightarrow\) Hash map or hash set.
+\item
+  \textbf{"Do I need sorted order or range queries?"} \(\rightarrow\) BST, sorted array + binary search, or segment tree.
+\item
+  \textbf{"Do I need repeated min/max?"} \(\rightarrow\) Heap.
+\item
+  \textbf{"Is this a traversal/reachability problem?"} \(\rightarrow\) BFS (shortest path) or DFS (connectivity, cycles).
+\item
+  \textbf{"Am I connecting/grouping things?"} \(\rightarrow\) Union-Find.
+\item
+  \textbf{"Do I need prefix operations?"} \(\rightarrow\) Trie (strings) or Fenwick tree (numbers).
+\end{enumerate}
+
+\subsubsection{Quick Pattern Mapping}\label{quick-pattern-mapping}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4906}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5094}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Structure
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Sliding window & Array + two pointers \\
+Sliding window max/min & Monotonic deque \\
+Next greater element & Monotonic stack \\
+Level-order traversal & Queue (BFS) \\
+Path/exhaustive search & Stack (DFS) / recursion \\
+Shortest path (unweighted) & BFS \\
+Shortest path (weighted) & Dijkstra (min-heap) \\
+Connected components & BFS/DFS or Union-Find \\
+Top K elements & Heap of size K \\
+Frequency counting & Hash map / Counter \\
+Deduplication & Hash set \\
+Prefix sum & Fenwick tree / prefix array \\
+Range sum (mutable) & Fenwick tree \\
+Range min/max (mutable) & Segment tree \\
+Word prefix search & Trie \\
+Order + O(1) eviction & LRU (HashMap + DLL) \\
+Large-scale membership & Bloom filter \\
+\end{longtable}
+
+\subsubsection{The 5 Structures You MUST Be Able to Code From Scratch}\label{the-5-structures-you-must-be-able-to-code-from-scratch}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Hash Map} (open addressing or chaining --- at least explain internals)
+\item
+  \textbf{Linked List} with insert, delete, reverse
+\item
+  \textbf{Binary Heap} with push, pop, heapify
+\item
+  \textbf{Trie} with insert, search, startsWith
+\item
+  \textbf{LRU Cache} (HashMap + doubly linked list)
+\end{enumerate}
+
+\subsubsection{Memory Aids}\label{memory-aids}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Heap is NOT a BST} --- heap has parent \(\leq\) children (only), BST has left \textless{} parent \textless{} right.
+\item
+  \textbf{Trie depth = key length, not n} --- n = number of keys.
+\item
+  \textbf{Union-Find has no delete} --- it\textquotesingle s append-only by design.
+\item
+  \textbf{BFS finds shortest path; DFS does not} --- in unweighted graphs.
+\item
+  \textbf{\texttt{heapify} is O(n)} --- this surprises everyone. Proof: most nodes are at the bottom and need to sift down only a little.
+\item
+  \textbf{Hash map worst case O(n)} --- when all keys hash to same bucket (adversarial input or bad hash). In practice O(1).
+\item
+  \textbf{AVL is stricter than Red-Black} --- AVL: max height diff 1; RB: height \(\leq\) 2*log(n). RB faster for insert/delete, AVL faster for lookup.
+\end{itemize}
+
+\end{document}

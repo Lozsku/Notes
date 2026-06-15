@@ -1,0 +1,255 @@
+% =====================================================================
+%  interviewstyle.sty  —  professional technical-book style
+%  Engine: XeLaTeX (via Tectonic).  Author: automated conversion pipeline
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{interviewstyle}[2026/06/15 Interview notes professional style]
+
+% ---------- core packages ----------
+\usepackage[a4paper,margin=2.1cm,top=2.4cm,bottom=2.4cm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{calc}            % defines \real{} used by pandoc longtable widths
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{amsmath,amssymb}
+\usepackage{fontawesome5}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{fancyvrb}
+\usepackage{etoolbox}
+\usepackage{needspace}
+\usepackage{lastpage}
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+
+% ---------- accent color (overridable per topic) ----------
+% \themecolor is set in each document's preamble before \begin{document}
+\providecommand{\ThemeHex}{6366f1}     % default indigo
+\providecommand{\ThemeName}{Interview Notes}
+\providecommand{\ThemeKicker}{FAANG Master Notes}
+\providecommand{\ThemeNumber}{}
+
+\definecolor{acc}{HTML}{6366f1}        % replaced at runtime via \setthemecolor
+\definecolor{acc2}{HTML}{8b5cf6}
+\definecolor{ink}{HTML}{12172a}
+\definecolor{ink2}{HTML}{4b5468}
+\definecolor{mist}{HTML}{f5f7fb}
+\definecolor{paper}{HTML}{ffffff}
+\definecolor{rule}{HTML}{e2e6ef}
+\definecolor{codbgsafe}{HTML}{0f1426}
+\definecolor{codeink}{HTML}{e7ecf6}
+
+\newcommand{\setthemecolor}[2]{% {hex-accent}{hex-accent2}
+  \definecolor{acc}{HTML}{#1}%
+  \definecolor{acc2}{HTML}{#2}%
+}
+
+% ---------- fonts (use whatever professional families are installed) ----
+% Body: prefer a Times-like serif; fall back to DejaVu (broad glyph coverage).
+\IfFontExistsTF{Liberation Serif}{%
+  \setmainfont{Liberation Serif}%
+}{\IfFontExistsTF{DejaVu Serif}{\setmainfont{DejaVu Serif}}{}}
+% Sans / headings: Ubuntu (modern) -> Liberation Sans -> DejaVu Sans
+\IfFontExistsTF{Ubuntu}{%
+  \setsansfont{Ubuntu}[Scale=0.94]\newfontfamily\headingfont{Ubuntu}%
+}{\IfFontExistsTF{Liberation Sans}{%
+  \setsansfont{Liberation Sans}[Scale=0.94]\newfontfamily\headingfont{Liberation Sans}%
+}{\setsansfont{DejaVu Sans}[Scale=0.9]\newfontfamily\headingfont{DejaVu Sans}[Scale=0.9]}}
+% Mono / code & ASCII diagrams: DejaVu Sans Mono has box-drawing + arrows.
+\IfFontExistsTF{DejaVu Sans Mono}{%
+  \setmonofont{DejaVu Sans Mono}[Scale=0.82]%
+}{\IfFontExistsTF{Liberation Mono}{\setmonofont{Liberation Mono}[Scale=0.85]}{}}
+
+% ---------- hyperref ----------
+\hypersetup{
+  colorlinks=true, linkcolor=acc, urlcolor=acc2, citecolor=acc,
+  bookmarksnumbered=true, pdfborder={0 0 0},
+}
+
+% ---------- section styling ----------
+\titleformat{\section}
+  {\needspace{3\baselineskip}\headingfont\Large\bfseries\color{ink}}
+  {\colorbox{acc}{\color{white}\rule[-2pt]{0pt}{14pt}\,\thesection\,}}{0.6em}{}
+  [\vspace{-0.4em}{\color{acc}\titlerule[2pt]}\vspace{-0.2em}{\color{rule}\titlerule[0.6pt]}]
+\titleformat{\subsection}
+  {\needspace{2.5\baselineskip}\headingfont\large\bfseries\color{acc}}
+  {\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}
+  {\headingfont\normalsize\bfseries\color{ink2}}
+  {}{0em}{}
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.1em}{0.4em}
+\titlespacing*{\subsubsection}{0pt}{0.8em}{0.2em}
+
+% ---------- headers / footers ----------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhead[L]{\headingfont\footnotesize\color{ink2}\ThemeName}
+\fancyhead[R]{\headingfont\footnotesize\color{acc}\ThemeKicker}
+\fancyfoot[L]{\headingfont\scriptsize\color{ink2}\ThemeName}
+\fancyfoot[C]{\headingfont\scriptsize\color{ink2}}
+\fancyfoot[R]{\headingfont\footnotesize\color{ink2}\thepage\,/\,\pageref*{LastPage}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[R]{\headingfont\footnotesize\color{ink2}\thepage}}
+
+% subtle header rule
+\patchcmd{\headrule}{\hrule}{\color{rule}\hrule}{}{}
+\renewcommand{\headrulewidth}{0.6pt}
+
+% ---------- lists ----------
+\setlist[itemize]{leftmargin=1.3em,itemsep=2pt,topsep=3pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=2pt,topsep=3pt,parsep=0pt}
+\setlist[itemize,1]{label={\color{acc}\footnotesize\faAngleRight}}
+\setlist[itemize,2]{label={\color{acc2}\scriptsize\textbullet}}
+
+% =====================================================================
+%  CODE BLOCKS  — override pandoc's Shaded/Highlighting into a dark card
+% =====================================================================
+% pandoc (skylighting) defines token commands + Shaded(Highlighting).
+% We wrap Highlighting in a tcolorbox styled like a macOS terminal window:
+% a title bar with three "traffic-light" dots.
+\definecolor{codbar}{HTML}{20283f}     % title-bar shade (lighter than body)
+\definecolor{macred}{HTML}{ff5f56}
+\definecolor{macyel}{HTML}{ffbd2e}
+\definecolor{macgrn}{HTML}{27c93f}
+\definecolor{macdim}{HTML}{8b95ad}
+\newtcolorbox{codecard}{
+  enhanced, breakable,
+  colback=codbgsafe, colframe=codbgsafe,
+  boxrule=0pt, arc=5pt, left=12pt, right=10pt, top=21pt, bottom=9pt,
+  before skip=8pt, after skip=10pt,
+  % macOS title bar + dots: drawn on the first/unbroken piece only
+  overlay unbroken and first={%
+    \begin{tcbclipinterior}%
+      \fill[codbar] (frame.north west) rectangle ([yshift=-16pt]frame.north east);%
+      \fill[macred] ([xshift=13pt,yshift=-8pt]frame.north west) circle(2.7pt);%
+      \fill[macyel] ([xshift=25pt,yshift=-8pt]frame.north west) circle(2.7pt);%
+      \fill[macgrn] ([xshift=37pt,yshift=-8pt]frame.north west) circle(2.7pt);%
+      \node[anchor=north,yshift=-3.4pt,font=\sffamily\bfseries\fontsize{6.4}{6.4}\selectfont,
+            text=macdim] at ([yshift=0pt]frame.north) {\faTerminal\ \ source};%
+    \end{tcbclipinterior}},
+}
+
+% redefine the pandoc Shaded environment (it wraps Highlighting)
+\AtBeginDocument{%
+  \@ifundefined{Shaded}{}{%
+    \renewenvironment{Shaded}{\begin{codecard}\ttfamily\footnotesize\color{codeink}}{\end{codecard}}%
+  }%
+  % make verbatim-in-highlight use mono + light ink
+  \@ifundefined{Highlighting}{}{}%
+}
+
+% Plain (untagged) code fences -> "diagram/terminal" card (ASCII diagrams).
+% pandoc emits these as a lowercase {verbatim} env; wrap it transparently.
+\tcolorboxenvironment{verbatim}{
+  enhanced, breakable,
+  colback=mist, colframe=rule, boxrule=0.8pt, arc=3pt,
+  left=9pt,right=7pt,top=7pt,bottom=7pt,
+  before skip=8pt, after skip=10pt,
+  fontupper=\ttfamily\scriptsize\color{ink},
+}
+
+% =====================================================================
+%  BLOCKQUOTE callout  (pandoc \quote)
+% =====================================================================
+\renewenvironment{quote}
+  {\begin{tcolorbox}[enhanced,breakable,colback=acc!6,colframe=acc!60!white,
+     boxrule=0pt,leftrule=3pt,arc=2pt,left=10pt,right=8pt,top=6pt,bottom=6pt,
+     before skip=8pt,after skip=10pt,fontupper=\normalsize]}
+  {\end{tcolorbox}}
+
+% generic callouts for hand-authored figures
+\newtcolorbox{keybox}[1][Key Idea]{enhanced,breakable,colback=acc!7,colframe=acc,
+  boxrule=0pt,leftrule=3.5pt,arc=2pt,fonttitle=\headingfont\bfseries\small\color{acc},
+  coltitle=acc,title={\faKey~~#1},left=10pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{warnbox}[1][Watch Out]{enhanced,breakable,colback=red!5,colframe=red!60!black,
+  boxrule=0pt,leftrule=3.5pt,arc=2pt,fonttitle=\headingfont\bfseries\small,
+  coltitle=red!70!black,title={\faExclamationTriangle~~#1},left=10pt,right=8pt,top=6pt,bottom=6pt}
+
+% =====================================================================
+%  VISUAL REFERENCE figures (generated matplotlib PDFs)
+% =====================================================================
+\newcounter{visualfig}
+\newcommand{\visualfigure}[2]{% {path}{caption}
+  \par\addvspace{10pt}\needspace{0.42\textheight}%
+  \refstepcounter{visualfig}%
+  \begin{center}%
+    \fcolorbox{rule}{white}{\includegraphics[width=0.9\linewidth]{#1}}%
+  \end{center}%
+  \vspace{-2pt}%
+  {\small\headingfont\color{ink2}%
+   \textbf{\color{acc}Figure~\arabic{visualfig}.}~#2\par}%
+  \addvspace{12pt}}
+
+% =====================================================================
+%  TABLES  — booktabs + tinted header + zebra (pandoc longtable friendly)
+% =====================================================================
+\definecolor{zebra}{HTML}{f3f5fb}
+\setlength{\arrayrulewidth}{0.6pt}
+\renewcommand{\arraystretch}{1.28}
+\arrayrulecolor{rule}
+\AtBeginEnvironment{longtable}{\small}
+% header row helper used by post-processor
+\newcommand{\heademph}[1]{{\headingfont\bfseries\color{ink}#1}}
+
+% =====================================================================
+%  TITLE PAGE
+% =====================================================================
+\newcommand{\makecoverpage}{%
+  \begin{titlepage}
+  \thispagestyle{empty}
+  \newgeometry{margin=0pt}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[ink] (current page.south west) rectangle (current page.north east);
+    \fill[acc] (current page.north west) rectangle ([yshift=-5.2cm]current page.north east);
+    \fill[acc2,opacity=0.35] ([yshift=-4.6cm]current page.north west)
+        -- ([yshift=-5.2cm]current page.north east)
+        -- ([yshift=-5.9cm]current page.north east)
+        -- ([yshift=-5.3cm]current page.north west) -- cycle;
+    % kicker
+    \node[anchor=north west,text=white,font=\headingfont\bfseries\large,xshift=2cm,yshift=-1.6cm]
+      at (current page.north west) {\ThemeKicker};
+    \node[anchor=north west,text=white,opacity=0.85,font=\headingfont\small,xshift=2cm,yshift=-2.5cm]
+      at (current page.north west) {Interview Preparation Series \textbullet\ Professional Edition};
+    % big title
+    \node[anchor=west,text=white,font=\headingfont\fontsize{34}{38}\selectfont\bfseries,
+          text width=17cm,align=left,xshift=2cm,yshift=-9.2cm]
+      at (current page.north west) {\hyphenpenalty=10000\exhyphenpenalty=10000\RaggedRight\ThemeName};
+    \ifx\ThemeNumber\empty\else
+      \node[anchor=west,text=acc2,font=\headingfont\fontsize{120}{120}\selectfont\bfseries,
+            opacity=0.16,xshift=11.5cm,yshift=-15cm] at (current page.north west) {\ThemeNumber};
+    \fi
+    % footer strip
+    \node[anchor=south west,text=white,opacity=0.7,font=\headingfont\footnotesize,xshift=2cm,yshift=1.5cm]
+      at (current page.south west) {Compiled with \LaTeX\ \textbullet\ \today};
+    \node[anchor=south east,text=acc2,font=\headingfont\footnotesize\bfseries,xshift=-2cm,yshift=1.5cm]
+      at (current page.south east) {harsha.somisetty01@gmail.com};
+  \end{tikzpicture}
+  \restoregeometry
+  \end{titlepage}
+}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+% nicer TOC
+\renewcommand{\contentsname}{\headingfont In This Edition}
+\setcounter{tocdepth}{1}
+\titlecontents{section}[2.6em]{\addvspace{4pt}\headingfont\bfseries\color{ink}}
+  {\contentslabel[\color{acc}\thecontentslabel]{2.2em}}{}
+  {\hfill\color{ink2}\thecontentspage}[\vspace{1pt}]
+\titlecontents{subsection}[4.8em]{\headingfont\small\color{ink2}}
+  {\thecontentslabel\enspace}{}{\titlerule*[6pt]{\color{rule}.}\color{ink2}\thecontentspage}
+
+\endinput

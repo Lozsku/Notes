@@ -1,0 +1,2350 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{DSA Patterns \& Templates}
+\newcommand{\ThemeKicker}{DSA Track}
+\newcommand{\ThemeNumber}{01}
+
+\usepackage{interviewstyle}
+\setthemecolor{be123c}{fb7185}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{DSA Coding Patterns \& Reusable Templates}\label{dsa-coding-patterns--reusable-templates}
+
+\begin{quote}
+The "when you see X \(\rightarrow\) use Y" trigger guide for FAANG coding rounds.
+Dense, copy-pasteable, built for fast recognition and last-minute revision.
+\end{quote}
+
+\subsection{Overview}\label{overview}
+
+\subsubsection{How to Use This File}\label{how-to-use-this-file}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Before interview}: read the Pattern Recognition Cheat Table (§2) until you can map a problem sentence to a pattern in under 10 seconds.
+\item
+  \textbf{During prep}: for each pattern in §3, memorize the trigger signal, copy the template, and solve the listed problems.
+\item
+  \textbf{Night before}: skim the Revision Cheat Sheet (§7).
+\end{itemize}
+
+\subsubsection{Universal Problem-Solving Workflow}\label{universal-problem-solving-workflow}
+
+\begin{verbatim}
+1. CLARIFY    — constraints (N size), edge cases, return type, mutate or not?
+2. EXAMPLES   — run 2-3 examples by hand, including edge cases
+3. BRUTE FORCE— state it out loud, give its complexity
+4. OPTIMIZE   — identify the bottleneck; apply pattern recognition
+5. CODE       — write clean code with variable names that tell the story
+6. TEST       — trace through your examples + edge cases on the code
+7. COMPLEXITY — state time and space, justify each term
+\end{verbatim}
+
+\begin{quote}
+\textbf{Rule of thumb}: always state brute force before optimizing. Interviewers reward structured thinking over jumping to solutions.
+\end{quote}
+
+\subsection{Pattern Recognition Cheat Table}\label{pattern-recognition-cheat-table}
+
+\begin{quote}
+The most important section. Map the problem\textquotesingle s key phrases to a pattern before writing a single line of code.
+\end{quote}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6789}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3211}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+If the problem says / asks for ...
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reach for this pattern
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Sorted array, find pair/triplet with target sum & \textbf{Two Pointers} \\
+Remove duplicates in-place, sorted array & \textbf{Two Pointers} \\
+Longest/shortest subarray/substring with condition & \textbf{Sliding Window (variable)} \\
+Subarray of exact size K with property & \textbf{Sliding Window (fixed)} \\
+Linked list cycle, middle of list, palindrome LL & \textbf{Fast \& Slow Pointers} \\
+Overlapping intervals, merge/insert intervals & \textbf{Merge Intervals} \\
+Array 0..N-1, find missing/duplicate number & \textbf{Cyclic Sort} \\
+Reverse a linked list, K-group reversal & \textbf{In-place LL Reversal} \\
+Shortest path, level-order traversal, minimum steps & \textbf{BFS} \\
+All paths, connected components, flood fill & \textbf{DFS / Backtracking} \\
+All subsets, all permutations, all combinations & \textbf{Backtracking / Subsets} \\
+"Find minimum/maximum satisfying condition", search space is monotonic & \textbf{Binary Search on Answer} \\
+Top K largest/smallest, K closest, Kth element & \textbf{Heap (Top-K)} \\
+Merge K sorted lists/arrays & \textbf{K-way Merge (Heap)} \\
+Median of stream, two halves balanced & \textbf{Two Heaps} \\
+Next greater element, stock prices, daily temperatures & \textbf{Monotonic Stack} \\
+Subarray sum equals K, running sum queries & \textbf{Prefix Sum} \\
+Connected components, union/cycle in graph & \textbf{Union-Find (DSU)} \\
+Course schedule, dependency order, DAG ordering & \textbf{Topological Sort} \\
+Word search, prefix matching, autocomplete & \textbf{Trie} \\
+Count ways, min cost, max value, overlapping sub-problems & \textbf{Dynamic Programming} \\
+0/1 choice per item, weight/capacity constraint & \textbf{DP --- 0/1 Knapsack} \\
+Unlimited copies of items allowed & \textbf{DP --- Unbounded Knapsack} \\
+Longest common subsequence/substring & \textbf{DP --- LCS} \\
+Longest increasing subsequence & \textbf{DP --- LIS} \\
+Grid, min path, unique paths & \textbf{DP --- Matrix/Grid} \\
+Intervals, burst balloons, matrix chain & \textbf{DP --- Interval DP} \\
+Locally optimal choice leads to global optimum & \textbf{Greedy} \\
+XOR, AND, OR, bit shift tricks, unique element & \textbf{Bit Manipulation} \\
+\end{longtable}
+
+\subsection{The Patterns}\label{the-patterns}
+
+\subsubsection{Two Pointers}\label{two-pointers}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: sorted array/string, find a pair or triplet, remove duplicates in-place, partition array.
+\end{quote}
+
+\textbf{Core Idea}
+Use two indices that move toward each other (or in the same direction) to eliminate the need for a nested loop. Works on sorted input or with a logical invariant.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ two\_pointers(arr, target):}
+\NormalTok{    left, right }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ left }\OperatorTok{\textless{}}\NormalTok{ right:}
+\NormalTok{        current }\OperatorTok{=}\NormalTok{ arr[left] }\OperatorTok{+}\NormalTok{ arr[right]}
+        \ControlFlowTok{if}\NormalTok{ current }\OperatorTok{==}\NormalTok{ target:}
+            \ControlFlowTok{return}\NormalTok{ [left, right]          }\CommentTok{\# found}
+        \ControlFlowTok{elif}\NormalTok{ current }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            left }\OperatorTok{+=} \DecValTok{1}                     \CommentTok{\# need larger sum}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            right }\OperatorTok{{-}=} \DecValTok{1}                    \CommentTok{\# need smaller sum}
+    \ControlFlowTok{return}\NormalTok{ []}
+
+\CommentTok{\# Same{-}direction variant (remove duplicates)}
+\KeywordTok{def}\NormalTok{ remove\_duplicates(arr):}
+\NormalTok{    slow }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ fast }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr)):}
+        \ControlFlowTok{if}\NormalTok{ arr[fast] }\OperatorTok{!=}\NormalTok{ arr[slow]:}
+\NormalTok{            slow }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{            arr[slow] }\OperatorTok{=}\NormalTok{ arr[fast]}
+    \ControlFlowTok{return}\NormalTok{ slow }\OperatorTok{+} \DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N), Space O(1)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Two Sum II (sorted array) --- LeetCode 167
+\item
+  3Sum --- LeetCode 15
+\item
+  Container With Most Water --- LeetCode 11
+\item
+  Remove Duplicates from Sorted Array --- LeetCode 26
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Forgetting to skip duplicate values in 3Sum (leads to duplicate triplets).
+\item
+  Using on unsorted input without sorting first (add O(N log N) sort cost).
+\item
+  Off-by-one: \texttt{left\ \textless{}\ right} vs \texttt{left\ \textless{}=\ right}.
+\end{itemize}
+
+\subsubsection{Sliding Window (Fixed + Variable)}\label{sliding-window-fixed--variable}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: contiguous subarray/substring, fixed window of size K, longest/shortest window satisfying a condition.
+\end{quote}
+
+\textbf{Core Idea}
+Maintain a window \texttt{{[}left,\ right{]}} over the sequence. Expand right to grow; shrink left when the constraint is violated. Avoids recomputing the full window from scratch each step.
+
+\textbf{Template --- Fixed Window (size K)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ fixed\_window(arr, k):}
+\NormalTok{    window\_sum }\OperatorTok{=} \BuiltInTok{sum}\NormalTok{(arr[:k])}
+\NormalTok{    max\_sum }\OperatorTok{=}\NormalTok{ window\_sum}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(k, }\BuiltInTok{len}\NormalTok{(arr)):}
+\NormalTok{        window\_sum }\OperatorTok{+=}\NormalTok{ arr[i] }\OperatorTok{{-}}\NormalTok{ arr[i }\OperatorTok{{-}}\NormalTok{ k]   }\CommentTok{\# slide: add right, remove left}
+\NormalTok{        max\_sum }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_sum, window\_sum)}
+    \ControlFlowTok{return}\NormalTok{ max\_sum}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- Variable Window}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict}
+
+\KeywordTok{def}\NormalTok{ variable\_window(s, k):}
+    \CommentTok{"""Longest substring with at most k distinct characters."""}
+\NormalTok{    char\_count }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{int}\NormalTok{)}
+\NormalTok{    left }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    max\_len }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ right }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(s)):}
+\NormalTok{        char\_count[s[right]] }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{while} \BuiltInTok{len}\NormalTok{(char\_count) }\OperatorTok{\textgreater{}}\NormalTok{ k:          }\CommentTok{\# shrink until valid}
+\NormalTok{            char\_count[s[left]] }\OperatorTok{{-}=} \DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ char\_count[s[left]] }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+                \KeywordTok{del}\NormalTok{ char\_count[s[left]]}
+\NormalTok{            left }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{        max\_len }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_len, right }\OperatorTok{{-}}\NormalTok{ left }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ max\_len}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N), Space O(K) for the hash map
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Maximum Sum Subarray of Size K
+\item
+  Longest Substring Without Repeating Characters --- LeetCode 3
+\item
+  Minimum Window Substring --- LeetCode 76
+\item
+  Fruit Into Baskets --- LeetCode 904
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Shrinking the window with \texttt{if} instead of \texttt{while} (can leave window invalid).
+\item
+  Not updating the result both inside and after the while shrink loop.
+\item
+  Variable window: forgetting to delete keys with count 0 (artificially inflates distinct count).
+\end{itemize}
+
+\subsubsection{Fast \& Slow Pointers (Cycle Detection)}\label{fast--slow-pointers-cycle-detection}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: linked list cycle, find middle node, palindrome linked list, detect duplicate in array (Floyd\textquotesingle s algorithm).
+\end{quote}
+
+\textbf{Core Idea}
+Two pointers move at different speeds (fast = 2 steps, slow = 1 step). If there\textquotesingle s a cycle they must meet. Without a cycle, fast reaches the end first.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ ListNode:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, val}\OperatorTok{=}\DecValTok{0}\NormalTok{, }\BuiltInTok{next}\OperatorTok{=}\VariableTok{None}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.val }\OperatorTok{=}\NormalTok{ val}
+        \VariableTok{self}\NormalTok{.}\BuiltInTok{next} \OperatorTok{=} \BuiltInTok{next}
+
+\KeywordTok{def}\NormalTok{ has\_cycle(head):}
+\NormalTok{    slow }\OperatorTok{=}\NormalTok{ fast }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ fast }\KeywordTok{and}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{:}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{.}\BuiltInTok{next}
+        \ControlFlowTok{if}\NormalTok{ slow }\KeywordTok{is}\NormalTok{ fast:}
+            \ControlFlowTok{return} \VariableTok{True}
+    \ControlFlowTok{return} \VariableTok{False}
+
+\KeywordTok{def}\NormalTok{ find\_cycle\_start(head):}
+\NormalTok{    slow }\OperatorTok{=}\NormalTok{ fast }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ fast }\KeywordTok{and}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{:}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{.}\BuiltInTok{next}
+        \ControlFlowTok{if}\NormalTok{ slow }\KeywordTok{is}\NormalTok{ fast:}
+            \ControlFlowTok{break}
+    \ControlFlowTok{else}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{None}          \CommentTok{\# no cycle}
+    \CommentTok{\# Reset one pointer to head; advance both at speed 1}
+\NormalTok{    slow }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ slow }\KeywordTok{is} \KeywordTok{not}\NormalTok{ fast:}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}
+    \ControlFlowTok{return}\NormalTok{ slow              }\CommentTok{\# cycle start}
+
+\KeywordTok{def}\NormalTok{ find\_middle(head):}
+\NormalTok{    slow }\OperatorTok{=}\NormalTok{ fast }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ fast }\KeywordTok{and}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{:}
+\NormalTok{        slow }\OperatorTok{=}\NormalTok{ slow.}\BuiltInTok{next}
+\NormalTok{        fast }\OperatorTok{=}\NormalTok{ fast.}\BuiltInTok{next}\NormalTok{.}\BuiltInTok{next}
+    \ControlFlowTok{return}\NormalTok{ slow              }\CommentTok{\# middle node (for even length: second middle)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N), Space O(1)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Linked List Cycle --- LeetCode 141
+\item
+  Linked List Cycle II (find start) --- LeetCode 142
+\item
+  Middle of the Linked List --- LeetCode 876
+\item
+  Find the Duplicate Number --- LeetCode 287
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Checking \texttt{slow\ ==\ fast} before moving on first iteration (they start equal).
+\item
+  Not handling \texttt{head\ is\ None} or single-node lists.
+\item
+  Find Duplicate: the array must be treated as a linked list (index \(\rightarrow\) value \(\rightarrow\) next index).
+\end{itemize}
+
+\subsubsection{Merge Intervals}\label{merge-intervals}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: overlapping intervals, schedule conflicts, insert interval, minimum meeting rooms.
+\end{quote}
+
+\textbf{Core Idea}
+Sort intervals by start time. Walk through; if the current interval overlaps the last merged one, merge by extending the end. Otherwise, append as new.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ merge\_intervals(intervals):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ intervals:}
+        \ControlFlowTok{return}\NormalTok{ []}
+\NormalTok{    intervals.sort(key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: x[}\DecValTok{0}\NormalTok{])}
+\NormalTok{    merged }\OperatorTok{=}\NormalTok{ [intervals[}\DecValTok{0}\NormalTok{]]}
+    \ControlFlowTok{for}\NormalTok{ start, end }\KeywordTok{in}\NormalTok{ intervals[}\DecValTok{1}\NormalTok{:]:}
+        \ControlFlowTok{if}\NormalTok{ start }\OperatorTok{\textless{}=}\NormalTok{ merged[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][}\DecValTok{1}\NormalTok{]:          }\CommentTok{\# overlap: start ≤ prev end}
+\NormalTok{            merged[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][}\DecValTok{1}\NormalTok{] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(merged[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][}\DecValTok{1}\NormalTok{], end)}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            merged.append([start, end])}
+    \ControlFlowTok{return}\NormalTok{ merged}
+
+\KeywordTok{def}\NormalTok{ insert\_interval(intervals, new\_interval):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    i }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(intervals)}
+    \CommentTok{\# Add all intervals that end before new\_interval starts}
+    \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}}\NormalTok{ n }\KeywordTok{and}\NormalTok{ intervals[i][}\DecValTok{1}\NormalTok{] }\OperatorTok{\textless{}}\NormalTok{ new\_interval[}\DecValTok{0}\NormalTok{]:}
+\NormalTok{        result.append(intervals[i])}\OperatorTok{;}\NormalTok{ i }\OperatorTok{+=} \DecValTok{1}
+    \CommentTok{\# Merge all overlapping}
+    \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}}\NormalTok{ n }\KeywordTok{and}\NormalTok{ intervals[i][}\DecValTok{0}\NormalTok{] }\OperatorTok{\textless{}=}\NormalTok{ new\_interval[}\DecValTok{1}\NormalTok{]:}
+\NormalTok{        new\_interval[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(new\_interval[}\DecValTok{0}\NormalTok{], intervals[i][}\DecValTok{0}\NormalTok{])}
+\NormalTok{        new\_interval[}\DecValTok{1}\NormalTok{] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(new\_interval[}\DecValTok{1}\NormalTok{], intervals[i][}\DecValTok{1}\NormalTok{])}
+\NormalTok{        i }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{    result.append(new\_interval)}
+\NormalTok{    result.extend(intervals[i:])}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N log N) (sort), Space O(N)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Merge Intervals --- LeetCode 56
+\item
+  Insert Interval --- LeetCode 57
+\item
+  Meeting Rooms II (min rooms) --- LeetCode 253
+\item
+  Non-overlapping Intervals --- LeetCode 435
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Forgetting to sort before merging.
+\item
+  Using \texttt{\textless{}} instead of \texttt{\textless{}=} for overlap check (intervals that just touch should merge if problem says so).
+\item
+  Mutating the original list element; use \texttt{merged{[}-1{]}{[}1{]}\ =\ max(...)}.
+\end{itemize}
+
+\subsubsection{Cyclic Sort}\label{cyclic-sort}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: array containing numbers in range \texttt{{[}1,\ N{]}} or \texttt{{[}0,\ N-1{]}}, find missing/duplicate/all missing numbers.
+\end{quote}
+
+\textbf{Core Idea}
+Each number belongs at index \texttt{num\ -\ 1}. Walk the array; if \texttt{arr{[}i{]}} is not at its correct index, swap it there. After one pass, scan for misplaced numbers.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ cyclic\_sort(nums):}
+\NormalTok{    i }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(nums):}
+\NormalTok{        correct }\OperatorTok{=}\NormalTok{ nums[i] }\OperatorTok{{-}} \DecValTok{1}               \CommentTok{\# where nums[i] should live}
+        \ControlFlowTok{if}\NormalTok{ nums[i] }\OperatorTok{!=}\NormalTok{ nums[correct]:        }\CommentTok{\# not in place}
+\NormalTok{            nums[i], nums[correct] }\OperatorTok{=}\NormalTok{ nums[correct], nums[i]}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            i }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ nums}
+
+\KeywordTok{def}\NormalTok{ find\_missing(nums):}
+\NormalTok{    cyclic\_sort(nums)}
+    \ControlFlowTok{for}\NormalTok{ i, num }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+        \ControlFlowTok{if}\NormalTok{ num }\OperatorTok{!=}\NormalTok{ i }\OperatorTok{+} \DecValTok{1}\NormalTok{:}
+            \ControlFlowTok{return}\NormalTok{ i }\OperatorTok{+} \DecValTok{1}
+    \ControlFlowTok{return} \BuiltInTok{len}\NormalTok{(nums) }\OperatorTok{+} \DecValTok{1}
+
+\KeywordTok{def}\NormalTok{ find\_duplicate(nums):}
+\NormalTok{    i }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(nums):}
+\NormalTok{        correct }\OperatorTok{=}\NormalTok{ nums[i] }\OperatorTok{{-}} \DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ nums[i] }\OperatorTok{!=}\NormalTok{ i }\OperatorTok{+} \DecValTok{1}\NormalTok{:}
+            \ControlFlowTok{if}\NormalTok{ nums[i] }\OperatorTok{==}\NormalTok{ nums[correct]:    }\CommentTok{\# duplicate found}
+                \ControlFlowTok{return}\NormalTok{ nums[i]}
+\NormalTok{            nums[i], nums[correct] }\OperatorTok{=}\NormalTok{ nums[correct], nums[i]}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            i }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N), Space O(1)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Missing Number --- LeetCode 268
+\item
+  Find All Numbers Disappeared in an Array --- LeetCode 448
+\item
+  Find the Duplicate Number --- LeetCode 287
+\item
+  First Missing Positive --- LeetCode 41
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Infinite loop if you don\textquotesingle t guard against \texttt{nums{[}i{]}\ ==\ nums{[}correct{]}} when finding duplicates.
+\item
+  Range \texttt{{[}0,\ N-1{]}} vs \texttt{{[}1,\ N{]}} --- adjust \texttt{correct} index accordingly.
+\end{itemize}
+
+\subsubsection{In-place Linked List Reversal}\label{in-place-linked-list-reversal}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: reverse a linked list, reverse in groups of K, reverse between positions L and R.
+\end{quote}
+
+\textbf{Core Idea}
+Iteratively redirect \texttt{next} pointers using three pointers: \texttt{prev}, \texttt{curr}, \texttt{next\_node}. No extra space needed.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ reverse\_list(head):}
+\NormalTok{    prev }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    curr }\OperatorTok{=}\NormalTok{ head}
+    \ControlFlowTok{while}\NormalTok{ curr:}
+\NormalTok{        next\_node }\OperatorTok{=}\NormalTok{ curr.}\BuiltInTok{next}
+\NormalTok{        curr.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ prev}
+\NormalTok{        prev }\OperatorTok{=}\NormalTok{ curr}
+\NormalTok{        curr }\OperatorTok{=}\NormalTok{ next\_node}
+    \ControlFlowTok{return}\NormalTok{ prev}
+
+\KeywordTok{def}\NormalTok{ reverse\_sublist(head, left, right):}
+    \CommentTok{"""Reverse nodes from position left to right (1{-}indexed)."""}
+\NormalTok{    dummy }\OperatorTok{=}\NormalTok{ ListNode(}\DecValTok{0}\NormalTok{)}
+\NormalTok{    dummy.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ head}
+\NormalTok{    prev }\OperatorTok{=}\NormalTok{ dummy}
+    \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(left }\OperatorTok{{-}} \DecValTok{1}\NormalTok{):}
+\NormalTok{        prev }\OperatorTok{=}\NormalTok{ prev.}\BuiltInTok{next}
+\NormalTok{    curr }\OperatorTok{=}\NormalTok{ prev.}\BuiltInTok{next}
+    \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(right }\OperatorTok{{-}}\NormalTok{ left):}
+\NormalTok{        next\_node }\OperatorTok{=}\NormalTok{ curr.}\BuiltInTok{next}
+\NormalTok{        curr.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ next\_node.}\BuiltInTok{next}
+\NormalTok{        next\_node.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ prev.}\BuiltInTok{next}
+\NormalTok{        prev.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ next\_node}
+    \ControlFlowTok{return}\NormalTok{ dummy.}\BuiltInTok{next}
+
+\KeywordTok{def}\NormalTok{ reverse\_k\_groups(head, k):}
+    \CommentTok{"""Reverse every k nodes."""}
+\NormalTok{    dummy }\OperatorTok{=}\NormalTok{ ListNode(}\DecValTok{0}\NormalTok{)}
+\NormalTok{    dummy.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ head}
+\NormalTok{    group\_prev }\OperatorTok{=}\NormalTok{ dummy}
+    \ControlFlowTok{while} \VariableTok{True}\NormalTok{:}
+\NormalTok{        kth }\OperatorTok{=}\NormalTok{ get\_kth(group\_prev, k)}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ kth:}
+            \ControlFlowTok{break}
+\NormalTok{        group\_next }\OperatorTok{=}\NormalTok{ kth.}\BuiltInTok{next}
+\NormalTok{        prev, curr }\OperatorTok{=}\NormalTok{ kth.}\BuiltInTok{next}\NormalTok{, group\_prev.}\BuiltInTok{next}
+        \ControlFlowTok{while}\NormalTok{ curr }\OperatorTok{!=}\NormalTok{ group\_next:}
+\NormalTok{            tmp }\OperatorTok{=}\NormalTok{ curr.}\BuiltInTok{next}
+\NormalTok{            curr.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ prev}
+\NormalTok{            prev }\OperatorTok{=}\NormalTok{ curr}
+\NormalTok{            curr }\OperatorTok{=}\NormalTok{ tmp}
+\NormalTok{        tmp }\OperatorTok{=}\NormalTok{ group\_prev.}\BuiltInTok{next}
+\NormalTok{        group\_prev.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ kth}
+\NormalTok{        group\_prev }\OperatorTok{=}\NormalTok{ tmp}
+    \ControlFlowTok{return}\NormalTok{ dummy.}\BuiltInTok{next}
+
+\KeywordTok{def}\NormalTok{ get\_kth(curr, k):}
+    \ControlFlowTok{while}\NormalTok{ curr }\KeywordTok{and}\NormalTok{ k }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{:}
+\NormalTok{        curr }\OperatorTok{=}\NormalTok{ curr.}\BuiltInTok{next}
+\NormalTok{        k }\OperatorTok{{-}=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ curr}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N), Space O(1)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Reverse Linked List --- LeetCode 206
+\item
+  Reverse Linked List II --- LeetCode 92
+\item
+  Reverse Nodes in k-Group --- LeetCode 25
+\item
+  Reorder List --- LeetCode 143
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Losing the \texttt{next} pointer before redirecting it.
+\item
+  Off-by-one on position indices (1-indexed vs 0-indexed).
+\item
+  Not attaching the dummy node\textquotesingle s tail to the remaining list after reversal.
+\end{itemize}
+
+\subsubsection{BFS (Tree + Grid + Graph)}\label{bfs-tree--grid--graph}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: shortest path in unweighted graph, minimum steps, level-order traversal, nearest X in grid, connected components (layer by layer).
+\end{quote}
+
+\textbf{Core Idea}
+Explore nodes level by level using a queue. Guarantees shortest path in unweighted graphs. Track visited set to avoid revisiting.
+
+\textbf{Template --- Tree Level-Order}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+
+\KeywordTok{def}\NormalTok{ level\_order(root):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ root:}
+        \ControlFlowTok{return}\NormalTok{ []}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque([root])}
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        level\_size }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(queue)}
+\NormalTok{        level }\OperatorTok{=}\NormalTok{ []}
+        \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(level\_size):}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ queue.popleft()}
+\NormalTok{            level.append(node.val)}
+            \ControlFlowTok{if}\NormalTok{ node.left:  queue.append(node.left)}
+            \ControlFlowTok{if}\NormalTok{ node.right: queue.append(node.right)}
+\NormalTok{        result.append(level)}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- Grid BFS}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ bfs\_grid(grid, start\_r, start\_c):}
+\NormalTok{    rows, cols }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(grid), }\BuiltInTok{len}\NormalTok{(grid[}\DecValTok{0}\NormalTok{])}
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque([(start\_r, start\_c, }\DecValTok{0}\NormalTok{)])   }\CommentTok{\# (row, col, distance)}
+\NormalTok{    visited }\OperatorTok{=}\NormalTok{ \{(start\_r, start\_c)\}}
+\NormalTok{    directions }\OperatorTok{=}\NormalTok{ [(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{),(}\DecValTok{0}\NormalTok{,}\OperatorTok{{-}}\DecValTok{1}\NormalTok{),(}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{),(}\OperatorTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)]}
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        r, c, dist }\OperatorTok{=}\NormalTok{ queue.popleft()}
+        \ControlFlowTok{if}\NormalTok{ is\_target(r, c):}
+            \ControlFlowTok{return}\NormalTok{ dist}
+        \ControlFlowTok{for}\NormalTok{ dr, dc }\KeywordTok{in}\NormalTok{ directions:}
+\NormalTok{            nr, nc }\OperatorTok{=}\NormalTok{ r }\OperatorTok{+}\NormalTok{ dr, c }\OperatorTok{+}\NormalTok{ dc}
+            \ControlFlowTok{if} \DecValTok{0} \OperatorTok{\textless{}=}\NormalTok{ nr }\OperatorTok{\textless{}}\NormalTok{ rows }\KeywordTok{and} \DecValTok{0} \OperatorTok{\textless{}=}\NormalTok{ nc }\OperatorTok{\textless{}}\NormalTok{ cols }\KeywordTok{and}\NormalTok{ (nr, nc) }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+                \ControlFlowTok{if}\NormalTok{ grid[nr][nc] }\OperatorTok{!=}\NormalTok{ WALL:}
+\NormalTok{                    visited.add((nr, nc))}
+\NormalTok{                    queue.append((nr, nc, dist }\OperatorTok{+} \DecValTok{1}\NormalTok{))}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- Graph BFS}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict, deque}
+
+\KeywordTok{def}\NormalTok{ bfs\_graph(graph, start):}
+\NormalTok{    visited }\OperatorTok{=}\NormalTok{ \{start\}}
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque([start])}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ queue.popleft()}
+\NormalTok{        order.append(node)}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                visited.add(neighbor)}
+\NormalTok{                queue.append(neighbor)}
+    \ControlFlowTok{return}\NormalTok{ order}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(V + E), Space O(V)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary Tree Level Order Traversal --- LeetCode 102
+\item
+  Rotting Oranges --- LeetCode 994
+\item
+  Number of Islands --- LeetCode 200
+\item
+  Word Ladder --- LeetCode 127
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Not marking visited when enqueuing (can enqueue same node multiple times \(\rightarrow\) TLE or infinite loop).
+\item
+  Measuring \texttt{len(queue)} inside the inner loop (changes as you enqueue children).
+\item
+  Forgetting to handle disconnected graphs (multiple BFS starts or check all nodes).
+\end{itemize}
+
+\subsubsection{DFS (Tree + Grid + Graph)}\label{dfs-tree--grid--graph}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: all paths, detect cycle, count components, flood fill, deep exploration before backtracking.
+\end{quote}
+
+\textbf{Core Idea}
+Recursively (or with explicit stack) explore as far as possible down one branch before backtracking. Mark visited to prevent cycles.
+
+\textbf{Template --- Tree DFS}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ dfs\_tree(node):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ node:}
+        \ControlFlowTok{return}\NormalTok{ base\_case}
+\NormalTok{    left }\OperatorTok{=}\NormalTok{ dfs\_tree(node.left)}
+\NormalTok{    right }\OperatorTok{=}\NormalTok{ dfs\_tree(node.right)}
+    \ControlFlowTok{return}\NormalTok{ combine(left, right, node.val)}
+
+\CommentTok{\# Iterative}
+\KeywordTok{def}\NormalTok{ dfs\_iterative(root):}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ [root]}
+    \ControlFlowTok{while}\NormalTok{ stack:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ stack.pop()}
+\NormalTok{        process(node)}
+        \ControlFlowTok{if}\NormalTok{ node.right: stack.append(node.right)}
+        \ControlFlowTok{if}\NormalTok{ node.left:  stack.append(node.left)    }\CommentTok{\# left last = processed first}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- Grid DFS}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ dfs\_grid(grid, r, c, visited):}
+\NormalTok{    rows, cols }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(grid), }\BuiltInTok{len}\NormalTok{(grid[}\DecValTok{0}\NormalTok{])}
+    \ControlFlowTok{if}\NormalTok{ r }\OperatorTok{\textless{}} \DecValTok{0} \KeywordTok{or}\NormalTok{ r }\OperatorTok{\textgreater{}=}\NormalTok{ rows }\KeywordTok{or}\NormalTok{ c }\OperatorTok{\textless{}} \DecValTok{0} \KeywordTok{or}\NormalTok{ c }\OperatorTok{\textgreater{}=}\NormalTok{ cols:}
+        \ControlFlowTok{return}
+    \ControlFlowTok{if}\NormalTok{ (r, c) }\KeywordTok{in}\NormalTok{ visited }\KeywordTok{or}\NormalTok{ grid[r][c] }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+        \ControlFlowTok{return}
+\NormalTok{    visited.add((r, c))}
+    \ControlFlowTok{for}\NormalTok{ dr, dc }\KeywordTok{in}\NormalTok{ [(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{),(}\DecValTok{0}\NormalTok{,}\OperatorTok{{-}}\DecValTok{1}\NormalTok{),(}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{),(}\OperatorTok{{-}}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{)]:}
+\NormalTok{        dfs\_grid(grid, r }\OperatorTok{+}\NormalTok{ dr, c }\OperatorTok{+}\NormalTok{ dc, visited)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- Graph DFS / Cycle Detection}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ has\_cycle(graph, n):}
+\NormalTok{    WHITE, GRAY, BLACK }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}
+\NormalTok{    color }\OperatorTok{=}\NormalTok{ [WHITE] }\OperatorTok{*}\NormalTok{ n}
+
+    \KeywordTok{def}\NormalTok{ dfs(u):}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ GRAY}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ GRAY:    }\CommentTok{\# back edge = cycle}
+                \ControlFlowTok{return} \VariableTok{True}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ WHITE }\KeywordTok{and}\NormalTok{ dfs(v):}
+                \ControlFlowTok{return} \VariableTok{True}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ BLACK}
+        \ControlFlowTok{return} \VariableTok{False}
+
+    \ControlFlowTok{return} \BuiltInTok{any}\NormalTok{(color[u] }\OperatorTok{==}\NormalTok{ WHITE }\KeywordTok{and}\NormalTok{ dfs(u) }\ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n))}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(V + E), Space O(V) recursion stack
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Number of Islands --- LeetCode 200
+\item
+  Max Area of Island --- LeetCode 695
+\item
+  Path Sum II --- LeetCode 113
+\item
+  Course Schedule --- LeetCode 207
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Forgetting to mark visited before recursive call (infinite recursion on cycles).
+\item
+  Python recursion limit (\textasciitilde1000 default); use \texttt{sys.setrecursionlimit} or iterative DFS for large inputs.
+\item
+  Not restoring visited state when you need to explore all paths (use backtracking instead).
+\end{itemize}
+
+\subsubsection{Backtracking}\label{backtracking}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: generate all valid configurations, constraint satisfaction (N-Queens, Sudoku), all paths in a graph.
+\end{quote}
+
+\textbf{Core Idea}
+Build candidates incrementally. At each step, check if candidate is still valid. If not, prune and backtrack. If complete, record solution.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ backtrack(candidates, result, current, start, }\OperatorTok{*}\NormalTok{constraints):}
+    \ControlFlowTok{if}\NormalTok{ is\_complete(current):        }\CommentTok{\# base case: valid solution}
+\NormalTok{        result.append(}\BuiltInTok{list}\NormalTok{(current))}
+        \ControlFlowTok{return}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(start, }\BuiltInTok{len}\NormalTok{(candidates)):}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ is\_valid(current, candidates[i]):  }\CommentTok{\# prune}
+            \ControlFlowTok{continue}
+\NormalTok{        current.append(candidates[i])             }\CommentTok{\# choose}
+\NormalTok{        backtrack(candidates, result, current, i }\OperatorTok{+} \DecValTok{1}\NormalTok{, }\OperatorTok{*}\NormalTok{constraints)}
+\NormalTok{        current.pop()                             }\CommentTok{\# un{-}choose}
+
+\CommentTok{\# Concrete: Combination Sum (reuse allowed)}
+\KeywordTok{def}\NormalTok{ combination\_sum(candidates, target):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ backtrack(start, current, remaining):}
+        \ControlFlowTok{if}\NormalTok{ remaining }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+\NormalTok{            result.append(}\BuiltInTok{list}\NormalTok{(current))}
+            \ControlFlowTok{return}
+        \ControlFlowTok{if}\NormalTok{ remaining }\OperatorTok{\textless{}} \DecValTok{0}\NormalTok{:}
+            \ControlFlowTok{return}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(start, }\BuiltInTok{len}\NormalTok{(candidates)):}
+\NormalTok{            current.append(candidates[i])}
+\NormalTok{            backtrack(i, current, remaining }\OperatorTok{{-}}\NormalTok{ candidates[i])  }\CommentTok{\# i (not i+1): reuse ok}
+\NormalTok{            current.pop()}
+\NormalTok{    backtrack(}\DecValTok{0}\NormalTok{, [], target)}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(2\^{}N) or O(N!) depending on branching factor; Space O(N) recursion depth
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Combination Sum --- LeetCode 39
+\item
+  N-Queens --- LeetCode 51
+\item
+  Sudoku Solver --- LeetCode 37
+\item
+  Word Search --- LeetCode 79
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Not making a copy when appending to results (\texttt{result.append(current{[}:{]})}).
+\item
+  Passing \texttt{i+1} when reuse is allowed (should pass \texttt{i}).
+\item
+  Missing pruning conditions \(\rightarrow\) TLE on large inputs.
+\end{itemize}
+
+\subsubsection{Subsets / Permutations / Combinations}\label{subsets--permutations--combinations}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: all subsets, power set, all permutations, all combinations of size K.
+\end{quote}
+
+\textbf{Core Idea}
+For subsets: at each element, decide include or exclude. For permutations: at each position, try all unused elements. Backtracking framework handles both.
+
+\textbf{Template --- Subsets}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ subsets(nums):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ backtrack(start, current):}
+\NormalTok{        result.append(}\BuiltInTok{list}\NormalTok{(current))        }\CommentTok{\# every prefix is a subset}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(start, }\BuiltInTok{len}\NormalTok{(nums)):}
+\NormalTok{            current.append(nums[i])}
+\NormalTok{            backtrack(i }\OperatorTok{+} \DecValTok{1}\NormalTok{, current)}
+\NormalTok{            current.pop()}
+\NormalTok{    backtrack(}\DecValTok{0}\NormalTok{, [])}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Bit manipulation alternative (elegant, no recursion)}
+\KeywordTok{def}\NormalTok{ subsets\_bit(nums):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(nums)}
+    \ControlFlowTok{return}\NormalTok{ [[nums[j] }\ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n) }\ControlFlowTok{if}\NormalTok{ (i }\OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ j) }\OperatorTok{\&} \DecValTok{1}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ n)]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- Permutations}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ permutations(nums):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ backtrack(current, remaining):}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ remaining:}
+\NormalTok{            result.append(}\BuiltInTok{list}\NormalTok{(current))}
+            \ControlFlowTok{return}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(remaining)):}
+\NormalTok{            current.append(remaining[i])}
+\NormalTok{            backtrack(current, remaining[:i] }\OperatorTok{+}\NormalTok{ remaining[i}\OperatorTok{+}\DecValTok{1}\NormalTok{:])}
+\NormalTok{            current.pop()}
+\NormalTok{    backtrack([], nums)}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# In{-}place swap permutations (more efficient)}
+\KeywordTok{def}\NormalTok{ permutations\_swap(nums):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ backtrack(start):}
+        \ControlFlowTok{if}\NormalTok{ start }\OperatorTok{==} \BuiltInTok{len}\NormalTok{(nums):}
+\NormalTok{            result.append(nums[:])}
+            \ControlFlowTok{return}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(start, }\BuiltInTok{len}\NormalTok{(nums)):}
+\NormalTok{            nums[start], nums[i] }\OperatorTok{=}\NormalTok{ nums[i], nums[start]}
+\NormalTok{            backtrack(start }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{            nums[start], nums[i] }\OperatorTok{=}\NormalTok{ nums[i], nums[start]}
+\NormalTok{    backtrack(}\DecValTok{0}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Subsets O(2\^{}N * N), Permutations O(N! * N), Space O(N)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Subsets --- LeetCode 78
+\item
+  Subsets II (with duplicates) --- LeetCode 90
+\item
+  Permutations --- LeetCode 46
+\item
+  Combinations --- LeetCode 77
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Subsets II: sort first, then skip \texttt{nums{[}i{]}\ ==\ nums{[}i-1{]}} at the same recursion level.
+\item
+  Permutations II: use a \texttt{used{[}{]}} array or sort + skip duplicates.
+\item
+  Forgetting \texttt{list(current)} copy when appending.
+\end{itemize}
+
+\subsubsection{Binary Search (+ On Answer / Monotonic Predicate)}\label{binary-search--on-answer--monotonic-predicate}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: sorted array, rotated sorted array, "find minimum/maximum satisfying a condition", search space is monotonic, minimize the maximum / maximize the minimum.
+\end{quote}
+
+\textbf{Core Idea}
+Halve the search space each iteration by comparing the midpoint. "Binary search on answer": define a predicate \texttt{feasible(x)} that is monotonically True/False over the answer space, then binary search on that space.
+
+\textbf{Template --- Classic}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ binary\_search(arr, target):}
+\NormalTok{    left, right }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ left }\OperatorTok{\textless{}=}\NormalTok{ right:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ left }\OperatorTok{+}\NormalTok{ (right }\OperatorTok{{-}}\NormalTok{ left) }\OperatorTok{//} \DecValTok{2}    \CommentTok{\# avoids overflow}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{==}\NormalTok{ target:}
+            \ControlFlowTok{return}\NormalTok{ mid}
+        \ControlFlowTok{elif}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            left }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            right }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+
+\CommentTok{\# Find leftmost occurrence}
+\KeywordTok{def}\NormalTok{ lower\_bound(arr, target):}
+\NormalTok{    left, right }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr)}
+    \ControlFlowTok{while}\NormalTok{ left }\OperatorTok{\textless{}}\NormalTok{ right:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (left }\OperatorTok{+}\NormalTok{ right) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            left }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            right }\OperatorTok{=}\NormalTok{ mid}
+    \ControlFlowTok{return}\NormalTok{ left}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- On Answer}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ binary\_search\_on\_answer(lo, hi, feasible):}
+    \CommentTok{"""Find the smallest x in [lo, hi] where feasible(x) is True."""}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}}\NormalTok{ hi:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ feasible(mid):}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid          }\CommentTok{\# mid could be the answer, keep it}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ lo}
+
+\CommentTok{\# Example: Koko Eating Bananas — LeetCode 875}
+\KeywordTok{def}\NormalTok{ min\_eating\_speed(piles, h):}
+    \KeywordTok{def}\NormalTok{ can\_finish(speed):}
+        \ControlFlowTok{return} \BuiltInTok{sum}\NormalTok{((p }\OperatorTok{+}\NormalTok{ speed }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{//}\NormalTok{ speed }\ControlFlowTok{for}\NormalTok{ p }\KeywordTok{in}\NormalTok{ piles) }\OperatorTok{\textless{}=}\NormalTok{ h}
+    \ControlFlowTok{return}\NormalTok{ binary\_search\_on\_answer(}\DecValTok{1}\NormalTok{, }\BuiltInTok{max}\NormalTok{(piles), can\_finish)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(log N) classic, O(log(answer\_range) * verification\_cost) on answer
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary Search --- LeetCode 704
+\item
+  Search in Rotated Sorted Array --- LeetCode 33
+\item
+  Koko Eating Bananas --- LeetCode 875
+\item
+  Find Minimum in Rotated Sorted Array --- LeetCode 153
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{mid\ =\ (left\ +\ right)\ //\ 2} can overflow in other languages; use \texttt{left\ +\ (right\ -\ left)\ //\ 2}.
+\item
+  Off-by-one: \texttt{left\ \textless{}=\ right} vs \texttt{left\ \textless{}\ right} --- use \texttt{\textless{}=} for classic, \texttt{\textless{}} for leftmost/rightmost variants.
+\item
+  Binary search on answer: define \texttt{feasible} correctly (monotonic), and set \texttt{hi} to a valid upper bound.
+\end{itemize}
+
+\subsubsection{Top-K / Heap}\label{top-k--heap}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: top K largest, K smallest, K closest points, Kth largest/smallest element, K most frequent.
+\end{quote}
+
+\textbf{Core Idea}
+Use a min-heap of size K for "top K largest" (smaller elements get evicted). Use a max-heap for "bottom K smallest". \texttt{heapq} in Python is a min-heap; negate values for max-heap.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ heapq}
+
+\CommentTok{\# Top K largest elements — O(N log K)}
+\KeywordTok{def}\NormalTok{ top\_k\_largest(nums, k):}
+\NormalTok{    min\_heap }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ num }\KeywordTok{in}\NormalTok{ nums:}
+\NormalTok{        heapq.heappush(min\_heap, num)}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(min\_heap) }\OperatorTok{\textgreater{}}\NormalTok{ k:}
+\NormalTok{            heapq.heappop(min\_heap)      }\CommentTok{\# evict smallest}
+    \ControlFlowTok{return} \BuiltInTok{list}\NormalTok{(min\_heap)}
+
+\CommentTok{\# Kth largest — O(N log K)}
+\KeywordTok{def}\NormalTok{ kth\_largest(nums, k):}
+    \ControlFlowTok{return}\NormalTok{ heapq.nlargest(k, nums)[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]  }\CommentTok{\# or use the heap above}
+
+\CommentTok{\# K closest points to origin — O(N log K)}
+\KeywordTok{def}\NormalTok{ k\_closest(points, k):}
+    \ControlFlowTok{return}\NormalTok{ heapq.nsmallest(k, points, key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ p: p[}\DecValTok{0}\NormalTok{]}\OperatorTok{**}\DecValTok{2} \OperatorTok{+}\NormalTok{ p[}\DecValTok{1}\NormalTok{]}\OperatorTok{**}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\# K most frequent — O(N log K)}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ Counter}
+\KeywordTok{def}\NormalTok{ top\_k\_frequent(nums, k):}
+\NormalTok{    count }\OperatorTok{=}\NormalTok{ Counter(nums)}
+    \ControlFlowTok{return}\NormalTok{ heapq.nlargest(k, count.keys(), key}\OperatorTok{=}\NormalTok{count.get)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N log K), Space O(K)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Kth Largest Element in an Array --- LeetCode 215
+\item
+  K Closest Points to Origin --- LeetCode 973
+\item
+  Top K Frequent Elements --- LeetCode 347
+\item
+  Find K Pairs with Smallest Sums --- LeetCode 373
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Python\textquotesingle s \texttt{heapq} is min-heap only; negate for max-heap (\texttt{heapq.heappush(h,\ -val)}).
+\item
+  \texttt{heapq.nlargest(k,\ ...)} is O(N log K); fine for single calls but build the heap manually for streams.
+\item
+  For Kth largest, min-heap of size K is more memory-efficient than sorting.
+\end{itemize}
+
+\subsubsection{K-way Merge}\label{k-way-merge}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: merge K sorted lists/arrays, find smallest range covering K lists, smallest in range.
+\end{quote}
+
+\textbf{Core Idea}
+Use a min-heap with one element from each list. Pop the minimum, push the next element from that list. Repeat.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ heapq}
+
+\KeywordTok{def}\NormalTok{ merge\_k\_sorted\_lists(lists):}
+    \CommentTok{"""Merge K sorted linked lists into one sorted list."""}
+\NormalTok{    heap }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ i, node }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(lists):}
+        \ControlFlowTok{if}\NormalTok{ node:}
+\NormalTok{            heapq.heappush(heap, (node.val, i, node))}
+\NormalTok{    dummy }\OperatorTok{=}\NormalTok{ ListNode(}\DecValTok{0}\NormalTok{)}
+\NormalTok{    curr }\OperatorTok{=}\NormalTok{ dummy}
+    \ControlFlowTok{while}\NormalTok{ heap:}
+\NormalTok{        val, i, node }\OperatorTok{=}\NormalTok{ heapq.heappop(heap)}
+\NormalTok{        curr.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node}
+\NormalTok{        curr }\OperatorTok{=}\NormalTok{ curr.}\BuiltInTok{next}
+        \ControlFlowTok{if}\NormalTok{ node.}\BuiltInTok{next}\NormalTok{:}
+\NormalTok{            heapq.heappush(heap, (node.}\BuiltInTok{next}\NormalTok{.val, i, node.}\BuiltInTok{next}\NormalTok{))}
+    \ControlFlowTok{return}\NormalTok{ dummy.}\BuiltInTok{next}
+
+\KeywordTok{def}\NormalTok{ merge\_k\_sorted\_arrays(arrays):}
+\NormalTok{    heap }\OperatorTok{=}\NormalTok{ [(arrays[i][}\DecValTok{0}\NormalTok{], i, }\DecValTok{0}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(arrays)) }\ControlFlowTok{if}\NormalTok{ arrays[i]]}
+\NormalTok{    heapq.heapify(heap)}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ heap:}
+\NormalTok{        val, arr\_idx, elem\_idx }\OperatorTok{=}\NormalTok{ heapq.heappop(heap)}
+\NormalTok{        result.append(val)}
+        \ControlFlowTok{if}\NormalTok{ elem\_idx }\OperatorTok{+} \DecValTok{1} \OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(arrays[arr\_idx]):}
+\NormalTok{            heapq.heappush(heap, (arrays[arr\_idx][elem\_idx}\OperatorTok{+}\DecValTok{1}\NormalTok{], arr\_idx, elem\_idx}\OperatorTok{+}\DecValTok{1}\NormalTok{))}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N log K) where N = total elements, Space O(K)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Merge K Sorted Lists --- LeetCode 23
+\item
+  Find K Pairs with Smallest Sums --- LeetCode 373
+\item
+  Smallest Range Covering Elements from K Lists --- LeetCode 632
+\item
+  Kth Smallest Element in a Sorted Matrix --- LeetCode 378
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Heap tuple must have unique tiebreakers if values can be equal (add index \texttt{i} to tuple).
+\item
+  Don\textquotesingle t push \texttt{None} into the heap when a list is exhausted.
+\end{itemize}
+
+\subsubsection{Two Heaps (Median of Stream)}\label{two-heaps-median-of-stream}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: median of a data stream, balance two halves, sliding window median.
+\end{quote}
+
+\textbf{Core Idea}
+Maintain a max-heap for the lower half and a min-heap for the upper half. Always balance sizes so they differ by at most 1. Median is the top of the larger heap (or average of both tops).
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ heapq}
+
+\KeywordTok{class}\NormalTok{ MedianFinder:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.small }\OperatorTok{=}\NormalTok{ []   }\CommentTok{\# max{-}heap (lower half): store negated values}
+        \VariableTok{self}\NormalTok{.large }\OperatorTok{=}\NormalTok{ []   }\CommentTok{\# min{-}heap (upper half)}
+
+    \KeywordTok{def}\NormalTok{ add\_num(}\VariableTok{self}\NormalTok{, num):}
+\NormalTok{        heapq.heappush(}\VariableTok{self}\NormalTok{.small, }\OperatorTok{{-}}\NormalTok{num)          }\CommentTok{\# push to lower half}
+        \CommentTok{\# Ensure max(small) \textless{}= min(large)}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.small }\KeywordTok{and} \VariableTok{self}\NormalTok{.large }\KeywordTok{and}\NormalTok{ (}\OperatorTok{{-}}\VariableTok{self}\NormalTok{.small[}\DecValTok{0}\NormalTok{] }\OperatorTok{\textgreater{}} \VariableTok{self}\NormalTok{.large[}\DecValTok{0}\NormalTok{]):}
+\NormalTok{            heapq.heappush(}\VariableTok{self}\NormalTok{.large, }\OperatorTok{{-}}\NormalTok{heapq.heappop(}\VariableTok{self}\NormalTok{.small))}
+        \CommentTok{\# Balance sizes}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.small) }\OperatorTok{\textgreater{}} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.large) }\OperatorTok{+} \DecValTok{1}\NormalTok{:}
+\NormalTok{            heapq.heappush(}\VariableTok{self}\NormalTok{.large, }\OperatorTok{{-}}\NormalTok{heapq.heappop(}\VariableTok{self}\NormalTok{.small))}
+        \ControlFlowTok{elif} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.large) }\OperatorTok{\textgreater{}} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.small):}
+\NormalTok{            heapq.heappush(}\VariableTok{self}\NormalTok{.small, }\OperatorTok{{-}}\NormalTok{heapq.heappop(}\VariableTok{self}\NormalTok{.large))}
+
+    \KeywordTok{def}\NormalTok{ find\_median(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.small) }\OperatorTok{\textgreater{}} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.large):}
+            \ControlFlowTok{return} \OperatorTok{{-}}\VariableTok{self}\NormalTok{.small[}\DecValTok{0}\NormalTok{]}
+        \ControlFlowTok{return}\NormalTok{ (}\OperatorTok{{-}}\VariableTok{self}\NormalTok{.small[}\DecValTok{0}\NormalTok{] }\OperatorTok{+} \VariableTok{self}\NormalTok{.large[}\DecValTok{0}\NormalTok{]) }\OperatorTok{/} \FloatTok{2.0}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(log N) per insertion, O(1) median query; Space O(N)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Find Median from Data Stream --- LeetCode 295
+\item
+  Sliding Window Median --- LeetCode 480
+\item
+  IPO (maximize capital) --- LeetCode 502
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Forgetting to negate when pushing to \texttt{small} (Python heap is min-heap).
+\item
+  Rebalancing order matters: first move invalid element, then balance sizes.
+\item
+  Sliding window median needs lazy deletion (mark removed elements, skip when popped).
+\end{itemize}
+
+\subsubsection{Monotonic Stack}\label{monotonic-stack}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: next greater/smaller element, previous greater/smaller, stock span, daily temperatures, largest rectangle in histogram, trapping rain water.
+\end{quote}
+
+\textbf{Core Idea}
+Maintain a stack that is strictly increasing or decreasing. When a new element violates the order, pop elements (they\textquotesingle ve found their "next greater/smaller" answer).
+
+\textbf{Template --- Next Greater Element}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ next\_greater\_element(nums):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(nums)}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ [}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ []   }\CommentTok{\# stores indices; values are decreasing (monotonic decreasing)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{while}\NormalTok{ stack }\KeywordTok{and}\NormalTok{ nums[stack[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]] }\OperatorTok{\textless{}}\NormalTok{ nums[i]:}
+\NormalTok{            idx }\OperatorTok{=}\NormalTok{ stack.pop()}
+\NormalTok{            result[idx] }\OperatorTok{=}\NormalTok{ nums[i]           }\CommentTok{\# nums[i] is the next greater for idx}
+\NormalTok{        stack.append(i)}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\KeywordTok{def}\NormalTok{ daily\_temperatures(temps):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*} \BuiltInTok{len}\NormalTok{(temps)}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ i, t }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(temps):}
+        \ControlFlowTok{while}\NormalTok{ stack }\KeywordTok{and}\NormalTok{ temps[stack[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]] }\OperatorTok{\textless{}}\NormalTok{ t:}
+\NormalTok{            idx }\OperatorTok{=}\NormalTok{ stack.pop()}
+\NormalTok{            result[idx] }\OperatorTok{=}\NormalTok{ i }\OperatorTok{{-}}\NormalTok{ idx}
+\NormalTok{        stack.append(i)}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\KeywordTok{def}\NormalTok{ largest\_rectangle\_histogram(heights):}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    max\_area }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    heights.append(}\DecValTok{0}\NormalTok{)           }\CommentTok{\# sentinel to flush stack}
+    \ControlFlowTok{for}\NormalTok{ i, h }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(heights):}
+\NormalTok{        start }\OperatorTok{=}\NormalTok{ i}
+        \ControlFlowTok{while}\NormalTok{ stack }\KeywordTok{and}\NormalTok{ stack[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][}\DecValTok{1}\NormalTok{] }\OperatorTok{\textgreater{}}\NormalTok{ h:}
+\NormalTok{            idx, height }\OperatorTok{=}\NormalTok{ stack.pop()}
+\NormalTok{            max\_area }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_area, height }\OperatorTok{*}\NormalTok{ (i }\OperatorTok{{-}}\NormalTok{ idx))}
+\NormalTok{            start }\OperatorTok{=}\NormalTok{ idx}
+\NormalTok{        stack.append((start, h))}
+    \ControlFlowTok{return}\NormalTok{ max\_area}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(N), Space O(N)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Daily Temperatures --- LeetCode 739
+\item
+  Next Greater Element I --- LeetCode 496
+\item
+  Largest Rectangle in Histogram --- LeetCode 84
+\item
+  Trapping Rain Water --- LeetCode 42
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Deciding increasing vs decreasing: next greater \(\rightarrow\) decreasing stack; next smaller \(\rightarrow\) increasing stack.
+\item
+  Circular arrays: iterate \texttt{2*N} with \texttt{i\ \%\ N} indexing.
+\item
+  Histogram: store (start\_index, height) not just height, to track span.
+\end{itemize}
+
+\subsubsection{Prefix Sum}\label{prefix-sum}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: subarray sum equals K, range sum queries, count subarrays with given sum/property.
+\end{quote}
+
+\textbf{Core Idea}
+\texttt{prefix{[}i{]}} = sum of first \texttt{i} elements. Range sum \texttt{{[}l,\ r{]}} = \texttt{prefix{[}r+1{]}\ -\ prefix{[}l{]}}. For count of subarrays summing to K, use a hashmap of prefix sums seen so far.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Range sum query — O(1) per query after O(N) preprocessing}
+\KeywordTok{def}\NormalTok{ build\_prefix(nums):}
+\NormalTok{    prefix }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (}\BuiltInTok{len}\NormalTok{(nums) }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ i, num }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+\NormalTok{        prefix[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{=}\NormalTok{ prefix[i] }\OperatorTok{+}\NormalTok{ num}
+    \ControlFlowTok{return}\NormalTok{ prefix}
+
+\KeywordTok{def}\NormalTok{ range\_sum(prefix, l, r):           }\CommentTok{\# inclusive [l, r]}
+    \ControlFlowTok{return}\NormalTok{ prefix[r}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{{-}}\NormalTok{ prefix[l]}
+
+\CommentTok{\# Count subarrays with sum == k — O(N)}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ defaultdict}
+\KeywordTok{def}\NormalTok{ subarray\_sum\_equals\_k(nums, k):}
+\NormalTok{    count }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    prefix }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    seen }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{int}\NormalTok{)}
+\NormalTok{    seen[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \DecValTok{1}                        \CommentTok{\# empty prefix}
+    \ControlFlowTok{for}\NormalTok{ num }\KeywordTok{in}\NormalTok{ nums:}
+\NormalTok{        prefix }\OperatorTok{+=}\NormalTok{ num}
+\NormalTok{        count }\OperatorTok{+=}\NormalTok{ seen[prefix }\OperatorTok{{-}}\NormalTok{ k]      }\CommentTok{\# how many prefixes end at (prefix {-} k)}
+\NormalTok{        seen[prefix] }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ count}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Build O(N), Query O(1); Subarray count O(N), Space O(N)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Subarray Sum Equals K --- LeetCode 560
+\item
+  Range Sum Query - Immutable --- LeetCode 303
+\item
+  Count of Range Sum --- LeetCode 327
+\item
+  Product of Array Except Self --- LeetCode 238
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Initialize \texttt{seen{[}0{]}\ =\ 1} (the empty prefix with sum 0 exists once).
+\item
+  For 2D prefix sums, use inclusion-exclusion: \texttt{pre{[}r2{]}{[}c2{]}\ -\ pre{[}r1-1{]}{[}c2{]}\ -\ pre{[}r2{]}{[}c1-1{]}\ +\ pre{[}r1-1{]}{[}c1-1{]}}.
+\item
+  Negative numbers are fine; this works regardless.
+\end{itemize}
+
+\subsubsection{Union-Find (DSU)}\label{union-find-dsu}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: connected components, dynamic connectivity, cycle detection in undirected graph, redundant connection, accounts merge.
+\end{quote}
+
+\textbf{Core Idea}
+Each element points to a parent. \texttt{find(x)} returns root of x\textquotesingle s component (with path compression). \texttt{union(x,\ y)} merges components (with rank/size to keep tree flat).
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ UnionFind:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, n):}
+        \VariableTok{self}\NormalTok{.parent }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(n))}
+        \VariableTok{self}\NormalTok{.rank }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+        \VariableTok{self}\NormalTok{.components }\OperatorTok{=}\NormalTok{ n}
+
+    \KeywordTok{def}\NormalTok{ find(}\VariableTok{self}\NormalTok{, x):}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.parent[x] }\OperatorTok{!=}\NormalTok{ x:}
+            \VariableTok{self}\NormalTok{.parent[x] }\OperatorTok{=} \VariableTok{self}\NormalTok{.find(}\VariableTok{self}\NormalTok{.parent[x])   }\CommentTok{\# path compression}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.parent[x]}
+
+    \KeywordTok{def}\NormalTok{ union(}\VariableTok{self}\NormalTok{, x, y):}
+\NormalTok{        px, py }\OperatorTok{=} \VariableTok{self}\NormalTok{.find(x), }\VariableTok{self}\NormalTok{.find(y)}
+        \ControlFlowTok{if}\NormalTok{ px }\OperatorTok{==}\NormalTok{ py:}
+            \ControlFlowTok{return} \VariableTok{False}                                  \CommentTok{\# already connected}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.rank[px] }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.rank[py]:}
+\NormalTok{            px, py }\OperatorTok{=}\NormalTok{ py, px}
+        \VariableTok{self}\NormalTok{.parent[py] }\OperatorTok{=}\NormalTok{ px                             }\CommentTok{\# union by rank}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.rank[px] }\OperatorTok{==} \VariableTok{self}\NormalTok{.rank[py]:}
+            \VariableTok{self}\NormalTok{.rank[px] }\OperatorTok{+=} \DecValTok{1}
+        \VariableTok{self}\NormalTok{.components }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{return} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ connected(}\VariableTok{self}\NormalTok{, x, y):}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.find(x) }\OperatorTok{==} \VariableTok{self}\NormalTok{.find(y)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Near O(1) amortized per operation (inverse Ackermann \(\alpha\)(N)); Space O(N)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Number of Connected Components in Undirected Graph --- LeetCode 323
+\item
+  Redundant Connection --- LeetCode 684
+\item
+  Accounts Merge --- LeetCode 721
+\item
+  Making a Large Island --- LeetCode 827
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Not using both path compression AND union by rank (without both, worst case degrades to O(N)).
+\item
+  Forgetting to check if \texttt{find(x)\ ==\ find(y)} before union (cycle detection).
+\item
+  Off-by-one with node numbering (0-indexed vs 1-indexed).
+\end{itemize}
+
+\subsubsection{Topological Sort}\label{topological-sort}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: course prerequisites, task scheduling, build dependency order, DAG ordering, alien dictionary.
+\end{quote}
+
+\textbf{Core Idea}
+\textbf{Kahn\textquotesingle s algorithm (BFS)}: compute in-degrees, start with 0 in-degree nodes, process each and reduce neighbors\textquotesingle{} in-degrees. \textbf{DFS-based}: finish time ordering --- DFS, push to stack on exit, reverse the stack.
+
+\textbf{Template --- Kahn\textquotesingle s (BFS)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque, defaultdict}
+
+\KeywordTok{def}\NormalTok{ topo\_sort\_kahn(n, prerequisites):}
+\NormalTok{    graph }\OperatorTok{=}\NormalTok{ defaultdict(}\BuiltInTok{list}\NormalTok{)}
+\NormalTok{    in\_degree }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+    \ControlFlowTok{for}\NormalTok{ a, b }\KeywordTok{in}\NormalTok{ prerequisites:          }\CommentTok{\# b {-}\textgreater{} a (b must come before a)}
+\NormalTok{        graph[b].append(a)}
+\NormalTok{        in\_degree[a] }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque([i }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n) }\ControlFlowTok{if}\NormalTok{ in\_degree[i] }\OperatorTok{==} \DecValTok{0}\NormalTok{])}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ queue.popleft()}
+\NormalTok{        order.append(node)}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+\NormalTok{            in\_degree[neighbor] }\OperatorTok{{-}=} \DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ in\_degree[neighbor] }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+\NormalTok{                queue.append(neighbor)}
+    \ControlFlowTok{return}\NormalTok{ order }\ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(order) }\OperatorTok{==}\NormalTok{ n }\ControlFlowTok{else}\NormalTok{ []  }\CommentTok{\# empty = cycle exists}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Template --- DFS-based}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ topo\_sort\_dfs(n, graph):}
+\NormalTok{    WHITE, GRAY, BLACK }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}
+\NormalTok{    color }\OperatorTok{=}\NormalTok{ [WHITE] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    has\_cycle }\OperatorTok{=}\NormalTok{ [}\VariableTok{False}\NormalTok{]}
+
+    \KeywordTok{def}\NormalTok{ dfs(u):}
+        \ControlFlowTok{if}\NormalTok{ has\_cycle[}\DecValTok{0}\NormalTok{]: }\ControlFlowTok{return}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ GRAY}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ GRAY:}
+\NormalTok{                has\_cycle[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \VariableTok{True}\OperatorTok{;} \ControlFlowTok{return}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ WHITE:}
+\NormalTok{                dfs(v)}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ BLACK}
+\NormalTok{        result.append(u)}
+
+    \ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{if}\NormalTok{ color[u] }\OperatorTok{==}\NormalTok{ WHITE:}
+\NormalTok{            dfs(u)}
+    \ControlFlowTok{return}\NormalTok{ [] }\ControlFlowTok{if}\NormalTok{ has\_cycle[}\DecValTok{0}\NormalTok{] }\ControlFlowTok{else}\NormalTok{ result[::}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(V + E), Space O(V + E)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Course Schedule --- LeetCode 207
+\item
+  Course Schedule II --- LeetCode 210
+\item
+  Alien Dictionary --- LeetCode 269
+\item
+  Sequence Reconstruction --- LeetCode 444
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Cycle = no valid ordering: \texttt{len(order)\ ==\ n} check in Kahn\textquotesingle s detects it.
+\item
+  Building graph in wrong direction (which node blocks which).
+\item
+  Alien Dictionary: adjacent characters in each word define edges; must check invalid input (longer word before shorter prefix \(\rightarrow\) return "").
+\end{itemize}
+
+\subsubsection{Trie}\label{trie}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: word search, prefix matching, autocomplete, count words with prefix, replace words with shortest root.
+\end{quote}
+
+\textbf{Core Idea}
+A tree where each node represents a character. Each root-to-leaf path spells a word. Supports O(L) insert/search (L = word length) regardless of dictionary size.
+
+\textbf{Template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ TrieNode:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.children }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.is\_end }\OperatorTok{=} \VariableTok{False}
+
+\KeywordTok{class}\NormalTok{ Trie:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.root }\OperatorTok{=}\NormalTok{ TrieNode()}
+
+    \KeywordTok{def}\NormalTok{ insert(}\VariableTok{self}\NormalTok{, word):}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.root}
+        \ControlFlowTok{for}\NormalTok{ ch }\KeywordTok{in}\NormalTok{ word:}
+            \ControlFlowTok{if}\NormalTok{ ch }\KeywordTok{not} \KeywordTok{in}\NormalTok{ node.children:}
+\NormalTok{                node.children[ch] }\OperatorTok{=}\NormalTok{ TrieNode()}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ node.children[ch]}
+\NormalTok{        node.is\_end }\OperatorTok{=} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ search(}\VariableTok{self}\NormalTok{, word):}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_find\_node(word)}
+        \ControlFlowTok{return}\NormalTok{ node }\KeywordTok{is} \KeywordTok{not} \VariableTok{None} \KeywordTok{and}\NormalTok{ node.is\_end}
+
+    \KeywordTok{def}\NormalTok{ starts\_with(}\VariableTok{self}\NormalTok{, prefix):}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_find\_node(prefix) }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ \_find\_node(}\VariableTok{self}\NormalTok{, prefix):}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.root}
+        \ControlFlowTok{for}\NormalTok{ ch }\KeywordTok{in}\NormalTok{ prefix:}
+            \ControlFlowTok{if}\NormalTok{ ch }\KeywordTok{not} \KeywordTok{in}\NormalTok{ node.children:}
+                \ControlFlowTok{return} \VariableTok{None}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ node.children[ch]}
+        \ControlFlowTok{return}\NormalTok{ node}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Time O(L) per operation (L = word length); Space O(total characters * alphabet size)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Implement Trie (Prefix Tree) --- LeetCode 208
+\item
+  Word Search II --- LeetCode 212
+\item
+  Replace Words --- LeetCode 648
+\item
+  Design Search Autocomplete System --- LeetCode 642
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Using a dict vs array for children: dict is flexible; \texttt{{[}None{]}*26} is faster for lowercase English only.
+\item
+  \texttt{search} vs \texttt{starts\_with}: \texttt{is\_end} flag differentiates them.
+\item
+  Word Search II: prune the Trie as words are found to avoid revisiting.
+\end{itemize}
+
+\subsubsection{Dynamic Programming}\label{dynamic-programming}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: count ways, min/max cost/steps, optimal value, overlapping subproblems (same sub-calculation repeated), optimal substructure (optimal solution uses optimal sub-solutions).
+\end{quote}
+
+\textbf{Core Idea}
+Break problem into subproblems; store results (memoization/tabulation). Key: define \texttt{dp{[}i{]}} or \texttt{dp{[}i{]}{[}j{]}} precisely, write the recurrence, identify base cases.
+
+\paragraph{DP --- 0/1 Knapsack}\label{dp--01-knapsack}
+
+\textbf{Trigger}: "pick or skip" each item, capacity constraint, maximize/count value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ knapsack\_01(weights, values, capacity):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(weights)}
+    \CommentTok{\# dp[i][w] = max value using first i items with capacity w}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (capacity }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{+} \DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ w }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(capacity }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+            \CommentTok{\# skip item i}
+\NormalTok{            dp[i][w] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][w]}
+            \CommentTok{\# take item i (if it fits)}
+            \ControlFlowTok{if}\NormalTok{ weights[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{\textless{}=}\NormalTok{ w:}
+\NormalTok{                dp[i][w] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[i][w], dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][w }\OperatorTok{{-}}\NormalTok{ weights[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]] }\OperatorTok{+}\NormalTok{ values[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[n][capacity]}
+
+\CommentTok{\# Space{-}optimized to 1D (iterate w in reverse!)}
+\KeywordTok{def}\NormalTok{ knapsack\_01\_1d(weights, values, capacity):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (capacity }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(weights)):}
+        \ControlFlowTok{for}\NormalTok{ w }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(capacity, weights[i] }\OperatorTok{{-}} \DecValTok{1}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{):   }\CommentTok{\# REVERSE to avoid reuse}
+\NormalTok{            dp[w] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[w], dp[w }\OperatorTok{{-}}\NormalTok{ weights[i]] }\OperatorTok{+}\NormalTok{ values[i])}
+    \ControlFlowTok{return}\NormalTok{ dp[capacity]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: 0/1 Knapsack, Subset Sum (LeetCode 416), Partition Equal Subset Sum (LeetCode 416), Target Sum (LeetCode 494).
+
+\paragraph{DP --- Unbounded Knapsack}\label{dp--unbounded-knapsack}
+
+\textbf{Trigger}: "unlimited copies" of each item, coin change (any number of coins).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ unbounded\_knapsack(weights, values, capacity):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (capacity }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ w }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, capacity }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(weights)):}
+            \ControlFlowTok{if}\NormalTok{ weights[i] }\OperatorTok{\textless{}=}\NormalTok{ w:}
+\NormalTok{                dp[w] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[w], dp[w }\OperatorTok{{-}}\NormalTok{ weights[i]] }\OperatorTok{+}\NormalTok{ values[i])}
+    \ControlFlowTok{return}\NormalTok{ dp[capacity]}
+
+\KeywordTok{def}\NormalTok{ coin\_change(coins, amount):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)] }\OperatorTok{*}\NormalTok{ (amount }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{    dp[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ a }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, amount }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ coin }\KeywordTok{in}\NormalTok{ coins:}
+            \ControlFlowTok{if}\NormalTok{ coin }\OperatorTok{\textless{}=}\NormalTok{ a:}
+\NormalTok{                dp[a] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(dp[a], dp[a }\OperatorTok{{-}}\NormalTok{ coin] }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ dp[amount] }\ControlFlowTok{if}\NormalTok{ dp[amount] }\OperatorTok{!=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{) }\ControlFlowTok{else} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: Coin Change (LeetCode 322), Coin Change II (LeetCode 518), Rod Cutting.
+
+\textbf{Key difference from 0/1}: iterate \texttt{w} forward (allows reuse of same item).
+
+\paragraph{DP --- LCS (Longest Common Subsequence)}\label{dp--lcs-longest-common-subsequence}
+
+\textbf{Trigger}: two strings/sequences, longest common subsequence, edit distance, shortest common supersequence.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ lcs(s1, s2):}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(s1), }\BuiltInTok{len}\NormalTok{(s2)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m }\OperatorTok{+} \DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+            \ControlFlowTok{if}\NormalTok{ s1[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{==}\NormalTok{ s2[j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]:}
+\NormalTok{                dp[i][j] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{+} \DecValTok{1}
+            \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                dp[i][j] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j], dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[m][n]}
+
+\KeywordTok{def}\NormalTok{ edit\_distance(word1, word2):}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(word1), }\BuiltInTok{len}\NormalTok{(word2)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m }\OperatorTok{+} \DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m }\OperatorTok{+} \DecValTok{1}\NormalTok{): dp[i][}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ i}
+    \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{+} \DecValTok{1}\NormalTok{): dp[}\DecValTok{0}\NormalTok{][j] }\OperatorTok{=}\NormalTok{ j}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+            \ControlFlowTok{if}\NormalTok{ word1[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{==}\NormalTok{ word2[j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]:}
+\NormalTok{                dp[i][j] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+            \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                dp[i][j] }\OperatorTok{=} \DecValTok{1} \OperatorTok{+} \BuiltInTok{min}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j], dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{], dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[m][n]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: LCS (LeetCode 1143), Edit Distance (LeetCode 72), Shortest Common Supersequence (LeetCode 1092).
+
+\paragraph{DP --- LIS (Longest Increasing Subsequence)}\label{dp--lis-longest-increasing-subsequence}
+
+\textbf{Trigger}: longest strictly increasing subsequence, patience sorting, number of LIS.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ lis\_dp(nums):}
+    \CommentTok{"""O(N\^{}2) DP"""}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(nums)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(i):}
+            \ControlFlowTok{if}\NormalTok{ nums[j] }\OperatorTok{\textless{}}\NormalTok{ nums[i]:}
+\NormalTok{                dp[i] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[i], dp[j] }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{return} \BuiltInTok{max}\NormalTok{(dp)}
+
+\KeywordTok{def}\NormalTok{ lis\_binary\_search(nums):}
+    \CommentTok{"""O(N log N) using patience sorting"""}
+    \ImportTok{from}\NormalTok{ bisect }\ImportTok{import}\NormalTok{ bisect\_left}
+\NormalTok{    tails }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ num }\KeywordTok{in}\NormalTok{ nums:}
+\NormalTok{        pos }\OperatorTok{=}\NormalTok{ bisect\_left(tails, num)}
+        \ControlFlowTok{if}\NormalTok{ pos }\OperatorTok{==} \BuiltInTok{len}\NormalTok{(tails):}
+\NormalTok{            tails.append(num)}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            tails[pos] }\OperatorTok{=}\NormalTok{ num}
+    \ControlFlowTok{return} \BuiltInTok{len}\NormalTok{(tails)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: Longest Increasing Subsequence (LeetCode 300), Russian Doll Envelopes (LeetCode 354), Number of LIS (LeetCode 673).
+
+\paragraph{DP --- Matrix / Grid DP}\label{dp--matrix--grid-dp}
+
+\textbf{Trigger}: grid, min path sum, unique paths, count paths, max square of 1s.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ min\_path\_sum(grid):}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(grid), }\BuiltInTok{len}\NormalTok{(grid[}\DecValTok{0}\NormalTok{])}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{]}\OperatorTok{*}\NormalTok{n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m)]}
+\NormalTok{    dp[}\DecValTok{0}\NormalTok{][}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ grid[}\DecValTok{0}\NormalTok{][}\DecValTok{0}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m): dp[i][}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][}\DecValTok{0}\NormalTok{] }\OperatorTok{+}\NormalTok{ grid[i][}\DecValTok{0}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n): dp[}\DecValTok{0}\NormalTok{][j] }\OperatorTok{=}\NormalTok{ dp[}\DecValTok{0}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{+}\NormalTok{ grid[}\DecValTok{0}\NormalTok{][j]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n):}
+\NormalTok{            dp[i][j] }\OperatorTok{=}\NormalTok{ grid[i][j] }\OperatorTok{+} \BuiltInTok{min}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j], dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[m}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+
+\KeywordTok{def}\NormalTok{ maximal\_square(matrix):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ matrix: }\ControlFlowTok{return} \DecValTok{0}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(matrix), }\BuiltInTok{len}\NormalTok{(matrix[}\DecValTok{0}\NormalTok{])}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{]}\OperatorTok{*}\NormalTok{n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m)]}
+\NormalTok{    max\_side }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+            \ControlFlowTok{if}\NormalTok{ matrix[i][j] }\OperatorTok{==} \StringTok{\textquotesingle{}1\textquotesingle{}}\NormalTok{:}
+                \ControlFlowTok{if}\NormalTok{ i }\OperatorTok{==} \DecValTok{0} \KeywordTok{or}\NormalTok{ j }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+\NormalTok{                    dp[i][j] }\OperatorTok{=} \DecValTok{1}
+                \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                    dp[i][j] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j], dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{], dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]) }\OperatorTok{+} \DecValTok{1}
+\NormalTok{                max\_side }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_side, dp[i][j])}
+    \ControlFlowTok{return}\NormalTok{ max\_side }\OperatorTok{*}\NormalTok{ max\_side}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: Unique Paths (LeetCode 62), Minimum Path Sum (LeetCode 64), Maximal Square (LeetCode 221), Dungeon Game (LeetCode 174).
+
+\paragraph{DP --- Interval DP}\label{dp--interval-dp}
+
+\textbf{Trigger}: merge stones, burst balloons, matrix chain multiplication, palindrome partitioning.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ burst\_balloons(nums):}
+    \CommentTok{"""LeetCode 312 — classic interval DP"""}
+\NormalTok{    nums }\OperatorTok{=}\NormalTok{ [}\DecValTok{1}\NormalTok{] }\OperatorTok{+}\NormalTok{ nums }\OperatorTok{+}\NormalTok{ [}\DecValTok{1}\NormalTok{]}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(nums)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{]}\OperatorTok{*}\NormalTok{n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n)]}
+    \ControlFlowTok{for}\NormalTok{ length }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{2}\NormalTok{, n):               }\CommentTok{\# interval length}
+        \ControlFlowTok{for}\NormalTok{ left }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{{-}}\NormalTok{ length):}
+\NormalTok{            right }\OperatorTok{=}\NormalTok{ left }\OperatorTok{+}\NormalTok{ length}
+            \ControlFlowTok{for}\NormalTok{ k }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(left}\OperatorTok{+}\DecValTok{1}\NormalTok{, right):   }\CommentTok{\# k = last balloon to burst in (left, right)}
+\NormalTok{                dp[left][right] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(}
+\NormalTok{                    dp[left][right],}
+\NormalTok{                    dp[left][k] }\OperatorTok{+}\NormalTok{ nums[left]}\OperatorTok{*}\NormalTok{nums[k]}\OperatorTok{*}\NormalTok{nums[right] }\OperatorTok{+}\NormalTok{ dp[k][right]}
+\NormalTok{                )}
+    \ControlFlowTok{return}\NormalTok{ dp[}\DecValTok{0}\NormalTok{][n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: Burst Balloons (LeetCode 312), Minimum Cost to Merge Stones (LeetCode 1000), Strange Printer (LeetCode 664).
+
+\paragraph{DP --- Subsequences / Strings}\label{dp--subsequences--strings}
+
+\textbf{Trigger}: count distinct subsequences, palindromic subsequences, word break.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ num\_distinct\_subsequences(s, t):}
+    \CommentTok{"""Count distinct subsequences of s equal to t — LeetCode 115"""}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(s), }\BuiltInTok{len}\NormalTok{(t)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{]}\OperatorTok{*}\NormalTok{(n}\OperatorTok{+}\DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m}\OperatorTok{+}\DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m}\OperatorTok{+}\DecValTok{1}\NormalTok{): dp[i][}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \DecValTok{1}     \CommentTok{\# empty t matched}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m}\OperatorTok{+}\DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n}\OperatorTok{+}\DecValTok{1}\NormalTok{):}
+\NormalTok{            dp[i][j] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j]         }\CommentTok{\# don\textquotesingle{}t use s[i{-}1]}
+            \ControlFlowTok{if}\NormalTok{ s[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{==}\NormalTok{ t[j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]:}
+\NormalTok{                dp[i][j] }\OperatorTok{+=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]  }\CommentTok{\# use s[i{-}1]}
+    \ControlFlowTok{return}\NormalTok{ dp[m][n]}
+
+\KeywordTok{def}\NormalTok{ word\_break(s, word\_dict):}
+    \CommentTok{"""LeetCode 139"""}
+\NormalTok{    word\_set }\OperatorTok{=} \BuiltInTok{set}\NormalTok{(word\_dict)}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(s)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\VariableTok{False}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{    dp[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \VariableTok{True}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n}\OperatorTok{+}\DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(i):}
+            \ControlFlowTok{if}\NormalTok{ dp[j] }\KeywordTok{and}\NormalTok{ s[j:i] }\KeywordTok{in}\NormalTok{ word\_set:}
+\NormalTok{                dp[i] }\OperatorTok{=} \VariableTok{True}\OperatorTok{;} \ControlFlowTok{break}
+    \ControlFlowTok{return}\NormalTok{ dp[n]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Classic}: Distinct Subsequences (LeetCode 115), Word Break (LeetCode 139), Palindromic Substrings (LeetCode 647).
+
+\subsubsection{Greedy}\label{greedy}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: "minimum number of X", "maximize Y", local decisions that don\textquotesingle t affect future options, exchange argument, interval scheduling.
+\end{quote}
+
+\textbf{Core Idea}
+Make the locally optimal choice at each step. Prove (or intuit) that no better global solution exists. Common proof technique: "exchange argument" --- show swapping any element for the greedy choice can only improve or maintain the solution.
+
+\textbf{Template --- Interval Scheduling Maximization}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ max\_non\_overlapping\_intervals(intervals):}
+    \CommentTok{"""Maximum number of non{-}overlapping intervals (greedy: earliest end first)"""}
+\NormalTok{    intervals.sort(key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: x[}\DecValTok{1}\NormalTok{])   }\CommentTok{\# sort by }\RegionMarkerTok{END}\CommentTok{ time}
+\NormalTok{    count }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    last\_end }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}{-}inf\textquotesingle{}}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ start, end }\KeywordTok{in}\NormalTok{ intervals:}
+        \ControlFlowTok{if}\NormalTok{ start }\OperatorTok{\textgreater{}=}\NormalTok{ last\_end:}
+\NormalTok{            count }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{            last\_end }\OperatorTok{=}\NormalTok{ end}
+    \ControlFlowTok{return}\NormalTok{ count}
+
+\KeywordTok{def}\NormalTok{ jump\_game(nums):}
+    \CommentTok{"""Can reach last index? — LeetCode 55"""}
+\NormalTok{    max\_reach }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ i, num }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+        \ControlFlowTok{if}\NormalTok{ i }\OperatorTok{\textgreater{}}\NormalTok{ max\_reach:}
+            \ControlFlowTok{return} \VariableTok{False}
+\NormalTok{        max\_reach }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_reach, i }\OperatorTok{+}\NormalTok{ num)}
+    \ControlFlowTok{return} \VariableTok{True}
+
+\KeywordTok{def}\NormalTok{ jump\_game\_ii(nums):}
+    \CommentTok{"""Minimum jumps to reach last index — LeetCode 45"""}
+\NormalTok{    jumps }\OperatorTok{=}\NormalTok{ cur\_end }\OperatorTok{=}\NormalTok{ cur\_far }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(nums) }\OperatorTok{{-}} \DecValTok{1}\NormalTok{):}
+\NormalTok{        cur\_far }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(cur\_far, i }\OperatorTok{+}\NormalTok{ nums[i])}
+        \ControlFlowTok{if}\NormalTok{ i }\OperatorTok{==}\NormalTok{ cur\_end:}
+\NormalTok{            jumps }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{            cur\_end }\OperatorTok{=}\NormalTok{ cur\_far}
+    \ControlFlowTok{return}\NormalTok{ jumps}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: Usually O(N log N) (sort) + O(N); Space O(1)
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Jump Game --- LeetCode 55
+\item
+  Non-overlapping Intervals --- LeetCode 435
+\item
+  Task Scheduler --- LeetCode 621
+\item
+  Gas Station --- LeetCode 134
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Not all greedy approaches are correct; verify with a counterexample.
+\item
+  Activity selection: sort by END (not start, not duration).
+\item
+  When greedy fails, fall back to DP.
+\end{itemize}
+
+\subsubsection{Bit Manipulation}\label{bit-manipulation}
+
+\textbf{Trigger / When to Use}
+
+\begin{quote}
+\textbf{When you see}: find unique element in array where all others appear twice/three times, count set bits, power of 2, XOR tricks, subset enumeration.
+\end{quote}
+
+\textbf{Core Idea}
+Exploit binary properties: XOR cancels duplicates, AND/OR extract/set bits, shifting multiplies/divides by powers of 2.
+
+\textbf{Key Tricks}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# XOR: a \^{} a = 0, a \^{} 0 = a}
+\KeywordTok{def}\NormalTok{ single\_number(nums):}
+    \CommentTok{"""Find the element appearing once — LeetCode 136"""}
+\NormalTok{    result }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ num }\KeywordTok{in}\NormalTok{ nums:}
+\NormalTok{        result }\OperatorTok{\^{}=}\NormalTok{ num}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Count set bits (Brian Kernighan)}
+\KeywordTok{def}\NormalTok{ count\_bits(n):}
+\NormalTok{    count }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{while}\NormalTok{ n:}
+\NormalTok{        n }\OperatorTok{\&=}\NormalTok{ (n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)       }\CommentTok{\# removes lowest set bit}
+\NormalTok{        count }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ count}
+
+\CommentTok{\# Check power of 2}
+\KeywordTok{def}\NormalTok{ is\_power\_of\_two(n):}
+    \ControlFlowTok{return}\NormalTok{ n }\OperatorTok{\textgreater{}} \DecValTok{0} \KeywordTok{and}\NormalTok{ (n }\OperatorTok{\&}\NormalTok{ (n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)) }\OperatorTok{==} \DecValTok{0}
+
+\CommentTok{\# Get / Set / Clear bit}
+\KeywordTok{def}\NormalTok{ get\_bit(n, i):   }\ControlFlowTok{return}\NormalTok{ (n }\OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ i) }\OperatorTok{\&} \DecValTok{1}
+\KeywordTok{def}\NormalTok{ set\_bit(n, i):   }\ControlFlowTok{return}\NormalTok{ n }\OperatorTok{|}\NormalTok{ (}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ i)}
+\KeywordTok{def}\NormalTok{ clear\_bit(n, i): }\ControlFlowTok{return}\NormalTok{ n }\OperatorTok{\&} \OperatorTok{\textasciitilde{}}\NormalTok{(}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ i)}
+
+\CommentTok{\# Enumerate all subsets of a bitmask}
+\KeywordTok{def}\NormalTok{ enumerate\_subsets(mask):}
+\NormalTok{    sub }\OperatorTok{=}\NormalTok{ mask}
+    \ControlFlowTok{while}\NormalTok{ sub:}
+\NormalTok{        process(sub)}
+\NormalTok{        sub }\OperatorTok{=}\NormalTok{ (sub }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{\&}\NormalTok{ mask    }\CommentTok{\# next smaller submask}
+
+\CommentTok{\# XOR to find two unique numbers (all others appear twice)}
+\KeywordTok{def}\NormalTok{ single\_number\_iii(nums):}
+    \CommentTok{"""LeetCode 260"""}
+\NormalTok{    xor }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ n }\KeywordTok{in}\NormalTok{ nums: xor }\OperatorTok{\^{}=}\NormalTok{ n           }\CommentTok{\# xor of the two unique numbers}
+\NormalTok{    diff\_bit }\OperatorTok{=}\NormalTok{ xor }\OperatorTok{\&}\NormalTok{ (}\OperatorTok{{-}}\NormalTok{xor)           }\CommentTok{\# rightmost set bit}
+\NormalTok{    a }\OperatorTok{=}\NormalTok{ b }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ n }\KeywordTok{in}\NormalTok{ nums:}
+        \ControlFlowTok{if}\NormalTok{ n }\OperatorTok{\&}\NormalTok{ diff\_bit: a }\OperatorTok{\^{}=}\NormalTok{ n}
+        \ControlFlowTok{else}\NormalTok{:            b }\OperatorTok{\^{}=}\NormalTok{ n}
+    \ControlFlowTok{return}\NormalTok{ [a, b]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity}: O(N) time, O(1) space for most tricks
+
+\textbf{Classic Problems}
+
+\begin{itemize}
+\tightlist
+\item
+  Single Number --- LeetCode 136
+\item
+  Number of 1 Bits --- LeetCode 191
+\item
+  Counting Bits --- LeetCode 338
+\item
+  Reverse Bits --- LeetCode 190
+\item
+  Single Number III --- LeetCode 260
+\end{itemize}
+
+\textbf{Pitfalls}
+
+\begin{itemize}
+\tightlist
+\item
+  Python integers have arbitrary precision; no overflow, but be careful with \texttt{\textasciitilde{}n} (gives \texttt{-n\ -\ 1}).
+\item
+  Use \texttt{n\ \&\ (-n)} to isolate the lowest set bit.
+\item
+  Bitmask DP: remember \texttt{1\ \textless{}\textless{}\ n} can be large; check constraints.
+\end{itemize}
+
+\subsection{Complexity Quick Reference}\label{complexity-quick-reference}
+
+\subsubsection{Big-O of Common Data Structure Operations}\label{big-o-of-common-data-structure-operations}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2007}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0769}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1692}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1231}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1385}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1070}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1846}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Operation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Array
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Linked List
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hash Map
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+BST (avg)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heap
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sorted Array
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Access by index & O(1) & O(N) & N/A & N/A & N/A & O(1) \\
+Search & O(N) & O(N) & O(1) & O(log N) & O(N) & O(log N) \\
+Insert (end) & O(1)* & O(1) & O(1) & O(log N) & O(log N) & O(N) \\
+Insert (middle) & O(N) & O(1)** & O(1) & O(log N) & O(log N) & O(N) \\
+Delete & O(N) & O(1)** & O(1) & O(log N) & O(log N) & O(N) \\
+Min/Max & O(N) & O(N) & O(N) & O(log N) & O(1) & O(1) \\
+\end{longtable}
+
+*Amortized for dynamic array. **Given a pointer to the node.
+
+\subsubsection{Common Algorithm Complexities}\label{common-algorithm-complexities}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5185}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1481}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Space
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Binary Search & O(log N) & O(1) \\
+Quick Sort & O(N log N) avg, O(N\(^2\)) worst & O(log N) \\
+Merge Sort & O(N log N) & O(N) \\
+Heap Sort & O(N log N) & O(1) \\
+BFS / DFS & O(V + E) & O(V) \\
+Dijkstra (heap) & O((V+E) log V) & O(V) \\
+Topological Sort & O(V + E) & O(V) \\
+Union-Find & O(\(\alpha\)(N)) per op & O(N) \\
+Trie insert/search & O(L) & O(L) \\
+\end{longtable}
+
+\subsubsection{Acceptable Complexity vs Input Size N}\label{acceptable-complexity-vs-input-size-n}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1847}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3123}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5030}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+N (input size)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max acceptable complexity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+N \(\leq\) 10 & O(N!) & Permutations, backtracking with full exploration \\
+N \(\leq\) 20 & O(2\^{}N) & Bitmask DP, subset enumeration \\
+N \(\leq\) 100 & O(N\(^3\)) & Matrix chain, interval DP, Floyd-Warshall \\
+N \(\leq\) 500 & O(N\(^2\)) & Some DP, all-pairs work \\
+N \(\leq\) 1,000 & O(N\(^2\)) & Bubble/insertion sort if needed, O(N\(^2\)) DP \\
+N \(\leq\) 10,000 & O(N\(^2\) log N) & Rarely; O(N\(^2\)) should work \\
+N \(\leq\) 100,000 & O(N log N) & Sort, heap operations, segment tree \\
+N \(\leq\) 1,000,000 & O(N log N) & Must be near-linear \\
+N \(\leq\) 10,000,000 & O(N) & Linear only --- prefix sum, two pointers, sliding window \\
+N \textgreater{} 10\^{}8 & O(log N) or O(1) & Binary search, math tricks \\
+\end{longtable}
+
+\begin{quote}
+\textbf{Rule}: Assume \textasciitilde10\^{}8 simple operations per second for Python (10\^{}9 for C++). Multiply complexity by constant factors; Python is \textasciitilde5-10x slower than C++.
+\end{quote}
+
+\subsection{Interview Communication Tips}\label{interview-communication-tips}
+
+\subsubsection{Before You Code}\label{before-you-code}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Repeat the problem} in your own words. "So we\textquotesingle re given... and we need to return..."
+\item
+  \textbf{Clarify edge cases} out loud: empty input? negative numbers? duplicates allowed? integer overflow?
+\item
+  \textbf{State constraints} you noticed: "N can be up to 10\^{}5, so we need O(N log N) or better."
+\item
+  \textbf{Start with brute force} --- even if obvious: "The naive approach is O(N\(^2\)) by checking all pairs. We can do better..."
+\item
+  \textbf{Think aloud} while optimizing: "I notice the array is sorted, so maybe we can binary search... or use two pointers..."
+\end{enumerate}
+
+\subsubsection{While Coding}\label{while-coding}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Name variables clearly}: \texttt{left}, \texttt{right}, \texttt{window\_sum}, not \texttt{i}, \texttt{j}, \texttt{temp}.
+\item
+  \textbf{Comment key invariants}: \texttt{\#\ left:\ next\ position\ to\ fill}, \texttt{\#\ window\ is\ always\ valid\ here}.
+\item
+  \textbf{Write helper functions} for repetitive logic rather than duplicating code.
+\item
+  \textbf{Don\textquotesingle t go silent} for more than 30 seconds; narrate your thought process.
+\end{itemize}
+
+\subsubsection{After Coding}\label{after-coding}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Trace through your example} step by step on the code you wrote.
+\item
+  \textbf{Check edge cases}: empty array, single element, all same, already sorted, negative numbers.
+\item
+  \textbf{State complexity} proactively: "Time is O(N log N) for the sort plus O(N) for the scan, so O(N log N). Space is O(1) if we ignore the output."
+\item
+  \textbf{Ask if they want you to optimize} before jumping to a different approach.
+\end{enumerate}
+
+\subsubsection{Recovery Tactics}\label{recovery-tactics}
+
+\begin{itemize}
+\tightlist
+\item
+  Stuck? Say "Let me think about what information I\textquotesingle m not using yet."
+\item
+  Hint? "That\textquotesingle s helpful --- so if we track X, we could avoid recomputing Y..."
+\item
+  Bug? "Let me re-trace this test case to find where it diverges."
+\end{itemize}
+
+\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4258}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5742}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mistake
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fix
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Jumping to code without clarifying} & Always spend 2-3 min clarifying before touching code \\
+\textbf{Skipping brute force} & State it first; it demonstrates structured thinking and sets a baseline \\
+\textbf{Not handling edge cases} & Build a checklist: empty, single element, all same, negatives, overflow \\
+\textbf{Vague variable names} (\texttt{i}, \texttt{j}, \texttt{tmp}) & Use descriptive names even if it takes 5 more seconds \\
+\textbf{Not stating complexity} & Interviewers almost always ask; volunteer it proactively \\
+\textbf{Silently debugging} & Narrate: "I think the bug is here because..." \\
+\textbf{Confusing inclusive/exclusive bounds} & Write \texttt{\#\ inclusive} or \texttt{\#\ exclusive} in comments \\
+\textbf{Off-by-one in binary search} & Stick to one template and test \texttt{{[}1{]}}, \texttt{{[}1,2{]}}, \texttt{{[}1,2,3{]}} \\
+\textbf{Forgetting to copy list before appending} & \texttt{result.append(current{[}:{]})} not \texttt{result.append(current)} \\
+\textbf{Not tracking the \texttt{visited} set} & Add it before BFS/DFS; mark visited when enqueuing \\
+\textbf{Wrong loop order in DP} & 0/1 knapsack: reverse; unbounded: forward \\
+\textbf{Greedy without justification} & Briefly argue why greedy works or think about exchange argument \\
+\textbf{Python recursion limit} & Add \texttt{sys.setrecursionlimit(10**6)} for deep DFS \\
+\textbf{Mutating input} & Ask "can I modify the input?" or work on a copy \\
+\end{longtable}
+
+\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsubsection{The 20 Must-Know Patterns}\label{the-20-must-know-patterns}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2690}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6772}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1-line Memory Hook
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \textbf{Two Pointers} & Sorted + pair/triplet \(\rightarrow\) shrink from both ends \\
+2 & \textbf{Sliding Window} & Contiguous subarray condition \(\rightarrow\) shrink/grow window \\
+3 & \textbf{Fast \& Slow Pointers} & Cycle / middle \(\rightarrow\) tortoise and hare \\
+4 & \textbf{Merge Intervals} & Overlapping intervals \(\rightarrow\) sort by start, merge greedily \\
+5 & \textbf{Cyclic Sort} & Array with {[}1..N{]} \(\rightarrow\) each number belongs at index n-1 \\
+6 & \textbf{LL Reversal} & Reverse linked list \(\rightarrow\) prev/curr/next dance \\
+7 & \textbf{BFS} & Shortest path / level order \(\rightarrow\) queue + visited \\
+8 & \textbf{DFS / Backtracking} & All paths / all configs \(\rightarrow\) recurse + undo \\
+9 & \textbf{Binary Search} & Sorted / monotonic predicate \(\rightarrow\) halve search space \\
+10 & \textbf{Top-K Heap} & K largest/smallest \(\rightarrow\) min-heap of size K \\
+11 & \textbf{K-way Merge} & K sorted lists \(\rightarrow\) heap with one from each \\
+12 & \textbf{Two Heaps} & Median of stream \(\rightarrow\) max-heap left, min-heap right \\
+13 & \textbf{Monotonic Stack} & Next greater/smaller \(\rightarrow\) pop when violated \\
+14 & \textbf{Prefix Sum} & Subarray sum = K \(\rightarrow\) hash map of prefix sums \\
+15 & \textbf{Union-Find} & Dynamic connectivity \(\rightarrow\) compress + rank \\
+16 & \textbf{Topo Sort} & DAG ordering / cycle \(\rightarrow\) Kahn\textquotesingle s (BFS in-degree) \\
+17 & \textbf{Trie} & Prefix search \(\rightarrow\) character tree \\
+18 & \textbf{0/1 Knapsack DP} & Pick or skip + capacity \(\rightarrow\) 2D or reverse-1D DP \\
+19 & \textbf{Greedy} & Local optimal = global optimal \(\rightarrow\) sort + scan \\
+20 & \textbf{Bit Manipulation} & XOR / AND / shifts \(\rightarrow\) bitmask tricks \\
+\end{longtable}
+
+\subsubsection{Decision Tree (30-second pattern picker)}\label{decision-tree-30-second-pattern-picker}
+
+\begin{verbatim}
+Is array sorted or can we sort it?
+├── Yes → Two Pointers or Binary Search
+└── No
+    ├── Subarray/substring condition? → Sliding Window
+    ├── Linked list? → Fast & Slow or LL Reversal
+    ├── Graph/tree?
+    │   ├── Shortest path / min steps? → BFS
+    │   ├── All paths / components? → DFS / Backtracking
+    │   ├── Dependency order? → Topological Sort
+    │   └── Connected components (dynamic)? → Union-Find
+    ├── K elements? → Heap (Top-K or K-way Merge)
+    ├── Intervals? → Merge Intervals
+    ├── Count ways / optimal value? → Dynamic Programming
+    ├── Prefix search / autocomplete? → Trie
+    ├── Next greater / histogram? → Monotonic Stack
+    ├── Subarray sum queries? → Prefix Sum
+    └── XOR / bits / unique? → Bit Manipulation
+\end{verbatim}
+
+\subsubsection{Quick Complexity Reminder}\label{quick-complexity-reminder}
+
+\begin{verbatim}
+O(1)       → hash map lookup, heap top
+O(log N)   → binary search, heap push/pop
+O(N)       → single pass, two pointers, sliding window
+O(N log N) → sort, N heap operations
+O(N²)      → nested loops, some DP
+O(2^N)     → subsets, bitmask DP
+O(N!)      → permutations
+\end{verbatim}
+
+\emph{Last updated: 2026-06-14 \textbar{} Covers \textasciitilde25 patterns with 100+ LeetCode problems}
+
+\end{document}

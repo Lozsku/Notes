@@ -1,0 +1,2109 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Low-Level Design}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{06}
+
+\usepackage{interviewstyle}
+\setthemecolor{ea580c}{fb923c}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{Low-Level Design (LLD) / Object-Oriented Design}\label{low-level-design-lld--object-oriented-design}
+
+\subsection{Comprehensive Interview-Prep Guide}\label{comprehensive-interview-prep-guide}
+
+\begin{quote}
+\textbf{Target}: FAANG interviews requiring class-level design, OOP mastery, and design pattern fluency.
+\textbf{Format}: Deep learning + quick-revision sections. Revisit the cheat sheet before every interview.
+\end{quote}
+
+\subsection{Overview --- What It Is}\label{overview--what-it-is}
+
+\textbf{Low-Level Design (LLD)} is the art of translating a feature requirement into a concrete, maintainable class structure. Where High-Level Design (HLD) asks \emph{"what boxes talk to each other?"}, LLD asks \emph{"what does each box look like inside?"}.
+
+LLD covers:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Class hierarchies} --- what objects exist, what they know, what they do
+\item
+  \textbf{Object relationships} --- how objects collaborate (inheritance, composition, association)
+\item
+  \textbf{Design patterns} --- proven recipes for recurring structural problems
+\item
+  \textbf{SOLID / clean-code principles} --- rules that keep code changeable over years
+\item
+  \textbf{UML notation} --- a shared visual language to express designs without writing code
+\end{itemize}
+
+Think of LLD as \textbf{architecture at the function and class level}, just like an engineer laying out rooms inside a building (vs. HLD which decides the city block).
+
+\subsection{Why It Exists}\label{why-it-exists}
+
+Software without deliberate design rots. Symptoms of bad LLD:
+
+\begin{itemize}
+\tightlist
+\item
+  Every new feature requires touching dozens of classes (\textbf{shotgun surgery})
+\item
+  Adding a discount type breaks the payment class (\textbf{tight coupling})
+\item
+  Copy-pasted logic across modules that diverge silently (\textbf{DRY violations})
+\item
+  Unit tests require 20 mocks (\textbf{low cohesion})
+\end{itemize}
+
+LLD exists to produce code that is:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1967}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8033}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Goal
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What It Means
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Extensible} & Add features by adding code, not changing existing code \\
+\textbf{Maintainable} & A new engineer understands a class in \textless{} 5 minutes \\
+\textbf{Testable} & Classes have clear contracts; can be tested in isolation \\
+\textbf{Reusable} & Components are general enough to appear in multiple contexts \\
+\textbf{Readable} & Code reads like prose; intent is obvious \\
+\end{longtable}
+
+\subsection{Why FAANG Cares}\label{why-faang-cares}
+
+\textbf{Amazon} --- Bar raisers explicitly look for OOD clarity. Leadership Principle "Insist on Highest Standards" maps directly to clean class design. Expect to design systems like a parking lot, library, or food-ordering system end-to-end.
+
+\textbf{Google} --- Evaluates \emph{code quality} as a separate signal. Interviewers check: Are abstractions at the right level? Does the candidate know when NOT to use a pattern?
+
+\textbf{Meta} --- "Crush it" culture means shipping fast without accumulating debt. LLD tests whether you write code that won\textquotesingle t become legacy in 6 months.
+
+\textbf{Microsoft} --- Heavy on SOLID and extensibility. Will ask you to extend your own design with a new requirement mid-interview.
+
+\textbf{Apple} --- Cares about correct ownership semantics (composition vs. inheritance) and interface design.
+
+\textbf{Specific signals they\textquotesingle re testing:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Do you naturally think in \textbf{nouns (entities) and verbs (behaviors)}?
+\item
+  Can you \textbf{draw a class diagram on a whiteboard} in 10 minutes?
+\item
+  Do you know \textbf{when a design pattern applies} vs. when it\textquotesingle s overkill?
+\item
+  Can you \textbf{articulate trade-offs} (e.g., "I used Strategy here instead of a giant if-else so adding new algorithms doesn\textquotesingle t touch existing code")?
+\item
+  Do you write \textbf{clean, idiomatic code} with meaningful names?
+\end{enumerate}
+
+\subsection{The LLD Interview Framework}\label{the-lld-interview-framework}
+
+Follow this seven-step process in every LLD interview. It signals structure and prevents blank-page panic.
+
+\subsubsection{Step 1: Clarify Requirements (2--3 min)}\label{step-1-clarify-requirements-23-min}
+
+Ask functional and constraint questions:
+
+\begin{itemize}
+\tightlist
+\item
+  "Should we support multiple floors in the parking lot?"
+\item
+  "Is the elevator system for one building or configurable?"
+\item
+  "Do we need persistence or just in-memory?"
+\item
+  "What scale --- one elevator or N?"
+\end{itemize}
+
+\textbf{Goal}: Narrow scope. You can\textquotesingle t design what you don\textquotesingle t understand.
+
+\subsubsection{Step 2: Identify Entities / Nouns (2 min)}\label{step-2-identify-entities--nouns-2-min}
+
+Extract nouns from the requirements. Each noun is a candidate class.
+
+\begin{quote}
+"Design a Parking Lot" \(\rightarrow\) ParkingLot, Floor, ParkingSpot, Vehicle, Ticket, Payment, Gate, Attendant
+\end{quote}
+
+\textbf{Goal}: Build your initial class inventory.
+
+\subsubsection{Step 3: Identify Relationships (2 min)}\label{step-3-identify-relationships-2-min}
+
+For each pair of entities, ask:
+
+\begin{itemize}
+\tightlist
+\item
+  Is one a \emph{kind-of} another? \(\rightarrow\) \textbf{Inheritance}
+\item
+  Does one \emph{contain/own} another? \(\rightarrow\) \textbf{Composition}
+\item
+  Does one \emph{use} another? \(\rightarrow\) \textbf{Association / Dependency}
+\end{itemize}
+
+\textbf{Goal}: Draw arrows. Sketch rough UML.
+
+\subsubsection{Step 4: Class Diagram (3--5 min)}\label{step-4-class-diagram-35-min}
+
+Sketch on whiteboard:
+
+\begin{itemize}
+\tightlist
+\item
+  Classes with key \textbf{attributes} (fields) and \textbf{methods}
+\item
+  Access modifiers (+ public, - private, \# protected)
+\item
+  Relationships (arrows)
+\end{itemize}
+
+Say aloud: \emph{"I\textquotesingle ll keep this diagram minimal now and fill in details when I code."}
+
+\subsubsection{Step 5: Apply Patterns (1--2 min)}\label{step-5-apply-patterns-12-min}
+
+Scan your diagram for pattern opportunities:
+
+\begin{itemize}
+\tightlist
+\item
+  Multiple vehicle types but same interface? \(\rightarrow\) \textbf{Strategy} or \textbf{Template Method}
+\item
+  Need one ParkingLot instance? \(\rightarrow\) \textbf{Singleton}
+\item
+  Create vehicles without knowing exact type? \(\rightarrow\) \textbf{Factory}
+\item
+  Notify displays when spot availability changes? \(\rightarrow\) \textbf{Observer}
+\end{itemize}
+
+\textbf{Don\textquotesingle t force patterns.} Say: \emph{"I\textquotesingle m considering Strategy here because the ticket pricing algorithm may vary."}
+
+\subsubsection{Step 6: Code Core Classes (10--15 min)}\label{step-6-code-core-classes-1015-min}
+
+Code the most important 2--3 classes fully. Show:
+
+\begin{itemize}
+\tightlist
+\item
+  Constructors, getters/setters (or lack thereof --- explain why)
+\item
+  Core business methods
+\item
+  Use of patterns where you flagged them
+\end{itemize}
+
+Prioritize \textbf{readability over completeness}.
+
+\subsubsection{Step 7: Discuss Extensibility (2--3 min)}\label{step-7-discuss-extensibility-23-min}
+
+Proactively say:
+
+\begin{itemize}
+\tightlist
+\item
+  "If we add electric vehicle spots, I\textquotesingle d extend ParkingSpot with an EVSpot subclass without touching existing code --- that\textquotesingle s OCP."
+\item
+  "If pricing changes to subscription-based, we swap in a new PricingStrategy."
+\end{itemize}
+
+\textbf{This step separates senior candidates from junior ones.}
+
+\subsection{Core Concepts}\label{core-concepts}
+
+\subsubsection{OOP Four Pillars}\label{oop-four-pillars}
+
+\paragraph{Encapsulation}\label{encapsulation}
+
+\textbf{Definition}: Bundle data and the methods that operate on it; hide internal state; expose only a controlled interface.
+
+\textbf{Why}: Protects invariants. A \texttt{BankAccount} shouldn\textquotesingle t let outsiders directly set \texttt{balance\ =\ -1000}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# BAD — no encapsulation}
+\KeywordTok{class}\NormalTok{ BankAccount:}
+\NormalTok{    balance }\OperatorTok{=} \DecValTok{0}  \CommentTok{\# public field; anyone can set it}
+
+\CommentTok{\# GOOD — encapsulated}
+\KeywordTok{class}\NormalTok{ BankAccount:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, initial: }\BuiltInTok{float}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_balance }\OperatorTok{=}\NormalTok{ initial  }\CommentTok{\# private}
+
+    \KeywordTok{def}\NormalTok{ deposit(}\VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{):}
+        \ControlFlowTok{if}\NormalTok{ amount }\OperatorTok{\textless{}=} \DecValTok{0}\NormalTok{:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"Must be positive"}\NormalTok{)}
+        \VariableTok{self}\NormalTok{.\_balance }\OperatorTok{+=}\NormalTok{ amount}
+
+    \AttributeTok{@property}
+    \KeywordTok{def}\NormalTok{ balance(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_balance}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview Takeaway}: Encapsulation = \emph{"Tell, don\textquotesingle t ask."} Objects manage their own state; callers invoke behavior, not data.
+
+\paragraph{Abstraction}\label{abstraction}
+
+\textbf{Definition}: Expose \emph{what} an object does, not \emph{how} it does it. Hide implementation details behind an interface or abstract class.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ abc }\ImportTok{import}\NormalTok{ ABC, abstractmethod}
+
+\KeywordTok{class}\NormalTok{ PaymentProcessor(ABC):          }\CommentTok{\# abstraction}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ process(}\VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+\NormalTok{        ...}
+
+\KeywordTok{class}\NormalTok{ StripeProcessor(PaymentProcessor):  }\CommentTok{\# concrete detail hidden}
+    \KeywordTok{def}\NormalTok{ process(}\VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \CommentTok{\# Stripe API calls hidden here}
+        \ControlFlowTok{return} \VariableTok{True}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview Takeaway}: Abstraction lets you swap implementations (Stripe \(\rightarrow\) PayPal) without touching calling code. Think \emph{interface contracts}.
+
+\paragraph{Inheritance}\label{inheritance}
+
+\textbf{Definition}: A class (child) inherits attributes and behaviors of another class (parent), extending or overriding them.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Vehicle:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, make: }\BuiltInTok{str}\NormalTok{, speed: }\BuiltInTok{int}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.make }\OperatorTok{=}\NormalTok{ make}
+        \VariableTok{self}\NormalTok{.speed }\OperatorTok{=}\NormalTok{ speed}
+
+    \KeywordTok{def}\NormalTok{ move(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+        \ControlFlowTok{return} \SpecialStringTok{f"}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{make}\SpecialCharTok{\}}\SpecialStringTok{ moves at }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{speed}\SpecialCharTok{\}}\SpecialStringTok{ km/h"}
+
+\KeywordTok{class}\NormalTok{ ElectricCar(Vehicle):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, make: }\BuiltInTok{str}\NormalTok{, speed: }\BuiltInTok{int}\NormalTok{, battery\_kwh: }\BuiltInTok{int}\NormalTok{):}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{(make, speed)}
+        \VariableTok{self}\NormalTok{.battery\_kwh }\OperatorTok{=}\NormalTok{ battery\_kwh}
+
+    \KeywordTok{def}\NormalTok{ move(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:           }\CommentTok{\# override}
+        \ControlFlowTok{return} \SpecialStringTok{f"}\SpecialCharTok{\{}\BuiltInTok{super}\NormalTok{()}\SpecialCharTok{.}\NormalTok{move()}\SpecialCharTok{\}}\SpecialStringTok{ silently"}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview Takeaway}: Use inheritance for \emph{IS-A} relationships where the child truly specializes the parent. Prefer \textbf{composition} when you\textquotesingle re tempted by code reuse alone.
+
+\paragraph{Polymorphism}\label{polymorphism}
+
+\textbf{Definition}: One interface, many forms. The same method call behaves differently depending on the actual object type at runtime.
+
+Two flavors:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Compile-time (overloading)}: same method name, different signatures
+\item
+  \textbf{Runtime (overriding)}: subclass replaces parent method
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{vehicles: }\BuiltInTok{list}\NormalTok{[Vehicle] }\OperatorTok{=}\NormalTok{ [Car(), Truck(), ElectricCar()]}
+\ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ vehicles:}
+    \BuiltInTok{print}\NormalTok{(v.move())   }\CommentTok{\# each calls its own move() — runtime polymorphism}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview Takeaway}: Polymorphism eliminates type-checking \texttt{if\ isinstance(x,\ Car)} chains. Code against the interface; let the runtime dispatch.
+
+\subsubsection{SOLID Principles}\label{solid-principles}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0611}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1861}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3943}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3584}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Letter
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Principle
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-Line Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Smell It Prevents
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{S} & Single Responsibility & A class has ONE reason to change & God class, spaghetti \\
+\textbf{O} & Open/Closed & Open for extension, closed for modification & Feature additions break existing code \\
+\textbf{L} & Liskov Substitution & Subtypes must be substitutable for their base type & Broken inheritance hierarchies \\
+\textbf{I} & Interface Segregation & Clients shouldn\textquotesingle t depend on methods they don\textquotesingle t use & Fat interfaces force stub implementations \\
+\textbf{D} & Dependency Inversion & Depend on abstractions, not concretions & Hard coupling to third-party libraries \\
+\end{longtable}
+
+\paragraph{S --- Single Responsibility Principle (SRP)}\label{s--single-responsibility-principle-srp}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# VIOLATION: UserManager does auth, email, AND DB — three reasons to change}
+\KeywordTok{class}\NormalTok{ UserManager:}
+    \KeywordTok{def}\NormalTok{ login(}\VariableTok{self}\NormalTok{, username, password): ...}
+    \KeywordTok{def}\NormalTok{ send\_welcome\_email(}\VariableTok{self}\NormalTok{, user): ...}
+    \KeywordTok{def}\NormalTok{ save\_to\_database(}\VariableTok{self}\NormalTok{, user): ...}
+
+\CommentTok{\# FIX: split into focused classes}
+\KeywordTok{class}\NormalTok{ AuthService:}
+    \KeywordTok{def}\NormalTok{ login(}\VariableTok{self}\NormalTok{, username, password): ...}
+
+\KeywordTok{class}\NormalTok{ EmailService:}
+    \KeywordTok{def}\NormalTok{ send\_welcome\_email(}\VariableTok{self}\NormalTok{, user): ...}
+
+\KeywordTok{class}\NormalTok{ UserRepository:}
+    \KeywordTok{def}\NormalTok{ save(}\VariableTok{self}\NormalTok{, user): ...}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{O --- Open/Closed Principle (OCP)}\label{o--openclosed-principle-ocp}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# VIOLATION: adding a new shape requires editing calculate\_area()}
+\KeywordTok{def}\NormalTok{ calculate\_area(shape):}
+    \ControlFlowTok{if}\NormalTok{ shape.}\BuiltInTok{type} \OperatorTok{==} \StringTok{"circle"}\NormalTok{:}
+        \ControlFlowTok{return} \FloatTok{3.14} \OperatorTok{*}\NormalTok{ shape.radius }\OperatorTok{**} \DecValTok{2}
+    \ControlFlowTok{elif}\NormalTok{ shape.}\BuiltInTok{type} \OperatorTok{==} \StringTok{"rectangle"}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ shape.w }\OperatorTok{*}\NormalTok{ shape.h}
+    \CommentTok{\# ... must edit this every time}
+
+\CommentTok{\# FIX: each shape knows its own area}
+\KeywordTok{class}\NormalTok{ Shape(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ area(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{: ...}
+
+\KeywordTok{class}\NormalTok{ Circle(Shape):}
+    \KeywordTok{def}\NormalTok{ area(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \FloatTok{3.14} \OperatorTok{*} \VariableTok{self}\NormalTok{.radius }\OperatorTok{**} \DecValTok{2}
+
+\KeywordTok{class}\NormalTok{ Rectangle(Shape):}
+    \KeywordTok{def}\NormalTok{ area(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.w }\OperatorTok{*} \VariableTok{self}\NormalTok{.h}
+\CommentTok{\# Adding Triangle → new class only, zero edits to existing code}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{L --- Liskov Substitution Principle (LSP)}\label{l--liskov-substitution-principle-lsp}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# VIOLATION: Square overrides setter in a way that breaks Rectangle\textquotesingle{}s contract}
+\KeywordTok{class}\NormalTok{ Rectangle:}
+    \KeywordTok{def}\NormalTok{ set\_width(}\VariableTok{self}\NormalTok{, w): }\VariableTok{self}\NormalTok{.\_w }\OperatorTok{=}\NormalTok{ w}
+    \KeywordTok{def}\NormalTok{ set\_height(}\VariableTok{self}\NormalTok{, h): }\VariableTok{self}\NormalTok{.\_h }\OperatorTok{=}\NormalTok{ h}
+    \KeywordTok{def}\NormalTok{ area(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_w }\OperatorTok{*} \VariableTok{self}\NormalTok{.\_h}
+
+\KeywordTok{class}\NormalTok{ Square(Rectangle):             }\CommentTok{\# Square IS{-}NOT a Rectangle in behavior}
+    \KeywordTok{def}\NormalTok{ set\_width(}\VariableTok{self}\NormalTok{, w):}
+        \VariableTok{self}\NormalTok{.\_w }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_h }\OperatorTok{=}\NormalTok{ w        }\CommentTok{\# breaks caller expectation}
+
+\CommentTok{\# FIX: don\textquotesingle{}t force Square into Rectangle hierarchy;}
+\CommentTok{\# use a common Shape abstraction without set\_width/set\_height}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{LSP rule}: If you find yourself throwing \texttt{NotImplementedError} or doing nothing in an overridden method, it\textquotesingle s an LSP violation.
+
+\paragraph{I --- Interface Segregation Principle (ISP)}\label{i--interface-segregation-principle-isp}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# VIOLATION: Robot forced to implement eat()}
+\KeywordTok{class}\NormalTok{ Worker(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ work(}\VariableTok{self}\NormalTok{): ...}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ eat(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ Robot(Worker):}
+    \KeywordTok{def}\NormalTok{ work(}\VariableTok{self}\NormalTok{): ...}
+    \KeywordTok{def}\NormalTok{ eat(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{raise} \PreprocessorTok{NotImplementedError}  \CommentTok{\# ISP violation}
+
+\CommentTok{\# FIX: segregate interfaces}
+\KeywordTok{class}\NormalTok{ Workable(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ work(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ Eatable(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ eat(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ Human(Workable, Eatable):}
+    \KeywordTok{def}\NormalTok{ work(}\VariableTok{self}\NormalTok{): ...}
+    \KeywordTok{def}\NormalTok{ eat(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ Robot(Workable):}
+    \KeywordTok{def}\NormalTok{ work(}\VariableTok{self}\NormalTok{): ...  }\CommentTok{\# no eat() burden}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{D --- Dependency Inversion Principle (DIP)}\label{d--dependency-inversion-principle-dip}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# VIOLATION: high{-}level OrderService directly depends on MySQLDatabase}
+\KeywordTok{class}\NormalTok{ OrderService:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.db }\OperatorTok{=}\NormalTok{ MySQLDatabase()     }\CommentTok{\# concrete dependency}
+
+\CommentTok{\# FIX: depend on the abstraction}
+\KeywordTok{class}\NormalTok{ Database(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ save(}\VariableTok{self}\NormalTok{, order): ...}
+
+\KeywordTok{class}\NormalTok{ OrderService:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, db: Database):  }\CommentTok{\# injected abstraction}
+        \VariableTok{self}\NormalTok{.db }\OperatorTok{=}\NormalTok{ db}
+
+\CommentTok{\# Caller injects MySQLDatabase() or MockDatabase() — same OrderService}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Composition vs. Inheritance}\label{composition-vs-inheritance}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2209}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4419}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3372}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Inheritance
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Composition
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Relationship} & IS-A & HAS-A \\
+\textbf{Coupling} & Tight (child knows parent internals) & Loose (owns a reference) \\
+\textbf{Reuse mechanism} & Inherit behavior & Delegate to component \\
+\textbf{Runtime flexibility} & Fixed at compile time & Can swap component at runtime \\
+\textbf{Deep hierarchies} & Brittle ("fragile base class" problem) & Flat, easy to follow \\
+\end{longtable}
+
+\textbf{Rule}: \emph{Favor composition over inheritance} (GoF, Item 18 in Effective Java).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Inheritance{-}heavy — brittle}
+\KeywordTok{class}\NormalTok{ Logger(FileHandler):          }\CommentTok{\# tied to file handling forever}
+\NormalTok{    ...}
+
+\CommentTok{\# Composition — flexible}
+\KeywordTok{class}\NormalTok{ Logger:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, handler: LogHandler):  }\CommentTok{\# swap: FileHandler, ConsoleHandler, DBHandler}
+        \VariableTok{self}\NormalTok{.\_handler }\OperatorTok{=}\NormalTok{ handler}
+
+    \KeywordTok{def}\NormalTok{ log(}\VariableTok{self}\NormalTok{, msg: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_handler.emit(msg)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{When inheritance IS right}: genuine IS-A + you want to expose the full parent API + hierarchy is shallow (\(\leq\) 2 levels).
+
+\subsubsection{Coupling and Cohesion}\label{coupling-and-cohesion}
+
+\textbf{Coupling} = degree to which one module depends on another.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Loose coupling} = good. Changes in one class don\textquotesingle t ripple everywhere.
+\item
+  \textbf{Tight coupling} = bad. Changing \texttt{MySQLDatabase} breaks \texttt{OrderService}.
+\end{itemize}
+
+\textbf{Cohesion} = degree to which elements inside a module belong together.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{High cohesion} = good. \texttt{AuthService} only does authentication.
+\item
+  \textbf{Low cohesion} = bad. \texttt{UtilsManager} does logging, emailing, and caching.
+\end{itemize}
+
+\textbf{Golden Rule}: \textbf{High cohesion + Loose coupling = maintainable software.}
+
+\subsubsection{DRY / KISS / YAGNI}\label{dry--kiss--yagni}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0894}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1987}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3922}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3197}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Principle
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expansion
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Anti-pattern it prevents
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{DRY} & Don\textquotesingle t Repeat Yourself & Every piece of knowledge has a single representation & Copy-paste bugs, inconsistent updates \\
+\textbf{KISS} & Keep It Simple, Stupid & Prefer simple solutions over clever ones & Over-engineered abstractions \\
+\textbf{YAGNI} & You Ain\textquotesingle t Gonna Need It & Don\textquotesingle t build features until they\textquotesingle re needed & Speculative generality, unused code \\
+\end{longtable}
+
+\subsection{Design Patterns}\label{design-patterns}
+
+Design patterns are \textbf{named solutions to recurring design problems}. They are not libraries --- they\textquotesingle re vocabulary and blueprints.
+
+\textbf{Source}: Gang of Four (GoF) --- \emph{Design Patterns: Elements of Reusable Object-Oriented Software} (1994).
+
+\subsubsection{Pattern Summary Table}\label{pattern-summary-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1533}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0958}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4349}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3161}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Category
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Intent
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Real-World Use
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Singleton & Creational & One instance, global access & Config, Logger, Connection Pool \\
+Factory Method & Creational & Subclass decides which object to create & Document editors, UI widgets \\
+Abstract Factory & Creational & Family of related objects without specifying classes & Cross-platform UI toolkits \\
+Builder & Creational & Construct complex objects step by step & SQL query builders, HTTP requests \\
+Prototype & Creational & Clone existing objects & Undo/redo, game object spawning \\
+Adapter & Structural & Wrap incompatible interface & Third-party library integration \\
+Decorator & Structural & Add behavior dynamically without subclassing & Java I/O streams, middleware \\
+Facade & Structural & Simplified interface to a subsystem & SDK wrappers, home theater \\
+Proxy & Structural & Control access to another object & Lazy loading, caching, auth \\
+Composite & Structural & Treat individual/groups uniformly & File systems, UI component trees \\
+Strategy & Behavioral & Define interchangeable algorithms & Sorting, pricing, compression \\
+Observer & Behavioral & One-to-many event notification & Event listeners, MVC, pub/sub \\
+Command & Behavioral & Encapsulate a request as an object & Undo/redo, queued jobs, macros \\
+State & Behavioral & Object changes behavior when state changes & Order lifecycle, traffic light \\
+Template Method & Behavioral & Define skeleton; subclasses fill in steps & Game loops, data export pipelines \\
+Iterator & Behavioral & Sequential access without exposing internals & Collection traversal \\
+\end{longtable}
+
+\subsubsection{Creational Patterns}\label{creational-patterns}
+
+\paragraph{Singleton}\label{singleton}
+
+\textbf{Intent}: Ensure only one instance of a class exists and provide a global access point.
+
+\textbf{When to use}: Logger, configuration, thread pool, connection pool --- resources that must be shared and have exactly one owner.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Singleton:}
+\NormalTok{    \_instance }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def} \FunctionTok{\_\_new\_\_}\NormalTok{(cls):}
+        \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+\NormalTok{            cls.\_instance }\OperatorTok{=} \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_new\_\_}\NormalTok{(cls)}
+        \ControlFlowTok{return}\NormalTok{ cls.\_instance}
+
+\CommentTok{\# Thread{-}safe version (Python)}
+\ImportTok{import}\NormalTok{ threading}
+
+\KeywordTok{class}\NormalTok{ ThreadSafeSingleton:}
+\NormalTok{    \_instance }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    \_lock }\OperatorTok{=}\NormalTok{ threading.Lock()}
+
+    \AttributeTok{@classmethod}
+    \KeywordTok{def}\NormalTok{ get\_instance(cls):}
+        \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+            \ControlFlowTok{with}\NormalTok{ cls.\_lock:}
+                \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:       }\CommentTok{\# double{-}checked locking}
+\NormalTok{                    cls.\_instance }\OperatorTok{=}\NormalTok{ cls()}
+        \ControlFlowTok{return}\NormalTok{ cls.\_instance}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: \texttt{java.lang.Runtime.getRuntime()}, database connection pool.
+
+\textbf{Pitfall}: Hard to unit test (global state). In interviews, mention using dependency injection instead of Singleton for testability.
+
+\paragraph{Factory Method}\label{factory-method}
+
+\textbf{Intent}: Define an interface for creating an object, but let subclasses decide which class to instantiate.
+
+\textbf{When to use}: When the exact type to create isn\textquotesingle t known until subclass decision, or you want to decouple creation from usage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Notification(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ send(}\VariableTok{self}\NormalTok{, message: }\BuiltInTok{str}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ EmailNotification(Notification):}
+    \KeywordTok{def}\NormalTok{ send(}\VariableTok{self}\NormalTok{, message): }\BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Email: }\SpecialCharTok{\{}\NormalTok{message}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ SMSNotification(Notification):}
+    \KeywordTok{def}\NormalTok{ send(}\VariableTok{self}\NormalTok{, message): }\BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"SMS: }\SpecialCharTok{\{}\NormalTok{message}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ NotificationFactory:}
+    \AttributeTok{@staticmethod}
+    \KeywordTok{def}\NormalTok{ create(type\_: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Notification:}
+        \ControlFlowTok{if}\NormalTok{ type\_ }\OperatorTok{==} \StringTok{"email"}\NormalTok{:}
+            \ControlFlowTok{return}\NormalTok{ EmailNotification()}
+        \ControlFlowTok{elif}\NormalTok{ type\_ }\OperatorTok{==} \StringTok{"sms"}\NormalTok{:}
+            \ControlFlowTok{return}\NormalTok{ SMSNotification()}
+        \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Unknown type: }\SpecialCharTok{\{}\NormalTok{type\_}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\CommentTok{\# Usage}
+\NormalTok{notif }\OperatorTok{=}\NormalTok{ NotificationFactory.create(}\StringTok{"email"}\NormalTok{)}
+\NormalTok{notif.send(}\StringTok{"Welcome!"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: \texttt{Calendar.getInstance()} in Java, Django ORM \texttt{objects.create()}.
+
+\paragraph{Abstract Factory}\label{abstract-factory}
+
+\textbf{Intent}: Create families of related objects without specifying their concrete classes.
+
+\textbf{When to use}: When your system must be independent of how its products are created, and you want to enforce that products from the same family are used together.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Abstract products}
+\KeywordTok{class}\NormalTok{ Button(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ render(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ Checkbox(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ render(}\VariableTok{self}\NormalTok{): ...}
+
+\CommentTok{\# Concrete Windows family}
+\KeywordTok{class}\NormalTok{ WindowsButton(Button):}
+    \KeywordTok{def}\NormalTok{ render(}\VariableTok{self}\NormalTok{): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Windows Button"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ WindowsCheckbox(Checkbox):}
+    \KeywordTok{def}\NormalTok{ render(}\VariableTok{self}\NormalTok{): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Windows Checkbox"}\NormalTok{)}
+
+\CommentTok{\# Abstract factory}
+\KeywordTok{class}\NormalTok{ GUIFactory(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ create\_button(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Button: ...}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ create\_checkbox(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Checkbox: ...}
+
+\KeywordTok{class}\NormalTok{ WindowsFactory(GUIFactory):}
+    \KeywordTok{def}\NormalTok{ create\_button(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return}\NormalTok{ WindowsButton()}
+    \KeywordTok{def}\NormalTok{ create\_checkbox(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return}\NormalTok{ WindowsCheckbox()}
+
+\CommentTok{\# Client}
+\KeywordTok{def}\NormalTok{ render\_ui(factory: GUIFactory):}
+\NormalTok{    factory.create\_button().render()}
+\NormalTok{    factory.create\_checkbox().render()}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{vs Factory Method}: Factory Method creates ONE product; Abstract Factory creates a FAMILY of related products.
+
+\paragraph{Builder}\label{builder}
+
+\textbf{Intent}: Construct a complex object step by step, separating construction from representation.
+
+\textbf{When to use}: When an object has many optional parameters, or its construction requires multiple steps.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Pizza:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.size }\OperatorTok{=} \VariableTok{None}
+        \VariableTok{self}\NormalTok{.crust }\OperatorTok{=} \VariableTok{None}
+        \VariableTok{self}\NormalTok{.toppings }\OperatorTok{=}\NormalTok{ []}
+
+\KeywordTok{class}\NormalTok{ PizzaBuilder:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_pizza }\OperatorTok{=}\NormalTok{ Pizza()}
+
+    \KeywordTok{def}\NormalTok{ size(}\VariableTok{self}\NormalTok{, size: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_pizza.size }\OperatorTok{=}\NormalTok{ size}
+        \ControlFlowTok{return} \VariableTok{self}           \CommentTok{\# fluent API}
+
+    \KeywordTok{def}\NormalTok{ crust(}\VariableTok{self}\NormalTok{, crust: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_pizza.crust }\OperatorTok{=}\NormalTok{ crust}
+        \ControlFlowTok{return} \VariableTok{self}
+
+    \KeywordTok{def}\NormalTok{ topping(}\VariableTok{self}\NormalTok{, t: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_pizza.toppings.append(t)}
+        \ControlFlowTok{return} \VariableTok{self}
+
+    \KeywordTok{def}\NormalTok{ build(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Pizza:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_pizza}
+
+\CommentTok{\# Usage}
+\NormalTok{pizza }\OperatorTok{=}\NormalTok{ (PizzaBuilder()}
+\NormalTok{         .size(}\StringTok{"large"}\NormalTok{)}
+\NormalTok{         .crust(}\StringTok{"thin"}\NormalTok{)}
+\NormalTok{         .topping(}\StringTok{"mushrooms"}\NormalTok{)}
+\NormalTok{         .topping(}\StringTok{"olives"}\NormalTok{)}
+\NormalTok{         .build())}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Java \texttt{StringBuilder}, \texttt{HttpRequest.Builder}, Lombok \texttt{@Builder}, SQL query builders.
+
+\paragraph{Prototype}\label{prototype}
+
+\textbf{Intent}: Create new objects by copying (cloning) an existing object.
+
+\textbf{When to use}: When object creation is expensive (DB call, heavy computation) and you want to clone a cached version.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ copy}
+
+\KeywordTok{class}\NormalTok{ GameCharacter:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, name, health, weapons):}
+        \VariableTok{self}\NormalTok{.name }\OperatorTok{=}\NormalTok{ name}
+        \VariableTok{self}\NormalTok{.health }\OperatorTok{=}\NormalTok{ health}
+        \VariableTok{self}\NormalTok{.weapons }\OperatorTok{=}\NormalTok{ weapons[:]  }\CommentTok{\# shallow copy of list}
+
+    \KeywordTok{def}\NormalTok{ clone(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{return}\NormalTok{ copy.deepcopy(}\VariableTok{self}\NormalTok{)}
+
+\CommentTok{\# Usage}
+\NormalTok{template }\OperatorTok{=}\NormalTok{ GameCharacter(}\StringTok{"Warrior"}\NormalTok{, }\DecValTok{100}\NormalTok{, [}\StringTok{"sword"}\NormalTok{, }\StringTok{"shield"}\NormalTok{])}
+\NormalTok{clone1 }\OperatorTok{=}\NormalTok{ template.clone()}
+\NormalTok{clone1.name }\OperatorTok{=} \StringTok{"Warrior{-}2"}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Undo/redo in editors, spawning enemy waves in games, \texttt{Object.clone()} in Java.
+
+\subsubsection{Structural Patterns}\label{structural-patterns}
+
+\paragraph{Adapter}\label{adapter}
+
+\textbf{Intent}: Convert the interface of a class into another interface that clients expect. Makes incompatible interfaces work together.
+
+\textbf{When to use}: Integrating third-party libraries, legacy code, or two systems with different interfaces.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Target interface our system expects}
+\KeywordTok{class}\NormalTok{ JSONLogger(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ log\_json(}\VariableTok{self}\NormalTok{, data: }\BuiltInTok{dict}\NormalTok{): ...}
+
+\CommentTok{\# Third{-}party logger with incompatible interface}
+\KeywordTok{class}\NormalTok{ LegacyLogger:}
+    \KeywordTok{def}\NormalTok{ write\_log(}\VariableTok{self}\NormalTok{, message: }\BuiltInTok{str}\NormalTok{):}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"[LEGACY] }\SpecialCharTok{\{}\NormalTok{message}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\CommentTok{\# Adapter bridges the gap}
+\KeywordTok{class}\NormalTok{ LegacyLoggerAdapter(JSONLogger):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, legacy: LegacyLogger):}
+        \VariableTok{self}\NormalTok{.\_legacy }\OperatorTok{=}\NormalTok{ legacy}
+
+    \KeywordTok{def}\NormalTok{ log\_json(}\VariableTok{self}\NormalTok{, data: }\BuiltInTok{dict}\NormalTok{):}
+\NormalTok{        message }\OperatorTok{=} \BuiltInTok{str}\NormalTok{(data)}
+        \VariableTok{self}\NormalTok{.\_legacy.write\_log(message)   }\CommentTok{\# translates call}
+
+\CommentTok{\# Client uses JSONLogger interface; doesn\textquotesingle{}t know about legacy}
+\NormalTok{adapter }\OperatorTok{=}\NormalTok{ LegacyLoggerAdapter(LegacyLogger())}
+\NormalTok{adapter.log\_json(\{}\StringTok{"event"}\NormalTok{: }\StringTok{"login"}\NormalTok{, }\StringTok{"user"}\NormalTok{: }\StringTok{"alice"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Java \texttt{InputStreamReader} (adapts \texttt{InputStream} to \texttt{Reader}), power plug adapters.
+
+\paragraph{Decorator}\label{decorator}
+
+\textbf{Intent}: Attach additional responsibilities to an object dynamically, as an alternative to subclassing.
+
+\textbf{When to use}: Adding features (logging, caching, compression, authentication) without modifying the original class.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Coffee(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ cost(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{: ...}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ description(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{: ...}
+
+\KeywordTok{class}\NormalTok{ SimpleCoffee(Coffee):}
+    \KeywordTok{def}\NormalTok{ cost(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \FloatTok{1.0}
+    \KeywordTok{def}\NormalTok{ description(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \StringTok{"Coffee"}
+
+\KeywordTok{class}\NormalTok{ MilkDecorator(Coffee):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, coffee: Coffee):}
+        \VariableTok{self}\NormalTok{.\_coffee }\OperatorTok{=}\NormalTok{ coffee}
+
+    \KeywordTok{def}\NormalTok{ cost(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_coffee.cost() }\OperatorTok{+} \FloatTok{0.25}
+    \KeywordTok{def}\NormalTok{ description(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_coffee.description() }\OperatorTok{+} \StringTok{", Milk"}
+
+\KeywordTok{class}\NormalTok{ SugarDecorator(Coffee):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, coffee: Coffee):}
+        \VariableTok{self}\NormalTok{.\_coffee }\OperatorTok{=}\NormalTok{ coffee}
+
+    \KeywordTok{def}\NormalTok{ cost(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_coffee.cost() }\OperatorTok{+} \FloatTok{0.10}
+    \KeywordTok{def}\NormalTok{ description(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_coffee.description() }\OperatorTok{+} \StringTok{", Sugar"}
+
+\CommentTok{\# Compose dynamically}
+\NormalTok{coffee }\OperatorTok{=}\NormalTok{ SugarDecorator(MilkDecorator(SimpleCoffee()))}
+\BuiltInTok{print}\NormalTok{(coffee.cost())          }\CommentTok{\# 1.35}
+\BuiltInTok{print}\NormalTok{(coffee.description())   }\CommentTok{\# Coffee, Milk, Sugar}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Java I/O (\texttt{BufferedInputStream(new\ FileInputStream(...))}), Python \texttt{@functools.lru\_cache}, HTTP middleware chains.
+
+\textbf{vs Inheritance}: Decorator wraps at runtime; inheritance is fixed at compile time. Decorators compose; subclasses explode combinatorially.
+
+\paragraph{Facade}\label{facade}
+
+\textbf{Intent}: Provide a simplified interface to a complex subsystem.
+
+\textbf{When to use}: When a subsystem has many moving parts and clients don\textquotesingle t need all that complexity.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ DVDPlayer:}
+    \KeywordTok{def}\NormalTok{ on(}\VariableTok{self}\NormalTok{): }\BuiltInTok{print}\NormalTok{(}\StringTok{"DVD on"}\NormalTok{)}
+    \KeywordTok{def}\NormalTok{ play(}\VariableTok{self}\NormalTok{, movie): }\BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Playing }\SpecialCharTok{\{}\NormalTok{movie}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ Amplifier:}
+    \KeywordTok{def}\NormalTok{ on(}\VariableTok{self}\NormalTok{): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Amp on"}\NormalTok{)}
+    \KeywordTok{def}\NormalTok{ set\_volume(}\VariableTok{self}\NormalTok{, v): }\BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Volume: }\SpecialCharTok{\{}\NormalTok{v}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ Projector:}
+    \KeywordTok{def}\NormalTok{ on(}\VariableTok{self}\NormalTok{): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Projector on"}\NormalTok{)}
+    \KeywordTok{def}\NormalTok{ wide\_screen(}\VariableTok{self}\NormalTok{): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Wide screen mode"}\NormalTok{)}
+
+\CommentTok{\# Facade hides the complexity}
+\KeywordTok{class}\NormalTok{ HomeTheaterFacade:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, dvd, amp, projector):}
+        \VariableTok{self}\NormalTok{.\_dvd, }\VariableTok{self}\NormalTok{.\_amp, }\VariableTok{self}\NormalTok{.\_proj }\OperatorTok{=}\NormalTok{ dvd, amp, projector}
+
+    \KeywordTok{def}\NormalTok{ watch\_movie(}\VariableTok{self}\NormalTok{, movie: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_amp.on()}\OperatorTok{;} \VariableTok{self}\NormalTok{.\_amp.set\_volume(}\DecValTok{5}\NormalTok{)}
+        \VariableTok{self}\NormalTok{.\_proj.on()}\OperatorTok{;} \VariableTok{self}\NormalTok{.\_proj.wide\_screen()}
+        \VariableTok{self}\NormalTok{.\_dvd.on()}\OperatorTok{;} \VariableTok{self}\NormalTok{.\_dvd.play(movie)}
+
+\CommentTok{\# Client calls ONE method}
+\NormalTok{theater }\OperatorTok{=}\NormalTok{ HomeTheaterFacade(DVDPlayer(), Amplifier(), Projector())}
+\NormalTok{theater.watch\_movie(}\StringTok{"Inception"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: \texttt{slf4j} logging facade, AWS SDK clients, REST API that wraps microservices.
+
+\paragraph{Proxy}\label{proxy}
+
+\textbf{Intent}: Provide a surrogate that controls access to another object.
+
+\textbf{Flavors}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Virtual Proxy}: lazy initialization (create expensive object on demand)
+\item
+  \textbf{Protection Proxy}: access control
+\item
+  \textbf{Remote Proxy}: local handle for remote object (RPC)
+\item
+  \textbf{Caching Proxy}: cache results
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Image(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ display(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ RealImage(Image):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, filename: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.filename }\OperatorTok{=}\NormalTok{ filename}
+        \VariableTok{self}\NormalTok{.\_load()               }\CommentTok{\# expensive}
+
+    \KeywordTok{def}\NormalTok{ \_load(}\VariableTok{self}\NormalTok{):}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Loading }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{filename}\SpecialCharTok{\}}\SpecialStringTok{ from disk..."}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ display(}\VariableTok{self}\NormalTok{):}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Displaying }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{filename}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ ImageProxy(Image):           }\CommentTok{\# virtual proxy — defers loading}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, filename: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.filename }\OperatorTok{=}\NormalTok{ filename}
+        \VariableTok{self}\NormalTok{.\_real }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ display(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_real }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+            \VariableTok{self}\NormalTok{.\_real }\OperatorTok{=}\NormalTok{ RealImage(}\VariableTok{self}\NormalTok{.filename)   }\CommentTok{\# load on first use}
+        \VariableTok{self}\NormalTok{.\_real.display()}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Spring AOP proxies, Hibernate lazy loading, \texttt{java.lang.reflect.Proxy}.
+
+\paragraph{Composite}\label{composite}
+
+\textbf{Intent}: Compose objects into tree structures to represent part-whole hierarchies. Treat individual objects and compositions uniformly.
+
+\textbf{When to use}: File systems (file/folder), UI component trees, org charts.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ FileSystemComponent(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ show(}\VariableTok{self}\NormalTok{, indent}\OperatorTok{=}\DecValTok{0}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ File(FileSystemComponent):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, name: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.name }\OperatorTok{=}\NormalTok{ name}
+
+    \KeywordTok{def}\NormalTok{ show(}\VariableTok{self}\NormalTok{, indent}\OperatorTok{=}\DecValTok{0}\NormalTok{):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{" "} \OperatorTok{*}\NormalTok{ indent }\OperatorTok{+} \VariableTok{self}\NormalTok{.name)}
+
+\KeywordTok{class}\NormalTok{ Directory(FileSystemComponent):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, name: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.name }\OperatorTok{=}\NormalTok{ name}
+        \VariableTok{self}\NormalTok{.\_children: }\BuiltInTok{list}\NormalTok{[FileSystemComponent] }\OperatorTok{=}\NormalTok{ []}
+
+    \KeywordTok{def}\NormalTok{ add(}\VariableTok{self}\NormalTok{, c: FileSystemComponent):}
+        \VariableTok{self}\NormalTok{.\_children.append(c)}
+
+    \KeywordTok{def}\NormalTok{ show(}\VariableTok{self}\NormalTok{, indent}\OperatorTok{=}\DecValTok{0}\NormalTok{):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{" "} \OperatorTok{*}\NormalTok{ indent }\OperatorTok{+} \SpecialStringTok{f"[}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{]"}\NormalTok{)}
+        \ControlFlowTok{for}\NormalTok{ child }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_children:}
+\NormalTok{            child.show(indent }\OperatorTok{+} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\# Build tree}
+\NormalTok{root }\OperatorTok{=}\NormalTok{ Directory(}\StringTok{"root"}\NormalTok{)}
+\NormalTok{src }\OperatorTok{=}\NormalTok{ Directory(}\StringTok{"src"}\NormalTok{)}
+\NormalTok{src.add(File(}\StringTok{"main.py"}\NormalTok{))}\OperatorTok{;}\NormalTok{ src.add(File(}\StringTok{"utils.py"}\NormalTok{))}
+\NormalTok{root.add(src)}\OperatorTok{;}\NormalTok{ root.add(File(}\StringTok{"README.md"}\NormalTok{))}
+\NormalTok{root.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Behavioral Patterns}\label{behavioral-patterns}
+
+\paragraph{Strategy}\label{strategy}
+
+\textbf{Intent}: Define a family of algorithms, encapsulate each, and make them interchangeable.
+
+\textbf{When to use}: Multiple ways to do the same task that should be swappable at runtime (sort orders, payment methods, compression algorithms).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ SortStrategy(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ sort(}\VariableTok{self}\NormalTok{, data: }\BuiltInTok{list}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{: ...}
+
+\KeywordTok{class}\NormalTok{ BubbleSort(SortStrategy):}
+    \KeywordTok{def}\NormalTok{ sort(}\VariableTok{self}\NormalTok{, data): }\ControlFlowTok{return} \BuiltInTok{sorted}\NormalTok{(data)   }\CommentTok{\# simplified}
+
+\KeywordTok{class}\NormalTok{ QuickSort(SortStrategy):}
+    \KeywordTok{def}\NormalTok{ sort(}\VariableTok{self}\NormalTok{, data): }\ControlFlowTok{return} \BuiltInTok{sorted}\NormalTok{(data, key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: x)}
+
+\KeywordTok{class}\NormalTok{ Sorter:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, strategy: SortStrategy):}
+        \VariableTok{self}\NormalTok{.\_strategy }\OperatorTok{=}\NormalTok{ strategy}
+
+    \KeywordTok{def}\NormalTok{ set\_strategy(}\VariableTok{self}\NormalTok{, strategy: SortStrategy):}
+        \VariableTok{self}\NormalTok{.\_strategy }\OperatorTok{=}\NormalTok{ strategy}
+
+    \KeywordTok{def}\NormalTok{ sort(}\VariableTok{self}\NormalTok{, data: }\BuiltInTok{list}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_strategy.sort(data)}
+
+\CommentTok{\# Usage}
+\NormalTok{sorter }\OperatorTok{=}\NormalTok{ Sorter(BubbleSort())}
+\NormalTok{result }\OperatorTok{=}\NormalTok{ sorter.sort([}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{])}
+\NormalTok{sorter.set\_strategy(QuickSort())  }\CommentTok{\# swap at runtime}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{vs if-else}: Strategy eliminates \texttt{if\ type\ ==\ "bubble"\ ...\ elif\ type\ ==\ "quick"}. Adding a new sort = new class, zero edits.
+
+\textbf{Real example}: \texttt{java.util.Comparator}, payment processors, compression codecs.
+
+\paragraph{Observer}\label{observer}
+
+\textbf{Intent}: Define a one-to-many dependency so that when one object changes state, all dependents are notified automatically.
+
+\textbf{When to use}: Event systems, MVC (model notifies views), pub/sub, real-time dashboards.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Observer(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ update(}\VariableTok{self}\NormalTok{, event: }\BuiltInTok{str}\NormalTok{, data): ...}
+
+\KeywordTok{class}\NormalTok{ Subject:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_observers: }\BuiltInTok{list}\NormalTok{[Observer] }\OperatorTok{=}\NormalTok{ []}
+
+    \KeywordTok{def}\NormalTok{ subscribe(}\VariableTok{self}\NormalTok{, o: Observer):}
+        \VariableTok{self}\NormalTok{.\_observers.append(o)}
+
+    \KeywordTok{def}\NormalTok{ unsubscribe(}\VariableTok{self}\NormalTok{, o: Observer):}
+        \VariableTok{self}\NormalTok{.\_observers.remove(o)}
+
+    \KeywordTok{def}\NormalTok{ notify(}\VariableTok{self}\NormalTok{, event: }\BuiltInTok{str}\NormalTok{, data):}
+        \ControlFlowTok{for}\NormalTok{ o }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_observers:}
+\NormalTok{            o.update(event, data)}
+
+\KeywordTok{class}\NormalTok{ StockMarket(Subject):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{()}
+        \VariableTok{self}\NormalTok{.\_price }\OperatorTok{=} \DecValTok{0}
+
+    \KeywordTok{def}\NormalTok{ set\_price(}\VariableTok{self}\NormalTok{, price: }\BuiltInTok{float}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_price }\OperatorTok{=}\NormalTok{ price}
+        \VariableTok{self}\NormalTok{.notify(}\StringTok{"price\_change"}\NormalTok{, price)}
+
+\KeywordTok{class}\NormalTok{ StockAlert(Observer):}
+    \KeywordTok{def}\NormalTok{ update(}\VariableTok{self}\NormalTok{, event, data):}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Alert! Stock price: }\SpecialCharTok{\{}\NormalTok{data}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ StockDisplay(Observer):}
+    \KeywordTok{def}\NormalTok{ update(}\VariableTok{self}\NormalTok{, event, data):}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Display updated: }\SpecialCharTok{\{}\NormalTok{data}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\NormalTok{market }\OperatorTok{=}\NormalTok{ StockMarket()}
+\NormalTok{market.subscribe(StockAlert())}
+\NormalTok{market.subscribe(StockDisplay())}
+\NormalTok{market.set\_price(}\FloatTok{150.0}\NormalTok{)   }\CommentTok{\# both get notified}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Java \texttt{EventListener}, React state management, Django signals, \texttt{Observable} in RxJava.
+
+\paragraph{Command}\label{command}
+
+\textbf{Intent}: Encapsulate a request as an object, allowing parameterization, queuing, logging, and undo/redo.
+
+\textbf{When to use}: Undo/redo, transactional operations, job queues, macro recording.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Command(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ execute(}\VariableTok{self}\NormalTok{): ...}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ undo(}\VariableTok{self}\NormalTok{): ...}
+
+\KeywordTok{class}\NormalTok{ TextEditor:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.text }\OperatorTok{=} \StringTok{""}
+    \KeywordTok{def}\NormalTok{ insert(}\VariableTok{self}\NormalTok{, s: }\BuiltInTok{str}\NormalTok{): }\VariableTok{self}\NormalTok{.text }\OperatorTok{+=}\NormalTok{ s}
+    \KeywordTok{def}\NormalTok{ delete(}\VariableTok{self}\NormalTok{, n: }\BuiltInTok{int}\NormalTok{): }\VariableTok{self}\NormalTok{.text }\OperatorTok{=} \VariableTok{self}\NormalTok{.text[:}\OperatorTok{{-}}\NormalTok{n]}
+
+\KeywordTok{class}\NormalTok{ InsertCommand(Command):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, editor: TextEditor, text: }\BuiltInTok{str}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_editor, }\VariableTok{self}\NormalTok{.\_text }\OperatorTok{=}\NormalTok{ editor, text}
+
+    \KeywordTok{def}\NormalTok{ execute(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.\_editor.insert(}\VariableTok{self}\NormalTok{.\_text)}
+    \KeywordTok{def}\NormalTok{ undo(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.\_editor.delete(}\BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.\_text))}
+
+\KeywordTok{class}\NormalTok{ CommandHistory:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.\_history }\OperatorTok{=}\NormalTok{ []}
+
+    \KeywordTok{def}\NormalTok{ execute(}\VariableTok{self}\NormalTok{, cmd: Command):}
+\NormalTok{        cmd.execute()}
+        \VariableTok{self}\NormalTok{.\_history.append(cmd)}
+
+    \KeywordTok{def}\NormalTok{ undo(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_history:}
+            \VariableTok{self}\NormalTok{.\_history.pop().undo()}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Git commits (undo = revert), database transactions, UI action history.
+
+\paragraph{State}\label{state}
+
+\textbf{Intent}: Allow an object to alter its behavior when its internal state changes. The object will appear to change its class.
+
+\textbf{When to use}: Order lifecycle (PENDING \(\rightarrow\) PAID \(\rightarrow\) SHIPPED \(\rightarrow\) DELIVERED), traffic lights, vending machine.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ OrderState(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ pay(}\VariableTok{self}\NormalTok{, order): ...}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ ship(}\VariableTok{self}\NormalTok{, order): ...}
+
+\KeywordTok{class}\NormalTok{ PendingState(OrderState):}
+    \KeywordTok{def}\NormalTok{ pay(}\VariableTok{self}\NormalTok{, order):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"Payment processed"}\NormalTok{)}
+\NormalTok{        order.state }\OperatorTok{=}\NormalTok{ PaidState()}
+    \KeywordTok{def}\NormalTok{ ship(}\VariableTok{self}\NormalTok{, order):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"Cannot ship — not paid"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ PaidState(OrderState):}
+    \KeywordTok{def}\NormalTok{ pay(}\VariableTok{self}\NormalTok{, order):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"Already paid"}\NormalTok{)}
+    \KeywordTok{def}\NormalTok{ ship(}\VariableTok{self}\NormalTok{, order):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"Shipping order"}\NormalTok{)}
+\NormalTok{        order.state }\OperatorTok{=}\NormalTok{ ShippedState()}
+
+\KeywordTok{class}\NormalTok{ ShippedState(OrderState):}
+    \KeywordTok{def}\NormalTok{ pay(}\VariableTok{self}\NormalTok{, order): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Already paid"}\NormalTok{)}
+    \KeywordTok{def}\NormalTok{ ship(}\VariableTok{self}\NormalTok{, order): }\BuiltInTok{print}\NormalTok{(}\StringTok{"Already shipped"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ Order:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ PendingState()}
+    \KeywordTok{def}\NormalTok{ pay(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.state.pay(}\VariableTok{self}\NormalTok{)}
+    \KeywordTok{def}\NormalTok{ ship(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.state.ship(}\VariableTok{self}\NormalTok{)}
+
+\NormalTok{order }\OperatorTok{=}\NormalTok{ Order()}
+\NormalTok{order.pay()    }\CommentTok{\# "Payment processed"}
+\NormalTok{order.ship()   }\CommentTok{\# "Shipping order"}
+\NormalTok{order.ship()   }\CommentTok{\# "Already shipped"}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{vs if-else}: State eliminates massive \texttt{if\ self.status\ ==\ "pending":\ ...\ elif\ self.status\ ==\ "paid"} chains. Each state is its own class.
+
+\paragraph{Template Method}\label{template-method}
+
+\textbf{Intent}: Define the skeleton of an algorithm in a base class; defer specific steps to subclasses.
+
+\textbf{When to use}: Algorithms with a fixed structure but variable steps (data export, game loops, test frameworks).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ DataExporter(ABC):}
+    \CommentTok{\# Template method — defines the algorithm skeleton}
+    \KeywordTok{def}\NormalTok{ export(}\VariableTok{self}\NormalTok{, filename: }\BuiltInTok{str}\NormalTok{):}
+\NormalTok{        data }\OperatorTok{=} \VariableTok{self}\NormalTok{.fetch\_data()         }\CommentTok{\# step 1 — fixed}
+\NormalTok{        formatted }\OperatorTok{=} \VariableTok{self}\NormalTok{.}\BuiltInTok{format}\NormalTok{(data)    }\CommentTok{\# step 2 — varies}
+        \VariableTok{self}\NormalTok{.save(formatted, filename)   }\CommentTok{\# step 3 — varies}
+        \VariableTok{self}\NormalTok{.notify()                    }\CommentTok{\# step 4 — fixed}
+
+    \KeywordTok{def}\NormalTok{ fetch\_data(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{return}\NormalTok{ \{}\StringTok{"rows"}\NormalTok{: [}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{]\}      }\CommentTok{\# common implementation}
+
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def} \BuiltInTok{format}\NormalTok{(}\VariableTok{self}\NormalTok{, data) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{: ...}
+
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ save(}\VariableTok{self}\NormalTok{, content: }\BuiltInTok{str}\NormalTok{, filename: }\BuiltInTok{str}\NormalTok{): ...}
+
+    \KeywordTok{def}\NormalTok{ notify(}\VariableTok{self}\NormalTok{):}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"Export complete!"}\NormalTok{)}
+
+\KeywordTok{class}\NormalTok{ CSVExporter(DataExporter):}
+    \KeywordTok{def} \BuiltInTok{format}\NormalTok{(}\VariableTok{self}\NormalTok{, data): }\ControlFlowTok{return} \StringTok{","}\NormalTok{.join(}\BuiltInTok{str}\NormalTok{(r) }\ControlFlowTok{for}\NormalTok{ r }\KeywordTok{in}\NormalTok{ data[}\StringTok{"rows"}\NormalTok{])}
+    \KeywordTok{def}\NormalTok{ save(}\VariableTok{self}\NormalTok{, content, filename): }\BuiltInTok{open}\NormalTok{(filename, }\StringTok{"w"}\NormalTok{).write(content)}
+
+\KeywordTok{class}\NormalTok{ JSONExporter(DataExporter):}
+    \ImportTok{import}\NormalTok{ json}
+    \KeywordTok{def} \BuiltInTok{format}\NormalTok{(}\VariableTok{self}\NormalTok{, data): }\ControlFlowTok{return} \BuiltInTok{str}\NormalTok{(data)}
+    \KeywordTok{def}\NormalTok{ save(}\VariableTok{self}\NormalTok{, content, filename): }\BuiltInTok{open}\NormalTok{(filename, }\StringTok{"w"}\NormalTok{).write(content)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{vs Strategy}: Template Method uses inheritance to vary steps; Strategy uses composition to swap the whole algorithm.
+
+\paragraph{Iterator}\label{iterator}
+
+\textbf{Intent}: Provide a sequential access mechanism to elements of a collection without exposing the underlying structure.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ BookCollection:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{): }\VariableTok{self}\NormalTok{.\_books }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ add(}\VariableTok{self}\NormalTok{, book: }\BuiltInTok{str}\NormalTok{): }\VariableTok{self}\NormalTok{.\_books.append(book)}
+    \KeywordTok{def} \FunctionTok{\_\_iter\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \BuiltInTok{iter}\NormalTok{(}\VariableTok{self}\NormalTok{.\_books)   }\CommentTok{\# Python built{-}in}
+
+\NormalTok{library }\OperatorTok{=}\NormalTok{ BookCollection()}
+\NormalTok{library.add(}\StringTok{"Clean Code"}\NormalTok{)}\OperatorTok{;}\NormalTok{ library.add(}\StringTok{"Design Patterns"}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ book }\KeywordTok{in}\NormalTok{ library:   }\CommentTok{\# uses Iterator}
+    \BuiltInTok{print}\NormalTok{(book)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Real example}: Python \texttt{iter()}/\texttt{\_\_iter\_\_}, Java \texttt{Iterator\textless{}T\textgreater{}}, database cursors.
+
+\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsubsection{UML Class Diagram Notation Cheat-Sheet}\label{uml-class-diagram-notation-cheat-sheet}
+
+\begin{verbatim}
+Relationship       Notation (ASCII)       Meaning
+───────────────────────────────────────────────────────────
+Association        A ──────────> B         A uses/knows B
+Aggregation        A ◇──────────> B        A has B (B exists independently)
+Composition        A ◆──────────> B        A owns B (B dies with A)
+Inheritance        A ──────────▷ B         A is-a B (extends/implements)
+Dependency         A - - - - - > B         A uses B temporarily (method arg)
+Realization        A - - - - - ▷ B         A implements interface B
+\end{verbatim}
+
+\subsubsection{UML Relationship Table}\label{uml-relationship-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1306}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0653}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3786}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4255}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Relationship
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Symbol
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Association} & \texttt{──\textgreater{}} & General link between classes & Student uses Library \\
+\textbf{Aggregation} & \texttt{◇──\textgreater{}} & Weak whole-part (part survives) & Team has Players (players exist without team) \\
+\textbf{Composition} & \texttt{◆──\textgreater{}} & Strong whole-part (part dies with whole) & House has Rooms (room has no meaning without house) \\
+\textbf{Inheritance} & \texttt{──▷} & IS-A, extends/implements & Car extends Vehicle \\
+\textbf{Dependency} & \texttt{-\ -\textgreater{}} & Uses temporarily (parameter/local var) & Controller depends on Service \\
+\textbf{Realization} & \texttt{-\ -▷} & Implements interface & MySQLDB realizes Database \\
+\end{longtable}
+
+\subsubsection{Parking Lot ASCII Class Diagram}\label{parking-lot-ascii-class-diagram}
+
+\begin{verbatim}
++------------------+        +-------------------+
+|   ParkingLot     |◆──────>|      Floor        |
++------------------+  1..*  +-------------------+
+| -id: int         |        | -floorNo: int     |
+| -floors: List    |        | -spots: List      |
++------------------+        +-------------------+
+| +getAvailSpot()  |                 |◆ 1..*
+| +assignSpot()    |                 v
++------------------+        +-------------------+
+                            |   ParkingSpot     |
+         +------------------+-------------------+
+         |                  | -spotId: int      |
++--------+-------+          | -type: SpotType   |
+|    Vehicle     |          | -isOccupied: bool |
++----------------+          +-------------------+
+| -licensePlate  |          | +occupy()         |
+| -vehicleType   |          | +vacate()         |
++----------------+          +-------------------+
+       △
+       |
+  ┌────┴────┐
+  |         |
++----+  +-------+
+|Car |  | Truck |
++----+  +-------+
+
++-------------------+     +-------------------+
+|    Ticket         |     |    Payment        |
++-------------------+     +-------------------+
+| -ticketId: str    |     | -amount: float    |
+| -entryTime: dt    |     | -paymentType      |
+| -vehicle: Vehicle |     +-------------------+
+| -spot: ParkingSpot|     | +process()        |
++-------------------+     +-------------------+
+| +calculateFee()   |
++-------------------+
+\end{verbatim}
+
+\subsubsection{Multiplicity Notation}\label{multiplicity-notation}
+
+\begin{verbatim}
+1       exactly one
+0..1    zero or one (optional)
+*       zero or more
+1..*    one or more
+2..5    specific range
+\end{verbatim}
+
+\subsection{Real-World Examples}\label{real-world-examples}
+
+\subsubsection{Design a Parking Lot}\label{design-a-parking-lot}
+
+\textbf{Requirements (clarified)}: Multi-floor, multiple spot types (compact/large/handicapped), entry/exit gates, ticket system, payment.
+
+\textbf{Key entities}: \texttt{ParkingLot}, \texttt{Floor}, \texttt{ParkingSpot} (abstract) \(\rightarrow\) \texttt{CompactSpot}, \texttt{LargeSpot}, \texttt{HandicappedSpot}, \texttt{Vehicle} (abstract) \(\rightarrow\) \texttt{Car}, \texttt{Truck}, \texttt{Motorcycle}, \texttt{Ticket}, \texttt{Payment}, \texttt{Gate} (Entry/Exit), \texttt{PricingStrategy}
+
+\textbf{Patterns applied}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Singleton}: \texttt{ParkingLot} --- one instance managing the whole lot
+\item
+  \textbf{Factory}: Create appropriate \texttt{ParkingSpot} type
+\item
+  \textbf{Strategy}: \texttt{PricingStrategy} --- hourly, flat-rate, weekend-rate
+\item
+  \textbf{Observer}: Notify display boards when spot count changes
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ enum }\ImportTok{import}\NormalTok{ Enum}
+\ImportTok{from}\NormalTok{ datetime }\ImportTok{import}\NormalTok{ datetime}
+
+\KeywordTok{class}\NormalTok{ SpotType(Enum):}
+\NormalTok{    COMPACT }\OperatorTok{=} \StringTok{"compact"}
+\NormalTok{    LARGE }\OperatorTok{=} \StringTok{"large"}
+\NormalTok{    HANDICAPPED }\OperatorTok{=} \StringTok{"handicapped"}
+
+\KeywordTok{class}\NormalTok{ ParkingSpot:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, spot\_id: }\BuiltInTok{str}\NormalTok{, spot\_type: SpotType):}
+        \VariableTok{self}\NormalTok{.spot\_id }\OperatorTok{=}\NormalTok{ spot\_id}
+        \VariableTok{self}\NormalTok{.spot\_type }\OperatorTok{=}\NormalTok{ spot\_type}
+        \VariableTok{self}\NormalTok{.\_is\_occupied }\OperatorTok{=} \VariableTok{False}
+        \VariableTok{self}\NormalTok{.\_vehicle }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ is\_available(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{return} \KeywordTok{not} \VariableTok{self}\NormalTok{.\_is\_occupied}
+
+    \KeywordTok{def}\NormalTok{ occupy(}\VariableTok{self}\NormalTok{, vehicle):}
+        \VariableTok{self}\NormalTok{.\_is\_occupied }\OperatorTok{=} \VariableTok{True}
+        \VariableTok{self}\NormalTok{.\_vehicle }\OperatorTok{=}\NormalTok{ vehicle}
+
+    \KeywordTok{def}\NormalTok{ vacate(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_is\_occupied }\OperatorTok{=} \VariableTok{False}
+        \VariableTok{self}\NormalTok{.\_vehicle }\OperatorTok{=} \VariableTok{None}
+
+\KeywordTok{class}\NormalTok{ Ticket:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, ticket\_id: }\BuiltInTok{str}\NormalTok{, vehicle, spot: ParkingSpot):}
+        \VariableTok{self}\NormalTok{.ticket\_id }\OperatorTok{=}\NormalTok{ ticket\_id}
+        \VariableTok{self}\NormalTok{.vehicle }\OperatorTok{=}\NormalTok{ vehicle}
+        \VariableTok{self}\NormalTok{.spot }\OperatorTok{=}\NormalTok{ spot}
+        \VariableTok{self}\NormalTok{.entry\_time }\OperatorTok{=}\NormalTok{ datetime.now()}
+        \VariableTok{self}\NormalTok{.exit\_time }\OperatorTok{=} \VariableTok{None}
+
+\KeywordTok{class}\NormalTok{ PricingStrategy(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ calculate(}\VariableTok{self}\NormalTok{, hours: }\BuiltInTok{float}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{: ...}
+
+\KeywordTok{class}\NormalTok{ HourlyPricing(PricingStrategy):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, rate: }\BuiltInTok{float}\NormalTok{): }\VariableTok{self}\NormalTok{.rate }\OperatorTok{=}\NormalTok{ rate}
+    \KeywordTok{def}\NormalTok{ calculate(}\VariableTok{self}\NormalTok{, hours): }\ControlFlowTok{return}\NormalTok{ hours }\OperatorTok{*} \VariableTok{self}\NormalTok{.rate}
+
+\KeywordTok{class}\NormalTok{ ParkingLot:}
+\NormalTok{    \_instance }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def} \FunctionTok{\_\_new\_\_}\NormalTok{(cls):}
+        \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+\NormalTok{            cls.\_instance }\OperatorTok{=} \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_new\_\_}\NormalTok{(cls)}
+        \ControlFlowTok{return}\NormalTok{ cls.\_instance}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{if} \KeywordTok{not} \BuiltInTok{hasattr}\NormalTok{(}\VariableTok{self}\NormalTok{, }\StringTok{\textquotesingle{}\_initialized\textquotesingle{}}\NormalTok{):}
+            \VariableTok{self}\NormalTok{.\_floors }\OperatorTok{=}\NormalTok{ []}
+            \VariableTok{self}\NormalTok{.\_pricing }\OperatorTok{=}\NormalTok{ HourlyPricing(}\FloatTok{2.0}\NormalTok{)}
+            \VariableTok{self}\NormalTok{.\_initialized }\OperatorTok{=} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ find\_available\_spot(}\VariableTok{self}\NormalTok{, vehicle\_type) }\OperatorTok{{-}\textgreater{}}\NormalTok{ ParkingSpot:}
+        \ControlFlowTok{for}\NormalTok{ floor }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_floors:}
+            \ControlFlowTok{for}\NormalTok{ spot }\KeywordTok{in}\NormalTok{ floor.spots:}
+                \ControlFlowTok{if}\NormalTok{ spot.is\_available():}
+                    \ControlFlowTok{return}\NormalTok{ spot}
+        \ControlFlowTok{return} \VariableTok{None}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Design an Elevator System}\label{design-an-elevator-system}
+
+\textbf{Key entities}: \texttt{ElevatorSystem}, \texttt{Elevator}, \texttt{Floor}, \texttt{Request} (internal/external), \texttt{ElevatorController}, \texttt{Door}, \texttt{Display}
+
+\textbf{Patterns}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State}: Elevator states --- \texttt{IDLE}, \texttt{MOVING\_UP}, \texttt{MOVING\_DOWN}, \texttt{DOORS\_OPEN}
+\item
+  \textbf{Strategy}: Scheduling algorithm (FCFS, SCAN/LOOK)
+\item
+  \textbf{Observer}: Floor panels observe elevator position
+\end{itemize}
+
+\textbf{Core state machine}:
+
+\begin{verbatim}
+IDLE → MOVING_UP → DOORS_OPEN → IDLE
+     → MOVING_DOWN → DOORS_OPEN → IDLE
+\end{verbatim}
+
+\textbf{Key design decision}: Should \texttt{Elevator} know about scheduling? No --- use a \texttt{Scheduler} (SRP + Strategy). \texttt{Elevator} follows orders; \texttt{Scheduler} decides which requests to fulfill in what order.
+
+\subsubsection{Design a Vending Machine}\label{design-a-vending-machine}
+
+\textbf{Key entities}: \texttt{VendingMachine}, \texttt{Item}, \texttt{Slot}, \texttt{CoinSlot}, \texttt{Display}, \texttt{VendingState}
+
+\textbf{Patterns}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State}: \texttt{IDLE}, \texttt{HAS\_MONEY}, \texttt{DISPENSING}, \texttt{OUT\_OF\_STOCK}
+\item
+  \textbf{Singleton}: \texttt{VendingMachine}
+\item
+  \textbf{Command}: Each user action (insert coin, select item, cancel) as a Command
+\end{itemize}
+
+\textbf{State transitions}:
+
+\begin{verbatim}
+IDLE ──(insertCoin)──> HAS_MONEY ──(selectItem)──> DISPENSING ──(dispense)──> IDLE
+                    ──(cancel)──> IDLE
+IDLE ──(selectItem)──> "Insert coin first"
+\end{verbatim}
+
+\subsubsection{Design a Library Management System}\label{design-a-library-management-system}
+
+\textbf{Key entities}: \texttt{Library}, \texttt{Book}, \texttt{BookItem} (physical copy), \texttt{Member}, \texttt{Librarian}, \texttt{Loan}, \texttt{Reservation}, \texttt{Catalog}, \texttt{Search}
+
+\textbf{Patterns}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Facade}: \texttt{LibraryService} wraps catalog search, loan management, member management
+\item
+  \textbf{Observer}: Notify waitlisted members when a book becomes available
+\item
+  \textbf{Strategy}: Search strategy (by title, author, ISBN, category)
+\item
+  \textbf{Factory}: Create different \texttt{Member} types (Student, Faculty, Guest)
+\end{itemize}
+
+\subsection{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One smart home --- every principle and pattern is a switch, a socket, or a system in the same house.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1286}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8714}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Real-Life Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Encapsulation} & The walls hiding the wiring --- you flip a switch and the light comes on; you never touch the live cables behind the plasterboard \\
+\textbf{Abstraction} & The thermostat dial --- you set 21°C and walk away; the furnace, gas valve, and duct fans sort themselves out behind the wall \\
+\textbf{Inheritance} & The "Villa" plan extends the base "House" plan --- it inherits every room, every circuit, every load-bearing wall, and adds a pool wing on top \\
+\textbf{Polymorphism} & One "Open" button on the smart-home app that swings the front door, rolls up the garage shutter, and tilts the skylight --- each mechanism moves in its own way \\
+\textbf{SRP} & The smoke detector detects smoke; the siren makes noise; the sprinkler douses flames --- one job per device, swap any one without touching the others \\
+\textbf{OCP} & The breaker panel --- you snap a new circuit breaker in to power the home office extension without touching the existing breakers that run the kitchen \\
+\textbf{LSP} & Any certified light bulb --- LED, halogen, or smart bulb --- fits the same socket and dims when the dimmer turns; no fixture needs rewiring for the swap \\
+\textbf{ISP} & The outdoor weatherproof socket only implements the "power" interface; it knows nothing about the thermostat\textquotesingle s heating schedule --- each device gets only the interface it actually uses \\
+\textbf{DIP} & Every appliance plugs into the same standard socket --- an abstraction --- rather than being hard-wired to the power station; swap the supplier, not the toaster \\
+\textbf{Singleton} & The main fuse box --- exactly one exists in the house; every circuit routes through it and the architect makes sure nothing bypasses it \\
+\textbf{Factory} & The prefab workshop off-site --- you tell it "I need a kitchen module" and it delivers a fully fitted unit; you never see the assembly jigs or which crew built it \\
+\textbf{Abstract Factory} & The architect\textquotesingle s room-kit catalogue --- order the "Scandinavian" kit and every fitting (taps, handles, light switches) arrives from the same matching family \\
+\textbf{Builder} & Fitting out a bare shell room step by step --- lay flooring, then paint walls, then hang curtains, then mount shelves --- each step optional, sequence matters, one \texttt{handOver()} at the end \\
+\textbf{Prototype} & The show-home template --- instead of designing each holiday-let room from scratch, you clone the master layout and tweak only the colour scheme \\
+\textbf{Adapter} & A travel plug adapter on the kitchen counter --- the European two-pin appliance plugs into it, and the adapter presents the UK three-pin shape the house expects \\
+\textbf{Decorator} & Outfitting a bare concrete room layer by layer --- insulation, then plasterboard, then paint, then coving, then smart lighting --- each layer adds behaviour without demolishing what came before \\
+\textbf{Facade} & The smart-home app\textquotesingle s "Movie Night" scene --- one tap dims every light, lowers the blinds, turns on the projector, and silences the doorbell; you never touch seven separate sub-systems \\
+\textbf{Proxy} & The smart doorbell that screens visitors --- it answers the door, checks the camera, and only rings you inside if it can\textquotesingle t verify the caller itself \\
+\textbf{Observer} & The smoke detectors --- one sensor in the kitchen smells smoke and instantly notifies every alarm, the sprinkler controller, and the security panel across the house \\
+\textbf{Strategy} & Swappable heating behind the same thermostat dial --- gas boiler today, electric heat-pump tomorrow, solar thermal next year; the dial interface never changes \\
+\textbf{Command} & A scene button you programme yourself --- press it once to execute a sequence of actions (dim lights, lock doors, set alarm), press again to undo, queue multiple scenes to run at midnight \\
+\textbf{State} & The thermostat\textquotesingle s mode wheel --- Home, Away, and Sleep each change what temperature the whole house targets; same thermostat, entirely different behaviour per mode \\
+\textbf{Composite} & The master suite --- it groups the bedroom, en-suite, and dressing room as a single bookable unit, yet each sub-room also exposes the same \texttt{inspect()} interface individually \\
+\textbf{Template Method} & The architect\textquotesingle s standard commissioning checklist --- always: pressure-test plumbing, then certify electrics, then sign off ventilation; the steps are fixed but each trade fills in its own method \\
+\textbf{Iterator} & The electrician\textquotesingle s walkthrough --- she moves from socket to socket around every room in a fixed sequence without needing a floor-plan in her hand; the house exposes one \texttt{nextSocket()} cursor \\
+\end{longtable}
+
+\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\subsubsection{SOLID Expanded Mnemonic}\label{solid-expanded-mnemonic}
+
+\textbf{"Some Old Lions Don\textquotesingle t Invert"}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0892}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2715}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6393}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Letter
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Principle
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Memory Hook
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{S} & Single Responsibility & \textbf{S}niper --- one target at a time \\
+\textbf{O} & Open/Closed & \textbf{O}pen door, closed vault --- can enter new, can\textquotesingle t change old \\
+\textbf{L} & Liskov & \textbf{L}egacy employee --- should work like original without surprises \\
+\textbf{I} & Interface Segregation & \textbf{I}nterface diet --- no fat interfaces \\
+\textbf{D} & Dependency Inversion & \textbf{D}on\textquotesingle t call us, we\textquotesingle ll call you (Hollywood principle) \\
+\end{longtable}
+
+\subsubsection{Design Pattern Memory Aids}\label{design-pattern-memory-aids}
+
+\textbf{Creational --- "SAFBP" (So A Factory Builds Prototypes)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S}ingleton, \textbf{A}bstract Factory, \textbf{F}actory Method, \textbf{B}uilder, \textbf{P}rototype
+\end{itemize}
+
+\textbf{Structural --- "ABCDFP" (Always Build Clean Design For People)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{A}dapter, \textbf{B}ridge, \textbf{C}omposite, \textbf{D}ecorator, \textbf{F}acade, \textbf{P}roxy
+\end{itemize}
+
+\textbf{Behavioral --- "CCIMMOST" (Clever Coders Iterate Memorably, Most Often See Tricks)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{C}hain of Responsibility, \textbf{C}ommand, \textbf{I}terator, \textbf{M}ediator, \textbf{M}emento, \textbf{O}bserver, \textbf{S}tate, \textbf{S}trategy, \textbf{T}emplate Method, \textbf{V}isitor
+\end{itemize}
+
+\subsubsection{Pattern "When to Use" Quick Recall}\label{pattern-when-to-use-quick-recall}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6863}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3137}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Trigger Word
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+"Only one instance" & Singleton \\
+"Create without knowing exact type" & Factory Method \\
+"Family of related objects" & Abstract Factory \\
+"Step by step construction" & Builder \\
+"Clone an expensive object" & Prototype \\
+"Incompatible interfaces" & Adapter \\
+"Add behavior dynamically" & Decorator \\
+"Simplify complex subsystem" & Facade \\
+"Control access / lazy load" & Proxy \\
+"Tree structure, treat uniformly" & Composite \\
+"Swappable algorithms" & Strategy \\
+"Event notification" & Observer \\
+"Undo/redo, queue requests" & Command \\
+"Behavior changes with state" & State \\
+"Fixed skeleton, variable steps" & Template Method \\
+"Sequential collection traversal" & Iterator \\
+\end{longtable}
+
+\subsection{Common Interview Questions}\label{common-interview-questions}
+
+\subsubsection{Classic LLD Prompts}\label{classic-lld-prompts}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2642}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3585}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3774}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Prompt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Patterns
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Important Classes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Design a Parking Lot & Singleton, Factory, Strategy, Observer & ParkingLot, Floor, Spot, Vehicle, Ticket \\
+Design an Elevator & State, Strategy, Observer & Elevator, Request, Scheduler, State \\
+Design a Vending Machine & State, Singleton, Command & VendingMachine, Slot, CoinSlot \\
+Design a Library System & Facade, Observer, Strategy & Library, Book, Member, Loan \\
+Design a Chess Game & Factory, State, Composite & Board, Piece, Player, Move \\
+Design a Hotel Booking & Factory, Strategy, Observer & Hotel, Room, Booking, Payment \\
+Design an ATM & State, Command, Strategy & ATM, Card, Account, Transaction \\
+Design a Food Ordering App & Factory, Observer, Strategy & Restaurant, Menu, Order, Delivery \\
+Design a Movie Ticket System & Factory, Strategy, Observer & Cinema, Show, Seat, Booking \\
+Design a Ride-sharing App & Observer, Strategy, State & Driver, Rider, Trip, Location \\
+\end{longtable}
+
+\subsubsection{Approach for Each}\label{approach-for-each}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Clarify}: "Is this for a single parking lot or a chain?" / "How many floors, concurrent users?"
+\item
+  \textbf{Entities}: List nouns \(\rightarrow\) candidate classes
+\item
+  \textbf{Relationships}: IS-A vs HAS-A for each pair
+\item
+  \textbf{Core classes}: Code 2-3 most important ones fully
+\item
+  \textbf{Patterns}: Name which you used and why
+\item
+  \textbf{Extensibility}: "If requirement X changes, I\textquotesingle d..."
+\end{enumerate}
+
+\subsubsection{Follow-Up Questions to Expect}\label{follow-up-questions-to-expect}
+
+\begin{itemize}
+\tightlist
+\item
+  "How would you add multi-currency support to your vending machine?"
+\item
+  "What if two users try to book the same parking spot simultaneously?" (\textbf{thread safety})
+\item
+  "How would you scale this to 1000 elevators?" (\textbf{HLD pivot})
+\item
+  "What if we need to support dynamic pricing?" (\textbf{Strategy pattern})
+\item
+  "How would you test this design?" (\textbf{testability, DI})
+\end{itemize}
+
+\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\subsubsection{When NOT to Use a Pattern}\label{when-not-to-use-a-pattern}
+
+\textbf{Patterns have costs.} Know when to skip them:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2379}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7621}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Don\textquotesingle t Use When
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Singleton & You need testability (inject dependencies instead) \\
+Abstract Factory & Only one product family exists now \\
+Observer & Notification order matters (observers execute in undefined order) \\
+Decorator & You need to inspect the wrapped type at runtime \\
+Command & Simple one-shot operations with no undo requirement \\
+State & Only 2-3 states that rarely change (if-else is clearer) \\
+\end{longtable}
+
+\subsubsection{Over-Engineering Warning Signs}\label{over-engineering-warning-signs}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pattern for pattern\textquotesingle s sake}: "I used Factory here so..." (but there\textquotesingle s only ever one concrete type)
+\item
+  \textbf{Premature abstraction}: Creating interfaces for classes that will never have a second implementation
+\item
+  \textbf{Deep inheritance}: \textgreater{} 3 levels is almost always wrong
+\item
+  \textbf{Anemic Domain Model}: Classes with only getters/setters and no behavior (all logic in "Service" classes)
+\item
+  \textbf{God classes}: \texttt{OrderManager} that does 20 things
+\end{itemize}
+
+\subsubsection{Extensibility vs. Simplicity Trade-off}\label{extensibility-vs-simplicity-trade-off}
+
+\textbf{Open/Closed is not free.} Every abstraction adds indirection. Ask:
+
+\begin{itemize}
+\tightlist
+\item
+  "Will this variation point actually be varied?"
+\item
+  "Is the cost of abstraction worth the likely future change?"
+\end{itemize}
+
+\textbf{Rule of Three}: Introduce an abstraction after the third time you need to vary it. Not before.
+
+\subsubsection{Thread Safety in Patterns}\label{thread-safety-in-patterns}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Singleton}: Double-checked locking. In Java, use \texttt{volatile}; in Python, use the GIL (but be aware of async contexts).
+\item
+  \textbf{Observer}: Notification callbacks must be thread-safe; consider using a message queue.
+\item
+  \textbf{Command Queue}: Use \texttt{queue.Queue} (Python) or \texttt{BlockingQueue} (Java) for thread-safe command dispatch.
+\item
+  \textbf{Proxy (caching)}: Cache invalidation must be synchronized.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Thread{-}safe Singleton (Python)}
+\ImportTok{import}\NormalTok{ threading}
+
+\KeywordTok{class}\NormalTok{ Config:}
+\NormalTok{    \_instance }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    \_lock }\OperatorTok{=}\NormalTok{ threading.Lock()}
+
+    \AttributeTok{@classmethod}
+    \KeywordTok{def}\NormalTok{ get\_instance(cls):}
+        \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:          }\CommentTok{\# first check (no lock)}
+            \ControlFlowTok{with}\NormalTok{ cls.\_lock:}
+                \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:  }\CommentTok{\# second check (with lock)}
+\NormalTok{                    cls.\_instance }\OperatorTok{=}\NormalTok{ cls()}
+        \ControlFlowTok{return}\NormalTok{ cls.\_instance}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Dependency Injection Container Pattern}\label{dependency-injection-container-pattern}
+
+In production code, instead of hard-coding \texttt{new\ MySQLDB()} everywhere, use a DI container (Spring, Guice, Python\textquotesingle s \texttt{dependency\_injector}). \textbf{In interviews}, manually inject via constructor --- it signals DI awareness.
+
+\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mistake
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why It\textquotesingle s Wrong
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What to Do Instead
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Jump straight to code & Missed requirements surface mid-code & Always clarify, then diagram \\
+Only one class per problem & Shows shallow thinking & Identify 5--8 entities minimum \\
+All public fields & Breaks encapsulation & Private fields + controlled access \\
+Inheritance for code reuse & Tight coupling, brittle & Compose if no IS-A relationship \\
+No interfaces/abstractions & Hard-codes concrete types & Define abstractions first \\
+Name patterns without applying them & Sounds cargo-cult & Explain WHY, show how it helps \\
+Over-pattern small problems & Shows poor judgment & Know when simple if-else is fine \\
+Skip extensibility discussion & Misses senior signal & Always say "if X changes, we can..." \\
+Anemic model (all logic in services) & Not OOP thinking & Put behavior in the right object \\
+Forget to mention thread safety & Incomplete for concurrent systems & Always ask "is this multi-threaded?" \\
+\end{longtable}
+
+\subsection{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) High-Level Design (HLD)}{LLD \textbackslash leftrightarrow High-Level Design (HLD)}}\label{lld-leftrightarrow-high-level-design-hld}
+
+LLD happens \textbf{inside} the boxes of HLD. In HLD you say "Order Service"; in LLD you design what classes are inside Order Service. In interviews, LLD is usually a stepping stone to HLD discussions.
+
+\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Clean Code}{LLD \textbackslash leftrightarrow Clean Code}}\label{lld-leftrightarrow-clean-code}
+
+Clean Code principles (meaningful names, small functions, no magic numbers) are the micro-level expression of SOLID/DRY. A class with perfect SOLID compliance can still be unreadable if method names are cryptic.
+
+\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Concurrency}{LLD \textbackslash leftrightarrow Concurrency}}\label{lld-leftrightarrow-concurrency}
+
+Patterns need thread-safety consideration:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Singleton}: Must be thread-safe (double-checked locking, \texttt{volatile})
+\item
+  \textbf{Observer}: Modifying observer list while iterating is a race condition (use \texttt{CopyOnWriteArrayList} in Java)
+\item
+  \textbf{Command Queue}: Natural fit for producer-consumer with \texttt{BlockingQueue}
+\item
+  \textbf{Flyweight}: Shared state must be immutable or synchronized
+\end{itemize}
+
+\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Testing}{LLD \textbackslash leftrightarrow Testing}}\label{lld-leftrightarrow-testing}
+
+Good LLD makes testing easy:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DIP} \(\rightarrow\) can inject mocks instead of real dependencies
+\item
+  \textbf{SRP} \(\rightarrow\) each class tests independently
+\item
+  \textbf{Strategy} \(\rightarrow\) swap test strategies without touching production code
+\item
+  \textbf{Composition} \(\rightarrow\) components testable in isolation
+\end{itemize}
+
+\subsubsection{\texorpdfstring{LLD \(\leftrightarrow\) Databases / ORM}{LLD \textbackslash leftrightarrow Databases / ORM}}\label{lld-leftrightarrow-databases--orm}
+
+\begin{itemize}
+\tightlist
+\item
+  Active Record pattern (Django models): each model knows how to save itself
+\item
+  Repository pattern: separates business logic from data access (better for testing)
+\item
+  Unit of Work pattern: groups DB operations into a transaction
+\end{itemize}
+
+\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Start with clarification, always.} Even 2 questions shows systematic thinking. Interviewers deduct points for assumptions that lead you down wrong paths.
+\item
+  \textbf{Narrate your design decisions.} "I\textquotesingle m making \texttt{Vehicle} abstract because we\textquotesingle ll have Cars, Trucks, Motorcycles --- I want to treat them uniformly in parking logic." Silence signals uncertainty.
+\item
+  \textbf{Draw the class diagram before coding.} Code without design = red flag. Even a rough ASCII diagram on the whiteboard earns points.
+\item
+  \textbf{Name your patterns explicitly.} "This is a Strategy pattern because..." Naming shows pattern literacy even if your code is slightly off.
+\item
+  \textbf{Show the extensibility story.} After building your design, say: "If we needed to add electric vehicle charging spots, I\textquotesingle d subclass ParkingSpot \(\rightarrow\) EVSpot without touching existing code --- that\textquotesingle s OCP." This is the \#1 senior-signal moment.
+\item
+  \textbf{Don\textquotesingle t over-engineer.} Interviewers value appropriate complexity. A 2-class problem shouldn\textquotesingle t have 10 patterns. Say "YAGNI --- I\textquotesingle d add X if the requirement comes."
+\item
+  \textbf{Be specific about trade-offs.} "I chose Composition over Inheritance here because PricingStrategy may need to change at runtime, and subclassing would require new classes for every combination."
+\item
+  \textbf{Handle the concurrency question.} If your Singleton or Observer is used in a multi-threaded context, proactively address thread safety. At FAANG, this is expected.
+\item
+  \textbf{Code clean, not fast.} Readable variable names, meaningful method names, proper access modifiers. Interviewers read your code; clarity \textgreater{} speed.
+\item
+  \textbf{Amazon-specific}: Map your design to Leadership Principles. "Dive Deep" = knowing pattern internals. "Insist on Highest Standards" = clean code. "Invent and Simplify" = choosing the right pattern, not the most complex one.
+\end{enumerate}
+
+\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsubsection{10-Minute Summary}\label{10-minute-summary}
+
+\textbf{OOP}: Encapsulate state \(\rightarrow\) Abstract interfaces \(\rightarrow\) Inherit only IS-A \(\rightarrow\) Polymorphism for dispatch.
+
+\textbf{SOLID}: Single responsibility \(\rightarrow\) Open/closed \(\rightarrow\) Liskov substitution \(\rightarrow\) Interface segregation \(\rightarrow\) Dependency inversion.
+
+\textbf{DRY/KISS/YAGNI}: No duplication \(\rightarrow\) Keep simple \(\rightarrow\) Don\textquotesingle t speculate.
+
+\textbf{Composition \textgreater{} Inheritance}: Use HAS-A when in doubt; switch components at runtime.
+
+\textbf{High cohesion + Loose coupling} = maintainable code.
+
+\textbf{Interview Steps}: Clarify \(\rightarrow\) Entities \(\rightarrow\) Relationships \(\rightarrow\) Class Diagram \(\rightarrow\) Patterns \(\rightarrow\) Code \(\rightarrow\) Extensibility.
+
+\subsubsection{Key Concepts at a Glance}\label{key-concepts-at-a-glance}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1-Line Summary
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Encapsulation & Hide state; expose behavior \\
+Abstraction & Code to interfaces, not implementations \\
+Inheritance & IS-A, use sparingly, max 2-3 levels \\
+Polymorphism & Same message, different behavior \\
+SRP & One reason to change \\
+OCP & Extend don\textquotesingle t modify \\
+LSP & Subtypes must honor base contract \\
+ISP & Small, focused interfaces \\
+DIP & Depend on abstractions \\
+Singleton & One instance, controlled access \\
+Factory & Decouple creation from usage \\
+Builder & Step-by-step complex construction \\
+Strategy & Swappable algorithms \\
+Observer & Event-driven notification \\
+Command & Encapsulate requests for undo/queue \\
+State & Behavior changes with state \\
+Decorator & Add behavior without subclassing \\
+Facade & Simplify complex subsystem \\
+Adapter & Bridge incompatible interfaces \\
+Proxy & Control access / lazy load \\
+Composite & Tree structures, uniform treatment \\
+\end{longtable}
+
+\subsubsection{Quick Cheat-Sheet Table}\label{quick-cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2841}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4205}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2955}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+SOLID
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Smell Prevented
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One Fix
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+S --- Single Responsibility & God class & Extract class \\
+O --- Open/Closed & Modification to add features & Polymorphism + Strategy \\
+L --- Liskov & Broken override (NotImplementedError) & Redesign hierarchy \\
+I --- Interface Segregation & Fat interface, stub methods & Split into role interfaces \\
+D --- Dependency Inversion & \texttt{new\ ConcreteClass()} in business logic & Constructor injection \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2133}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4400}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3467}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+I Need To...
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use When
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Singleton & One instance globally & Config, Logger, Pool \\
+Factory Method & Create without knowing type & Plugin systems \\
+Abstract Factory & Create a family of objects & Cross-platform UI \\
+Builder & Build complex object step-by-step & Many optional fields \\
+Prototype & Clone expensive objects & Object pools, game spawn \\
+Adapter & Use incompatible API & 3rd party integration \\
+Decorator & Add behavior at runtime & Middleware, I/O streams \\
+Facade & Hide subsystem complexity & SDK wrappers \\
+Proxy & Control/delay/cache access & Lazy load, auth, cache \\
+Composite & Treat tree nodes uniformly & File system, UI trees \\
+Strategy & Swap algorithms at runtime & Sorting, pricing, routing \\
+Observer & Notify dependents on change & Events, MVC, pub/sub \\
+Command & Queue/undo/log requests & Undo, task queues \\
+State & Change behavior with state & Order, elevator, traffic \\
+Template Method & Fix skeleton, vary steps & Export pipeline, game loop \\
+Iterator & Traverse collection uniformly & Collections, cursors \\
+\end{longtable}
+
+\subsubsection{Most Important Concepts (Rank-Ordered for FAANG)}\label{most-important-concepts-rank-ordered-for-faang}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{OOP Four Pillars} --- Must articulate with examples in 30 seconds each
+\item
+  \textbf{SOLID} --- Must know all 5, show violation and fix
+\item
+  \textbf{Strategy Pattern} --- Most commonly applicable; almost every LLD uses it
+\item
+  \textbf{Observer Pattern} --- Notification systems appear in nearly every design
+\item
+  \textbf{Singleton (thread-safe)} --- Appears in most system designs; know the pitfalls
+\item
+  \textbf{Factory Method / Abstract Factory} --- Object creation is always present
+\item
+  \textbf{Composition vs. Inheritance} --- A litmus test for OOP maturity
+\item
+  \textbf{Builder} --- Shows up in complex domain objects
+\item
+  \textbf{State Pattern} --- Critical for lifecycle-heavy systems (orders, elevators)
+\item
+  \textbf{The LLD Interview Framework} --- The 7-step process; follow it every time
+\end{enumerate}
+
+\emph{Study tip: Design at least 3 systems (parking lot, elevator, library) from scratch without notes. The muscle memory of identifying entities, drawing class diagrams, and selecting patterns is what makes you fluent under interview pressure.}
+
+\end{document}

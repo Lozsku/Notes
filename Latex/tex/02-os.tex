@@ -1,0 +1,2117 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Operating Systems}
+\newcommand{\ThemeKicker}{Systems Track}
+\newcommand{\ThemeNumber}{02}
+
+\usepackage{interviewstyle}
+\setthemecolor{0ea5a4}{22d3ee}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{Operating Systems --- FAANG Interview Mastery}\label{operating-systems--faang-interview-mastery}
+
+\begin{quote}
+Build from first principles. Understand deeply. Recall under pressure.
+\end{quote}
+
+\subsection{Overview --- What It Is}\label{overview--what-it-is}
+
+An \textbf{Operating System} is the layer of software that sits between hardware and user applications. It virtualizes physical resources (CPU, RAM, disk, network) into clean abstractions that programs can use without knowing hardware details.
+
+Think of it as a \textbf{resource manager + referee + abstraction layer}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Resource Manager}: decides who gets the CPU next, how RAM is divided, which process can write to disk
+\item
+  \textbf{Referee}: enforces isolation so one process can\textquotesingle t corrupt another
+\item
+  \textbf{Abstraction Layer}: turns raw hardware into clean primitives --- files, threads, sockets, processes
+\end{itemize}
+
+Core OS abstractions:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3457}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6543}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Physical Resource
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+OS Abstraction
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CPU & Process / Thread \\
+RAM & Virtual Address Space \\
+Disk & File System \\
+Network card & Socket \\
+I/O devices & Device drivers / file-like interfaces \\
+\end{longtable}
+
+\subsection{Why It Exists}\label{why-it-exists}
+
+Without an OS, every program would need to:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Speak directly to hardware (CPU-specific assembly, device-specific registers)
+\item
+  Manually share the CPU --- programs would run one at a time forever
+\item
+  Trust every other program not to stomp on its memory
+\item
+  Re-implement disk access from scratch
+\end{enumerate}
+
+\textbf{Core problems the OS solves:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Multiplexing} --- many programs share one CPU (time-sharing) and one RAM (space-sharing)
+\item
+  \textbf{Isolation} --- a buggy program crashes itself, not the whole system
+\item
+  \textbf{Abstraction} --- programs deal with files, not spinning disk sectors
+\item
+  \textbf{Protection} --- user code can\textquotesingle t access kernel memory or hardware directly
+\end{enumerate}
+
+The OS achieves this through \textbf{privileged hardware modes} and \textbf{virtualization}.
+
+\subsection{Why FAANG Cares (Specifics)}\label{why-faang-cares-specifics}
+
+\textbf{Google:}
+
+\begin{itemize}
+\tightlist
+\item
+  Google\textquotesingle s entire infrastructure runs on Linux. Engineers tune kernel scheduling (CFS), memory allocators (tcmalloc), and container isolation (cgroups/namespaces). Borg/Kubernetes orchestration is fundamentally process/thread scheduling at cluster scale. Interview questions on \texttt{fork()}, copy-on-write, and memory mapping come up in systems design for search infrastructure.
+\end{itemize}
+
+\textbf{Meta:}
+
+\begin{itemize}
+\tightlist
+\item
+  Meta runs millions of PHP/Hack processes. HHVM relies on JIT and careful memory management. Their data centers run custom Linux kernels. Systems engineers are quizzed on IPC (shared memory for Scribe), page faults, and TLB shootdowns at scale.
+\end{itemize}
+
+\textbf{Amazon (AWS):}
+
+\begin{itemize}
+\tightlist
+\item
+  EC2 virtualizes physical machines --- fundamentally OS concepts (hypervisors, page tables, context switching). Lambda\textquotesingle s micro-VM (Firecracker) is a stripped-down kernel. S3/EBS performance hinges on OS-level I/O scheduling and file system design. Interview focus: virtual memory, file systems, system calls.
+\end{itemize}
+
+\textbf{Apple:}
+
+\begin{itemize}
+\tightlist
+\item
+  macOS/iOS are Darwin-based (XNU kernel). Apple engineers work on mach\_vm, Grand Central Dispatch (GCD) which sits atop pthreads and kernel queues. Interview focus: Mach IPC, Mach-O file format, memory management (ARC interacting with VM system), kernel extensions.
+\end{itemize}
+
+\textbf{Microsoft:}
+
+\begin{itemize}
+\tightlist
+\item
+  Windows NT kernel engineers and Azure hypervisor team live in OS concepts daily. Windows Subsystem for Linux (WSL2) runs a full Linux kernel in a VM. Interview topics: NT kernel scheduling, memory mapped files, COM object model\textquotesingle s reliance on processes/threads.
+\end{itemize}
+
+\textbf{Uber:}
+
+\begin{itemize}
+\tightlist
+\item
+  Uber\textquotesingle s dispatch system processes millions of location updates/second. They\textquotesingle ve written extensively about tuning Linux kernel parameters (TCP stack, socket buffers, scheduler affinity). Engineers tune \texttt{SO\_REUSEPORT}, \texttt{epoll}, and real-time scheduling for driver matching.
+\end{itemize}
+
+\textbf{Databricks:}
+
+\begin{itemize}
+\tightlist
+\item
+  Apache Spark runs JVM-based distributed computation. Understanding JVM GC (which is application-level memory management layered on OS virtual memory), huge pages (\texttt{madvise}), and NUMA topology affects Spark performance at scale. Engineers optimize shuffle I/O, which touches OS page cache, \texttt{sendfile()}, and direct I/O.
+\end{itemize}
+
+\textbf{The interview reality:} FAANG systems design rounds assume you understand what the OS does under the hood. When you say "cache this in memory," you should know what that means in terms of virtual memory, page cache, and eviction policies.
+
+\subsection{Core Concepts}\label{core-concepts}
+
+\subsubsection{Kernel vs User Mode}\label{kernel-vs-user-mode}
+
+The CPU has at least two privilege levels (x86 has 4 rings, Linux uses ring 0 and ring 3):
+
+\begin{verbatim}
+Ring 3 (User Mode)  — your program lives here
+    |
+    |  system call (trap/interrupt)
+    v
+Ring 0 (Kernel Mode) — OS kernel lives here
+    |
+    v
+Hardware (CPU, RAM, I/O)
+\end{verbatim}
+
+\textbf{User Mode:}
+
+\begin{itemize}
+\tightlist
+\item
+  Restricted instruction set --- can\textquotesingle t directly access hardware, can\textquotesingle t disable interrupts
+\item
+  Limited address space --- only sees its own virtual address space
+\item
+  Any illegal operation \(\rightarrow\) CPU raises exception \(\rightarrow\) kernel takes over \(\rightarrow\) usually kills the process (segfault)
+\end{itemize}
+
+\textbf{Kernel Mode:}
+
+\begin{itemize}
+\tightlist
+\item
+  Full access to hardware, all memory, all CPU instructions
+\item
+  Can modify page tables, configure interrupts, access I/O ports
+\end{itemize}
+
+\textbf{System Call} = the boundary crossing. A program calls \texttt{read()} \(\rightarrow\) C library wrapper executes a \texttt{syscall} instruction \(\rightarrow\) CPU switches to ring 0 \(\rightarrow\) kernel runs the actual read logic \(\rightarrow\) returns result \(\rightarrow\) CPU switches back to ring 3.
+
+\textbf{Cost of a system call:} \textasciitilde100-1000 ns. Crossing the boundary flushes parts of CPU pipeline, saves/restores registers. This is why programs that make many small syscalls are slower than ones that batch work (e.g., \texttt{write()} once with a big buffer vs. 1000 times with tiny buffers).
+
+\textbf{Interview takeaway:} \textbf{User mode protects the kernel from buggy/malicious user code. System calls are the only legal way to access kernel services.}
+
+\subsubsection{Process vs Thread}\label{process-vs-thread}
+
+\paragraph{Process}\label{process}
+
+A process is an \textbf{instance of a running program} with its own isolated execution environment:
+
+\begin{verbatim}
+Process address space:
+┌─────────────────────┐  High address
+│        Stack        │  ← grows down (local variables, return addresses)
+│          ↓          │
+│    (free space)     │
+│          ↑          │
+│        Heap         │  ← grows up (malloc'd memory)
+├─────────────────────┤
+│   BSS segment       │  uninitialized global/static variables
+├─────────────────────┤
+│   Data segment      │  initialized global/static variables
+├─────────────────────┤
+│   Text segment      │  executable code (read-only)
+└─────────────────────┘  Low address (0x0)
+\end{verbatim}
+
+Each process has:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PID} (process ID)
+\item
+  \textbf{Virtual address space} (its own illusion of contiguous memory)
+\item
+  \textbf{Open file descriptors}
+\item
+  \textbf{CPU registers} (saved when not running)
+\item
+  \textbf{Privileges/credentials} (UID, GID)
+\item
+  \textbf{Signal handlers}
+\item
+  \textbf{Page tables} (mapping virtual \(\rightarrow\) physical)
+\end{itemize}
+
+\paragraph{Thread}\label{thread}
+
+A thread is a \textbf{unit of execution within a process}. Multiple threads share the process address space but each has its own:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Stack} (each thread needs its own call stack)
+\item
+  \textbf{Registers} (including program counter --- where am I executing?)
+\item
+  \textbf{Thread-local storage}
+\end{itemize}
+
+\begin{verbatim}
+Process with 3 threads:
+┌──────────────────────────────────┐
+│         SHARED:                  │
+│  Code  |  Heap  |  Global Data  │
+│  File descriptors                │
+├────────┬────────┬────────────────┤
+│Stack T1│Stack T2│     Stack T3   │
+│(thread │(thread │     (thread    │
+│  1)    │  2)    │       3)       │
+└────────┴────────┴────────────────┘
+\end{verbatim}
+
+\paragraph{Key Differences Table}\label{key-differences-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1931}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3904}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4165}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Process
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Thread
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Memory space & Own virtual address space & Shared with other threads in process \\
+Creation cost & High (copy page tables, file descriptors) & Low (just allocate stack + registers) \\
+Communication & IPC (pipes, sockets, shared memory) & Direct (shared variables --- but needs locks) \\
+Isolation & Crash in one doesn\textquotesingle t affect another & Crash (segfault) kills entire process \\
+Context switch cost & High (flush TLB, switch page tables) & Low (same address space, partial register save) \\
+Typical overhead & \textasciitilde MB & \textasciitilde few KB \\
+Linux implementation & \texttt{fork()} & \texttt{clone()} with shared flags \\
+\end{longtable}
+
+\textbf{Interview takeaway:} \textbf{Processes give isolation; threads give efficiency. Pick processes when you need fault isolation (Chrome uses a process per tab), threads when you need to share data cheaply and speed matters.}
+
+\subsubsection{Process States and Lifecycle}\label{process-states-and-lifecycle}
+
+A process moves through states as it runs, waits, and exits:
+
+\begin{verbatim}
+                    fork()
+                      │
+                      ▼
+              ┌───────────────┐
+              │     NEW       │  (being created, memory allocated)
+              └───────┬───────┘
+                      │ admitted
+                      ▼
+              ┌───────────────┐  ◄──────────────────────────────────────┐
+              │     READY     │                                          │
+              └───────┬───────┘                                          │
+                      │ scheduler dispatch                               │
+                      ▼                                                  │
+              ┌───────────────┐  interrupt / quantum expired             │
+              │    RUNNING    │ ─────────────────────────────────────────┘
+              └──────┬──┬─────┘
+         I/O request │  │ exit()
+                     │  └────────► ┌───────────────┐
+                     │             │   TERMINATED  │
+                     ▼             └───────────────┘
+              ┌───────────────┐
+              │    WAITING    │  (blocked on I/O, semaphore, sleep)
+              └───────┬───────┘
+                      │ I/O complete / event
+                      └──────────────────────────────────────────────►  READY
+\end{verbatim}
+
+\textbf{5 classic states:} New \(\rightarrow\) Ready \(\rightarrow\) Running \(\rightarrow\) Waiting \(\rightarrow\) Terminated
+
+\textbf{Linux adds more nuance:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{R} = Running or Runnable
+\item
+  \texttt{S} = Interruptible Sleep (waiting, can be woken by signal)
+\item
+  \texttt{D} = Uninterruptible Sleep (in kernel, usually waiting for I/O --- can\textquotesingle t be killed)
+\item
+  \texttt{Z} = Zombie (finished but parent hasn\textquotesingle t \texttt{wait()}d yet --- PCB still exists)
+\item
+  \texttt{T} = Stopped (paused by \texttt{SIGSTOP})
+\end{itemize}
+
+\textbf{Zombie Process:} A process that has exited but whose exit status hasn\textquotesingle t been collected by the parent yet. The PCB (Process Control Block) remains in the kernel. Fix: parent must call \texttt{wait()}.
+
+\subsubsection{fork() and exec()}\label{fork-and-exec}
+
+\textbf{fork():} Creates an exact copy of the calling process.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pid\_t pid }\OperatorTok{=}\NormalTok{ fork}\OperatorTok{();}
+\ControlFlowTok{if} \OperatorTok{(}\NormalTok{pid }\OperatorTok{==} \DecValTok{0}\OperatorTok{)} \OperatorTok{\{}
+    \CommentTok{// child process — pid == 0}
+\NormalTok{    exec}\OperatorTok{(}\StringTok{"/bin/ls"}\OperatorTok{,} \OperatorTok{...);}
+\OperatorTok{\}} \ControlFlowTok{else} \ControlFlowTok{if} \OperatorTok{(}\NormalTok{pid }\OperatorTok{\textgreater{}} \DecValTok{0}\OperatorTok{)} \OperatorTok{\{}
+    \CommentTok{// parent process — pid = child\textquotesingle{}s PID}
+\NormalTok{    wait}\OperatorTok{(}\NormalTok{NULL}\OperatorTok{);}  \CommentTok{// wait for child}
+\OperatorTok{\}} \ControlFlowTok{else} \OperatorTok{\{}
+    \CommentTok{// error}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+What fork() copies:
+
+\begin{itemize}
+\tightlist
+\item
+  Virtual address space (using \textbf{copy-on-write})
+\item
+  File descriptors (same open files, shared file offset)
+\item
+  Signal handlers
+\item
+  Environment variables
+\end{itemize}
+
+What fork() does NOT copy:
+
+\begin{itemize}
+\tightlist
+\item
+  Memory locks
+\item
+  Pending signals (cleared)
+\item
+  Threads (only the calling thread exists in child --- dangerous with multithreading!)
+\end{itemize}
+
+\textbf{Copy-on-Write (CoW):} After \texttt{fork()}, both parent and child share the same physical pages, marked read-only. When either tries to write, a page fault occurs, the kernel copies that page, and the writing process gets its own copy. This makes \texttt{fork()} fast when the child immediately calls \texttt{exec()}.
+
+\textbf{exec():} Replaces the current process\textquotesingle s address space with a new program. The PID stays the same, but code, stack, and heap are completely replaced.
+
+The classic pattern: \texttt{fork()} then \texttt{exec()} = create new process running a different program. This is how shells work.
+
+\textbf{vfork():} Like fork() but child borrows parent\textquotesingle s address space (no copy, not even CoW). Parent is suspended until child calls exec() or exit(). Dangerous but useful for performance when you know exec() is next.
+
+\textbf{Interview takeaway:} \textbf{fork() + exec() is how Unix creates new processes. CoW makes fork() cheap. Zombie processes are cleaned up by parent calling wait().}
+
+\subsubsection{Context Switching}\label{context-switching}
+
+When the OS switches from process A to process B:
+
+\begin{verbatim}
+CPU running Process A
+        │
+        │ (timer interrupt fires / A blocks on I/O)
+        ▼
+┌───────────────────────────────┐
+│  1. Save A's CPU state (PCB): │
+│     - all registers            │
+│     - program counter          │
+│     - stack pointer            │
+│     - page table base register │
+└───────────────────────────────┘
+        │
+        ▼
+┌───────────────────────────────┐
+│  2. Run scheduler             │
+│     (pick next process)       │
+└───────────────────────────────┘
+        │
+        ▼
+┌───────────────────────────────┐
+│  3. Load B's CPU state (PCB): │
+│     - restore registers        │
+│     - restore PC               │
+│     - switch page tables       │
+│     - flush TLB (expensive!)   │
+└───────────────────────────────┘
+        │
+        ▼
+CPU running Process B
+\end{verbatim}
+
+\textbf{Cost sources:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Direct: saving/restoring registers (\textasciitilde dozens of ns)
+\item
+  Cache pollution: process B\textquotesingle s working set evicts A\textquotesingle s data from CPU cache
+\item
+  TLB flush: new address space = all TLB entries invalid = many page table walks needed initially
+\end{enumerate}
+
+Thread context switches are cheaper: same address space \(\rightarrow\) no page table switch \(\rightarrow\) no TLB flush.
+
+\textbf{PCB (Process Control Block)} = kernel data structure that stores everything about a process when it\textquotesingle s not running. Linux calls it \texttt{task\_struct}.
+
+\textbf{Interview takeaway:} \textbf{Context switch overhead is why you don\textquotesingle t want too many threads/processes --- cache thrashing and TLB flushes hurt performance. This is why async I/O and event loops (Node.js, nginx) can outperform thread-per-request models at high concurrency.}
+
+\subsubsection{Scheduling Algorithms}\label{scheduling-algorithms}
+
+The scheduler decides which ready process runs next. Different goals: maximize CPU utilization, minimize wait time, maximize throughput, minimize response time, ensure fairness.
+
+\textbf{Key metrics:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Turnaround time} = completion time \(-\) arrival time
+\item
+  \textbf{Waiting time} = turnaround \(-\) burst time
+\item
+  \textbf{Response time} = time from arrival to first scheduled
+\item
+  \textbf{Throughput} = processes completed per unit time
+\end{itemize}
+
+\paragraph{FCFS --- First Come First Served}\label{fcfs--first-come-first-served}
+
+Run processes in arrival order. Simple queue.
+
+\begin{verbatim}
+Processes: P1(burst=10), P2(burst=5), P3(burst=2)
+Arrival:   P1 at 0,      P2 at 0,     P3 at 0
+
+Gantt:
+|─────────────P1─────────────|────P2────|─P3─|
+0                            10         15   17
+
+Waiting: P1=0, P2=10, P3=15 → Average = 8.33
+\end{verbatim}
+
+\textbf{Problem: Convoy Effect} --- one long job blocks all short jobs. Like a slow truck at a one-lane bridge.
+
+Non-preemptive. No starvation (everyone eventually runs). Poor for interactive systems.
+
+\paragraph{SJF --- Shortest Job First}\label{sjf--shortest-job-first}
+
+Always run the job with the smallest CPU burst next. Optimal for minimizing average waiting time.
+
+\begin{verbatim}
+Same processes, SJF order: P3(2), P2(5), P1(10)
+
+Gantt:
+|─P3─|────P2────|─────────────P1─────────────|
+0    2          7                            17
+
+Waiting: P3=0, P2=2, P1=7 → Average = 3.0
+\end{verbatim}
+
+\textbf{Problem:} Need to know burst time in advance (impossible in practice). Solved by \textbf{prediction} (exponential averaging of past bursts).
+
+\textbf{SRTF (Shortest Remaining Time First)} = preemptive SJF. If a new job arrives with shorter remaining time, preempt current job.
+
+\textbf{Starvation risk:} Long jobs may never run if short jobs keep arriving.
+
+\paragraph{Round Robin (RR)}\label{round-robin-rr}
+
+Each process gets a fixed time quantum (e.g., 10ms), then preempted and moved to back of ready queue. Fair, good for interactive systems.
+
+\begin{verbatim}
+Processes: P1(burst=10), P2(burst=6), P3(burst=3)  quantum=4
+
+Gantt:
+|──P1──|──P2──|──P3──|──P1──|──P2──|
+0      4      8      11     15     17
+
+P1 runs 0-4, P2 runs 4-8, P3 runs 8-11 (done), P1 runs 11-15 (done), P2 runs 15-17 (done)
+\end{verbatim}
+
+\textbf{Quantum size matters:}
+
+\begin{itemize}
+\tightlist
+\item
+  Too small \(\rightarrow\) too many context switches, overhead dominates
+\item
+  Too large \(\rightarrow\) degenerates to FCFS
+\item
+  Typical: 10-100ms
+\end{itemize}
+
+No starvation. Good response time for interactive processes.
+
+\paragraph{Priority Scheduling}\label{priority-scheduling}
+
+Each process has a priority number. CPU goes to highest priority process. Can be preemptive or non-preemptive.
+
+\textbf{Starvation problem:} Low-priority processes may never run.
+\textbf{Solution: Aging} --- gradually increase priority of waiting processes (Linux: \texttt{nice} value adjustments).
+
+\paragraph{MLFQ --- Multi-Level Feedback Queue}\label{mlfq--multi-level-feedback-queue}
+
+The most important real-world scheduling insight. Solves the "we don\textquotesingle t know burst time" problem by learning from behavior.
+
+\begin{verbatim}
+Queue 0 (highest priority, quantum=8ms):    [process enters here]
+Queue 1 (medium priority, quantum=16ms):    [if uses full quantum, demotes here]
+Queue 2 (lowest priority, FCFS):            [CPU-bound jobs end up here]
+\end{verbatim}
+
+\textbf{Rules:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  New job enters highest priority queue
+\item
+  If job uses full quantum \(\rightarrow\) demote to lower queue (it\textquotesingle s CPU-bound)
+\item
+  If job gives up CPU before quantum expires \(\rightarrow\) stay at same level (it\textquotesingle s I/O-bound, interactive)
+\item
+  After some time period, boost all jobs back to top queue (prevents starvation)
+\end{enumerate}
+
+\textbf{Why this is genius:} I/O-bound processes (interactive) naturally float to top. CPU-bound background jobs sink to bottom. System \emph{learns} without being told burst times.
+
+\textbf{Interview takeaway:} \textbf{MLFQ is what real OSes approximate. It distinguishes interactive (short bursts, I/O-bound) from batch (long bursts, CPU-bound) jobs dynamically.}
+
+\paragraph{CFS --- Completely Fair Scheduler (Linux)}\label{cfs--completely-fair-scheduler-linux}
+
+Linux\textquotesingle s actual scheduler since kernel 2.6.23. Instead of fixed time quanta, it tracks \textbf{virtual runtime (vruntime)} per task and always runs the task with the smallest vruntime.
+
+Key ideas:
+
+\begin{itemize}
+\tightlist
+\item
+  Every task gets an equal share of CPU time (weighted by priority/niceness)
+\item
+  Uses a \textbf{red-black tree} (sorted by vruntime) to find next task in O(log n)
+\item
+  Target latency: try to give every task CPU within some period (e.g., 20ms)
+\item
+  Minimum granularity: won\textquotesingle t preempt if task has run less than 0.75ms
+\item
+  Nice values adjust weight: \texttt{nice\ -20} gets \textasciitilde10x more CPU than \texttt{nice\ +19}
+\end{itemize}
+
+\begin{verbatim}
+red-black tree (sorted by vruntime):
+
+        [P3: vrt=100]
+       /              \
+[P1: vrt=50]    [P5: vrt=200]
+       \
+   [P2: vrt=80]
+
+Scheduler picks leftmost node (P1, smallest vruntime) → runs it → 
+updates P1's vruntime → reinsert → tree rebalances
+\end{verbatim}
+
+\textbf{vruntime} adjusts for priority: a high-priority task\textquotesingle s vruntime increases slower, so it gets scheduled more often.
+
+\textbf{CFS groups} (cgroups integration): You can assign CPU shares to groups of processes --- this is how containers (Docker) limit CPU usage.
+
+\paragraph{Scheduling Algorithm Comparison Table}\label{scheduling-algorithm-comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2002}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1355}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1355}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0813}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1767}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2709}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Preemptive
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Starvation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Convoy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best For
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Drawback
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FCFS & No & No & Yes & Batch jobs & Convoy effect \\
+SJF (non-preempt) & No & Yes & No & Min avg wait & Needs burst time \\
+SRTF & Yes & Yes & No & Min avg wait & Needs burst time \\
+Round Robin & Yes & No & No & Interactive & Context switch overhead \\
+Priority & Both & Yes & No & Varied needs & Starvation \\
+MLFQ & Yes & No (aging) & No & General purpose & Complex tuning \\
+CFS & Yes & No & No & Linux general & Complex impl \\
+\end{longtable}
+
+\subsubsection{Virtual Memory}\label{virtual-memory}
+
+The key insight of virtual memory: \textbf{every process believes it has the entire address space to itself}. The OS + hardware hardware translates virtual addresses to physical addresses.
+
+Benefits:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Isolation} --- process A can\textquotesingle t read process B\textquotesingle s memory (different page tables)
+\item
+  \textbf{More memory than RAM} --- use disk as extension (swap)
+\item
+  \textbf{Simplified loading} --- programs can be compiled to fixed virtual addresses
+\item
+  \textbf{Shared memory} --- two processes can map the same physical page (e.g., shared libraries)
+\item
+  \textbf{Demand paging} --- only load pages actually accessed
+\end{enumerate}
+
+\begin{verbatim}
+Process Virtual Address Space (64-bit, Linux x86-64):
+
+0xFFFFFFFFFFFFFFFF ─────────────────────
+                    Kernel Space        ← not accessible from user mode
+0xFFFF800000000000 ─────────────────────
+     ...            (canonical hole)
+0x00007FFFFFFFFFFF ─────────────────────
+                    Stack               ← grows down
+                    (grows ↓)
+                    Memory mapped files
+                    (mmap region)
+                    Heap                ← grows up
+                    (grows ↑)
+                    BSS
+                    Data
+                    Text (code)
+0x0000000000400000 ─────────────────────
+                    (reserved/null page)
+0x0000000000000000 ─────────────────────
+\end{verbatim}
+
+\subsubsection{Paging}\label{paging}
+
+\textbf{Paging} divides virtual and physical memory into fixed-size \textbf{pages} (typically 4KB). The OS keeps a \textbf{page table} that maps virtual page numbers (VPN) to physical frame numbers (PFN).
+
+\begin{verbatim}
+Virtual Address (32-bit, 4KB pages):
+┌──────────────────────┬──────────────┐
+│  Virtual Page Number │  Page Offset │
+│       (20 bits)      │   (12 bits)  │
+└──────────────────────┴──────────────┘
+         │                    │
+         │ look up in         │ (offset stays same)
+         │ page table         │
+         ▼                    │
+┌──────────────────────┐      │
+│ Physical Frame Number│      │
+│       (PFN)          │      │
+└──────────────────────┘      │
+         │                    │
+         ▼                    ▼
+Physical Address = PFN * 4096 + offset
+\end{verbatim}
+
+\textbf{Page Table Entry (PTE)} contains:
+
+\begin{itemize}
+\tightlist
+\item
+  Physical Frame Number
+\item
+  Present bit (is page in RAM?)
+\item
+  Dirty bit (has page been written?)
+\item
+  Accessed bit (has page been read recently?)
+\item
+  Read/Write/Execute permissions
+\item
+  User/Supervisor bit
+\end{itemize}
+
+\textbf{Problem with single-level page table:} For 32-bit address space with 4KB pages: 2\^{}20 = 1M entries, each 4 bytes = 4MB \textbf{per process}. With 1000 processes = 4GB just for page tables. Too much.
+
+\textbf{Solution: Multi-level page tables}
+
+\begin{verbatim}
+Two-Level Page Table (x86-32):
+
+Virtual Address:
+┌──────────┬──────────┬──────────────┐
+│  PD idx  │  PT idx  │   Offset     │
+│ (10 bits)│ (10 bits)│  (12 bits)   │
+└──────────┴──────────┴──────────────┘
+      │           │
+      │           │
+      ▼           ▼
+Page Directory  Page Table    Page
+[0][1]...[1023] → [0]...[1023] → Physical Frame
+      │
+      └── only allocate PD entries for used regions → sparse, saves memory
+\end{verbatim}
+
+\textbf{x86-64 uses 4-level page tables:} PML4 \(\rightarrow\) PDP \(\rightarrow\) PD \(\rightarrow\) PT \(\rightarrow\) Physical (each 9 bits = 512 entries, 1 bit unused, 12-bit offset)
+
+\subsubsection{TLB --- Translation Lookaside Buffer}\label{tlb--translation-lookaside-buffer}
+
+Page table walks are expensive (3-4 memory accesses for multi-level tables). The \textbf{TLB} is a small, fast hardware cache of recent VPN \(\rightarrow\) PFN translations.
+
+\begin{verbatim}
+Virtual Address
+      │
+      ▼
+ ┌─────────┐    HIT  ──────────────────────────────────► Physical Address
+ │   TLB   │                                              (fast! ~1 cycle)
+ └─────────┘
+      │ MISS
+      ▼
+ Walk page tables                                         Physical Address
+ (3-4 memory accesses,                        ──────────────────────────►
+  ~100 cycles)                                (slow)
+      │
+      └── store result in TLB for next time
+\end{verbatim}
+
+\textbf{TLB miss rates matter.} If your program has good \textbf{spatial/temporal locality}, TLB hit rate is high (\textgreater99\%). Programs with random access patterns across large memory regions thrash the TLB.
+
+\textbf{TLB flush:} On context switch (new process = new page table = all TLB entries invalid), the OS must flush the TLB. This is expensive. Solutions:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ASID (Address Space ID):} Tag TLB entries with process ID, avoid full flush
+\item
+  \textbf{Hardware TLB walkers:} Modern CPUs walk page tables in hardware (x86)
+\end{itemize}
+
+\textbf{Huge pages (2MB or 1GB instead of 4KB):} Fewer TLB entries needed for same memory coverage. Linux \texttt{hugepages}, \texttt{madvise(MADV\_HUGEPAGE)}. Databricks and JVMs tune this.
+
+\textbf{Interview takeaway:} \textbf{TLB is why locality matters. Random memory access = TLB misses = slowness. Huge pages reduce TLB pressure for large working sets.}
+
+\subsubsection{Page Faults}\label{page-faults}
+
+A \textbf{page fault} occurs when a process accesses a virtual address that doesn\textquotesingle t have a valid PTE pointing to RAM.
+
+\textbf{Three types:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Minor page fault} --- page is in memory but PTE not set up (e.g., first access after mmap). No disk I/O. Fast.
+\item
+  \textbf{Major page fault} --- page is on disk (swap or file). Must load from disk. Slow (\textasciitilde10ms).
+\item
+  \textbf{Invalid fault (segfault)} --- address is not mapped at all, or permissions violated. Process gets SIGSEGV.
+\end{enumerate}
+
+\begin{verbatim}
+Process accesses virtual address 0x40001000
+        │
+        ▼
+CPU checks TLB → MISS
+        │
+        ▼
+CPU walks page table → Present bit = 0 (not in RAM)
+        │
+        ▼
+Hardware raises Page Fault exception
+        │
+        ▼
+OS page fault handler runs:
+    Is address valid? → No → SIGSEGV → process dies
+    Is address valid? → Yes:
+        Minor fault? → set up PTE → return → retry instruction
+        Major fault? → find page on disk → allocate physical frame →
+                       read page from disk → set PTE → return → retry
+        CoW fault? → copy page → update PTE → return → retry
+\end{verbatim}
+
+\textbf{Demand Paging:} Pages are only loaded into RAM when accessed (on demand), not when process starts. Makes process startup fast. exec() just sets up page table entries pointing to the binary on disk; actual code pages load on first access.
+
+\subsubsection{Page Replacement Algorithms}\label{page-replacement-algorithms}
+
+When RAM is full and a new page must be loaded, the OS must \textbf{evict} an existing page. Which one?
+
+\paragraph{FIFO --- First In First Out}\label{fifo--first-in-first-out}
+
+Evict the oldest page in RAM.
+
+\begin{verbatim}
+Pages: 1 2 3 4 1 2 5 1 2 3 4 5  (reference string)
+Frames: 3
+
+FIFO:
+1 → [1, -, -]   MISS
+2 → [1, 2, -]   MISS
+3 → [1, 2, 3]   MISS
+4 → [4, 2, 3]   MISS (evict 1)
+1 → [4, 1, 3]   MISS (evict 2)
+2 → [4, 1, 2]   MISS (evict 3)
+5 → [5, 1, 2]   MISS (evict 4)
+...  9 page faults total
+\end{verbatim}
+
+\textbf{Belady\textquotesingle s Anomaly:} Adding more frames can sometimes cause MORE page faults with FIFO. Counterintuitive and bad.
+
+\paragraph{Optimal (OPT)}\label{optimal-opt}
+
+Evict the page that will be used furthest in the future. Impossible to implement (requires future knowledge). Used as theoretical benchmark.
+
+Achieves minimum possible page faults. Compare other algorithms against OPT to measure how close they are.
+
+\paragraph{LRU --- Least Recently Used}\label{lru--least-recently-used}
+
+Evict the page that hasn\textquotesingle t been used for the longest time. Approximates OPT well in practice (temporal locality: recently used pages likely to be used again).
+
+\begin{verbatim}
+Same reference string, 3 frames, LRU:
+1 → [1]        MISS
+2 → [1,2]      MISS
+3 → [1,2,3]    MISS
+4 → [4,2,3]    MISS (1 LRU, evict 1)
+1 → [4,1,3]    MISS (2 LRU, evict 2)
+2 → [4,1,2]    MISS (3 LRU, evict 3)
+5 → [5,1,2]    MISS (4 LRU, evict 4)
+...  8 page faults (better than FIFO)
+\end{verbatim}
+
+\textbf{True LRU implementation:} hardware timestamp per page, or doubly-linked list + hash map. Expensive.
+
+\paragraph{Clock Algorithm (Second Chance)}\label{clock-algorithm-second-chance}
+
+Practical approximation of LRU. Each frame has a \textbf{reference bit} (set by hardware on access). A "clock hand" sweeps through frames:
+
+\begin{itemize}
+\tightlist
+\item
+  If reference bit = 1: clear it (give second chance), advance hand
+\item
+  If reference bit = 0: evict this page
+\end{itemize}
+
+\begin{verbatim}
+Clock hand cycles through frames:
+┌─────────────────────────────────────┐
+│  [P1,R=1] → [P2,R=0] → [P3,R=1]  │
+│      ↑                              │
+│   clock hand                        │
+│                                     │
+│  Visit P1: R=1, clear to 0, advance │
+│  Visit P2: R=0, EVICT P2, done      │
+└─────────────────────────────────────┘
+\end{verbatim}
+
+Linux uses a variant: pages have active/inactive lists, with the clock-like mechanism managing them.
+
+\paragraph{Page Replacement Comparison Table}\label{page-replacement-comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1323}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1470}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2045}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2351}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2812}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fault Rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Overhead
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Belady\textquotesingle s Anomaly
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FIFO & High & Low & Yes & Simple, bad \\
+Optimal & Lowest & Impossible & No & Theoretical benchmark \\
+LRU & Low & High (true impl) & No & Best practical choice \\
+Clock & Low-Medium & Low & No & Linux approximation \\
+LFU & Medium & Medium & No & Frequency, not recency \\
+Random & High & Negligible & No & Surprisingly decent \\
+\end{longtable}
+
+\subsubsection{Thrashing}\label{thrashing}
+
+\textbf{Thrashing} occurs when a process (or system) spends more time paging than executing.
+
+\begin{verbatim}
+Scenario: 5 processes each need 4 frames. Only 10 frames total.
+
+Each process gets 2 frames → working set doesn't fit in 2 frames
+→ constant page faults → page fault handler runs → page fault handler
+needs to evict pages that processes need → more page faults → ...
+
+CPU utilization:
+  100% ┤
+       │        ╭─────╮
+   50% ┤       ╱       ╲
+       │      ╱         ╲   ← THRASHING ZONE
+    0% ┤─────╱             ──────────
+       └─────┴──────────────────────
+           few      many
+       (# of processes / degree of multiprogramming)
+\end{verbatim}
+
+\textbf{Working Set Model:} Each process has a \textbf{working set} --- the set of pages it actively uses in some time window. If the sum of all working sets \textgreater{} RAM, thrashing occurs.
+
+\textbf{Solutions:}
+
+\begin{itemize}
+\tightlist
+\item
+  Reduce degree of multiprogramming (suspend some processes)
+\item
+  Add more RAM
+\item
+  Better page replacement (keep working sets in RAM)
+\item
+  Local page replacement (each process has its own frame quota)
+\end{itemize}
+
+\subsubsection{Segmentation}\label{segmentation}
+
+An alternative to paging: divide address space into variable-size \textbf{segments} (code, stack, heap, data). Each segment has a base address and limit.
+
+\begin{verbatim}
+Segment Table:
+Segment | Base    | Limit  | Permissions
+--------|---------|--------|------------
+Code    | 0x40000 | 0x2000 | R-X
+Data    | 0x42000 | 0x1000 | RW-
+Stack   | 0xFF000 | 0x3000 | RW-
+
+Virtual address: (segment#, offset)
+→ check offset < limit (else segfault)
+→ physical = base + offset
+\end{verbatim}
+
+\textbf{Fragmentation problem:} Variable-size segments cause external fragmentation --- holes of unusable memory between segments.
+
+Modern systems use \textbf{segmentation + paging} (x86-64 still technically has segments but with flat 0-base model, effectively disabled). Segments provide the logical view; paging handles the physical allocation.
+
+\subsubsection{Memory Management}\label{memory-management}
+
+\textbf{Physical memory management:} The kernel uses a \textbf{buddy system} allocator to manage physical frames. Free memory is maintained in lists of power-of-2-sized blocks. Allocation finds the smallest block that fits; deallocation merges adjacent buddies.
+
+\textbf{Virtual memory management (in process):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Kernel allocator:} \texttt{kmalloc()} for small kernel objects; \texttt{vmalloc()} for large non-contiguous virtual memory
+\item
+  \textbf{User space:} \texttt{brk()}/\texttt{sbrk()} to extend heap; \texttt{mmap()} for arbitrary mappings
+\item
+  \textbf{C library malloc:} sits above \texttt{brk()}/\texttt{mmap()}, maintains free lists, handles small allocations efficiently
+\end{itemize}
+
+\textbf{Memory mapped files (mmap):}
+
+\begin{verbatim}
+File on disk ──mapped to──► Region of virtual address space
+                              Reads/writes go directly to page cache
+                              Lazy loading (pages fault in on demand)
+                              Shared: multiple processes map same physical pages
+\end{verbatim}
+
+Used for: loading executables (ELF segments), shared libraries (every process maps libc), database buffer pools, Spark memory management.
+
+\subsubsection{IPC --- Inter-Process Communication}\label{ipc--inter-process-communication}
+
+Processes are isolated. To communicate, they need OS-provided channels.
+
+\paragraph{Pipes}\label{pipes}
+
+Unidirectional byte stream. Parent \(\rightarrow\) child (or chain of processes in shell).
+
+\begin{verbatim}
+ls | grep foo | wc -l
+
+   ls        grep       wc
+ stdout → | → stdin  stdout → | → stdin  stdout
+          pipe1              pipe2
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Anonymous pipes:} \texttt{pipe()} syscall. Only between related processes (parent-child).
+\item
+  \textbf{Named pipes (FIFOs):} Exist as filesystem entries. Unrelated processes can use them.
+\item
+  \textbf{Limitation:} Unidirectional, byte-stream only, local machine only.
+\end{itemize}
+
+\paragraph{Shared Memory}\label{shared-memory}
+
+Fastest IPC. Two processes map the same physical pages into their address spaces.
+
+\begin{verbatim}
+Process A addr space:    Process B addr space:
+0x1000 ─────────┐        0x2000 ─────────┐
+                 └──► [Physical frames] ◄─┘
+                        (shared pages)
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{shmget()} / \texttt{shmat()} (SysV) or \texttt{mmap()} with \texttt{MAP\_SHARED}
+\item
+  \textbf{No kernel involvement in data transfer} --- just write to your virtual address, B sees it immediately
+\item
+  \textbf{But:} Need synchronization (mutexes, semaphores) to avoid races
+\item
+  Used by: databases (PostgreSQL shared buffer pool), media apps, high-frequency trading
+\end{itemize}
+
+\paragraph{Message Queues}\label{message-queues}
+
+Kernel-maintained queue of messages. Producers send messages; consumers receive them. Messages have types (for filtering).
+
+\begin{itemize}
+\tightlist
+\item
+  POSIX: \texttt{mq\_open()}, \texttt{mq\_send()}, \texttt{mq\_receive()}
+\item
+  Preserves message boundaries (unlike pipes which are byte streams)
+\item
+  Can have multiple producers/consumers
+\end{itemize}
+
+\paragraph{Sockets}\label{sockets}
+
+Most flexible IPC. Can be:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Unix domain sockets:} Local machine, file-system path, very fast
+\item
+  \textbf{TCP/UDP sockets:} Network, across machines
+\end{itemize}
+
+Used for: nginx \(\leftrightarrow\) PHP-FPM, Docker daemon, database connections, literally all networked services.
+
+\paragraph{Signals}\label{signals}
+
+Asynchronous notification to a process. \texttt{kill(pid,\ SIGTERM)}, \texttt{kill(pid,\ SIGKILL)}, etc. Limited: only carry the signal number, no data payload. Used for process control, not data transfer.
+
+\paragraph{IPC Comparison Table}\label{ipc-comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1354}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0938}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1458}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1979}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1562}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2708}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Speed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Data Size
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Synchronization
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Scope
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Pipe & Fast & Stream & Blocking by default & Local (related) & Shell pipes, parent-child \\
+Named Pipe & Fast & Stream & Blocking & Local & Unrelated local processes \\
+Shared Memory & Fastest & Large & Manual (semaphores) & Local & High-perf data sharing \\
+Message Queue & Medium & Messages & Built-in & Local & Producer-consumer patterns \\
+Unix Socket & Fast & Stream/Dgram & N/A & Local & Service-to-service local \\
+TCP Socket & Medium & Stream & N/A & Network & Distributed systems \\
+Signal & Very fast & None (signal\#) & N/A & Local & Process control \\
+\end{longtable}
+
+\subsubsection{Deadlocks}\label{deadlocks}
+
+A \textbf{deadlock} occurs when a set of processes are each waiting for resources held by another process in the set --- a circular wait with no exit.
+
+\begin{verbatim}
+Classic Deadlock:
+
+Process A holds Lock 1, wants Lock 2 ──────────────┐
+                                                     │
+                                    circular wait!   │
+                                                     │
+Process B holds Lock 2, wants Lock 1 ◄──────────────┘
+\end{verbatim}
+
+\textbf{Coffman\textquotesingle s 4 Necessary Conditions (all must hold for deadlock):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Mutual Exclusion} --- resource can only be held by one process at a time
+\item
+  \textbf{Hold and Wait} --- process holds resources while waiting for more
+\item
+  \textbf{No Preemption} --- resources can\textquotesingle t be forcibly taken from a process
+\item
+  \textbf{Circular Wait} --- P1 waits for P2 waits for P3 waits for P1
+\end{enumerate}
+
+Mnemonic: \textbf{MHNC} --- "My Habits Negatively Create" deadlocks
+
+\textbf{Deadlock Handling Strategies:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1531}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3337}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1760}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3372}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Approach
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Used When
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Prevention} & Eliminate one of Coffman\textquotesingle s 4 conditions & May reduce concurrency & Design time \\
+\textbf{Avoidance} & Banker\textquotesingle s algorithm --- only allocate if safe state & Overhead per allocation & Known max resources \\
+\textbf{Detection + Recovery} & Let it happen, detect cycles, kill/rollback & Detection overhead & Databases (timeout + retry) \\
+\textbf{Ignore (Ostrich)} & Pretend deadlocks won\textquotesingle t happen & None & Linux/Windows (rare deadlocks \(\rightarrow\) reboot) \\
+\end{longtable}
+
+\textbf{Banker\textquotesingle s Algorithm (Avoidance):} Before granting a resource request, simulate the allocation. Check if a "safe sequence" still exists (an ordering where all processes can eventually complete). If yes \(\rightarrow\) grant. If no \(\rightarrow\) make process wait.
+
+\textbf{Deadlock Prevention techniques:}
+
+\begin{itemize}
+\tightlist
+\item
+  Break Mutual Exclusion: use lock-free data structures
+\item
+  Break Hold and Wait: acquire all locks at once (or release before requesting more)
+\item
+  Break No Preemption: forcibly take resources back (works for preemptable resources like CPU)
+\item
+  Break Circular Wait: impose a total ordering on lock acquisition (always acquire L1 before L2) --- \textbf{this is the most practical technique}
+\end{itemize}
+
+\textbf{Livelock:} Processes actively respond to each other but make no progress. Like two people in a hallway both stepping aside in the same direction.
+
+\textbf{Starvation:} A process never gets resources because others keep getting priority.
+
+\textbf{Interview takeaway:} \textbf{Prevent circular wait by enforcing lock ordering. In practice, databases detect deadlocks and roll back one transaction. OS mostly ignores deadlocks (reboot).}
+
+\subsubsection{File Systems}\label{file-systems}
+
+A file system organizes data on persistent storage into a hierarchy of files and directories.
+
+\textbf{Key abstractions:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{File:} Named sequence of bytes with metadata
+\item
+  \textbf{Directory:} Special file that maps names to file metadata
+\item
+  \textbf{inode:} Data structure storing file metadata
+\end{itemize}
+
+\paragraph{Inode}\label{inode}
+
+The \textbf{inode} (index node) is the core metadata structure for a file:
+
+\begin{verbatim}
+Inode #47:
+┌──────────────────────────────┐
+│ File type: regular file      │
+│ Permissions: rw-r--r--       │
+│ Owner: uid=1000, gid=1000    │
+│ Size: 4096 bytes             │
+│ Timestamps: atime/mtime/ctime│
+│ Link count: 2                │
+│ Direct blocks: [101, 102, 0] │ ← point to 4KB data blocks
+│ Indirect block: 200          │ ← points to block of pointers
+│ Double indirect: 300         │
+│ Triple indirect: 0           │
+└──────────────────────────────┘
+\end{verbatim}
+
+\textbf{Inode does NOT store the filename.} The directory maps filename \(\rightarrow\) inode number.
+
+\begin{verbatim}
+Directory "/home/user/":
+┌─────────────────────┐
+│ "." → inode 10      │
+│ ".." → inode 5      │
+│ "file.txt" → inode 47 │
+│ "docs" → inode 52   │
+└─────────────────────┘
+\end{verbatim}
+
+\textbf{Hard link:} Two directory entries pointing to the same inode. Deleting one entry doesn\textquotesingle t delete the file (link count decrements; file deleted when count reaches 0).
+
+\textbf{Soft link (symlink):} A file that contains the path to another file. Independent inode. Becomes "dangling" if target is deleted.
+
+\paragraph{Block Addressing in ext2/ext3/ext4}\label{block-addressing-in-ext2ext3ext4}
+
+\begin{verbatim}
+File data access via inode:
+
+Direct pointers (12 blocks × 4KB = 48KB)
+Single indirect (1 block of 1024 pointers × 4KB = 4MB)
+Double indirect (1024 × 1024 × 4KB = 4GB)
+Triple indirect (1024^3 × 4KB = 4TB)
+
+For small files: only direct blocks needed (fast)
+For large files: traverse indirect blocks (more disk accesses)
+\end{verbatim}
+
+Modern ext4 uses \textbf{extents} instead: a range of contiguous blocks (base\_block + length). Much more efficient for large files.
+
+\paragraph{Journaling}\label{journaling}
+
+\textbf{Problem:} Writing a file requires multiple disk writes (update inode, update data blocks, update directory). If system crashes mid-way, file system is inconsistent.
+
+\textbf{Solution: Journaling.} Before making actual changes, write the intended changes to a \textbf{journal (log)}. After journal write completes (atomic), apply changes. If crash during apply, replay journal on recovery.
+
+\begin{verbatim}
+Write operation:
+1. Write to journal (metadata or metadata+data)
+   - journal_start
+   - new inode
+   - new data blocks
+   - updated directory
+   - journal_commit
+2. Apply journal to actual disk locations
+3. Mark journal entry as done (free space)
+
+Crash recovery:
+- If crash before journal_commit: abandon (no partial change made)
+- If crash after journal_commit but before step 3: replay journal
+\end{verbatim}
+
+\textbf{Journal modes in ext4:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Writeback:} Only journal metadata. Fast but data might be stale after crash.
+\item
+  \textbf{Ordered:} Journal metadata; data written to disk before journaling metadata. Safe, default.
+\item
+  \textbf{Journal:} Journal both metadata and data. Slowest but safest.
+\end{itemize}
+
+\textbf{Interview takeaway:} \textbf{Journaling prevents file system corruption on crash by ensuring operations are atomic. ext4 uses ordered mode by default.}
+
+\subsubsection{System Calls Deep Dive}\label{system-calls-deep-dive}
+
+Common system calls and what they do:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1468}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2075}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6457}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Category
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Syscall
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Process & \texttt{fork()} & Clone current process \\
+Process & \texttt{exec()} & Replace process image with new program \\
+Process & \texttt{exit()} & Terminate process \\
+Process & \texttt{wait()} & Wait for child to exit \\
+Process & \texttt{getpid()} & Get process ID \\
+Memory & \texttt{brk()} & Extend/shrink heap \\
+Memory & \texttt{mmap()} & Map file/anonymous memory \\
+Memory & \texttt{munmap()} & Unmap memory region \\
+File & \texttt{open()} & Open file, return fd \\
+File & \texttt{read()} & Read from fd \\
+File & \texttt{write()} & Write to fd \\
+File & \texttt{close()} & Close fd \\
+File & \texttt{stat()} & Get file metadata \\
+IPC & \texttt{pipe()} & Create pipe \\
+IPC & \texttt{socket()} & Create socket \\
+IPC & \texttt{send()}/\texttt{recv()} & Socket I/O \\
+Sync & \texttt{futex()} & Fast userspace mutex (basis for pthreads) \\
+\end{longtable}
+
+\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsubsection{\texorpdfstring{Complete Virtual \(\rightarrow\) Physical Address Translation}{Complete Virtual \textbackslash rightarrow Physical Address Translation}}\label{complete-virtual-rightarrow-physical-address-translation}
+
+\begin{verbatim}
+                    CPU generates Virtual Address
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │    Split VA     │
+                    │  VPN | Offset  │
+                    └────┬────────────┘
+                         │
+                         ▼
+              ┌─────────────────────┐
+              │    Check TLB        │
+              │  (small fast cache  │
+              │   of VPN→PFN maps)  │
+              └──────┬──────────────┘
+                     │
+         ┌───────────┴────────────┐
+      HIT │                    MISS│
+         ▼                        ▼
+    PFN from TLB          Walk Page Tables
+         │                (multi-level lookup
+         │                 in memory)
+         │                        │
+         │              ┌─────────┴──────────┐
+         │           valid?               not valid?
+         │              │                     │
+         │              ▼                     ▼
+         │         PFN found            Page Fault!
+         │         update TLB          OS handles:
+         │              │              - Load from disk
+         │              │              - SIGSEGV
+         │              │
+         └──────────────┘
+                  │
+                  ▼
+         Physical Address = PFN × pagesize + offset
+                  │
+                  ▼
+             Access RAM
+\end{verbatim}
+
+\subsubsection{Process State Machine}\label{process-state-machine}
+
+\begin{verbatim}
+         ┌──────────────────────────────────────────────────────┐
+         │                                                      │
+         │                      READY                          │
+         │              ┌────────────────┐                     │
+         │   admit      │                │    interrupt/        │
+   NEW ──┼─────────────►│   Runnable     │◄───quantum_expiry   │
+         │              │                │                     │
+         │              └────────┬───────┘                     │
+         │                       │ dispatch                    │
+         │                       ▼                             │
+         │              ┌────────────────┐                     │
+         │              │    RUNNING     │─────────────────────┘
+         │              └────────┬───────┘
+         │                  │    │
+         │         I/O req  │    │  exit()
+         │                  │    │
+         │                  ▼    ▼
+         │         ┌──────────┐  ┌───────────┐
+         │         │ WAITING  │  │TERMINATED │
+         │         └────┬─────┘  └───────────┘
+         │              │ I/O done
+         └──────────────┘  (→ READY)
+\end{verbatim}
+
+\subsubsection{Memory Layout: Kernel vs User Space}\label{memory-layout-kernel-vs-user-space}
+
+\begin{verbatim}
+64-bit Linux Address Space:
+
+0xFFFFFFFFFFFFFFFF ────────────────────── (top)
+                   [Kernel Space: 128TB]
+                   - Kernel code & data
+                   - Physical memory mappings
+                   - Kernel stacks
+0xFFFF800000000000 ──────────────────────
+                   [Non-canonical hole]
+                   (hardware enforced,
+                    accessing = fault)
+0x00007FFFFFFFFFFF ──────────────────────
+                   [User Space: 128TB]
+                   │
+                   ├─ Stack (grows ↓)
+                   │  [random stack base, ASLR]
+                   │
+                   ├─ mmap region (shared libs, mmap'd files)
+                   │  libc.so, libpthread.so, etc.
+                   │
+                   ├─ Heap (grows ↑)
+                   │  [malloc'd memory, managed by ptmalloc]
+                   │
+                   ├─ BSS (zero-initialized globals)
+                   ├─ Data (initialized globals)
+                   └─ Text (code, read-only)
+                      [typically at 0x400000]
+0x0000000000000000 ──────────────────────
+                   [NULL page: unmapped, catch null deref]
+\end{verbatim}
+
+\subsubsection{Scheduling Gantt Charts Comparison}\label{scheduling-gantt-charts-comparison}
+
+\begin{verbatim}
+Processes: P1(0,10), P2(0,5), P3(0,3)  [arrival time, burst]
+
+FCFS:
+0    5   10   15   17
+|──P1──────|──P2──|P3|
+Avg wait: (0+10+15)/3 = 8.33
+
+SJF (non-preemptive):
+0  3  8          17
+|P3|──P2──|──────P1──|
+Avg wait: (0+3+8)/3 = 3.67
+
+Round Robin (quantum=3):
+0  3  6  9  12 14 17
+|P1|P2|P3|P1|P2|P1|P2|
+(P3 finishes at 9, P1 gets slice 9-12, P2 gets 12-14, P1 finishes 14-17, P2 finishes 17+)
+\end{verbatim}
+
+\subsubsection{Page Table Walk (4-level x86-64)}\label{page-table-walk-4-level-x86-64}
+
+\begin{verbatim}
+Virtual Address (48 bits used):
+┌────────┬────────┬────────┬────────┬─────────────┐
+│PML4 idx│ PDP idx│  PD idx│  PT idx│   Offset    │
+│ 9 bits │ 9 bits │ 9 bits │ 9 bits │  12 bits    │
+└───┬────┴───┬────┴───┬────┴───┬────┴─────────────┘
+    │        │        │        │
+    │        │        │        │
+    ▼        ▼        ▼        ▼
+  CR3     PML4[i]  PDP[i]   PD[i]   PT[i]
+  reg  ──► addr ──► addr ──► addr ──► addr
+  (page              │              │
+   dir base)         │              │
+                     ▼              ▼
+                  [PDP table]    [PD table]
+                     │              │
+                     ▼              ▼
+                  [PD table]    [PT table]
+                                   │
+                                   ▼
+                                PFN + Offset
+                              = Physical Address
+\end{verbatim}
+
+\subsection{Real-World Examples}\label{real-world-examples}
+
+\textbf{Chrome\textquotesingle s Process-per-Tab Model:} Google Chrome isolates each tab in its own process. If one tab crashes (or gets exploited), it can\textquotesingle t affect other tabs or the browser. This is a deliberate security and reliability choice leveraging OS process isolation. Each tab has its own virtual address space, preventing cross-tab memory corruption.
+
+\textbf{Fork in Redis:} Redis uses \texttt{fork()} to create background snapshots (RDB saves). The parent continues serving requests; the child writes memory to disk. Copy-on-write means the child sees a consistent snapshot without copying all data upfront. Writes from the parent after fork() cause CoW copies. Heavy write workloads during snapshots can double Redis\textquotesingle s memory usage.
+
+\textbf{PostgreSQL Shared Memory:} PostgreSQL uses shared memory (via \texttt{mmap()} or SysV shm) for its buffer pool --- pages from the database files are cached here, shared across all backend worker processes. Worker processes are separate processes (not threads), so they need IPC to share the buffer pool.
+
+\textbf{Linux Containers (Docker) = Namespaces + cgroups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Namespaces:} Isolate what a process can see (PID namespace, network namespace, mount namespace). A container thinks it\textquotesingle s the only process on the machine.
+\item
+  \textbf{cgroups:} Limit how much resource a group of processes can use (CPU, memory, I/O). Fundamental OS mechanism.
+\item
+  Virtual memory concepts directly apply: container memory limits translate to cgroup memory limits, causing page eviction or OOM kills.
+\end{itemize}
+
+\textbf{JVM Garbage Collection interacts with OS VM:} The JVM manages its own heap (Java objects), but that heap is RAM from the OS. GC pauses correlate with page faults if JVM heap pages were swapped out. This is why JVMs disable swap (\texttt{vm.swappiness=0}) on production servers. Major GC runs may trigger \texttt{madvise(MADV\_DONTNEED)} to return pages to OS.
+
+\subsection{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One building, one facilities team --- every concept is a floor, a room, or a routine in the same office.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.0977}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.9023}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+OS Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Real-Life Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Process} & A company renting a full floor --- its own offices, filing cabinets, and staff, physically walled off from the companies on other floors; one company can\textquotesingle t wander into another\textquotesingle s space \\
+\textbf{Thread} & An employee on that rented floor --- shares the floor\textquotesingle s filing cabinets and supplies with colleagues, but has their own desk, their own to-do list, and their own chair \\
+\textbf{Virtual Memory} & Every employee gets a floor map labelling their rooms 1, 2, 3 \ldots{} The building manager secretly maps those numbers to real rooms scattered across many floors --- the employee sees a tidy sequence; the building is a patchwork \\
+\textbf{Page Table} & The building manager\textquotesingle s master ledger --- one row per virtual room number, recording which actual room on which actual floor it corresponds to; without the ledger, no one can find anything \\
+\textbf{TLB} & The receptionist\textquotesingle s quick-reference card of the dozen rooms she looks up every hour --- she checks the card first; only if the room isn\textquotesingle t on it does she page through the full master ledger \\
+\textbf{Page Fault} & You walk to a room listed on your map and the files aren\textquotesingle t there --- someone has boxed them and sent them to the basement archive (disk). A facilities runner fetches the box (major fault); if the map just forgot to update after a recent delivery, the runner corrects the entry on the spot (minor fault) \\
+\textbf{Context Switch} & The building has one big glass-walled meeting room. When Team A\textquotesingle s booking ends, they pack every whiteboard note and laptop into labelled boxes; facilities wheels in Team B\textquotesingle s boxes and pins their diagrams back up before the next session starts \\
+\textbf{Deadlock} & Team A is holding the sole projector and waiting for the laser pointer that Team B is holding --- and Team B is waiting for the projector. Both teams sit in their rooms, arms folded, waiting forever \\
+\textbf{Scheduling (RR)} & The facilities team rotates access to the one shared high-speed printer: each department gets a 10-minute slot, then the next department\textquotesingle s key card is activated, cycling through the list fairly \\
+\textbf{MLFQ} & New print jobs enter the express tray (highest priority, short slot). If a job hogs the printer through its full slot, it gets moved to the standard tray, then to the overnight bulk tray --- quick one-page memos naturally stay at the top; the thousand-page report drifts to the bottom \\
+\textbf{Fork + CoW} & A company on floor 3 wants to spin up a branch office (child process). Facilities hands the branch a copy of the floor map pointing to the same filing cabinets. The moment the branch edits a document, facilities quietly makes a private copy of that cabinet drawer --- until then, nothing is duplicated \\
+\textbf{Pipe} & The inter-floor mail chute: Team A drops documents in at the top, Team B collects them at the bottom; flow is strictly one-way and the chute can only hold so many envelopes before it backs up \\
+\textbf{Shared Memory} & A glass-fronted document wall in the lobby that both the 3rd-floor and 5th-floor companies can read and update directly --- the fastest way to exchange data, but teams must agree on who writes when or pages get overwritten \\
+\textbf{File System Inode} & The building\textquotesingle s asset tag record for a cabinet drawer: it doesn\textquotesingle t hold the documents, but it records owner, creation date, number of folders inside, and exactly which shelf bays to find them in --- the drawer\textquotesingle s name is only in the floor directory, not on the record itself \\
+\textbf{Journaling} & Before facilities moves a cabinet from one room to another, the facilities manager writes the move order in the shift log. If the power cuts out mid-move, the morning crew reads the log and either completes or reverses the move --- nothing is left half-done \\
+\textbf{Thrashing} & The building has 10 rooms but 15 teams each need 4 rooms simultaneously. Facilities constantly evicts one team\textquotesingle s boxes to make space for another --- everyone spends the day waiting for their boxes to arrive from the basement rather than doing any actual work \\
+\textbf{Zombie Process} & A company vacates its floor and returns the key, but facilities hasn\textquotesingle t yet struck it from the tenant register. The floor is empty, yet the register still lists the company as an active tenant until the landlord (parent) signs off \\
+\textbf{Semaphore} & The parking-garage gate counter --- a sign shows spaces remaining. Each entering car decrements the count; the gate refuses entry at zero. Exiting cars increment it, and the next waiting car is waved in \\
+\end{longtable}
+
+\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\textbf{Coffman\textquotesingle s Deadlock Conditions: "MHNC"}
+
+\begin{quote}
+\textbf{M}utual exclusion, \textbf{H}old and wait, \textbf{N}o preemption, \textbf{C}ircular wait
+"My Habits Negatively Create deadlocks"
+\end{quote}
+
+\textbf{Process States: "NR RWT"}
+
+\begin{quote}
+\textbf{N}ew \(\rightarrow\) \textbf{R}eady \(\rightarrow\) \textbf{R}unning \(\rightarrow\) \textbf{W}aiting \(\rightarrow\) \textbf{T}erminated
+"New Runners Really Want Trophies"
+\end{quote}
+
+\textbf{Scheduling Algorithm Priority (for interactive systems):}
+
+\begin{quote}
+"MLFQ \textgreater{} RR \textgreater{} Priority \textgreater{} SJF \textgreater{} FCFS"
+Best to worst for interactive responsiveness
+\end{quote}
+
+\textbf{Page Fault Types: "MMS"}
+
+\begin{quote}
+\textbf{M}inor (no disk), \textbf{M}ajor (disk access), \textbf{S}egfault (invalid)
+"Minor = Minor inconvenience, Major = Major disk trip, Segfault = process death"
+\end{quote}
+
+\textbf{Page Replacement --- what to evict:}
+
+\begin{quote}
+\textbf{FIFO}: First In, First Out (oldest)
+\textbf{LRU}: Least Recently Used (longest unused)
+\textbf{OPT}: Optimal (furthest future use)
+\textbf{Clock}: LRU approximation (second chance)
+Memory trick: "FLOC" --- First, Least, Optimal, Clock
+\end{quote}
+
+\textbf{IPC Methods by Speed:}
+
+\begin{quote}
+Shared Memory \textgreater{} Pipe/Socket \textgreater{} Message Queue \textgreater{} Signal (for data capacity)
+"Sharing Privately Moves Slowly" (Shared \textgreater{} Pipe \textgreater{} Message \textgreater{} Signal)
+\end{quote}
+
+\textbf{TLB Miss Cost:}
+
+\begin{quote}
+Hit: \textasciitilde1 cycle. Miss: \textasciitilde100 cycles. Page fault: \textasciitilde10ms (10 million cycles)
+"1, 100, 10M" --- each step is 100x worse
+\end{quote}
+
+\textbf{Fork vs Exec:}
+
+\begin{quote}
+fork = \textbf{F}ission (split into two)
+exec = \textbf{Ex}change (swap out current program)
+\end{quote}
+
+\textbf{Kernel vs User Mode:}
+
+\begin{quote}
+K\textbf{ernel}: \textbf{K}ings can do everything
+User: \textbf{U}ntrusted, \textbf{U}nrestricted access denied
+\end{quote}
+
+\textbf{Buddy Allocator:}
+
+\begin{quote}
+"Buddies pair up" --- adjacent same-size free blocks merge into bigger block
+\end{quote}
+
+\subsection{Common Interview Questions}\label{common-interview-questions}
+
+\subsubsection{Q1: What is the difference between a process and a thread?}\label{q1-what-is-the-difference-between-a-process-and-a-thread}
+
+\textbf{Model Answer:} A process is an isolated instance of a running program with its own virtual address space, file descriptors, and OS resources. A thread is a unit of execution within a process --- multiple threads share the same address space, heap, and file descriptors but each has its own stack and registers.
+
+Key tradeoffs: processes provide strong isolation (crash in one doesn\textquotesingle t affect others) but are heavier to create and communicate between. Threads are lightweight and share memory naturally, but a crash or corruption in one thread kills the whole process, and shared memory requires careful synchronization.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  When would you use processes vs threads? (Processes: fault isolation like Chrome tabs, different security contexts; Threads: shared data, parallel computation within a task)
+\item
+  How does fork() work? What is copied? (Virtual address space via CoW, FDs, signal handlers; not memory locks or thread-specific state)
+\item
+  What\textquotesingle s a zombie process? (Child that exited but parent hasn\textquotesingle t called wait())
+\end{itemize}
+
+\subsubsection{Q2: Explain virtual memory and why it\textquotesingle s useful.}\label{q2-explain-virtual-memory-and-why-its-useful}
+
+\textbf{Model Answer:} Virtual memory gives each process the illusion of having the entire address space to itself. The OS + hardware maintains page tables that map virtual page numbers to physical frame numbers. When a process accesses a virtual address, hardware translates it to a physical address (via TLB \(\rightarrow\) page table).
+
+Benefits: isolation (each process has its own mapping so can\textquotesingle t read others\textquotesingle{} memory), ability to use more memory than physical RAM (swap), sharing (two processes can map the same physical pages), and demand paging (only load pages that are actually accessed).
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  What happens on a page fault? (Check if valid \(\rightarrow\) load from disk or allocate \(\rightarrow\) update PTE \(\rightarrow\) retry instruction)
+\item
+  What is the TLB? Why does it matter? (Cache of recent VPN\(\rightarrow\)PFN; without it, every memory access needs 3-4 memory lookups for page table walk)
+\item
+  What is thrashing? (Working set exceeds RAM \(\rightarrow\) constant paging \(\rightarrow\) CPU spends more time on page I/O than actual work)
+\end{itemize}
+
+\subsubsection{Q3: How does the OS choose which process to run next?}\label{q3-how-does-the-os-choose-which-process-to-run-next}
+
+\textbf{Model Answer:} The scheduler picks from the ready queue based on policy. Common algorithms:
+
+\begin{itemize}
+\tightlist
+\item
+  FCFS: simple FIFO, suffers convoy effect
+\item
+  Round Robin: time slices, fair for interactive
+\item
+  SJF: optimal average wait but needs burst time knowledge
+\item
+  MLFQ: practical real-world --- runs I/O-bound (interactive) jobs at higher priority; CPU-bound jobs sink to lower queues
+\item
+  CFS (Linux): tracks virtual runtime per task, always runs task with smallest vruntime, uses a red-black tree
+\end{itemize}
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  What\textquotesingle s the convoy effect in FCFS? (One long job blocks all short jobs behind it)
+\item
+  How does Linux CFS work? (vruntime, red-black tree, weighted by nice value)
+\item
+  What\textquotesingle s the difference between preemptive and non-preemptive scheduling? (Preemptive: OS can interrupt running process; non-preemptive: process runs until it yields or blocks)
+\end{itemize}
+
+\subsubsection{Q4: Explain deadlocks --- how do they occur and how do you prevent them?}\label{q4-explain-deadlocks--how-do-they-occur-and-how-do-you-prevent-them}
+
+\textbf{Model Answer:} Deadlock requires all four Coffman conditions: mutual exclusion, hold-and-wait, no preemption, and circular wait. The most practical prevention technique is \textbf{lock ordering} --- always acquire locks in a globally consistent order to eliminate circular wait. Databases typically use detection + timeout + rollback. OS largely uses the ostrich algorithm (ignore it; restart if needed).
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  What\textquotesingle s livelock? (Processes actively respond to each other but make no progress --- like two people in a hallway always stepping in the same direction)
+\item
+  What\textquotesingle s the Banker\textquotesingle s algorithm? (Safe-state analysis before granting resources; check if there exists a safe sequence; theoretical, rarely used in practice)
+\item
+  How does a database detect deadlock? (Build a wait-for graph; detect cycles; roll back the youngest/cheapest transaction in the cycle)
+\end{itemize}
+
+\subsubsection{Q5: What is a context switch and what makes it expensive?}\label{q5-what-is-a-context-switch-and-what-makes-it-expensive}
+
+\textbf{Model Answer:} A context switch saves the current process\textquotesingle s CPU state (registers, PC, SP) to its PCB, runs the scheduler to pick the next process, loads that process\textquotesingle s CPU state, and if it\textquotesingle s a different process, switches the page table (CR3 register on x86) and flushes the TLB.
+
+The expense comes from: (1) direct cost of saving/restoring registers (\textasciitilde microsecond), (2) TLB flush --- new process has cold TLB so first memory accesses need full page table walks, (3) cache pollution --- new process\textquotesingle s data evicts old process\textquotesingle s hot data from CPU caches. This is why event-driven servers (nginx, Node.js) can outperform thread-per-request at high concurrency.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  Why are thread switches cheaper than process switches? (Same address space \(\rightarrow\) no page table switch \(\rightarrow\) no TLB flush \(\rightarrow\) caches stay warm)
+\item
+  What is an ASID (Address Space ID)? (Tag TLB entries with process identifier to avoid full TLB flush on context switch)
+\end{itemize}
+
+\subsubsection{Q6: Explain how fork() and copy-on-write work.}\label{q6-explain-how-fork-and-copy-on-write-work}
+
+\textbf{Model Answer:} fork() creates a child process that is an exact copy of the parent. Instead of physically copying all memory pages (which could be gigabytes), the OS uses copy-on-write: both parent and child initially share the same physical pages, marked read-only. When either process writes to a page, a page fault occurs, the kernel copies that specific page, and the writing process gets its own private copy. Only written pages are duplicated.
+
+This makes fork() fast when followed immediately by exec() (child replaces its address space with a new program without ever writing to the CoW pages) and efficient in general since most data never gets written.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  Why is fork() + exec() two steps? (Unix philosophy: separation of process creation and program loading. Allows manipulating the process environment between fork and exec --- e.g., redirect file descriptors.)
+\item
+  What\textquotesingle s vfork()? (Like fork but child borrows parent\textquotesingle s address space entirely; parent is suspended; useful only if exec() is immediately called)
+\item
+  How does Redis use fork() for RDB snapshots? (Fork creates child; child writes memory to disk while parent continues serving; CoW means parent\textquotesingle s writes create new page copies, child sees original snapshot)
+\end{itemize}
+
+\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\textbf{1. Scheduler Tuning in Production}
+
+Linux CFS can be tuned via \texttt{/proc/sys/kernel/sched\_*}. For latency-sensitive workloads (trading, real-time audio), you might use \texttt{SCHED\_FIFO} or \texttt{SCHED\_RR} policies with \texttt{RT\_PRIORITY}. CPU pinning (\texttt{taskset}, \texttt{sched\_setaffinity}) prevents context switches by keeping a process on one CPU --- important for avoiding NUMA cross-socket memory access.
+
+\textbf{2. NUMA (Non-Uniform Memory Access)}
+
+In multi-socket servers, each CPU has local RAM (fast, \textasciitilde50ns) and remote RAM on other sockets (slow, \textasciitilde100ns). OS-level NUMA awareness means scheduling threads near their data. \texttt{numactl}, \texttt{mbind()}, \texttt{set\_mempolicy()}. Databricks/Spark performance tuning involves NUMA-aware memory allocation.
+
+\textbf{3. Memory Overcommit}
+
+Linux by default overcommits memory --- \texttt{malloc()} always "succeeds" even if insufficient RAM. Pages are allocated lazily on write. When RAM is truly exhausted, the OOM (Out of Memory) Killer selects and kills a process. This is why a system can appear to have plenty of memory but processes still get killed. Controlled by \texttt{/proc/sys/vm/overcommit\_memory}.
+
+\textbf{4. Huge Pages and TLB}
+
+For workloads with multi-GB working sets (databases, JVMs, key-value stores), 4KB pages require enormous TLB entries. 2MB huge pages reduce TLB entries by 512x. Linux Transparent Huge Pages (THP) automates this but can cause latency spikes (background defragmentation). Production databases often disable THP and manage huge pages manually.
+
+\textbf{5. io\_uring (Modern Linux I/O)}
+
+Traditional I/O: \texttt{read()}/\texttt{write()} = system calls = context switches. \texttt{io\_uring} (Linux 5.1+) allows batching many I/O operations in a ring buffer shared between kernel and userspace, reducing syscall overhead dramatically. Databases and web servers (nginx, Cloudflare) are adopting this.
+
+\textbf{6. Container and Kubernetes Scheduling}
+
+Kubernetes scheduler is an application-level scheduler on top of OS schedulers. A Pod is scheduled to a Node; the OS on that node schedules the container\textquotesingle s processes. cgroups v2 provides hierarchical resource accounting. Understanding OS scheduling helps debug container performance issues (CPU throttling, memory limits causing OOM).
+
+\textbf{7. Spectre and Meltdown (Hardware + OS intersection)}
+
+These exploits used speculative execution to read across process boundaries, violating OS isolation guarantees. Mitigations (KPTI --- Kernel Page Table Isolation) added overhead to system calls by unmapping kernel pages from user space page tables. Understanding the OS/hardware boundary is critical for security-sensitive systems work.
+
+\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\textbf{1. Confusing process and thread isolation}
+Saying "threads are isolated from each other" is wrong. Threads share address space --- one thread can corrupt another\textquotesingle s stack or heap. Only processes are strongly isolated.
+
+\textbf{2. Thinking fork() physically copies memory}
+It uses copy-on-write. Pages are shared until written. Don\textquotesingle t say "fork copies all memory."
+
+\textbf{3. Confusing virtual and physical addresses}
+When asked "where is this variable in memory?", the variable has a virtual address. The physical address depends on page table mapping and whether the page is even in RAM right now.
+
+\textbf{4. Ignoring TLB in context switch cost}
+Candidates say "context switch just saves registers." The real cost is TLB flushing and cache misses for the new process\textquotesingle s data. This is the actual performance bottleneck.
+
+\textbf{5. Saying deadlock happens with just circular wait}
+Deadlock requires ALL FOUR Coffman conditions. Circular wait alone isn\textquotesingle t sufficient.
+
+\textbf{6. Confusing scheduling algorithms\textquotesingle{} use cases}
+Saying "SJF is the best scheduler" --- it\textquotesingle s optimal for average wait time but impractical (requires knowing burst times) and causes starvation. Real systems use MLFQ/CFS.
+
+\textbf{7. Thinking page faults are always bad}
+Minor page faults are normal and fast. Demand paging intentionally causes page faults on first access. Major page faults are the expensive ones (disk I/O). Segfaults kill the process.
+
+\textbf{8. Forgetting that zombie processes consume resources}
+The PCB (task\_struct) persists until the parent calls wait(). Many zombie processes can exhaust PID space.
+
+\textbf{9. Confusing pipes and sockets}
+Pipes are unidirectional, local, byte streams. Sockets are bidirectional, can be networked, and have both stream (TCP) and datagram (UDP) modes.
+
+\textbf{10. Not knowing what system calls are expensive}
+\texttt{getpid()} \(\rightarrow\) cheap (cached). \texttt{open()} \(\rightarrow\) moderate. \texttt{read()}/\texttt{write()} (especially small I/O) \(\rightarrow\) expensive per call. Candidates should know to batch I/O, use buffering, and minimize syscall frequency.
+
+\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+
+\subsubsection{Concurrency and Synchronization}\label{concurrency-and-synchronization}
+
+OS provides the primitives (mutexes, semaphores, condition variables via \texttt{futex()}), but the synchronization problems (race conditions, deadlocks) are concurrent programming problems. OS scheduling makes races possible by preempting threads at any instruction. Understanding OS scheduling helps understand why race conditions are hard to reproduce (timing-dependent).
+
+\subsubsection{Performance Engineering}\label{performance-engineering}
+
+\begin{itemize}
+\tightlist
+\item
+  CPU scheduling \(\rightarrow\) latency and throughput of services
+\item
+  Virtual memory/TLB \(\rightarrow\) why memory access patterns matter (cache locality)
+\item
+  Page faults \(\rightarrow\) why initialization cost of large allocations is deferred
+\item
+  Context switches \(\rightarrow\) why event loops can beat threads at high concurrency
+\item
+  Page cache \(\rightarrow\) why disk I/O is faster than expected (kernel caches file blocks in RAM)
+\end{itemize}
+
+\subsubsection{Databases}\label{databases}
+
+\begin{itemize}
+\tightlist
+\item
+  File systems + journaling \(\rightarrow\) database WAL (Write-Ahead Log) is the same concept at the application layer
+\item
+  OS page cache \(\rightarrow\) databases fight with OS cache (use \texttt{O\_DIRECT} for their own buffer management)
+\item
+  \texttt{mmap()} \(\rightarrow\) some databases (SQLite, LMDB) use memory-mapped I/O
+\item
+  Process model \(\rightarrow\) PostgreSQL (process-per-connection) vs MySQL (thread-per-connection)
+\item
+  Lock management \(\rightarrow\) database locks are application-level, but OS provides the primitives
+\end{itemize}
+
+\subsubsection{Cloud Computing}\label{cloud-computing}
+
+\begin{itemize}
+\tightlist
+\item
+  Virtualization (EC2) \(\rightarrow\) hypervisor virtualizes CPU + memory, same concepts as OS but one level up
+\item
+  Containers \(\rightarrow\) namespaces + cgroups, direct OS features
+\item
+  Serverless (Lambda) \(\rightarrow\) tiny VMs (Firecracker), OS startup cost matters
+\item
+  Distributed systems \(\rightarrow\) sockets are OS IPC extended over network; distributed consensus has analogies to OS concurrency control
+\end{itemize}
+
+\subsubsection{Networking}\label{networking}
+
+\begin{itemize}
+\tightlist
+\item
+  Sockets are OS abstractions over network hardware
+\item
+  TCP buffers are kernel memory (sk\_buff)
+\item
+  \texttt{epoll} / \texttt{kqueue} \(\rightarrow\) OS-level event notification for I/O-bound servers
+\item
+  Socket options (\texttt{SO\_REUSEPORT}, \texttt{SO\_KEEPALIVE}, \texttt{TCP\_NODELAY}) are kernel tuning knobs
+\end{itemize}
+
+\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+
+\textbf{1. Lead with the "why" before the "what"}
+Don\textquotesingle t just define virtual memory --- explain \emph{why} it exists (isolation, overcommit, abstraction) before explaining \emph{how} it works (page tables, TLB). Interviewers want to see systems thinking, not memorization.
+
+\textbf{2. Draw diagrams proactively}
+For virtual address translation, process state machines, and scheduling Gantt charts --- start drawing immediately. It shows structured thinking and makes complex topics instantly clearer.
+
+\textbf{3. Connect OS to real systems you\textquotesingle ve used}
+"Redis uses fork() for snapshots and CoW means..." shows you understand OS concepts in real context. FAANG interviewers value this highly.
+
+\textbf{4. Know the tradeoffs, not just the facts}
+"Thread vs process" --- you must know when to choose each, not just how they differ.
+
+\textbf{5. Be ready to go deep on one topic}
+Often the interviewer will probe one area deeply. If they ask about virtual memory, be ready to go all the way down to TLB shootdowns or Spectre mitigations if asked.
+
+\textbf{6. Quantify costs}
+
+\begin{itemize}
+\tightlist
+\item
+  System call: \textasciitilde100ns
+\item
+  Context switch: \textasciitilde1-10\(\mu\)s (with cache effects)
+\item
+  TLB miss: \textasciitilde100ns
+\item
+  Major page fault: \textasciitilde10ms
+\item
+  L1 cache hit: \textasciitilde1ns, L2: \textasciitilde4ns, L3: \textasciitilde40ns, DRAM: \textasciitilde100ns, SSD: \textasciitilde100\(\mu\)s, HDD: \textasciitilde10ms
+\end{itemize}
+
+\textbf{7. Know the Linux specifics}
+FAANG uses Linux everywhere. Know \texttt{task\_struct}, CFS, cgroups, namespaces, procfs (\texttt{/proc/meminfo}, \texttt{/proc/{[}pid{]}/maps}). Mention Linux-specific terms when relevant.
+
+\textbf{8. Handling system design questions with OS flavor}
+When designing a key-value store: mention page cache, mmap options, WAL for durability (= journaling). When designing a web server: mention epoll, process vs thread model, socket buffers. OS knowledge elevates system design answers.
+
+\textbf{9. Common Google-specific angles}
+Google cares about: scalability, latency tails, resource efficiency. OS topics come up as: "how would you minimize context switches in a high-RPC system?", "explain how Borg schedules containers" (kernel scheduling at cluster scale).
+
+\textbf{10. Practice explaining to a rubber duck}
+Pick a topic (say, "page table walk") and explain it out loud from scratch. If you can\textquotesingle t, you don\textquotesingle t know it well enough. FAANG interviews are verbal --- clarity of explanation matters.
+
+\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsubsection{10-Minute Summary}\label{10-minute-summary}
+
+\textbf{The OS is a virtualization and protection layer.} It multiplexes the CPU (scheduling), virtualizes RAM (virtual memory + paging), and isolates processes (separate address spaces, privilege levels).
+
+\textbf{Processes vs Threads:} Process = isolated execution environment. Thread = lightweight execution unit within process. Choose process for isolation, thread for efficiency.
+
+\textbf{Scheduling:} FCFS (simple, convoy problem) \(\rightarrow\) RR (fair, quantum-based) \(\rightarrow\) SJF (optimal wait, needs burst time) \(\rightarrow\) MLFQ (practical, learns I/O vs CPU behavior) \(\rightarrow\) CFS (Linux, vruntime + red-black tree).
+
+\textbf{Virtual Memory:} Every process has a virtual address space. Page tables map virtual \(\rightarrow\) physical. TLB caches recent translations. Page faults load missing pages from disk (major) or fix up mappings (minor).
+
+\textbf{Deadlocks:} Need all 4 Coffman conditions. Prevent by enforcing lock ordering. Databases detect + rollback. OS ignores (ostrich).
+
+\textbf{IPC:} Shared memory (fastest), pipes (simple), sockets (flexible, networked), message queues (bounded).
+
+\textbf{File Systems:} Inode = metadata (not filename). Directories map names to inodes. Journaling = write intentions before acting, enables crash recovery.
+
+\subsubsection{Key Numbers}\label{key-numbers}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6389}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3611}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Page size & 4KB (typical) \\
+TLB hit & \textasciitilde1 cycle \\
+TLB miss (page walk) & \textasciitilde100 cycles \\
+Context switch overhead & \textasciitilde1-10 \(\mu\)s \\
+System call cost & \textasciitilde100-1000 ns \\
+Major page fault (SSD) & \textasciitilde100 \(\mu\)s \\
+Major page fault (HDD) & \textasciitilde10 ms \\
+L1 cache & \textasciitilde1 ns \\
+L3 cache & \textasciitilde40 ns \\
+DRAM access & \textasciitilde100 ns \\
+\end{longtable}
+
+\subsubsection{Compact Cheat-Sheet Table}\label{compact-cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1705}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4102}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4193}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Point
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Interview Gotcha
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Process vs Thread & Different address space vs shared & Threads not isolated from each other \\
+fork() & CoW, not a full copy & Heavy writes after fork() = doubled memory \\
+exec() & Replaces address space, same PID & Must follow fork() in typical usage \\
+Zombie & Child done, parent hasn\textquotesingle t wait()\textquotesingle d & Consumes PID and PCB \\
+Virtual Memory & Illusion of full address space & Virtual \(\neq\) physical \\
+Page Table & Maps VPN \(\rightarrow\) PFN & Multi-level to save space \\
+TLB & Cache of VPN\(\rightarrow\)PFN & Flush on context switch (process) \\
+Page Fault & Minor (fast), Major (disk), Segfault (die) & Minor faults are normal and expected \\
+FCFS & FIFO, simple & Convoy effect \\
+RR & Fair, quantum-based & Quantum size matters \\
+SJF & Optimal wait time & Needs burst time, starvation \\
+MLFQ & Learns I/O vs CPU dynamically & No starvation (aging) \\
+CFS & vruntime + red-black tree & Linux actual scheduler \\
+Deadlock & Need all 4 Coffman conditions & Circular wait alone \(\neq\) deadlock \\
+Lock ordering & Prevents circular wait & Most practical deadlock prevention \\
+Shared memory & Fastest IPC & Needs explicit synchronization \\
+Pipes & Unidirectional byte stream & Only between related processes \\
+Inode & Metadata, not filename & Filename stored in directory entry \\
+Journaling & Write intent before acting & ext4 ordered mode = default \\
+Thrashing & Sum of working sets \textgreater{} RAM & Reduce multiprogramming degree \\
+CoW & Shared pages until write & Redis fork() + heavy writes = 2\(\times\) memory \\
+Huge Pages & Reduce TLB pressure & THP can cause latency spikes \\
+cgroups & Limit CPU/memory per process group & Foundation of containers \\
+\end{longtable}
+
+\subsubsection{Most Important Concepts (Ranked by Interview Frequency)}\label{most-important-concepts-ranked-by-interview-frequency}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Process vs Thread} --- asked in nearly every systems interview
+\item
+  \textbf{Virtual Memory + Paging + TLB} --- foundational for everything
+\item
+  \textbf{Context Switch cost} --- critical for performance discussions
+\item
+  \textbf{fork() + CoW} --- specific, frequently tested
+\item
+  \textbf{Deadlock + prevention} --- classic OS question
+\item
+  \textbf{Scheduling algorithms} --- MLFQ and CFS are most important
+\item
+  \textbf{Page fault handling} --- demand paging, CoW faults
+\item
+  \textbf{IPC mechanisms} --- compared by speed and use case
+\item
+  \textbf{File system / inode} --- storage system design questions
+\item
+  \textbf{System calls + kernel/user mode} --- architecture foundation
+\end{enumerate}
+
+\clearpage
+\section{Visual Reference}
+\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
+\visualfigure{../figures/02-os/01-scheduling-gantt.pdf}{FCFS is simple but suffers the convoy effect; Round Robin time-slices for fairness and responsiveness at the cost of extra context switches.}
+\end{document}

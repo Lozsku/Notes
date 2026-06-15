@@ -1,0 +1,1984 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Distributed Systems}
+\newcommand{\ThemeKicker}{Systems Track}
+\newcommand{\ThemeNumber}{07}
+
+\usepackage{interviewstyle}
+\setthemecolor{0891b2}{22d3ee}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{Distributed Systems --- Interview Mastery Guide}\label{distributed-systems--interview-mastery-guide}
+
+\begin{quote}
+\textbf{Audience:} Senior engineers preparing for FAANG system-design and depth loops.
+\textbf{Goal:} First-principles mastery of every distributed systems concept examiners probe.
+\textbf{How to use:} Read deeply once, then use the Revision Cheat Sheet to refresh before each interview.
+\end{quote}
+
+\subsection{Overview --- What it is}\label{overview--what-it-is}
+
+A \textbf{distributed system} is a collection of autonomous computing nodes that communicate over a network and appear to users as a single coherent system.
+
+\textbf{Formal definition (Lamport):} "A distributed system is one in which the failure of a computer you didn\textquotesingle t even know existed can render your own computer unusable."
+
+Key properties:
+
+\begin{itemize}
+\tightlist
+\item
+  Nodes run concurrently and independently
+\item
+  Nodes communicate only via message passing (no shared memory)
+\item
+  Nodes can fail independently --- partial failure is the norm
+\item
+  There is no global clock; clocks drift
+\end{itemize}
+
+\textbf{Why it\textquotesingle s hard in one sentence:} Nodes fail, networks partition, and clocks lie --- all simultaneously, silently, and at the worst possible moment.
+
+\subsection{Why It Exists}\label{why-it-exists}
+
+Distributed systems are necessary when a single machine\textquotesingle s limits are reached:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2944}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7056}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Limit
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Distributed Solution
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+CPU/memory wall & Horizontal scale-out across many machines \\
+Storage capacity & Distributed file systems (HDFS, GFS) \\
+Geographic latency & Data replicated to edge / regional DCs \\
+Fault tolerance & Replicate so no single failure kills the system \\
+Throughput ceiling & Partition (shard) data across nodes \\
+\end{longtable}
+
+\textbf{Single machines are simpler but bounded.} Netflix can\textquotesingle t serve 250M users from one server. Google can\textquotesingle t index the web on one disk. Amazon can\textquotesingle t guarantee 99.99\% uptime on one machine.
+
+The moment you cross machine boundaries, you inherit: network unreliability, partial failures, clock skew, and the need to coordinate --- the core distributed systems problems.
+
+\subsection{Why FAANG Cares (be specific per company)}\label{why-faang-cares-be-specific-per-company}
+
+\subsubsection{Google}\label{google}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Spanner} (globally distributed RDBMS, TrueTime, external consistency) --- invented because Bigtable and Megastore were hard to use correctly
+\item
+  \textbf{Chubby} (lock service, Paxos-based) --- foundation of all Google coordination
+\item
+  \textbf{MapReduce, Colossus, Borg} --- entire infrastructure is distributed
+\item
+  Google interviews heavily test \textbf{consensus, consistency models, and CAP trade-offs}. Expect: "Design Spanner\textquotesingle s TrueTime" or "How does Chubby work?"
+\end{itemize}
+
+\subsubsection{Meta (Facebook)}\label{meta-facebook}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Cassandra} (originally built at FB for Inbox search) --- AP system with tunable consistency
+\item
+  \textbf{TAO} (distributed graph cache for social graph) --- read-heavy, eventual consistency
+\item
+  \textbf{ZippyDB}, \textbf{Memcached/mcrouter} --- caching layer
+\item
+  Meta cares about \textbf{eventual consistency, caching patterns, and large-scale fan-out}
+\end{itemize}
+
+\subsubsection{Amazon / AWS}\label{amazon--aws}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DynamoDB} (Dynamo paper, AP, consistent hashing, vector clocks, sloppy quorum)
+\item
+  \textbf{Aurora} (CP, quorum writes, storage disaggregation)
+\item
+  \textbf{Kinesis} (Kafka-like streaming)
+\item
+  Amazon interviews emphasize \textbf{Dynamo-style trade-offs, eventual consistency, and operational realities}
+\end{itemize}
+
+\subsubsection{Microsoft}\label{microsoft}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Azure Cosmos DB} (multi-model, five consistency levels, PACELC poster child)
+\item
+  \textbf{Azure Service Bus}, \textbf{Event Hubs} (Kafka-like)
+\item
+  Microsoft asks about \textbf{consistency models} (they literally offer five), PACELC, and geo-replication
+\end{itemize}
+
+\subsubsection{Apple / Netflix / Uber / LinkedIn}\label{apple--netflix--uber--linkedin}
+
+\begin{itemize}
+\tightlist
+\item
+  All run Kafka for event streaming
+\item
+  All use service meshes (Envoy, Istio) with distributed service discovery
+\item
+  All depend on consistent hashing for caching and load balancing
+\item
+  Interviews test \textbf{Kafka deep dives, service discovery, distributed caching}
+\end{itemize}
+
+\subsection{The 8 Fallacies of Distributed Computing}\label{the-8-fallacies-of-distributed-computing}
+
+Originally articulated by Peter Deutsch (Sun Microsystems, 1994). Every fallacy represents an assumption that kills distributed systems.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2226}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.7432}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fallacy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why It Bites You
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & \textbf{The network is reliable} & Packets get dropped, routers fail, links saturate. TCP retries help but add latency; still doesn\textquotesingle t guarantee delivery at the application layer. \\
+2 & \textbf{Latency is zero} & Even same-DC calls: \textasciitilde0.5ms. Cross-continent: 150ms+. Synchronous RPC chains multiply latency. One N-hop call = sum of all latencies. \\
+3 & \textbf{Bandwidth is infinite} & Large payloads, bulk transfers, or fan-out can saturate NICs or egress. Protobuf over JSON, streaming over batching often necessary. \\
+4 & \textbf{The network is secure} & Man-in-the-middle, rogue nodes, spoofing. Requires TLS, mTLS, service identity. Especially critical in multi-tenant clouds. \\
+5 & \textbf{Topology doesn\textquotesingle t change} & Nodes are added, removed, rebalanced. IP addresses change. Service discovery must be dynamic, not static config. \\
+6 & \textbf{There is one administrator} & Multi-team, multi-cloud, multi-region. Policies conflict. Schema migrations, firewall rules, and ops procedures must be coordinated across orgs. \\
+7 & \textbf{Transport cost is zero} & Serialization, encryption, compression, and network egress all cost CPU and money. Cross-AZ bandwidth is billed. \\
+8 & \textbf{The network is homogeneous} & Different NIC speeds, MTUs, protocols, OS network stacks. Kubernetes pods, bare metal, VMs, edge nodes --- all in one system. \\
+\end{longtable}
+
+\textbf{Interview takeaway:} Bring up the 8 fallacies when asked "What makes distributed systems hard?" --- it signals systems maturity. The most interview-relevant are \textbf{\#1 (reliability) + \#2 (latency) + topology change (\#5)}.
+
+\subsection{Core Concepts}\label{core-concepts}
+
+\subsubsection{CAP Theorem}\label{cap-theorem}
+
+\textbf{Statement (Brewer, 2000; formalized by Gilbert \& Lynch, 2002):}
+
+\begin{quote}
+In the presence of a network \textbf{P}artition, a distributed system must choose between \textbf{C}onsistency and \textbf{A}vailability.
+\end{quote}
+
+The three properties:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2921}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7079}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Property
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Consistency (C)} & Every read receives the most recent write or an error (linearizability) \\
+\textbf{Availability (A)} & Every non-failing node returns a response (possibly stale) \\
+\textbf{Partition Tolerance (P)} & The system continues operating despite arbitrary message loss between nodes \\
+\end{longtable}
+
+\textbf{The key insight:} Partition tolerance is NOT optional in real systems. Networks partition. You \textbf{must} tolerate partitions. Therefore the real choice is:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{CP systems:} Sacrifice availability during partitions. Return errors rather than stale data. Examples: ZooKeeper, etcd, HBase, Spanner, MongoDB (primary reads)
+\item
+  \textbf{AP systems:} Sacrifice consistency during partitions. Return possibly-stale data rather than errors. Examples: Cassandra, DynamoDB (default), CouchDB, DNS
+\end{itemize}
+
+\textbf{CA systems:} Only possible in single-node (no partitions possible by definition). RDBMS on a single machine is "CA" --- but this is trivial in distributed context.
+
+\textbf{Common misconception:} CAP says nothing about latency, throughput, or behavior under normal (non-partition) operation. PACELC extends this.
+
+\textbf{Interview takeaway:} "CA is not a real choice in distributed systems --- partitions happen, so you always pick CP or AP. The choice is: do you return an error or stale data when the network splits?"
+
+\subsubsection{PACELC}\label{pacelc}
+
+\textbf{Extension by Daniel Abadi (2010):} Captures what happens when there\textquotesingle s NO partition too.
+
+\begin{quote}
+\textbf{If Partition:} choose between \textbf{A}vailability and \textbf{C}onsistency
+\textbf{ELse (normal operation):} choose between \textbf{L}atency and \textbf{C}onsistency
+\end{quote}
+
+\begin{verbatim}
+P -> A vs C
+ELC -> L vs C
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1112}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2273}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2415}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4200}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+System
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Partition choice
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Normal-ops choice
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Category
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DynamoDB & A & L & PA/EL \\
+Cassandra & A & L & PA/EL \\
+Spanner & C & C & PC/EC \\
+MongoDB & C & C & PC/EC \\
+ZooKeeper & C & C & PC/EC \\
+Cosmos DB & Tunable & Tunable & All categories depending on config \\
+\end{longtable}
+
+\textbf{Why PACELC matters:} CAP only says what to do during a partition (rare). PACELC captures the latency vs. consistency trade-off that happens on EVERY SINGLE READ/WRITE. In practice, the ELC trade-off is more important day-to-day.
+
+\textbf{Interview takeaway:} "CAP is about rare partition events. PACELC is about the trade-off you make on every operation. Most high-traffic systems choose AP/EL --- they prefer low latency and availability over strong consistency."
+
+\subsubsection{Consistency Models}\label{consistency-models}
+
+From strongest to weakest:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1401}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3989}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2276}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2334}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Guarantee
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Linearizability (Strong)} & All ops appear instantaneous at some point between call and return. Total order matches real time. & High latency (synchronous coordination) & Spanner, etcd, Zookeeper \\
+\textbf{Sequential Consistency} & All ops appear in some sequential order consistent with each process\textquotesingle s order. No real-time requirement. & High & Research systems \\
+\textbf{Causal Consistency} & Causally related ops seen in order by all nodes. Concurrent ops may be seen in different orders. & Medium & COPS, MongoDB causal sessions \\
+\textbf{Read-your-Writes} & After you write X, you always read X (from any node). Others may see stale data. & Low-medium & Session consistency, sticky sessions \\
+\textbf{Monotonic Reads} & If you read value V, you\textquotesingle ll never read a value older than V. & Low & Cassandra with session-level consistency \\
+\textbf{Monotonic Writes} & Writes from one process are applied in order at all nodes. & Low & Kafka per-partition ordering \\
+\textbf{Eventual Consistency} & Given no new writes, all replicas converge to the same value. No timing guarantee. & Lowest & DynamoDB default, DNS, Cassandra default \\
+\end{longtable}
+
+\textbf{Interview mental model:}
+
+\begin{verbatim}
+Strongest                                         Weakest
+Linearizable → Sequential → Causal → Read-your-writes → Eventual
+\end{verbatim}
+
+\textbf{Key distinctions examiners probe:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Linearizability vs Serializability:} Linearizability is about single operations (real-time ordering). Serializability is about transactions (equivalent to some serial execution). Strict Serializability = both.
+\item
+  \textbf{Eventual vs Strong:} Eventual is fine for social media likes. Strong is required for bank balances and inventory counts.
+\end{itemize}
+
+\subsubsection{Consistent Hashing}\label{consistent-hashing}
+
+\textbf{Problem:} Naive hash-based sharding (node = hash(key) \% N) requires remapping ALL keys when N changes. Catastrophic for large caches or DBs.
+
+\textbf{Solution:} Place both nodes and keys on a virtual ring {[}0, 2\^{}32). A key maps to the nearest node clockwise.
+
+\begin{verbatim}
+ASCII: Consistent Hashing Ring
+
+              0 / 2^32
+                  |
+           NodeA (10)
+          /          \
+    NodeD (340)     NodeB (120)
+          \          /
+           NodeC (250)
+
+Key "user:42" → hash → 180 → NodeC (nearest clockwise from 180)
+Key "order:7" → hash → 90  → NodeB (nearest clockwise from 90)
+Key "product:1" → hash → 5 → NodeA (nearest clockwise from 5)
+
+When NodeB is REMOVED:
+  - Keys 90..250 that were on NodeB move to NodeC
+  - ALL other keys remain on their nodes
+  - Only ~1/N of keys need remapping (vs 100% in naive hashing)
+\end{verbatim}
+
+\textbf{Virtual nodes (vnodes):}
+Each physical node owns multiple positions on the ring. This improves load distribution and makes rebalancing smoother.
+
+\begin{verbatim}
+Physical: NodeA, NodeB, NodeC (3 nodes)
+Virtual:  A1, A2, B1, B2, C1, C2 scattered around ring
+
+Adding NodeD: It claims some positions from A, B, and C equally
+\end{verbatim}
+
+\textbf{Why vnodes?} Without them, if NodeA sits between 0-33\% of the ring and NodeB sits between 33-100\%, NodeB serves 2x more traffic. Vnodes balance this.
+
+\textbf{Interview takeaway:} "Consistent hashing limits key remapping to O(K/N) when nodes join/leave vs O(K) for naive modular hashing. Virtual nodes add uniform load distribution."
+
+\textbf{Real usage:} Amazon Dynamo, Apache Cassandra, Memcached (ketama), CDN edge node selection.
+
+\subsubsection{Quorum (R + W \textgreater{} N)}\label{quorum-r--w--n}
+
+\textbf{Setup:} N total replicas. Write to W replicas. Read from R replicas.
+
+\textbf{Quorum rule:} R + W \textgreater{} N guarantees at least one node in the read set has the latest write.
+
+\begin{verbatim}
+Quorum intersection example (N=3):
+
+Write quorum W=2: Write goes to nodes {A, B}
+Read quorum R=2:  Read comes from nodes {B, C}
+
+Overlap = {B} — B always has the latest value.
+Proof: W + R = 4 > N = 3, so overlap of at least 1.
+
+     [A] ← Write
+     [B] ← Write ← Read
+     [C]          ← Read
+\end{verbatim}
+
+\textbf{Common configurations:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1296}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1296}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0741}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.6667}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+R
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+W
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+N
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Characteristic
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & N & N & Write-heavy: slow writes, fast reads \\
+N & 1 & N & Read-heavy: fast writes, slow reads \\
+(N+1)/2 & (N+1)/2 & N & Balanced (majority quorum) \\
+1 & 1 & N & No quorum! Fastest but inconsistent \\
+\end{longtable}
+
+\textbf{Sloppy quorum (Dynamo):} During partition, accept writes to any available node (not necessarily the "correct" N nodes). Use \textbf{hinted handoff} to replay writes to original nodes when they recover. Boosts availability but risks temporary inconsistency.
+
+\textbf{Interview takeaway:} "R+W\textgreater N guarantees read-write overlap, making strong consistency possible without a single coordinator. Sloppy quorum breaks this guarantee for higher availability --- AP trade-off."
+
+\subsubsection{Consensus: Raft}\label{consensus-raft}
+
+\textbf{Problem:} How do distributed nodes agree on a single value (or sequence of values) despite failures?
+
+\textbf{Raft} (Ongaro \& Ousterhout, 2014) --- designed to be understandable vs Paxos.
+
+\paragraph{Raft: Three Roles}\label{raft-three-roles}
+
+\begin{verbatim}
+Leader:    Handles all client reads/writes. Sends heartbeats.
+Follower:  Passive. Responds to leader and candidates.
+Candidate: Requests votes during election.
+
+State machine:
+   Follower → (election timeout) → Candidate → (majority votes) → Leader
+   Candidate → (discovers leader)  → Follower
+   Leader    → (higher term seen)  → Follower
+\end{verbatim}
+
+\paragraph{Raft: Terms}\label{raft-terms}
+
+Each "epoch" is a \textbf{term} (monotonically increasing integer). Term acts as a logical clock. Stale leaders detecting a higher term immediately step down.
+
+\paragraph{Raft: Leader Election}\label{raft-leader-election}
+
+\begin{verbatim}
+Step 1: Follower's election timeout fires (150-300ms random)
+Step 2: Follower increments term, becomes Candidate, votes for self
+Step 3: Sends RequestVote RPC to all other nodes
+Step 4: Each node grants at most one vote per term (first-come-first-served)
+        BUT only if candidate's log is at least as up-to-date as voter's log
+Step 5: Candidate receiving majority votes → becomes Leader
+Step 6: Leader immediately sends AppendEntries (empty = heartbeat) to assert authority
+
+Split vote: Multiple candidates, no majority. Election timeout fires again with new term.
+Random timeouts make split votes rare.
+\end{verbatim}
+
+\paragraph{Raft: Log Replication}\label{raft-log-replication}
+
+\begin{verbatim}
+Client → Leader (append "SET x=5")
+Leader appends to local log (uncommitted)
+Leader sends AppendEntries to all Followers in parallel
+Followers append to their logs, reply OK
+Leader receives majority ACKs → commits entry
+Leader applies to state machine, returns to client
+Leader notifies followers of commit in next heartbeat
+Followers apply committed entries to their state machines
+
+Log structure:
+Index: | 1 | 2 | 3 | 4 | 5 |
+Term:  | 1 | 1 | 2 | 3 | 3 |
+Cmd:   |SET|SET|DEL|SET|SET|
+              ↑
+              committed up to here
+
+Leader always checks prevLogIndex and prevLogTerm before appending
+This ensures followers' logs never diverge
+\end{verbatim}
+
+\paragraph{Raft: Safety Guarantee}\label{raft-safety-guarantee}
+
+\textbf{Leader Completeness:} A leader always has all committed entries. Guaranteed by the election constraint: a candidate cannot win if its log is less up-to-date than the majority. "Up-to-date" = higher last term, or same last term and longer log.
+
+\textbf{Log Matching:} If two entries in different logs have the same index and term, the logs are identical up to that index.
+
+\paragraph{Raft: Cluster Changes}\label{raft-cluster-changes}
+
+\textbf{Joint consensus:} When adding/removing nodes, Raft uses a two-phase config change to avoid split-brain (two independent majorities).
+
+\subsubsection{Consensus: Paxos}\label{consensus-paxos}
+
+\textbf{Paxos} (Lamport, 1989/1998) --- the original consensus algorithm. Notoriously hard to understand and implement.
+
+\paragraph{Single-Decree Paxos: Two Phases}\label{single-decree-paxos-two-phases}
+
+\textbf{Phase 1: Prepare/Promise}
+
+\begin{verbatim}
+Proposer → sends Prepare(n) to majority of Acceptors   (n = proposal number)
+Acceptor → if n > any seen before:
+              Promise not to accept any proposal < n
+              Return highest-numbered proposal previously accepted (if any)
+\end{verbatim}
+
+\textbf{Phase 2: Accept/Accepted}
+
+\begin{verbatim}
+Proposer → sends Accept(n, v) to majority
+           (v = value from highest-numbered promise, or proposer's own if none)
+Acceptor → if no promise to ignore n, accept it
+           Sends Accepted to Proposer and Learners
+Proposer → value is chosen when majority accept
+\end{verbatim}
+
+\textbf{Why Paxos is hard:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Single-decree only} --- choosing one value. Multi-Paxos (choosing a log) requires additional hacks
+\item
+  \textbf{Liveness not guaranteed} --- two proposers can keep preempting each other (FLP impossibility)
+\item
+  \textbf{No distinguished leader} --- Multi-Paxos assumes a leader but doesn\textquotesingle t specify how to elect one
+\item
+  \textbf{Gap-filling} --- what if an instance has no chosen value? Holes in the log
+\item
+  \textbf{Implementation complexity} --- Google Chubby paper says it took 2 years to get right
+\end{enumerate}
+
+\paragraph{Raft vs Paxos Comparison}\label{raft-vs-paxos-comparison}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2048}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3133}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4819}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Raft
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Paxos (Multi)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Designer & Ongaro \& Ousterhout (2014) & Lamport (1989) \\
+Designed for & Understandability & Correctness proof \\
+Leader & Explicit, strong & Implicit assumption \\
+Log holes & Impossible (sequential) & Possible, need gap-fill \\
+Config changes & Joint consensus & Ad-hoc \\
+Implemented in & etcd, CockroachDB, TiKV & Chubby, Zookeeper (ZAB), Spanner \\
+Understandability & High & Low (Lamport: "choose trivially simple") \\
+Performance & Comparable & Comparable \\
+\end{longtable}
+
+\textbf{Interview takeaway:} "Paxos is proven correct but painful to implement. Raft achieves equivalent safety with explicit leader election and sequential log, making it far easier to implement correctly. For interviews, know Raft deeply."
+
+\subsubsection{Leader Election}\label{leader-election}
+
+Beyond Raft, general leader election approaches:
+
+\textbf{Bully Algorithm:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Node detects leader failure
+\item
+  Sends Election message to all higher-ID nodes
+\item
+  If no response, declares itself leader
+\item
+  Highest-ID node always wins
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Problem: O(N\^{}2) messages, highest ID isn\textquotesingle t always best
+\end{itemize}
+
+\textbf{Ring Election (Chang-Roberts):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Each node passes its ID clockwise around a ring
+\item
+  Each node forwards only IDs higher than its own
+\item
+  When a node receives its own ID, it\textquotesingle s the winner
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  O(N) messages in best case, O(N\^{}2) worst
+\end{itemize}
+
+\textbf{ZooKeeper/etcd approach (most practical):}
+
+\begin{itemize}
+\tightlist
+\item
+  Nodes write an ephemeral sequential znode
+\item
+  The node with the smallest sequence number is the leader
+\item
+  Others watch the node just before them (not the leader directly) --- avoids herd effect
+\end{itemize}
+
+\textbf{Interview takeaway:} "In practice, leader election is solved by Raft/Paxos or by external coordination services like etcd/ZooKeeper. Bully and ring are textbook algorithms rarely used in production."
+
+\subsubsection{Vector Clocks and Lamport Timestamps}\label{vector-clocks-and-lamport-timestamps}
+
+\textbf{The problem:} Distributed nodes have no shared clock. We need to reason about event ordering without a global clock.
+
+\paragraph{Lamport Timestamps}\label{lamport-timestamps}
+
+\textbf{Rules:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Each process starts counter at 0
+\item
+  On each local event: increment counter
+\item
+  On send: increment, attach counter to message
+\item
+  On receive: max(local, message\_counter) + 1
+\end{enumerate}
+
+\begin{verbatim}
+Process A:   1    2         4    5
+                  |         ↑
+                  ↓         |
+Process B:        3    4    5    6
+                            |
+                            ↓
+Process C:                  6    7    8
+\end{verbatim}
+
+\textbf{Limitation:} Lamport timestamps give a total order but cannot distinguish concurrent events. If A.ts \textless{} B.ts, A happened-before B OR they are concurrent --- you can\textquotesingle t tell which.
+
+\paragraph{Vector Clocks}\label{vector-clocks}
+
+Each node maintains a vector of counters, one per process.
+
+\textbf{Rules:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  On local event at node i: increment V{[}i{]}
+\item
+  On send from node i: increment V{[}i{]}, attach full vector
+\item
+  On receive at node j from i: V{[}j{]} = max(V{[}j{]}, V\_msg) element-wise, then increment V{[}j{]}
+\end{enumerate}
+
+\textbf{Comparison:}
+
+\begin{itemize}
+\tightlist
+\item
+  V\_a \textless{} V\_b (a happened-before b): V\_a{[}i{]} \(\leq\) V\_b{[}i{]} for all i, strict for at least one
+\item
+  Concurrent: neither V\_a \textless{} V\_b nor V\_b \textless{} V\_a
+\end{itemize}
+
+\begin{verbatim}
+Example (3 nodes A, B, C):
+A sends to B: A=[1,0,0]
+B receives:   B=[1,1,0]
+B sends to C: B=[1,2,0]
+C receives:   C=[1,2,1]
+A acts:       A=[2,0,0]
+
+A=[2,0,0] vs B=[1,1,0]: neither < other → CONCURRENT
+C=[1,2,1] vs A=[2,0,0]: C[0]=1 < A[0]=2 but C[1]=2 > A[1]=0 → CONCURRENT
+\end{verbatim}
+
+\textbf{Interview takeaway:} "Vector clocks detect causality between events in distributed systems. DynamoDB used them (originally) to detect conflicting writes. They scale as O(N) per message. For large N, dotted version vectors or hybrid logical clocks are used."
+
+\subsubsection{Two-Phase Commit (2PC) and Alternatives}\label{two-phase-commit-2pc-and-alternatives}
+
+\textbf{2PC} --- classic distributed transaction protocol.
+
+\paragraph{2PC Flow}\label{2pc-flow}
+
+\begin{verbatim}
+                     COORDINATOR
+                         |
+         ┌───────────────┼───────────────┐
+         ↓               ↓               ↓
+    Participant A   Participant B   Participant C
+
+Phase 1 (Prepare):
+  Coordinator → Prepare? → All participants
+  Each participant:
+    - Acquires locks
+    - Writes to redo/undo log
+    - Replies Yes or No
+
+Phase 2 (Commit):
+  If ALL said Yes:
+    Coordinator → Commit → All participants
+    Participants release locks, apply changes
+  If ANY said No:
+    Coordinator → Abort → All participants
+    Participants rollback
+\end{verbatim}
+
+\textbf{2PC Problems:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2733}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7267}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Problem
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Blocking} & If coordinator crashes after Phase 1, participants are stuck holding locks indefinitely \\
+\textbf{Single point of failure} & Coordinator crash = system halted until coordinator recovers \\
+\textbf{Not partition-tolerant} & Cannot make progress during network partition \\
+\textbf{Performance} & 2 round trips + synchronous lock holding = high latency \\
+\end{longtable}
+
+\paragraph{Three-Phase Commit (3PC)}\label{three-phase-commit-3pc}
+
+Adds a \textbf{Pre-Commit} phase between Prepare and Commit. Allows participants to safely abort if coordinator fails after Pre-Commit. Theoretically non-blocking but rarely used because: complex, still fails under network partition, and adds a 3rd round trip.
+
+\textbf{Production reality:} 2PC is used in databases (XA transactions) but rarely across microservices. Too slow, too fragile.
+
+\subsubsection{Distributed Transactions and Saga Pattern}\label{distributed-transactions-and-saga-pattern}
+
+\textbf{Saga Pattern} --- alternative to 2PC for long-running distributed transactions.
+
+\textbf{Concept:} Break a transaction into a sequence of local transactions. Each local transaction publishes an event or message. If any step fails, execute \textbf{compensating transactions} to undo previous steps.
+
+\begin{verbatim}
+Order Saga:
+  1. Create Order         → if fails: N/A (first step)
+  2. Reserve Inventory    → if fails: Cancel Order
+  3. Process Payment      → if fails: Release Inventory, Cancel Order
+  4. Arrange Shipping     → if fails: Refund Payment, Release Inventory, Cancel Order
+  5. Confirm Order        → success
+
+Compensating transactions (run on failure):
+  Cancel Order → Release Inventory → Refund Payment → Cancel Shipping
+\end{verbatim}
+
+\textbf{Two Saga implementations:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1002}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3603}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2543}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2852}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Choreography} & Each service listens to events and acts & Decoupled, no central coordinator & Hard to track flow, debugging complex \\
+\textbf{Orchestration} & Central saga orchestrator tells each service what to do & Easy to track, clear flow & Orchestrator is a bottleneck/SPOF \\
+\end{longtable}
+
+\textbf{2PC vs Saga:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2424}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3485}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4091}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+2PC
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Saga
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Consistency & ACID (strong) & Eventually consistent \\
+Latency & High (sync, locks) & Low (async) \\
+Failure handling & Automatic rollback & Compensating transactions \\
+Coupling & Tight (all in one TX) & Loose (events/messages) \\
+Use case & Same DB, short TX & Cross-service, long-running \\
+Blocking & Yes (coordinator crash) & No \\
+\end{longtable}
+
+\textbf{Interview takeaway:} "2PC gives strong consistency but blocks on coordinator failure. Saga gives eventual consistency with better availability. For microservices, Saga is preferred. The cost: you must design compensating transactions and accept temporary inconsistency."
+
+\subsubsection{Replication Strategies}\label{replication-strategies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1257}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3541}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2316}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2886}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Single-Leader} & All writes to primary, async/sync replication to replicas & Simple, strong consistency possible & Leader = SPOF, replica lag \\
+\textbf{Multi-Leader} & Multiple leaders, conflict resolution needed & Geo-distribution, resilient & Write conflicts (last-write-wins, CRDTs, merge) \\
+\textbf{Leaderless (Dynamo)} & Client writes to N nodes directly, quorum & High availability, no leader SPOF & Conflict resolution (vector clocks), stale reads \\
+\textbf{Chain Replication} & Head accepts writes, passes through chain, tail acknowledges to client & Strong consistency, good throughput & Write latency = chain length, tail is read SPOF \\
+\end{longtable}
+
+\textbf{Replication lag issues:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Read-after-write:} User writes, then reads from replica before write propagates
+\item
+  \textbf{Monotonic reads:} User reads from replica A (sees new data), then from replica B (sees old data)
+\item
+  \textbf{Causality violations:} User sees reply before the post it replies to
+\end{itemize}
+
+Solutions: sticky sessions, read from leader after write, version-based consistency.
+
+\subsubsection{Gossip Protocol}\label{gossip-protocol}
+
+\textbf{Concept:} Nodes periodically select random neighbors and exchange state information. Epidemiological model --- information spreads like a virus.
+
+\begin{verbatim}
+Step 0: Node A has new info
+        [A*] [B] [C] [D] [E] [F]
+
+Step 1: A gossips to C and E
+        [A*] [B] [C*] [D] [E*] [F]
+
+Step 2: C gossips to B; E gossips to D and F
+        [A*] [B*] [C*] [D*] [E*] [F*]
+
+All nodes informed in O(log N) rounds
+\end{verbatim}
+
+\textbf{Properties:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Epidemic spread:} O(log N) rounds to reach all N nodes
+\item
+  \textbf{Resilient:} Works even if many nodes fail
+\item
+  \textbf{Eventually consistent:} No guarantees on timing
+\item
+  \textbf{Scalable:} Each node makes constant number of contacts per round
+\end{itemize}
+
+\textbf{Use cases:}
+
+\begin{itemize}
+\tightlist
+\item
+  Membership/failure detection (Cassandra, Riak)
+\item
+  State dissemination (config updates)
+\item
+  Anti-entropy (reconcile differences between replicas)
+\end{itemize}
+
+\textbf{Interview takeaway:} "Gossip provides decentralized, fault-tolerant information propagation. Cassandra uses gossip for cluster membership. It\textquotesingle s eventually consistent --- nodes might have temporarily stale views."
+
+\subsubsection{Heartbeats and Failure Detection}\label{heartbeats-and-failure-detection}
+
+\textbf{Challenge:} In asynchronous networks, you cannot distinguish a slow node from a dead one (FLP impossibility).
+
+\textbf{Heartbeat:} Nodes send periodic "I\textquotesingle m alive" messages. Timeout \(\rightarrow\) assume dead.
+
+\textbf{Problems:}
+
+\begin{itemize}
+\tightlist
+\item
+  Short timeout: false positives (network hiccup = assume dead)
+\item
+  Long timeout: slow detection of actual failures
+\end{itemize}
+
+\textbf{Phi Accrual Failure Detector (Cassandra):}
+Instead of binary live/dead, outputs a suspicion level \(\varphi\) (phi). \(\varphi\) increases the longer since last heartbeat. Application sets threshold: if \(\varphi\) \textgreater{} 8, assume dead. Adapts to changing network conditions.
+
+\textbf{Split-Brain:}
+When a network partition isolates part of a cluster, both sides may believe they\textquotesingle re the leader. Both sides serve writes \(\rightarrow\) data diverges \(\rightarrow\) nightmare.
+
+\begin{verbatim}
+Before partition:                After partition:
+  [Leader] ─── [F1]               [Leader] ─X─ [F1]
+               [F2]                             [F2]
+
+Both sides think they're primary. Writes diverge.
+\end{verbatim}
+
+\textbf{Prevention:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{STONITH (Shoot The Other Node In The Head):} Active fencing --- force the other node offline
+\item
+  \textbf{Quorum-based leadership:} Leader requires majority quorum. Minority partition cannot elect leader.
+\item
+  \textbf{Epoch/term numbers:} New leader always has higher term. Old leader rejects its own writes when it sees higher terms.
+\end{itemize}
+
+\subsubsection{Service Discovery}\label{service-discovery}
+
+\textbf{Problem:} In dynamic environments (containers, auto-scaling), service IPs change constantly. Clients can\textquotesingle t use static IPs.
+
+\textbf{Two patterns:}
+
+\textbf{Client-Side Discovery:}
+
+\begin{verbatim}
+Client → Query Registry (etcd/Consul/ZooKeeper) → Get list of instances
+Client → Load balances itself → Picks instance → Direct call
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Netflix Eureka + Ribbon (client-side)
+\item
+  Pro: Client controls load-balancing algorithm
+\item
+  Con: Discovery logic in every client (language-specific)
+\end{itemize}
+
+\textbf{Server-Side Discovery:}
+
+\begin{verbatim}
+Client → Load Balancer (ELB, Nginx, Envoy)
+Load Balancer → Query Registry → Pick instance → Forward
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  AWS ELB + Route 53
+\item
+  Pro: Simple client, language-agnostic
+\item
+  Con: Load balancer is another hop + potential SPOF
+\end{itemize}
+
+\textbf{Service Registry Types:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ZooKeeper:} CP, strong consistency, general-purpose coordination
+\item
+  \textbf{Consul:} CP, built for service discovery + health checks + KV
+\item
+  \textbf{etcd:} CP, key-value, Kubernetes backing store
+\item
+  \textbf{Eureka:} AP, built for availability, used by Netflix
+\end{itemize}
+
+\textbf{Health checking approaches:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Active:} Registry pings service (HTTP /health)
+\item
+  \textbf{Passive:} Service sends heartbeats to registry (TTL-based)
+\item
+  \textbf{Ephemeral leases:} If service dies, lease expires and entry removed
+\end{itemize}
+
+\subsubsection{Distributed Caching}\label{distributed-caching}
+
+\textbf{Cache patterns:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2270}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4238}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3492}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Cache-Aside (Lazy Loading)} & App checks cache, on miss loads from DB and populates cache & General purpose; stale data possible \\
+\textbf{Write-Through} & Write to cache AND DB synchronously & Strong consistency; higher write latency \\
+\textbf{Write-Behind (Write-Back)} & Write to cache, async write to DB & High write throughput; risk of data loss \\
+\textbf{Read-Through} & Cache handles DB reads automatically & Transparent to app; must configure \\
+\textbf{Refresh-Ahead} & Pre-populate cache before expiry & Low miss rate; wastes memory if unused \\
+\end{longtable}
+
+\textbf{Cache consistency problems:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Cache stampede / thundering herd:} Cache expires, all requests hit DB simultaneously. Solution: probabilistic early expiration, mutex/lock on miss
+\item
+  \textbf{Cache invalidation:} "There are only two hard things in CS: cache invalidation and naming things" --- Phil Karlton. Solutions: TTL, event-based invalidation (CDC), versioning
+\item
+  \textbf{Hotspot keys:} One popular key overloads one cache node. Solutions: local in-process cache, key replication across nodes, consistent hashing with virtual nodes
+\end{itemize}
+
+\textbf{Distributed cache implementations:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Memcached:} Simple KV, no persistence, client-side sharding, very fast
+\item
+  \textbf{Redis:} Rich data structures (lists, sets, sorted sets), optional persistence, Lua scripting, Redis Cluster for sharding
+\end{itemize}
+
+\textbf{Cache eviction policies:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1031}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3139}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5830}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evicts
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Good for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+LRU & Least recently used & General; protects frequently-used items \\
+LFU & Least frequently used & Protects popular items better than LRU \\
+FIFO & Oldest inserted & Simple; ignores access patterns \\
+Random & Random item & Surprisingly OK; simple to implement \\
+TTL & Expired items & Time-sensitive data \\
+\end{longtable}
+
+\subsubsection{Kafka}\label{kafka}
+
+\textbf{Kafka} --- distributed event streaming platform. Originally LinkedIn, now Apache.
+
+\textbf{Core concepts:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Topic:} Named stream of records. Like a database table but append-only and distributed.
+\item
+  \textbf{Partition:} Topics are split into partitions. Each partition is an ordered, immutable log. Enables parallelism.
+\item
+  \textbf{Broker:} Kafka server. A cluster has multiple brokers.
+\item
+  \textbf{Producer:} Writes records to topics (chooses partition via key hash or round-robin).
+\item
+  \textbf{Consumer:} Reads records from partitions by maintaining an \textbf{offset}.
+\item
+  \textbf{Consumer Group:} Group of consumers sharing a topic. Each partition consumed by exactly one consumer in the group.
+\item
+  \textbf{Offset:} Sequence number of a record within a partition. Consumer controls its own offset.
+\item
+  \textbf{Replication Factor:} How many copies of each partition. Leader partition handles reads/writes; followers replicate.
+\item
+  \textbf{ISR (In-Sync Replicas):} Replicas caught up with the leader. Leader waits for ISR to ACK before committing (configurable).
+\end{itemize}
+
+\textbf{Delivery semantics:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1548}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4048}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4405}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Semantic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Config
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{At-most-once} & acks=0, no retry & May lose messages; never duplicates \\
+\textbf{At-least-once} & acks=all, retry enabled & No loss; may duplicate \\
+\textbf{Exactly-once} & Idempotent producer + transactions & No loss, no duplicates (within Kafka) \\
+\end{longtable}
+
+\textbf{Exactly-once is a myth at system level} --- even with Kafka\textquotesingle s exactly-once, if your consumer\textquotesingle s side effects are non-idempotent, you can still cause duplicates. The key: \textbf{make consumers idempotent}.
+
+\textbf{Why Kafka is fast:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Sequential disk writes} --- OS page cache, no random seeks
+\item
+  \textbf{Zero-copy} (sendfile syscall) --- data goes from disk to socket without copying to user space
+\item
+  \textbf{Batching} --- producer and broker batch records, amortize overhead
+\item
+  \textbf{Log compaction} --- keeps only latest value per key; enables changelog topics
+\end{enumerate}
+
+\textbf{Kafka ordering guarantee:} Within a partition, records are strictly ordered. Across partitions, no global order guarantee. This is why key selection matters: all messages for a user should go to the same partition (keyed by userId).
+
+\textbf{Consumer group rebalancing:} When consumers join/leave, partitions are reassigned. All consumers stop processing during rebalance (stop-the-world). Kafka 2.4+ introduced cooperative rebalancing to minimize disruption.
+
+\subsubsection{Idempotency and Exactly-Once vs At-Least-Once}\label{idempotency-and-exactly-once-vs-at-least-once}
+
+\textbf{Idempotent operation:} Applying it multiple times has the same effect as applying once.
+
+\begin{verbatim}
+Idempotent:     SET x = 5           → safe to retry
+Non-idempotent: INCREMENT x         → retry causes overcounting
+
+Making it idempotent: SET x = 5 WHERE version = 3
+\end{verbatim}
+
+\textbf{Idempotency key:} Client sends a unique ID with each request. Server deduplicates.
+
+\begin{verbatim}
+POST /payments
+{
+  "idempotency_key": "a1b2c3-uuid",
+  "amount": 100,
+  "account": "123"
+}
+Server stores (idempotency_key → result) and returns cached result on retry.
+\end{verbatim}
+
+\textbf{At-least-once vs Exactly-once:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2388}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3731}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3881}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+At-Least-Once
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Exactly-Once
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Risk & Duplicate processing & None in theory \\
+Complexity & Low & High \\
+Performance & Better & Worse (more coordination) \\
+Best practice & Make consumers idempotent & Only when truly needed \\
+Real-world usage & Most systems & Payment systems, financial \\
+\end{longtable}
+
+\textbf{Interview takeaway:} "Exactly-once is extremely hard to achieve end-to-end. At-least-once + idempotent consumers is the practical solution in \textgreater95\% of systems. Design your consumer operations to be naturally idempotent or add idempotency keys."
+
+\subsection{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsubsection{CAP Triangle}\label{cap-triangle}
+
+\begin{verbatim}
+        Consistency
+            /\
+           /  \
+          /    \
+         / CP   \
+        /  Zk    \
+       /  etcd    \
+      /  Spanner   \
+     /--------------\
+    / CA              \
+   / (single-node DB)  \
+  /----AP----------------\
+ /   DynamoDB             \
+/    Cassandra              \
+
+   Availability ←──────────→
+\end{verbatim}
+
+\subsubsection{Consistent Hashing Ring}\label{consistent-hashing-ring}
+
+\begin{verbatim}
+                     0
+                 ___/|\___
+                /    |    \
+    315        /     |     \   45
+              /   vnodes   \
+   NodeA─────*   scattered  *─────NodeB
+              \   on ring   /
+    270        \     |     /   90
+                \____|____/
+                     |
+                    180
+               NodeC / NodeD
+
+Example positions:
+NodeA: 15, 120, 240
+NodeB: 60, 190, 310
+NodeC: 90, 210, 350
+NodeD: 30, 150, 270
+
+Key at hash 100 → next clockwise ≥ 100 → 120 (NodeA)
+Key at hash 200 → next clockwise ≥ 200 → 210 (NodeC)
+\end{verbatim}
+
+\subsubsection{Raft: Leader Election and Log Replication}\label{raft-leader-election-and-log-replication}
+
+\begin{verbatim}
+INITIAL STATE:                    AFTER ELECTION:
+[F: term=1]                       [L: term=2]  ← elected leader
+[F: term=1]  → timeout →          [F: term=2]
+[F: term=1]                       [F: term=2]
+
+LEADER ELECTION MESSAGES:
+Candidate → RequestVote(term=2) → All
+Each Follower → VoteGranted       → Candidate (if log OK, first vote this term)
+Candidate receives 2 of 3 votes → becomes Leader
+
+LOG REPLICATION:
+Client → SET x=5 → Leader
+
+Leader Log:  | idx=1,t=1,x=1 | idx=2,t=2,x=5 | ← new, uncommitted
+                                      |
+                              AppendEntries RPC
+                             /                  \
+                            ↓                    ↓
+Follower1 Log: |idx=1,t=1| |idx=2,t=2,x=5|   Follower2 Log: |idx=1,t=1| |idx=2,t=2,x=5|
+                              ↑ ACK                              ↑ ACK
+
+Leader receives 2 ACKs (majority of 3) → commits idx=2
+→ Responds to client: OK
+→ Next heartbeat tells followers: commit up to idx=2
+Followers apply idx=2 to state machine
+
+SAFETY: Follower only votes for candidate whose log is at least as up-to-date
+        This prevents any node from winning without all committed entries
+\end{verbatim}
+
+\subsubsection{Quorum Reads and Writes (N=5, R=3, W=3)}\label{quorum-reads-and-writes-n5-r3-w3}
+
+\begin{verbatim}
+WRITE (W=3):
+Client → Write(x=5) → N1, N2, N3, N4, N5
+                       ↑    ↑    ↑
+                      ACK  ACK  ACK  ← 3 ACKs (majority) = committed
+                                N4, N5 may respond later
+
+READ (R=3):
+Client ← Read(x) ← N1, N2, N3
+         |          x=5  x=5  x=3 ← N3 is stale
+         |
+         Conflict resolution: pick latest version (vector clock / timestamp)
+         Return x=5
+
+OVERLAP GUARANTEE:
+Write set {N1,N2,N3}, Read set {N1,N2,N3}: Overlap = {N1,N2,N3}
+At least one node in read set always has the latest write. ✓
+\end{verbatim}
+
+\subsubsection{Kafka Topic/Partition/Consumer-Group}\label{kafka-topicpartitionconsumer-group}
+
+\begin{verbatim}
+Topic: "user-events"  (3 partitions, replication-factor=2)
+
+Partition 0: [msg0][msg1][msg4][msg7]...  Leader: Broker1, Replica: Broker2
+Partition 1: [msg2][msg5][msg8]...        Leader: Broker2, Replica: Broker3
+Partition 2: [msg3][msg6][msg9]...        Leader: Broker3, Replica: Broker1
+
+Producer A (key=userId % 3):
+  userId=10 → partition 1
+  userId=20 → partition 2
+  userId=30 → partition 0
+
+Consumer Group "analytics":
+  Consumer X → reads Partition 0 (offset: 7)
+  Consumer Y → reads Partition 1 (offset: 8)
+  Consumer Z → reads Partition 2 (offset: 9)
+
+Consumer Group "notifications":
+  Consumer P → reads Partition 0 + Partition 1
+  Consumer Q → reads Partition 2
+
+Rule: Each partition is consumed by exactly ONE consumer per consumer group
+      Multiple consumer groups each see ALL messages independently
+\end{verbatim}
+
+\subsection{Real-World Examples}\label{real-world-examples}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0763}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1703}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2613}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1938}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2983}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+System
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CAP
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Consistency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sharding
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{DynamoDB} & AP & Eventual (default), tunable & Consistent hashing & Dynamo paper: vector clocks, sloppy quorum, hinted handoff \\
+\textbf{Cassandra} & AP & Tunable (ONE to ALL) & Consistent hashing + vnodes & Gossip for membership, LWW for conflict resolution \\
+\textbf{Spanner} & CP & External consistency (linearizable + serializable) & Sharded Paxos & TrueTime API bounds clock uncertainty \\
+\textbf{ZooKeeper} & CP & Sequential consistency & No (single-leader) & ZAB protocol (Paxos-like), used for coordination/leader election \\
+\textbf{etcd} & CP & Linearizable & No (single-leader, but clustered) & Raft consensus, Kubernetes backing store \\
+\textbf{HBase} & CP & Strong (via HDFS + ZooKeeper) & Region-based & Built on Hadoop, ZooKeeper for master election \\
+\textbf{MongoDB} & CP (default) & Causal (tunable) & Range-based sharding & Primary-secondary replication, elections on failure \\
+\textbf{Redis Cluster} & AP & Eventual (async replication) & Hash slots (16384) & Sentinel for HA, Cluster for sharding \\
+\textbf{Kafka} & CP (for partition leadership) & Per-partition order & Log partitioning & ISR-based replication, ZooKeeper \(\rightarrow\) KRaft migration \\
+\textbf{Memcached} & AP & None (no replication) & Client-side consistent hash & Pure cache, no HA by itself \\
+\end{longtable}
+
+\subsection{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One kingdom of villages, connected only by riders --- every concept is a village, a decree, or a messenger.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.0906}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.9094}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CAP Theorem} & When the road between regions is washed out (partition), the council either halts all decisions until it reopens (consistency) or lets each region rule on its own possibly-stale information (availability) --- it cannot do both at once. \\
+\textbf{Eventual Consistency} & A decree carried by riders to every village: for a while different villages know different things, but the news eventually reaches all, and the kingdom settles on the same truth. \\
+\textbf{Consistent Hashing} & Granaries arranged around the kingdom\textquotesingle s ring road, each village responsible for the stretch of road after it. When one village abandons its granary, only that stretch is reassigned to the next village --- the rest of the kingdom\textquotesingle s ledgers stay untouched. \\
+\textbf{Raft Leader Election} & If the chief goes silent, a candidate rides out campaigning village to village; once a majority of village elders pledge support, that candidate is crowned chief for a new reign (the "term number"). Any rival who sees a higher reign number stands down immediately. \\
+\textbf{Quorum} & A decree becomes law only if a majority of village elders vote yes --- even with some elders absent on harvest duty, the decree can still pass as long as more than half of all elders have sealed it. \\
+\textbf{Vector Clocks} & Each rider\textquotesingle s message notes "I\textquotesingle d heard up to your 3rd decree and the western village\textquotesingle s 2nd." You can tell which decree answered which, and when two villages issued orders without hearing from each other, their clocks reveal the messages as concurrent --- no one can claim one came first. \\
+\textbf{Gossip Protocol} & A rider arrives at one village with news; that village\textquotesingle s own riders carry it to two neighbours next dawn; each of those villages dispatches riders in turn. In a few rounds every corner of the kingdom has heard --- even if some riders never arrive, enough paths exist that the news still spreads. \\
+\textbf{Saga Pattern} & A multi-village grain trade: Village A ships wheat, Village B grinds it to flour, Village C bakes bread for market. If the miller\textquotesingle s fire burns down mid-agreement, the miller sends word back to cancel the wheat shipment and refund the delivery riders --- each step carries a written undo-scroll so the trade can be unwound cleanly. \\
+\textbf{2PC} & The chief sends a rider to every village asking "are you ready to commit to the harvest levy?" (Phase 1: Prepare). Only when all villages reply "ready" does a second rider ride out saying "commit!" If any village replies "not ready" --- or the chief\textquotesingle s rider is lost mid-journey --- every village holds its grain locked in the storehouse, waiting, unable to trade until the chief\textquotesingle s next decree arrives. \\
+\textbf{Split Brain} & A flood cuts the kingdom\textquotesingle s roads in two. Both halves believe their regional elder is now chief, both issue decrees, both stamp their own ledgers as authoritative. When the roads reopen, the scribes find two contradictory sets of laws and must painfully reconcile whose decrees count --- or one chief must abdicate. \\
+\textbf{Heartbeat} & Each village elder sends a rider to the chief every dusk carrying only a blank scroll that means "still here." If the chief receives no blank scroll from a village for three dawns running, the council assumes that village has gone dark and dispatches a relief rider to investigate. \\
+\textbf{Idempotency} & A rider delivers the same levy decree twice because the road was muddy and they feared the first had been lost. A wise village elder stamps the decree\textquotesingle s unique seal number in the ledger: if the seal has already been recorded, the levy is not collected a second time --- the kingdom\textquotesingle s accounts stay sound no matter how many copies arrive. \\
+\end{longtable}
+
+\subsection{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\subsubsection{CAP: "Pick 2, but P is not optional"}\label{cap-pick-2-but-p-is-not-optional}
+
+\begin{verbatim}
+CAP = C A P
+       ↑ ↑ ↑
+       | | └── Partition Tolerance (MANDATORY in real systems)
+       | └──── Availability (return a response)
+       └────── Consistency (latest data)
+
+Real choice: CP (return error) or AP (return stale data)
+\end{verbatim}
+
+\subsubsection{PACELC: "P picks A or C, ELse picks L or C"}\label{pacelc-p-picks-a-or-c-else-picks-l-or-c}
+
+\begin{verbatim}
+P → A/C (partition scenario)
+ELC → L/C (normal scenario)
+"During Partition = AC, Else = LC"
+\end{verbatim}
+
+\subsubsection{Raft: "FELT" for leader election}\label{raft-felt-for-leader-election}
+
+\begin{verbatim}
+F - Follower times out
+E - Election begins (become Candidate)
+L - Log check (only vote if candidate log ≥ mine)
+T - Term number (higher term always wins)
+\end{verbatim}
+
+\subsubsection{Quorum: R + W \textgreater{} N}\label{quorum-r--w--n-1}
+
+\begin{verbatim}
+N = 5, want quorum: R=3, W=3 → 3+3=6 > 5 ✓
+"Read + Write must exceed total replicas"
+Fast reads: R=1, W=5 → write to all
+Fast writes: R=5, W=1 → read from all
+\end{verbatim}
+
+\subsubsection{Consistency Levels (strongest to weakest):}\label{consistency-levels-strongest-to-weakest}
+
+\begin{verbatim}
+"Lions Shouldn't Carry Raw Meat Ever"
+L - Linearizable
+S - Sequential
+C - Causal
+R - Read-your-writes
+M - Monotonic reads
+E - Eventual
+\end{verbatim}
+
+\subsubsection{8 Fallacies: "NLB-STT-Z"}\label{8-fallacies-nlb-stt-z}
+
+\begin{verbatim}
+N - Network is reliable
+L - Latency is zero
+B - Bandwidth is infinite
+S - Secure network
+T - Topology doesn't change
+T - There is one admin
+Z - Zero transport cost
+H - Homogeneous network
+\end{verbatim}
+
+(Or remember: "No Legitimate Business Survives Thinking They\textquotesingle re Zeus-like Homogeneous")
+
+\subsubsection{2PC vs Saga}\label{2pc-vs-saga}
+
+\begin{verbatim}
+2PC = "2 Phases, Can block" → ACID, tight coupling, blocking
+SAGA = "Steps And Compensating Actions" → eventual, loose, non-blocking
+\end{verbatim}
+
+\subsubsection{Raft Safety in one line:}\label{raft-safety-in-one-line}
+
+\begin{verbatim}
+"A leader can only win if its log is as complete as the majority"
+→ Ensures all committed entries survive leader changes
+\end{verbatim}
+
+\subsection{Common Interview Questions}\label{common-interview-questions}
+
+\subsubsection{Q1: "What is the CAP theorem? Give examples."}\label{q1-what-is-the-cap-theorem-give-examples}
+
+\textbf{Model answer:}
+"CAP states that in the presence of a network partition, a distributed system must choose between consistency and availability. Partition tolerance isn\textquotesingle t optional --- networks partition, so you always pick CP or AP.
+
+CP example: ZooKeeper returns errors during partitions rather than serving stale data --- used where coordination correctness matters (leader election, distributed locks).
+
+AP example: Cassandra and DynamoDB return potentially stale data during partitions --- used where availability matters more than perfect consistency (shopping carts, social feeds).
+
+Important nuance: CAP only describes behavior during a partition. PACELC extends this by noting that even during normal operation, you trade latency against consistency."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  "What\textquotesingle s the difference between linearizability and sequential consistency?" \(\rightarrow\) Linearizability: real-time ordering constraint. Sequential: some valid ordering consistent per-process.
+\item
+  "Is Cassandra really AP?" \(\rightarrow\) Tunable: at consistency level ONE it\textquotesingle s AP, at ALL it\textquotesingle s effectively CP
+\item
+  "What\textquotesingle s PACELC?" \(\rightarrow\) See PACELC section above
+\end{itemize}
+
+\subsubsection{Q2: "Explain how Raft works."}\label{q2-explain-how-raft-works}
+
+\textbf{Model answer:}
+"Raft is a consensus algorithm that replicates a state machine log across a cluster. It has three key components:
+
+\textbf{Leader election:} Nodes start as followers. On timeout (randomized 150-300ms), a follower becomes a candidate, increments its term, and requests votes. A node wins if it gets a majority, and only if its log is at least as up-to-date as each voter\textquotesingle s log. The winning node becomes leader for that term.
+
+\textbf{Log replication:} All writes go to the leader. The leader appends the entry locally, then sends AppendEntries RPCs to all followers. Once a majority acknowledges, the leader commits the entry, responds to the client, and notifies followers to commit in the next heartbeat.
+
+\textbf{Safety:} The election rule ensures a new leader always has all committed entries --- committed means majority wrote it, and a majority must vote, so their intersection always has the committed entry. This is the Log Matching property.
+
+Raft guarantees: leader completeness (elected leader has all committed entries), log matching (identical index+term means identical logs up to that point), and state machine safety (all nodes apply the same log in the same order)."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  "What happens when the leader crashes?" \(\rightarrow\) New election. Any committed entry survives because the winner has all committed entries.
+\item
+  "What about uncommitted entries in leader\textquotesingle s log?" \(\rightarrow\) They may or may not survive. Raft only guarantees committed entries survive.
+\item
+  "How does Raft handle log conflicts?" \(\rightarrow\) AppendEntries includes prevLogIndex and prevLogTerm. Follower rejects if mismatch. Leader walks back until they agree, then overwrites.
+\end{itemize}
+
+\subsubsection{Q3: "Design a distributed cache."}\label{q3-design-a-distributed-cache}
+
+\textbf{Model answer:}
+"I\textquotesingle d use a consistent hashing ring with virtual nodes for data distribution across N cache nodes. For high availability, replicate each key to the next K nodes clockwise.
+
+\textbf{Client routing:} Use client-side consistent hashing (memcached ketama) or a proxy layer (like mcrouter or Envoy with hashing LB).
+
+\textbf{Cache operations:}
+
+\begin{itemize}
+\tightlist
+\item
+  Cache-aside: application checks cache, misses hit DB, then populate cache
+\item
+  TTL-based expiration with lazy eviction + background cleanup
+\item
+  LRU or LFU eviction policy
+\end{itemize}
+
+\textbf{Failure handling:}
+
+\begin{itemize}
+\tightlist
+\item
+  Node failure: consistent hashing routes to next node; replication ensures data survives
+\item
+  Cache stampede on miss: use probabilistic early expiration or a distributed mutex (Redis SET NX with TTL)
+\end{itemize}
+
+\textbf{Consistency:}
+
+\begin{itemize}
+\tightlist
+\item
+  Write-through for critical data (payment status)
+\item
+  Write-behind for high-throughput writes (analytics events)
+\item
+  Event-based invalidation via CDC for DB-cache sync
+\end{itemize}
+
+At scale (e.g., Meta\textquotesingle s Memcached), layers: L1 in-process cache \(\rightarrow\) L2 regional Memcached cluster \(\rightarrow\) DB. Replication groups for high read throughput."
+
+\subsubsection{Q4: "Explain consistent hashing and why it\textquotesingle s used."}\label{q4-explain-consistent-hashing-and-why-its-used}
+
+\textbf{Model answer:}
+"Consistent hashing places nodes and keys on a virtual ring from 0 to 2\^{}32. A key is assigned to the nearest node clockwise. When a node joins or leaves, only O(K/N) keys --- the ones between the departing node and its predecessor --- are remapped, vs O(K) for naive modular hashing.
+
+Without it, adding one node to a 10-node cluster would remap \textasciitilde90\% of keys, causing a cache avalanche as every remapped key misses and hits the database.
+
+Virtual nodes improve load distribution: each physical node has multiple ring positions, so adding or removing a node draws/redistributes keys from many neighbors rather than just two."
+
+\subsubsection{Q5: "What is idempotency and why does it matter?"}\label{q5-what-is-idempotency-and-why-does-it-matter}
+
+\textbf{Model answer:}
+"An idempotent operation produces the same result whether applied once or multiple times. It matters because in distributed systems, network failures cause retries. Without idempotency, retries cause double-charges, duplicate orders, or corrupted state.
+
+Implementation: idempotency keys. The client sends a UUID with each request. The server stores (key \(\rightarrow\) response) and returns the cached result on retry. The key must be scoped appropriately --- per-user, per-resource, with TTL.
+
+In Kafka: idempotent producers use a PID + sequence number. Broker deduplicates retried batches. Transactional producers extend this across partitions.
+
+The practical rule: at-least-once delivery + idempotent consumers = effectively-once processing, without the complexity of true exactly-once."
+
+\subsubsection{Q6: "What is split-brain and how do you prevent it?"}\label{q6-what-is-split-brain-and-how-do-you-prevent-it}
+
+\textbf{Model answer:}
+"Split-brain occurs when a network partition causes two sides of a cluster to each believe they\textquotesingle re the active leader. Both accept writes, creating divergent state that\textquotesingle s extremely hard to reconcile.
+
+Prevention strategies:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Quorum-based leadership:} Leader requires majority (N/2+1) acknowledgment. Minority partition can\textquotesingle t elect a leader, so only one side stays active.
+\item
+  \textbf{Epoch/term fencing:} Leader writes include its term. If old leader comes back after partition, followers reject its writes because they\textquotesingle ve seen a higher term.
+\item
+  \textbf{STONITH (Shoot The Other Node In The Head):} Actively fence the other node --- cut its power, revoke its network access --- before proceeding. Used in HA database clusters.
+\item
+  \textbf{Witness nodes:} A tie-breaking node that grants quorum to one side.
+\end{enumerate}
+
+In Raft: the minority-side leader steps down when it can no longer replicate to a majority and stops receiving heartbeats from the new leader."
+
+\subsection{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\subsubsection{Why Paxos Is Hard to Implement}\label{why-paxos-is-hard-to-implement}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Multi-Paxos vs Single-Decree:} The original paper only describes agreeing on ONE value. Real systems need an ordered log (Multi-Paxos). The paper doesn\textquotesingle t specify this, leaving huge implementation gaps.
+\item
+  \textbf{Liveness holes:} Two proposers with consecutive proposal numbers can livelock forever (each preempts the other). Need a leader, but Paxos doesn\textquotesingle t specify leader election.
+\item
+  \textbf{Log gaps:} If an instance has no accepted value, you need to fill it (no-op). Non-trivial.
+\item
+  \textbf{Leader leases:} Reading committed state without contacting a majority on every read requires leader leases --- another protocol layered on top.
+\item
+  \textbf{Reconfiguration:} Changing cluster membership is extremely tricky.
+\end{enumerate}
+
+Google\textquotesingle s Chubby paper (2006): "there are significant gaps between the description of the Paxos algorithm and the needs of a real-world system... the final system will be based on an unproven protocol."
+
+\subsubsection{The Exactly-Once Myth}\label{the-exactly-once-myth}
+
+True exactly-once delivery at the network layer is \textbf{impossible} in the face of node failures (you can\textquotesingle t know if a message was delivered or not without asking, which risks duplicates). What systems achieve:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Kafka exactly-once semantics:} Exactly-once within Kafka\textquotesingle s producer-broker-consumer pipeline (idempotent producers + transactional APIs). But if the consumer writes to a non-transactional external system (DB, HTTP API), you\textquotesingle re back to at-least-once.
+\item
+  \textbf{Practical exactly-once:} Kafka + idempotent consumer with a transactional DB. Write the output AND commit the Kafka offset in one DB transaction. If processing fails, rollback both. But requires the consumer\textquotesingle s output to be in the same transactional store as the offset.
+\end{itemize}
+
+\subsubsection{Trade-offs: Consistency vs. Latency}\label{trade-offs-consistency-vs-latency}
+
+\begin{itemize}
+\tightlist
+\item
+  Every synchronous replication round trip adds \textasciitilde1ms per hop, per replica. Cross-region = 50-150ms per round trip.
+\item
+  Spanner achieves external consistency but sacrifices latency: \textasciitilde5-10ms per write vs DynamoDB\textquotesingle s \textasciitilde1ms
+\item
+  For social media (likes, view counts), eventual consistency is fine --- users won\textquotesingle t notice 100ms convergence delay
+\item
+  For financial systems (balances, inventory), strong consistency is required --- business logic demands it
+\end{itemize}
+
+\subsubsection{Failure Scenarios to Discuss}\label{failure-scenarios-to-discuss}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Leader with stale followers:} Network partition isolates leader. Minority leader keeps accepting writes. When partition heals, those writes are lost (overwritten by new majority\textquotesingle s leader).
+\item
+  \textbf{Thundering herd on cache miss:} Cache node fails. All clients simultaneously miss and stampede the DB. Mitigation: circuit breaker, request coalescing, probabilistic TTL extension.
+\item
+  \textbf{Slow node in quorum:} If you need 3 of 5 nodes to ACK, one slow node adds its latency to all writes. Dynamo uses "fastest R of N" and "background write" to avoid this.
+\item
+  \textbf{Zombie leader:} Old leader (post-partition) still thinks it\textquotesingle s leader. Without fencing tokens, it may service reads (returning stale data) or attempt writes (rejected by followers who see higher term). Solution: epoch-based fencing, STONITH.
+\item
+  \textbf{Cascading failure:} Node A fails \(\rightarrow\) Node B takes on its load \(\rightarrow\) B becomes overloaded \(\rightarrow\) B fails \(\rightarrow\) cascade. Mitigation: load shedding, bulkheads, backpressure.
+\end{enumerate}
+
+\subsubsection{Gossip vs Consensus for Membership}\label{gossip-vs-consensus-for-membership}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Gossip (Cassandra):} Eventually consistent membership. Nodes may briefly disagree on who\textquotesingle s in the cluster. Cheap, scales to thousands. Fine for eventual-consistency systems.
+\item
+  \textbf{Consensus (ZooKeeper, etcd):} Strongly consistent membership. All nodes agree. Slower (requires majority ACK). Required for systems that need exactly-once leader election or distributed locks.
+\end{itemize}
+
+\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3105}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6895}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mistake
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Correction
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+"CA is a valid CAP choice" & CA is only meaningful on a single machine. Distributed systems must tolerate partitions. Real choice is CP vs AP. \\
+"Eventual consistency = broken consistency" & Eventual consistency is appropriate and correct for many use cases (DNS, social feeds, analytics). It\textquotesingle s a deliberate trade-off. \\
+Confusing \textbf{linearizability} with \textbf{serializability} & Linearizability: single-operation real-time ordering. Serializability: transaction-level equivalence to serial execution. Spanner has BOTH (strict serializability). \\
+Saying "Kafka guarantees exactly-once delivery" & Kafka guarantees exactly-once within its own pipeline. End-to-end exactly-once requires idempotent consumers + transactional processing. \\
+"Just use 2PC for distributed transactions" & 2PC blocks on coordinator failure. For microservices, Saga with compensating transactions is more appropriate. \\
+"Raft is just like Paxos" & Raft is simpler and more understandable. Key differences: strong leader, sequential log (no holes), joint consensus for config changes. \\
+Not mentioning failure scenarios & Always discuss: what happens when a node dies, when network partitions, when the leader crashes. Interviewers want failure mode awareness. \\
+Treating CAP as binary switches & Tunable consistency (Cassandra) shows it\textquotesingle s a dial, not a switch. Different operations in the same system can have different consistency levels. \\
+"More replicas = more availability" & More replicas also means more nodes to fail during synchronous writes. Must balance replication factor with write latency and failure probability. \\
+Forgetting clock skew & Always mention that distributed timestamps require care. Lamport clocks, vector clocks, or TrueTime. Never assume clocks are synchronized. \\
+\end{longtable}
+
+\subsection{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+
+\subsubsection{System Design}\label{system-design}
+
+\begin{itemize}
+\tightlist
+\item
+  Every large-scale system design requires: partitioning strategy (consistent hashing or range), replication strategy (leader-follower or leaderless), consistency model choice, and service discovery
+\item
+  "Design a URL shortener" \(\rightarrow\) need distributed ID generation (Snowflake), caching (Redis consistent hash), and AP storage (Cassandra)
+\item
+  "Design WhatsApp" \(\rightarrow\) Kafka for message queuing, consistent hashing for user routing, read-your-writes consistency for messages
+\end{itemize}
+
+\subsubsection{Databases}\label{databases}
+
+\begin{itemize}
+\tightlist
+\item
+  SQL ACID transactions = linearizability + serializability = CP on single node
+\item
+  Distributed SQL (Spanner, CockroachDB) = Paxos/Raft + 2PC for cross-shard transactions
+\item
+  NoSQL tradeoffs: MongoDB (CP, tunable), Cassandra (AP, tunable), DynamoDB (AP, tunable)
+\item
+  Replication lag (MySQL async replication) = eventually consistent reads from replicas
+\item
+  MVCC + snapshot isolation = consistency model at DB level
+\end{itemize}
+
+\subsubsection{Computer Networks}\label{computer-networks}
+
+\begin{itemize}
+\tightlist
+\item
+  TCP reliability helps but doesn\textquotesingle t solve distributed consensus (still need application-level ACKs)
+\item
+  Network partition = the P in CAP. VPCs, AZs, regions add partition probability
+\item
+  HTTP idempotency: GET/PUT/DELETE are idempotent by design, POST is not
+\item
+  gRPC / Protobuf: reduce serialization cost (fallacy \#7)
+\item
+  TLS/mTLS: solve fallacy \#4 (network security)
+\end{itemize}
+
+\subsubsection{Concurrency}\label{concurrency}
+
+\begin{itemize}
+\tightlist
+\item
+  Distributed locks are the distributed equivalent of mutexes
+\item
+  Compare-and-Swap (CAS) at DB level enables optimistic locking = distributed equivalent of lock-free algorithms
+\item
+  Thread safety in single process :: consensus in distributed system
+\item
+  Race conditions in distributed systems \(\rightarrow\) addressed by ordering guarantees, vector clocks, transactions
+\item
+  Deadlock \(\rightarrow\) distributed deadlock detection is harder (requires global knowledge)
+\end{itemize}
+
+\subsection{FAANG Interview Tips}\label{faang-interview-tips}
+
+\textbf{For system design rounds:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Always ask about consistency requirements} early. "Does this need strong consistency, or is eventual OK?" This shapes all subsequent decisions.
+\item
+  \textbf{Name the patterns explicitly:} "I\textquotesingle d use consistent hashing for this because..." shows vocabulary.
+\item
+  \textbf{Discuss failure modes proactively:} "If the leader crashes during this write, here\textquotesingle s what happens..." --- separates senior candidates.
+\item
+  \textbf{PACELC lens:} After choosing CP/AP for partition scenario, immediately discuss "In normal operation, we\textquotesingle re trading latency for consistency by..."
+\item
+  \textbf{Quantify:} "With R=2, W=2, N=3, we get majority quorum on both reads and writes. Write latency is \textasciitilde2x a single node write because we wait for both ACKs."
+\end{enumerate}
+
+\textbf{For depth/DS\&A rounds on distributed topics:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Know Raft cold --- leader election, log replication, safety. Draw the state machine.
+\item
+  Know the Dynamo paper highlights --- consistent hashing, vector clocks, sloppy quorum, hinted handoff
+\item
+  Know Kafka deeply --- partitions, consumer groups, offset management, ISR, delivery semantics
+\item
+  Be prepared to critique trade-offs rather than just describe systems
+\end{enumerate}
+
+\textbf{Communication patterns:}
+
+\begin{itemize}
+\tightlist
+\item
+  "The classic tension here is X vs Y. If we prioritize X, we\textquotesingle d choose Z. If we prioritize Y, we\textquotesingle d choose W. Given the requirements you mentioned, I\textquotesingle d lean toward..."
+\item
+  "This is the split-brain problem. The standard solution is quorum-based leadership, specifically..."
+\item
+  "This reminds me of how DynamoDB handles this --- they use sloppy quorum with hinted handoff to maintain availability during partitions."
+\end{itemize}
+
+\textbf{Red flags to avoid:}
+
+\begin{itemize}
+\tightlist
+\item
+  Saying "just use a database" without specifying consistency/replication model
+\item
+  Not knowing the difference between a Kafka topic, partition, and consumer group
+\item
+  Unable to explain why Paxos is hard to implement
+\item
+  Treating distributed systems as deterministic/reliable
+\end{itemize}
+
+\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsubsection{10-Minute Summary}\label{10-minute-summary}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{CAP:} During partition, choose Consistency (error) or Availability (stale). P is mandatory.
+\item
+  \textbf{PACELC:} Extends CAP to normal ops: choose Latency or Consistency on every request.
+\item
+  \textbf{Consistency models:} Linearizable \textgreater{} Sequential \textgreater{} Causal \textgreater{} Read-your-writes \textgreater{} Eventual
+\item
+  \textbf{Consistent hashing:} O(K/N) remapping when nodes change. Virtual nodes for even distribution.
+\item
+  \textbf{Quorum:} R+W\textgreater N guarantees overlap. Sloppy quorum trades consistency for availability.
+\item
+  \textbf{Raft:} Leader election (majority votes, log must be up-to-date) + Log replication (leader commits on majority ACK). Term = epoch.
+\item
+  \textbf{Paxos:} Two phases (Prepare/Accept). Proven correct, painful to implement. Raft is practical alternative.
+\item
+  \textbf{Vector clocks:} Detect causality. V\_a \textless{} V\_b \(\rightarrow\) a happened-before b. Otherwise concurrent.
+\item
+  \textbf{2PC:} ACID across nodes but blocks on coordinator failure. Use Saga for microservices.
+\item
+  \textbf{Kafka:} Topics \(\rightarrow\) Partitions (ordered log). Consumer groups (each partition \(\rightarrow\) 1 consumer per group). ISR for replication.
+\item
+  \textbf{Idempotency:} At-least-once + idempotent = effectively exactly-once. Use idempotency keys.
+\item
+  \textbf{Split-brain:} Two leaders diverge. Prevent with quorum, epoch fencing, STONITH.
+\item
+  \textbf{Gossip:} O(log N) propagation, resilient, eventually consistent. Used for membership.
+\item
+  \textbf{Service discovery:} Client-side (Eureka) vs server-side (ELB). Registry must have health checks.
+\end{enumerate}
+
+\subsubsection{Key Points}\label{key-points}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{The 8 fallacies:} Network unreliable, latency not zero, bandwidth not infinite, not secure, topology changes, multiple admins, transport has cost, heterogeneous
+\item
+  \textbf{CP systems:} ZooKeeper, etcd, Spanner, HBase, MongoDB
+\item
+  \textbf{AP systems:} DynamoDB, Cassandra, CouchDB, DNS
+\item
+  \textbf{Raft safety guarantee:} Leader always has all committed entries (election log check)
+\item
+  \textbf{Kafka exactly-once:} Only within Kafka pipeline; consumers must be idempotent for E2E
+\item
+  \textbf{Consistent hashing:} Used in DynamoDB, Cassandra, Memcached, Redis Cluster, CDNs
+\item
+  \textbf{2PC vs Saga:} 2PC = strong, blocking; Saga = eventual, non-blocking, compensating transactions
+\end{itemize}
+
+\subsubsection{Comparison Tables Cheat Sheet}\label{comparison-tables-cheat-sheet}
+
+\textbf{CAP:}
+
+\begin{verbatim}
+CP: error on partition | AP: stale data on partition
+ZooKeeper, etcd       | Cassandra, DynamoDB, DNS
+\end{verbatim}
+
+\textbf{Quorum:}
+
+\begin{verbatim}
+R+W>N = strong consistency guarantee
+R=1, W=N: fast reads | R=N, W=1: fast writes | R=W=(N+1)/2: balanced
+\end{verbatim}
+
+\textbf{Raft vs Paxos:}
+
+\begin{verbatim}
+Raft: explicit leader, sequential log, understandable, etcd/CockroachDB
+Paxos: implicit leader, log holes, complex, Chubby/Spanner
+\end{verbatim}
+
+\textbf{2PC vs Saga:}
+
+\begin{verbatim}
+2PC: ACID, blocking, tight coupling, same DB
+Saga: eventual, non-blocking, loose coupling, microservices
+\end{verbatim}
+
+\textbf{At-least-once vs Exactly-once:}
+
+\begin{verbatim}
+At-least-once: simple, may duplicate → make consumers idempotent
+Exactly-once: complex, within Kafka only → use idempotency keys end-to-end
+\end{verbatim}
+
+\textbf{Delivery semantics:}
+
+\begin{verbatim}
+At-most-once: acks=0, may lose, no duplicates
+At-least-once: acks=all + retry, no loss, may duplicate
+Exactly-once: idempotent producer + transactions (Kafka internal)
+\end{verbatim}
+
+\subsubsection{Most Important Concepts (Priority Order)}\label{most-important-concepts-priority-order}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  CAP + PACELC (asked in every system design)
+\item
+  Raft consensus (frequently deep-dived)
+\item
+  Consistent hashing (appears in cache/DB designs)
+\item
+  Quorum R+W\textgreater N (core to DynamoDB/Cassandra discussion)
+\item
+  Kafka architecture (streaming systems everywhere)
+\item
+  Consistency models (senior-level differentiation)
+\item
+  Saga vs 2PC (microservices design)
+\item
+  Idempotency (practical distributed programming)
+\item
+  Vector clocks (conflict detection)
+\item
+  Split-brain + failure detection (operational maturity signal)
+\end{enumerate}
+
+\emph{Study tip: For each major concept, be able to (1) define it in one sentence, (2) give a real system example, (3) explain the trade-off, and (4) describe a failure scenario. This structure works for any distributed systems question.}
+
+\clearpage
+\section{Visual Reference}
+\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
+\visualfigure{../figures/07-distributed/01-cap-theorem.pdf}{When the network partitions, a distributed store must sacrifice either consistency (AP) or availability (CP). Partition tolerance is non-negotiable.}
+\end{document}

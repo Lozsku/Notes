@@ -1,0 +1,1991 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{System Design Problems — Foundational}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{I}
+
+\usepackage{interviewstyle}
+\setthemecolor{db2777}{f472b6}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{System Design --- Part 1: Foundational Problems}\label{system-design--part-1-foundational-problems}
+
+\begin{quote}
+Complete end-to-end worked designs for a 45--60 min FAANG system-design round.
+Each section mirrors the structure you should drive in the actual interview.
+\end{quote}
+
+\subsection{1. Design a URL Shortener (TinyURL / bit.ly)}\label{1-design-a-url-shortener-tinyurl--bitly}
+
+\subsubsection{1. Requirements}\label{1-requirements}
+
+\textbf{Clarifying questions to ask the interviewer:}
+
+\begin{itemize}
+\tightlist
+\item
+  What is the expected scale? (DAU, writes per second, reads per second?)
+\item
+  Should we support custom aliases (user-defined short codes)?
+\item
+  What is the required URL lifetime? Do links expire?
+\item
+  Do we need analytics (click counts, geo, referrer)?
+\item
+  Should we support link editing or deletion?
+\item
+  Is high availability or strong consistency more important?
+\end{itemize}
+
+\textbf{Functional Requirements:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Given a long URL, return a unique short URL (e.g., \texttt{https://tny.io/aB3kX9}).
+\item
+  Redirect a short URL to the original long URL.
+\item
+  (Optional) Custom aliases: user can specify the short code.
+\item
+  (Optional) URL expiry: links expire after N days.
+\item
+  (Optional) Analytics: track click count, geography, referrer.
+\end{enumerate}
+
+\textbf{Non-Functional Requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  100 ms P99 redirect latency.
+\item
+  99.99\% availability (URL shortener is a critical dependency for customers).
+\item
+  Short codes must be unique and not predictable/enumerable.
+\item
+  The system is \textbf{read-heavy} (100:1 read-to-write ratio is typical).
+\end{itemize}
+
+\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation}
+
+\textbf{Assumptions:}
+
+\begin{itemize}
+\tightlist
+\item
+  500 million URLs shortened per month (writes).
+\item
+  100:1 read-to-write ratio \(\rightarrow\) 50 billion redirects per month.
+\end{itemize}
+
+\textbf{Write QPS:}
+
+\begin{verbatim}
+500,000,000 / (30 × 86,400) ≈ 193 writes/sec  ≈ ~200 writes/sec
+Peak (3×):                                      ≈ ~600 writes/sec
+\end{verbatim}
+
+\textbf{Read QPS:}
+
+\begin{verbatim}
+50,000,000,000 / (30 × 86,400) ≈ 19,290 reads/sec  ≈ ~20,000 reads/sec
+Peak (3×):                                           ≈ ~60,000 reads/sec
+\end{verbatim}
+
+\textbf{Storage (URLs, 5 years):}
+
+\begin{verbatim}
+500M writes/month × 12 months × 5 years = 30 billion URLs
+Each record ≈ 500 bytes (long URL ~400 B + metadata ~100 B)
+Total: 30B × 500 B = 15 TB
+\end{verbatim}
+
+\textbf{Cache (top 20\% URLs serve 80\% traffic):}
+
+\begin{verbatim}
+20,000 reads/sec × 86,400 sec/day = 1.728 billion reads/day
+20% of 30B URLs = 6 billion "hot" URLs → not all fit in RAM
+Pragmatic: cache last 24 hrs of writes = 500M/30 × 500B ≈ 8.3 GB/day  →  ~10 GB RAM
+\end{verbatim}
+
+\textbf{Bandwidth:}
+
+\begin{verbatim}
+Inbound (writes):  200/sec × 500 B  ≈ 100 KB/s
+Outbound (reads):  20,000/sec × 500 B ≈ 10 MB/s
+\end{verbatim}
+
+\subsubsection{3. API Design}\label{3-api-design}
+
+\begin{verbatim}
+# Shorten a URL
+POST /api/v1/shorten
+Request:
+  {
+    "long_url":   "https://www.example.com/very/long/path?q=something",
+    "custom_code": "my-alias",          // optional
+    "expires_at":  "2027-01-01T00:00Z" // optional
+  }
+Response 201:
+  {
+    "short_url": "https://tny.io/aB3kX9",
+    "short_code": "aB3kX9",
+    "expires_at": "2027-01-01T00:00Z"
+  }
+
+# Redirect (the critical read path)
+GET /{short_code}
+Response 302:
+  Location: https://www.example.com/very/long/path?q=something
+
+# Analytics (optional)
+GET /api/v1/stats/{short_code}
+Response 200:
+  {
+    "clicks": 14982,
+    "top_countries": [...],
+    "referrers": [...]
+  }
+
+# Delete
+DELETE /api/v1/shorten/{short_code}
+Response 204
+\end{verbatim}
+
+\subsubsection{4. Data Model}\label{4-data-model}
+
+\textbf{SQL vs NoSQL decision:}
+
+\begin{itemize}
+\tightlist
+\item
+  The primary access pattern is a simple key-value lookup: \texttt{short\_code\ →\ long\_url}.
+\item
+  No complex joins needed; writes are straightforward inserts.
+\item
+  \textbf{Choice: NoSQL key-value store (Cassandra or DynamoDB) for the URL table} --- horizontal scale, high availability, and the access pattern is a perfect fit.
+\item
+  A relational DB (PostgreSQL) is used for user/account data where consistency matters.
+\end{itemize}
+
+\textbf{URL Table (Cassandra / DynamoDB):}
+
+\begin{verbatim}
+urls
+
+short_code    TEXT       PRIMARY KEY        -- "aB3kX9"
+long_url      TEXT       NOT NULL           -- original URL
+user_id       UUID                          -- creator (nullable for anonymous)
+created_at    TIMESTAMP
+expires_at    TIMESTAMP                     -- NULL = never expires
+is_deleted    BOOLEAN    DEFAULT false
+\end{verbatim}
+
+\textbf{Users Table (PostgreSQL):}
+
+\begin{verbatim}
+users
+
+user_id       UUID       PRIMARY KEY
+email         VARCHAR(255) UNIQUE NOT NULL
+api_key       VARCHAR(64)  UNIQUE            -- for rate limiting
+created_at    TIMESTAMP
+\end{verbatim}
+
+\textbf{Analytics Table (write-optimized, e.g., Cassandra or ClickHouse):}
+
+\begin{verbatim}
+click_events
+
+short_code    TEXT
+clicked_at    TIMESTAMP
+country       TEXT
+referrer      TEXT
+user_agent    TEXT
+-- Partition key: short_code; Clustering key: clicked_at DESC
+\end{verbatim}
+
+\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture}
+
+\begin{verbatim}
+                         ┌─────────────────────────────────────────────────┐
+                         │                   Clients                       │
+                         │        (Browser / Mobile / API consumers)       │
+                         └──────────────────────┬──────────────────────────┘
+                                                │ HTTPS
+                                     ┌──────────▼──────────┐
+                                     │   Load Balancer      │
+                                     │  (L7, e.g. Nginx /  │
+                                     │   AWS ALB)           │
+                                     └──────┬───────┬───────┘
+                                            │       │
+                               ┌────────────▼──┐ ┌──▼────────────┐
+                               │  Write Service │ │ Redirect Svc  │
+                               │  (POST /shorten│ │ (GET /{code}) │
+                               └───────┬────────┘ └──────┬────────┘
+                                       │                  │
+                              ┌────────▼──────┐   ┌───────▼────────┐
+                              │  Key Gen Svc  │   │  Redis Cache   │
+                              │  (KGS — see   │   │  (short_code → │
+                              │   Deep Dive)  │   │   long_url)    │
+                              └────────┬──────┘   └───────┬────────┘
+                                       │                   │ cache miss
+                                       │            ┌──────▼─────────┐
+                                       └───────────►│  Cassandra DB  │
+                                                    │  (URL table)   │
+                                                    └──────┬─────────┘
+                                                           │
+                                                  ┌────────▼────────┐
+                                                  │  Kafka (async)  │
+                                                  │  Click events   │
+                                                  └────────┬────────┘
+                                                           │
+                                                  ┌────────▼────────┐
+                                                  │  Analytics Svc  │
+                                                  │  (ClickHouse)   │
+                                                  └─────────────────┘
+\end{verbatim}
+
+\textbf{Component walkthrough:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Client} sends \texttt{POST\ /shorten} or \texttt{GET\ /\{code\}} over HTTPS.
+\item
+  \textbf{Load Balancer} routes to stateless Write Service or Redirect Service pods.
+\item
+  \textbf{Redirect Service} checks \textbf{Redis} first (cache hit \(\rightarrow\) 302 immediately). On cache miss, reads Cassandra, populates cache, then redirects.
+\item
+  \textbf{Write Service} calls \textbf{KGS} (Key Generation Service) for a pre-generated unique code, stores \texttt{(code,\ long\_url)} in Cassandra, and warms the cache.
+\item
+  \textbf{Kafka} asynchronously receives click events; \textbf{Analytics Service} batch-writes to ClickHouse for reporting.
+\end{enumerate}
+
+\subsubsection{6. Deep Dives}\label{6-deep-dives}
+
+\paragraph{6.1 Key Generation: How to create short codes?}\label{61-key-generation-how-to-create-short-codes}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1103}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3278}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2616}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3002}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Approach
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{MD5 / SHA-256 hash} & Hash long URL, take first 6--8 chars & Deterministic (same URL \(\rightarrow\) same code) & Collisions possible; must check DB on every write \\
+\textbf{Counter + Base62} & Global atomic counter \(\rightarrow\) encode in Base62 & No collisions; simple & Single counter = SPOF; reveals ordering/volume \\
+\textbf{Pre-generated KGS} & Dedicated service pre-generates \& stores unused keys in a "keys" table & No collision checking at write time; fast & Additional service to maintain; key theft if service crashes \\
+\textbf{UUID} & Generate random UUID, take first 8 chars & Simple & High collision probability at scale \\
+\end{longtable}
+
+\textbf{Key Decision: KGS (Key Generation Service) is the recommended approach for large scale.}
+
+KGS design:
+
+\begin{itemize}
+\tightlist
+\item
+  KGS pre-generates 6-character Base62 codes (62\^{}6 \(\approx\) 56 billion unique codes).
+\item
+  Stores them in two tables: \texttt{unused\_keys} and \texttt{used\_keys}.
+\item
+  Each Write Service instance requests a batch (e.g., 1,000 keys) from KGS on startup, holds them in-memory.
+\item
+  KGS marks those keys as "in use" atomically. If a Write Service pod crashes, those keys are wasted but never reused --- acceptable loss.
+\item
+  KGS itself can be replicated with a leader for key assignment.
+\end{itemize}
+
+\paragraph{6.2 Redirect: 301 vs 302?}\label{62-redirect-301-vs-302}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1866}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3940}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4194}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+301 Permanent
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+302 Temporary
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Browser caches? & Yes --- browser won\textquotesingle t call TinyURL again & No --- browser calls TinyURL on every click \\
+Analytics accuracy & \textbf{Broken} --- browser bypasses your servers & \textbf{Accurate} --- every click hits your servers \\
+Load on TinyURL & Lower after first visit & Higher (every click) \\
+\textbf{Recommendation} & Use only if analytics not needed & \textbf{Use 302 for full analytics capability} \\
+\end{longtable}
+
+\textbf{Interview takeaway:} Always use 302 unless you explicitly trade analytics for reduced server load.
+
+\paragraph{6.3 Collision Handling}\label{63-collision-handling}
+
+If using hash-based approach:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Compute MD5(long\_url) \(\rightarrow\) take first 7 chars as short\_code.
+\item
+  Check if \texttt{short\_code} exists in DB.
+\item
+  If collision: append a salt (e.g., increment integer), re-hash, retry.
+\item
+  Limit retries to 3; fall back to random generation if exhausted.
+\end{enumerate}
+
+With KGS, collisions are impossible --- keys are pre-assigned and marked used atomically.
+
+\paragraph{6.4 Custom Aliases}\label{64-custom-aliases}
+
+\begin{itemize}
+\tightlist
+\item
+  User provides desired short code (e.g., \texttt{my-brand}).
+\item
+  Check availability: \texttt{SELECT\ 1\ FROM\ urls\ WHERE\ short\_code\ =\ \textquotesingle{}my-brand\textquotesingle{}}.
+\item
+  If taken \(\rightarrow\) return 409 Conflict.
+\item
+  Store with \texttt{is\_custom\ =\ true} flag to distinguish from generated codes.
+\item
+  Rate-limit custom alias creation per user to prevent squatting.
+\end{itemize}
+
+\paragraph{6.5 URL Expiry}\label{65-url-expiry}
+
+\begin{itemize}
+\tightlist
+\item
+  Store \texttt{expires\_at} timestamp in the URL record.
+\item
+  On redirect: if \texttt{expires\_at\ \textless{}\ NOW()} \(\rightarrow\) return 404 (or 410 Gone).
+\item
+  Background cleanup job: delete expired records weekly (keep DB lean).
+\item
+  Cache entries: set Redis TTL = \texttt{expires\_at\ -\ NOW()} so expired URLs auto-evict.
+\end{itemize}
+
+\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling}
+
+\textbf{Read hotspot --- viral URLs:}
+
+\begin{itemize}
+\tightlist
+\item
+  A single URL (e.g., link from a viral tweet) can receive millions of reads/sec.
+\item
+  Redis handles this well --- single key lookup is O(1) and Redis handles 100k+ ops/sec per node.
+\item
+  For extreme cases: replicate the specific key across multiple Redis nodes or use local in-process cache (LRU with 1000 entries) in each Redirect Service pod.
+\end{itemize}
+
+\textbf{Write scaling:}
+
+\begin{itemize}
+\tightlist
+\item
+  Writes at \textasciitilde200/sec are trivially handled. Cassandra scales horizontally; add nodes as needed.
+\item
+  KGS: single KGS with a read replica for HA is sufficient at this scale. Key generation is CPU-light.
+\end{itemize}
+
+\textbf{DB sharding:}
+
+\begin{itemize}
+\tightlist
+\item
+  Cassandra partitions by \texttt{short\_code} automatically (consistent hashing). No manual sharding needed.
+\item
+  If using SQL: shard by \texttt{short\_code} modulo N (hash partitioning). Use a consistent hash ring to avoid resharding pain.
+\end{itemize}
+
+\textbf{Cache eviction:}
+
+\begin{itemize}
+\tightlist
+\item
+  Redis with LRU policy. Set max memory = 10--20 GB.
+\item
+  TTL on each entry = min(expires\_at, 24 hrs) to prevent stale data.
+\end{itemize}
+
+\textbf{Failure handling:}
+
+\begin{itemize}
+\tightlist
+\item
+  Redis down \(\rightarrow\) fall through to Cassandra (latency increases but system stays up).
+\item
+  KGS down \(\rightarrow\) Write Service uses its in-memory key batch until KGS recovers; alert if batch exhausted.
+\item
+  Cassandra node down \(\rightarrow\) Cassandra replication factor 3 (RF=3) ensures reads/writes still succeed with 2 nodes up.
+\end{itemize}
+
+\textbf{Geographic distribution:}
+
+\begin{itemize}
+\tightlist
+\item
+  Deploy read replicas of Cassandra in multiple regions.
+\item
+  Use GeoDNS to route users to nearest Redirect Service cluster.
+\item
+  URL writes go to a primary region; replicated asynchronously to others.
+\end{itemize}
+
+\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1494}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2988}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1826}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3693}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Decision
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Choice Made
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Alternative
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Key generation & \textbf{KGS (pre-generated)} & Hash + collision check & No collision risk; predictable latency \\
+DB for URLs & \textbf{Cassandra (NoSQL)} & PostgreSQL & Write scalability; simple key-value access pattern \\
+Redirect type & \textbf{302 Temporary} & 301 Permanent & Enables accurate analytics \\
+Cache & \textbf{Redis (LRU)} & Memcached & Rich data types; TTL support; persistence \\
+Analytics pipeline & \textbf{Kafka \(\rightarrow\) ClickHouse (async)} & Sync write to SQL & Decouples write path; handles bursty click events \\
+Custom aliases & \textbf{Supported (rate-limited)} & Not supported & Product differentiator; must prevent abuse \\
+\end{longtable}
+
+\subsection{2. Design a Rate Limiter}\label{2-design-a-rate-limiter}
+
+\subsubsection{1. Requirements}\label{1-requirements-1}
+
+\textbf{Clarifying questions to ask the interviewer:}
+
+\begin{itemize}
+\tightlist
+\item
+  Where should the rate limiter live? Client-side, API gateway, or per-service middleware?
+\item
+  What are we rate-limiting on? Per user? Per IP? Per API key? Per endpoint?
+\item
+  What happens when a limit is exceeded --- hard reject (429) or soft throttle (queue)?
+\item
+  Do we need distributed rate limiting (multiple servers sharing state)?
+\item
+  What are the latency requirements? Rate limit check must not add significant overhead.
+\item
+  Do rules need to be configurable at runtime without deployments?
+\end{itemize}
+
+\textbf{Functional Requirements:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Limit the number of requests a client (user/IP/API key) can make in a time window.
+\item
+  Return HTTP 429 Too Many Requests when limit is exceeded, with \texttt{Retry-After} header.
+\item
+  Support multiple limits (e.g., 100 req/min AND 1,000 req/hr for same client).
+\item
+  Rules are configurable without service restarts.
+\end{enumerate}
+
+\textbf{Non-Functional Requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  Rate limit check must add \textless{} 5 ms P99 latency overhead.
+\item
+  Highly available --- rate limiter failure should fail open (allow traffic) not fail closed (block everything).
+\item
+  Works across multiple servers (distributed, consistent limits).
+\item
+  Accurate enough --- exact precision not required; small over-limit acceptable.
+\end{itemize}
+
+\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-1}
+
+\textbf{Assumptions:}
+
+\begin{itemize}
+\tightlist
+\item
+  10 million DAU, each making \textasciitilde100 requests/day \(\rightarrow\) 1 billion requests/day.
+\item
+  Rate limit state must be checked for every request.
+\end{itemize}
+
+\textbf{QPS to rate limiter:}
+
+\begin{verbatim}
+1,000,000,000 / 86,400 ≈ 11,574 req/sec  ≈ ~12,000 checks/sec
+Peak (3×):                                ≈ ~36,000 checks/sec
+\end{verbatim}
+
+\textbf{Memory for rate limit counters:}
+
+\begin{verbatim}
+Strategy: sliding window counter per user per endpoint, 1-hr window.
+10M users × 10 endpoints × (counter + timestamp) ≈ 10M × 10 × 20 bytes = 2 GB
+→ Fits comfortably in a Redis cluster.
+\end{verbatim}
+
+\textbf{Bandwidth:}
+
+\begin{itemize}
+\tightlist
+\item
+  Rate limit check: small --- just a counter lookup and increment.
+\item
+  Each Redis call \(\approx\) microseconds; no large data transfer.
+\end{itemize}
+
+\subsubsection{3. API Design}\label{3-api-design-1}
+
+The rate limiter is typically middleware, not a standalone API. But if exposing as a service:
+
+\begin{verbatim}
+# Check and record a request (called by API gateway)
+POST /rate-limit/check
+Request:
+  {
+    "client_id": "user:1234",
+    "endpoint":  "/api/v1/posts",
+    "timestamp": 1718000000
+  }
+Response 200 (allowed):
+  {
+    "allowed": true,
+    "remaining": 42,
+    "reset_at": 1718003600
+  }
+Response 429 (throttled):
+  {
+    "allowed": false,
+    "retry_after": 58,       // seconds until window resets
+    "limit": 100,
+    "window": "1m"
+  }
+
+# Update rules (admin)
+PUT /rate-limit/rules/{client_id}
+Request:
+  {
+    "rules": [
+      { "window": "1m", "limit": 100 },
+      { "window": "1h", "limit": 1000 }
+    ]
+  }
+\end{verbatim}
+
+\textbf{Response headers to include on every API response:}
+
+\begin{verbatim}
+X-RateLimit-Limit:     100
+X-RateLimit-Remaining: 42
+X-RateLimit-Reset:     1718003600
+Retry-After:           58          // only on 429
+\end{verbatim}
+
+\subsubsection{4. Data Model}\label{4-data-model-1}
+
+\textbf{Redis data structures (no SQL needed --- state is ephemeral):}
+
+\textbf{Token Bucket / Fixed Window counter:}
+
+\begin{verbatim}
+Key:   "rl:{client_id}:{endpoint}:{window_start}"
+Value: integer (request count)
+TTL:   window duration (e.g., 60s for 1-min window)
+\end{verbatim}
+
+\textbf{Sliding Window Log:}
+
+\begin{verbatim}
+Key:   "rl:{client_id}:{endpoint}"
+Type:  Redis Sorted Set
+Member: request_id (UUID)
+Score:  timestamp (epoch ms)
+TTL:   window duration
+\end{verbatim}
+
+\textbf{Rules config (read rarely, cache in-process):}
+
+\begin{verbatim}
+# Redis Hash or a config store (Consul / etcd)
+Key:   "rule:{client_id}"
+Value: JSON { "rules": [{"window":"1m","limit":100}, ...] }
+\end{verbatim}
+
+\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-1}
+
+\begin{verbatim}
+           ┌──────────────────────────────────────────────┐
+           │                  Client                       │
+           └────────────────────┬─────────────────────────┘
+                                │ HTTP request
+                     ┌──────────▼──────────┐
+                     │    API Gateway /     │
+                     │    Reverse Proxy     │
+                     │  (Nginx / Kong /     │
+                     │   AWS API GW)        │
+                     └──────┬──────┬────────┘
+                            │      │
+               ┌────────────▼──┐   │ (if allowed)
+               │  Rate Limiter │   │
+               │  Middleware   │   │
+               │  (sidecar or  │   │
+               │   gateway     │   │
+               │   plugin)     │   │
+               └────────┬──────┘   │
+                        │          │
+              ┌─────────▼──────┐   │
+              │  Redis Cluster │   │
+              │  (counters,    │   │
+              │   sliding log) │   │
+              └────────────────┘   │
+                                   ▼
+                         ┌─────────────────┐
+                         │  Backend API    │
+                         │  Services       │
+                         └─────────────────┘
+
+Rules flow:
+┌──────────────┐       ┌───────────────┐
+│ Config Store │──────►│ Rate Limiter  │
+│ (etcd/Consul)│       │ (in-process   │
+│  (rules)     │       │  cache 30s)   │
+└──────────────┘       └───────────────┘
+\end{verbatim}
+
+\textbf{Component walkthrough:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Every request hits the \textbf{API Gateway}.
+\item
+  Gateway invokes \textbf{Rate Limiter Middleware} (same process or sidecar).
+\item
+  Middleware reads the rule for \texttt{(client\_id,\ endpoint)} from its \textbf{in-process cache} (refreshed every 30s from etcd/Consul).
+\item
+  Middleware atomically increments/checks the counter in \textbf{Redis}.
+\item
+  If allowed: forward request to \textbf{Backend Service}.
+\item
+  If denied: return 429 immediately with \texttt{Retry-After}.
+\end{enumerate}
+
+\subsubsection{6. Deep Dives}\label{6-deep-dives-1}
+
+\paragraph{6.1 Algorithm Comparison}\label{61-algorithm-comparison}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1188}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2817}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1674}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2647}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1674}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How it works
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Fixed Window Counter} & Reset counter every N seconds & Simple; O(1) memory & Boundary burst: 2\(\times\) limit possible at window edge & Simple internal limits \\
+\textbf{Sliding Window Log} & Store timestamp of every request in sorted set; count within window & Accurate & O(n) memory per user (n = requests in window) & Low-volume, high-accuracy needs \\
+\textbf{Sliding Window Counter} & Blend current + previous window counts weighted by overlap & Near-accurate, O(1) memory & Slight inaccuracy (\textasciitilde0.003\% over-limit) & \textbf{Best general choice} \\
+\textbf{Token Bucket} & Bucket of tokens refilled at rate R; request consumes one & Allows bursts up to bucket size & Harder to reason about exact limits; burst may confuse users & APIs that allow bursting \\
+\textbf{Leaky Bucket} & Queue requests; process at constant rate & Smooth output rate & Queue introduces latency; bursty requests get delayed & Network traffic shaping \\
+\end{longtable}
+
+\textbf{Key Decision: Sliding Window Counter for most API rate limiting. Token Bucket when you want to allow short bursts.}
+
+\paragraph{6.2 Sliding Window Counter --- Implementation Detail}\label{62-sliding-window-counter--implementation-detail}
+
+\begin{verbatim}
+Window = 1 minute.
+Current minute bucket: starts at :00
+Previous minute bucket: started at :-60
+
+count = prev_bucket_count × (overlap / window) + curr_bucket_count
+
+Example at :45 into the current minute:
+overlap = 60 - 45 = 15 seconds (15/60 = 25% of previous window still counts)
+count = prev_count × 0.25 + curr_count
+
+If count > limit → reject.
+\end{verbatim}
+
+Redis implementation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Lua script (atomic)}
+\KeywordTok{local} \VariableTok{key\_curr} \OperatorTok{=} \ConstantTok{KEYS}\OperatorTok{[}\DecValTok{1}\OperatorTok{]}  \CommentTok{{-}{-} "rl:user1:1718000060"}
+\KeywordTok{local} \VariableTok{key\_prev} \OperatorTok{=} \ConstantTok{KEYS}\OperatorTok{[}\DecValTok{2}\OperatorTok{]}  \CommentTok{{-}{-} "rl:user1:1718000000"}
+\KeywordTok{local} \VariableTok{limit}    \OperatorTok{=} \FunctionTok{tonumber}\OperatorTok{(}\ConstantTok{ARGV}\OperatorTok{[}\DecValTok{1}\OperatorTok{])}
+\KeywordTok{local} \VariableTok{now}      \OperatorTok{=} \FunctionTok{tonumber}\OperatorTok{(}\ConstantTok{ARGV}\OperatorTok{[}\DecValTok{2}\OperatorTok{])}
+\KeywordTok{local} \VariableTok{window}   \OperatorTok{=} \FunctionTok{tonumber}\OperatorTok{(}\ConstantTok{ARGV}\OperatorTok{[}\DecValTok{3}\OperatorTok{])}
+\KeywordTok{local} \VariableTok{window\_start} \OperatorTok{=} \VariableTok{now} \OperatorTok{{-}} \OperatorTok{(}\VariableTok{now} \OperatorTok{\%} \VariableTok{window}\OperatorTok{)}
+\KeywordTok{local} \VariableTok{overlap}  \OperatorTok{=} \VariableTok{window} \OperatorTok{{-}} \OperatorTok{(}\VariableTok{now} \OperatorTok{{-}} \VariableTok{window\_start}\OperatorTok{)}
+
+\KeywordTok{local} \VariableTok{curr\_count} \OperatorTok{=} \FunctionTok{tonumber}\OperatorTok{(}\VariableTok{redis}\OperatorTok{.}\NormalTok{call}\OperatorTok{(}\StringTok{\textquotesingle{}GET\textquotesingle{}}\OperatorTok{,} \VariableTok{key\_curr}\OperatorTok{)} \KeywordTok{or} \DecValTok{0}\OperatorTok{)}
+\KeywordTok{local} \VariableTok{prev\_count} \OperatorTok{=} \FunctionTok{tonumber}\OperatorTok{(}\VariableTok{redis}\OperatorTok{.}\NormalTok{call}\OperatorTok{(}\StringTok{\textquotesingle{}GET\textquotesingle{}}\OperatorTok{,} \VariableTok{key\_prev}\OperatorTok{)} \KeywordTok{or} \DecValTok{0}\OperatorTok{)}
+\KeywordTok{local} \VariableTok{weighted}   \OperatorTok{=} \VariableTok{prev\_count} \OperatorTok{*} \OperatorTok{(}\VariableTok{overlap} \OperatorTok{/} \VariableTok{window}\OperatorTok{)} \OperatorTok{+} \VariableTok{curr\_count}
+
+\ControlFlowTok{if} \VariableTok{weighted} \OperatorTok{\textgreater{}=} \VariableTok{limit} \ControlFlowTok{then}
+  \ControlFlowTok{return} \DecValTok{0}  \CommentTok{{-}{-} rejected}
+\ControlFlowTok{end}
+\VariableTok{redis}\OperatorTok{.}\NormalTok{call}\OperatorTok{(}\StringTok{\textquotesingle{}INCR\textquotesingle{}}\OperatorTok{,} \VariableTok{key\_curr}\OperatorTok{)}
+\VariableTok{redis}\OperatorTok{.}\NormalTok{call}\OperatorTok{(}\StringTok{\textquotesingle{}EXPIRE\textquotesingle{}}\OperatorTok{,} \VariableTok{key\_curr}\OperatorTok{,} \VariableTok{window} \OperatorTok{*} \DecValTok{2}\OperatorTok{)}
+\ControlFlowTok{return} \DecValTok{1}  \CommentTok{{-}{-} allowed}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{6.3 Where to Place the Rate Limiter?}\label{63-where-to-place-the-rate-limiter}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2279}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3512}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4208}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Placement
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Client-side} & Zero server load & Easily bypassed; untrustworthy \\
+\textbf{API Gateway} & Single enforcement point; language-agnostic & Gateway becomes a bottleneck; less context \\
+\textbf{Service middleware} & Per-service granularity; business context & Duplicated logic across services; harder to change rules centrally \\
+\textbf{Dedicated Rate Limit Service} & Centralized rules; all services call it & Extra network hop; additional failure point \\
+\textbf{Recommended: Gateway + Redis} & Rules centralized in Redis; enforced at gateway & Need to handle Redis failure gracefully \\
+\end{longtable}
+
+\paragraph{6.4 Distributed Rate Limiting --- Race Conditions}\label{64-distributed-rate-limiting--race-conditions}
+
+\textbf{Problem:} Two requests arrive simultaneously on different servers. Both read count=99 (limit=100), both increment to 100, both allow. Result: 2 requests slip through over limit.
+
+\textbf{Solutions:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Redis Lua scripts (recommended):} Atomic read-increment-check in a single Lua script. Redis is single-threaded; no race condition possible.
+\item
+  \textbf{Redis INCR + EXPIRE pattern:}
+\end{enumerate}
+
+\begin{verbatim}
+count = INCR(key)
+if count == 1: EXPIRE(key, window)  -- set TTL only on first request
+if count > limit: return 429
+\end{verbatim}
+
+Problem: race between INCR and EXPIRE if server crashes. Mitigate with \texttt{SET\ key\ 0\ EX\ window\ NX} on first call.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  \textbf{Sticky sessions / consistent hashing:} Route same client\_id to same rate limiter node. Eliminates distributed counting but adds routing complexity and uneven load.
+\end{enumerate}
+
+\textbf{Key Decision: Use Redis Lua scripts for atomicity. No locks, no transactions overhead.}
+
+\paragraph{6.5 Fail-Open vs Fail-Closed}\label{65-fail-open-vs-fail-closed}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Fail-open (recommended):} If Redis is down, allow all requests. Availability \textgreater{} perfect rate limiting.
+\item
+  \textbf{Fail-closed:} If Redis is down, reject all requests. Too severe for most use cases --- takes down your API.
+\item
+  Implementation: wrap Redis call in try-catch; on exception, log and allow the request, alert on-call.
+\end{itemize}
+
+\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-1}
+
+\textbf{Redis as single point of failure:}
+
+\begin{itemize}
+\tightlist
+\item
+  Use Redis Cluster (sharded) --- each client\_id maps to a shard via consistent hashing.
+\item
+  Redis Sentinel for HA (automatic failover).
+\item
+  Replication lag between primary and replica: acceptable (small over-limit possible).
+\end{itemize}
+
+\textbf{Redis latency:}
+
+\begin{itemize}
+\tightlist
+\item
+  Redis P99 \(\approx\) 0.5--1 ms in-datacenter. Total rate limit overhead \textless{} 2 ms.
+\item
+  If Redis is co-located on same host (Redis sidecar per gateway node): P99 \textless{} 0.2 ms.
+\end{itemize}
+
+\textbf{Rule changes at scale:}
+
+\begin{itemize}
+\tightlist
+\item
+  Store rules in etcd/Consul. Rate limiter middleware subscribes to watch-notifications.
+\item
+  In-process cache with 30s TTL: small window where old rules apply after update.
+\end{itemize}
+
+\textbf{Hotspots (one user generating massive traffic):}
+
+\begin{itemize}
+\tightlist
+\item
+  Rate limiter itself handles this well --- a single Redis key gets hammered, but Redis is designed for this.
+\item
+  Use local in-process counter as first layer (no Redis call for clearly non-bursting clients), then Redis for enforcement.
+\end{itemize}
+
+\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-1}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1217}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2154}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1873}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4757}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Decision
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Choice Made
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Alternative
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Algorithm & \textbf{Sliding Window Counter} & Token Bucket & Near-exact accuracy; O(1) memory; prevents boundary bursts \\
+State store & \textbf{Redis Cluster} & In-process memory & Distributed consistency across servers; fast enough \\
+Placement & \textbf{API Gateway middleware} & Dedicated service & Avoids extra network hop; centralizes enforcement \\
+Atomicity & \textbf{Redis Lua scripts} & Redis WATCH/MULTI & Simpler; no retry logic needed \\
+Failure mode & \textbf{Fail-open} & Fail-closed & Availability \textgreater{} perfect accuracy for most systems \\
+Rules storage & \textbf{etcd + in-process cache} & DB query per request & Rules rarely change; in-process cache eliminates lookup overhead \\
+\end{longtable}
+
+\subsection{3. Design a News Feed (Facebook/Twitter Timeline)}\label{3-design-a-news-feed-facebooktwitter-timeline}
+
+\subsubsection{1. Requirements}\label{1-requirements-2}
+
+\textbf{Clarifying questions to ask the interviewer:}
+
+\begin{itemize}
+\tightlist
+\item
+  Is this a "friends" model (Facebook --- bidirectional) or "followers" model (Twitter --- unidirectional)?
+\item
+  What is the feed ordering --- chronological or ranked by relevance?
+\item
+  What\textquotesingle s the expected social graph size? Max followers per user?
+\item
+  Do we support stories (ephemeral) vs. posts (permanent)?
+\item
+  Is the feed pre-generated (push) or assembled on request (pull)?
+\item
+  Do we need to support ads injection in the feed?
+\end{itemize}
+
+\textbf{Functional Requirements:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  User can create a post (text, image, video link).
+\item
+  User sees a feed of posts from people they follow, ordered by recency or ranking.
+\item
+  Feed updates in near-real-time (within seconds of post creation).
+\item
+  Pagination: load N posts, scroll for more.
+\item
+  Users can like, comment, share (out of scope for this design; focus on feed generation).
+\end{enumerate}
+
+\textbf{Non-Functional Requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  500 million DAU (Facebook scale).
+\item
+  Feed load latency \textless{} 200 ms.
+\item
+  Post creation propagates to followers within 5 seconds (eventual consistency is OK).
+\item
+  Users can have up to 5,000 friends (Facebook) or millions of followers (Twitter celebrities).
+\end{itemize}
+
+\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-2}
+
+\textbf{Assumptions:}
+
+\begin{itemize}
+\tightlist
+\item
+  500 million DAU.
+\item
+  Each user views feed 5 times/day \(\rightarrow\) 2.5 billion feed reads/day.
+\item
+  Each user creates 1 post every 5 days \(\rightarrow\) 100 million new posts/day.
+\item
+  Average friends/followers: 300.
+\end{itemize}
+
+\textbf{Post write QPS:}
+
+\begin{verbatim}
+100,000,000 / 86,400 ≈ 1,157 writes/sec  ≈ ~1,200 posts/sec
+Peak (5×):                                ≈ ~6,000 posts/sec
+\end{verbatim}
+
+\textbf{Feed read QPS:}
+
+\begin{verbatim}
+2,500,000,000 / 86,400 ≈ 28,935 reads/sec  ≈ ~29,000 reads/sec
+Peak (3×):                                  ≈ ~87,000 reads/sec
+\end{verbatim}
+
+\textbf{Fanout writes (push model --- writing to all follower feeds on post):}
+
+\begin{verbatim}
+1,200 posts/sec × 300 avg followers = 360,000 feed writes/sec
+Celebrity (10M followers): 1 post → 10M writes (burst)
+\end{verbatim}
+
+\textbf{Storage:}
+
+\begin{verbatim}
+Posts: 100M/day × 1 KB (text) = 100 GB/day text
+       Images/videos: separate blob store (S3)
+Feed cache: 500M users × 20 cached posts × 1 KB = 10 TB → too big for RAM
+  → Cache only active users (10% daily active at peak):
+    50M users × 20 posts × 1 KB = 1 TB → feasible with Redis cluster
+\end{verbatim}
+
+\subsubsection{3. API Design}\label{3-api-design-2}
+
+\begin{verbatim}
+# Create a post
+POST /api/v1/posts
+Auth: Bearer token
+Request:
+  {
+    "content":    "Hello world!",
+    "media_urls": ["https://cdn.example.com/img/abc.jpg"],
+    "visibility": "friends"   // or "public", "private"
+  }
+Response 201:
+  {
+    "post_id":    "p_9x3kA2",
+    "created_at": "2026-06-14T10:00:00Z"
+  }
+
+# Get news feed
+GET /api/v1/feed?limit=20&cursor=<opaque_cursor>
+Auth: Bearer token
+Response 200:
+  {
+    "posts": [
+      {
+        "post_id":    "p_9x3kA2",
+        "author_id":  "u_4f2k",
+        "author_name":"Alice",
+        "content":    "Hello world!",
+        "media_urls": [...],
+        "like_count": 142,
+        "comment_count": 7,
+        "created_at": "2026-06-14T10:00:00Z"
+      },
+      ...
+    ],
+    "next_cursor": "<opaque_cursor>"
+  }
+
+# Get a user's profile posts
+GET /api/v1/users/{user_id}/posts?limit=20&cursor=<cursor>
+Response 200: { "posts": [...], "next_cursor": "..." }
+\end{verbatim}
+
+\subsubsection{4. Data Model}\label{4-data-model-2}
+
+\textbf{SQL vs NoSQL:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Posts table:} Write-once, read-many. High read QPS. Shard by \texttt{author\_id}. \(\rightarrow\) NoSQL (Cassandra) or sharded PostgreSQL.
+\item
+  \textbf{Social graph (follows):} Relationship lookups ("who does user X follow?"). \(\rightarrow\) Graph DB (Neo4j) or sharded SQL; at Facebook scale: custom TAO (graph store).
+\item
+  \textbf{Feed cache:} Redis sorted sets (score = post timestamp).
+\item
+  \textbf{User data:} Relational (PostgreSQL) --- low write volume, complex queries.
+\end{itemize}
+
+\textbf{Posts Table (Cassandra --- partition by author, cluster by time):}
+
+\begin{verbatim}
+posts
+
+author_id   UUID        PARTITION KEY
+post_id     TIMEUUID    CLUSTERING KEY (DESC)   -- newest first
+content     TEXT
+media_urls  LIST<TEXT>
+like_count  COUNTER
+created_at  TIMESTAMP
+\end{verbatim}
+
+\textbf{Social Graph Table (Cassandra --- two tables for O(1) lookups):}
+
+\begin{verbatim}
+follows_by_follower          -- "who does user X follow?"
+
+follower_id  UUID  PARTITION KEY
+followee_id  UUID  CLUSTERING KEY
+
+follows_by_followee          -- "who follows user X?"
+
+followee_id  UUID  PARTITION KEY
+follower_id  UUID  CLUSTERING KEY
+\end{verbatim}
+
+\textbf{Feed Cache (Redis Sorted Set per user):}
+
+\begin{verbatim}
+Key:     "feed:{user_id}"
+Members: post_id
+Scores:  timestamp (epoch ms) — higher = newer
+TTL:     48 hours (evict inactive users)
+Max size: 800 posts per user (trim older entries)
+\end{verbatim}
+
+\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-2}
+
+\begin{verbatim}
+            ┌──────────────────────────────────────────────────┐
+            │                   Client                          │
+            │           (iOS / Android / Web)                   │
+            └────────────────────┬─────────────────────────────┘
+                                 │ HTTPS
+                      ┌──────────▼──────────┐
+                      │    Load Balancer     │
+                      └──────┬──────┬────────┘
+                             │      │
+               ┌─────────────▼─┐  ┌─▼──────────────┐
+               │  Post Service │  │  Feed Service  │
+               │  (create post)│  │  (read feed)   │
+               └──────┬────────┘  └──────┬─────────┘
+                      │                  │
+          ┌───────────▼──────┐    ┌──────▼──────────┐
+          │   Kafka Topic:   │    │   Redis Cluster  │
+          │   "new-posts"    │    │  (feed cache,   │
+          └───────┬──────────┘    │   sorted sets)   │
+                  │               └──────┬────────────┘
+          ┌───────▼──────────┐           │ cache miss
+          │   Fanout Service │           ▼
+          │  (Notification   │   ┌───────────────────┐
+          │   Workers)       │   │  Cassandra (posts)│
+          └───────┬──────────┘   └───────────────────┘
+                  │
+          ┌───────▼──────────┐
+          │  Social Graph    │    ┌───────────────────┐
+          │  (Cassandra /    │    │   CDN / Blob      │
+          │   TAO)           │    │   Store (S3)      │
+          └──────────────────┘    └───────────────────┘
+
+Post creation flow:  Post Svc → Cassandra + Kafka
+Fanout flow:         Kafka → Fanout Workers → Redis (write to follower feeds)
+Feed read flow:      Feed Svc → Redis cache → (miss) Cassandra
+\end{verbatim}
+
+\subsubsection{6. Deep Dives}\label{6-deep-dives-2}
+
+\paragraph{6.1 Fanout Strategies}\label{61-fanout-strategies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0979}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2780}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1690}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2860}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1690}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Fanout-on-Write (Push)} & On post creation, write post\_id to each follower\textquotesingle s feed cache & Feed reads O(1) --- just read from cache & Write amplification: 1 post \(\rightarrow\) N writes; celebrity (10M followers) = 10M cache writes & Average users \\
+\textbf{Fanout-on-Read (Pull)} & On feed request, fetch posts from each followee, merge, sort & No write amplification & Feed read O(N followees) --- slow for users following many people & Celebrity accounts, inactive followers \\
+\textbf{Hybrid (recommended)} & Push to regular followers; pull for celebrities at read time; don\textquotesingle t push to inactive users & Balances read and write load & More complex logic & \textbf{Large-scale production systems} \\
+\end{longtable}
+
+\textbf{Key Decision: Hybrid fanout.}
+
+Implementation:
+
+\begin{itemize}
+\tightlist
+\item
+  Define "celebrity" as users with \textgreater{} 1M followers.
+\item
+  On post write: fanout-on-write for non-celebrities; for celebrities, mark the post in a "celebrity posts" index only.
+\item
+  On feed read: read user\textquotesingle s pre-built feed from Redis (push-mode posts) + fetch latest celebrity posts from celebrity index + merge and deduplicate.
+\item
+  Skip fanout for users who haven\textquotesingle t been active in 7 days (check last\_active timestamp).
+\end{itemize}
+
+\paragraph{6.2 Celebrity Problem (Hotspot)}\label{62-celebrity-problem-hotspot}
+
+A celebrity with 10 million followers posts \(\rightarrow\) need 10 million cache writes within seconds.
+
+\textbf{Mitigation:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Async fanout workers:} Put the fanout job on Kafka with 10,000 partitions. Workers consume in parallel --- 10M writes spread across workers.
+\item
+  \textbf{Pull for celebrity content:} Don\textquotesingle t write celebrity posts to follower feeds. At read time, the top-K celebrities a user follows are fetched separately and injected into the feed.
+\item
+  \textbf{Pre-fetch:} For celebrities, replicate their latest posts to a separate, highly-cached "celebrity feed" shard. All followers read from the same shard (CDN-like effect).
+\end{enumerate}
+
+\paragraph{6.3 Feed Ranking}\label{63-feed-ranking}
+
+Simple timeline: sort by \texttt{score\ =\ timestamp}.
+
+ML-ranked feed (Facebook/Instagram model):
+
+\begin{verbatim}
+score = f(recency, engagement_velocity, relationship_strength, content_type)
+
+engagement_velocity = likes_per_hour / avg_likes_per_hour_for_author
+relationship_strength = interaction_history(viewer, author)
+\end{verbatim}
+
+\textbf{Interview takeaway:} In the interview, acknowledge ranking but defer details. Say: "We\textquotesingle d train an ML model offline, serve predictions via a Feature Store + low-latency inference service. The feed service re-ranks the top 200 candidates before returning the top 20."
+
+\paragraph{6.4 Pagination}\label{64-pagination}
+
+\textbf{Cursor-based pagination (not offset):}
+
+\begin{itemize}
+\tightlist
+\item
+  Offset pagination (\texttt{LIMIT\ 20\ OFFSET\ 100}) breaks when new posts are inserted --- items shift, causing duplicates/skips.
+\item
+  Cursor = encoded last-seen post timestamp + post\_id.
+\item
+  Redis: \texttt{ZRANGEBYSCORE\ feed:\{user\_id\}\ -inf\ \textless{}cursor\_score\textgreater{}\ LIMIT\ 0\ 20}.
+\item
+  Cursor makes the feed stable even as new posts arrive.
+\end{itemize}
+
+\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-2}
+
+\textbf{Feed cache size:}
+
+\begin{itemize}
+\tightlist
+\item
+  10 TB for active users --- run 50+ Redis nodes (200 GB each) in a cluster.
+\item
+  Use consistent hashing for user \(\rightarrow\) Redis shard mapping.
+\item
+  Evict feeds of users inactive for 7 days to save memory.
+\end{itemize}
+
+\textbf{Cassandra post storage:}
+
+\begin{itemize}
+\tightlist
+\item
+  Partition by \texttt{author\_id} \(\rightarrow\) hot partition if one author posts very frequently.
+\item
+  Mitigate: add \texttt{bucket} to partition key: \texttt{(author\_id,\ bucket)} where \texttt{bucket\ =\ created\_at\ /\ 30\ days}.
+\end{itemize}
+
+\textbf{Social graph at scale:}
+
+\begin{itemize}
+\tightlist
+\item
+  Facebook built TAO (The Associations and Objects) --- a custom graph store on top of MySQL + Memcache.
+\item
+  At smaller scale: Cassandra \texttt{follows\_by\_follower} + \texttt{follows\_by\_followee} tables work well.
+\end{itemize}
+
+\textbf{Read path latency breakdown (target \textless{} 200 ms):}
+
+\begin{verbatim}
+Redis feed read:          5 ms
+Celebrity post fetch:    20 ms (parallel)
+User profile hydration:  10 ms (from user cache)
+Ranking re-score:        15 ms
+Network + serialization: 10 ms
+Total:                  ~60 ms  (well within 200 ms budget)
+\end{verbatim}
+
+\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-2}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1575}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2362}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2012}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4051}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Decision
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Choice Made
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Alternative
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Fanout strategy & \textbf{Hybrid (push+pull)} & Pure push or pure pull & Balances write amplification vs read latency \\
+Feed storage & \textbf{Redis sorted sets} & DB query at read time & Sub-10ms reads; DB can\textquotesingle t handle 87K reads/sec directly \\
+Feed ordering & \textbf{Reverse-chronological (MVP)} & ML-ranked feed & Simpler; ranked feed is a layer on top \\
+Pagination & \textbf{Cursor-based} & Offset-based & Stable under inserts; no duplicate/skip on new posts \\
+Post DB & \textbf{Cassandra} & PostgreSQL (sharded) & Write throughput; natural time-series clustering \\
+Celebrity handling & \textbf{Pull at read time} & Fanout to all followers & Avoids 10M+ write storms per celebrity post \\
+\end{longtable}
+
+\subsection{4. Design a Chat System (WhatsApp / Messenger)}\label{4-design-a-chat-system-whatsapp--messenger}
+
+\subsubsection{1. Requirements}\label{1-requirements-3}
+
+\textbf{Clarifying questions to ask the interviewer:}
+
+\begin{itemize}
+\tightlist
+\item
+  1:1 chat only, or also group chat? What is the max group size?
+\item
+  Do we need real-time delivery (online) and push notifications (offline)?
+\item
+  Media support (images, video, voice)?
+\item
+  Do messages need end-to-end encryption?
+\item
+  Message history: how far back? Searchable?
+\item
+  Read receipts (sent / delivered / read)?
+\item
+  Online presence ("last seen")?
+\end{itemize}
+
+\textbf{Functional Requirements:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  1:1 messaging with real-time delivery.
+\item
+  Group messaging (up to 500 members per group).
+\item
+  Online/offline status with "last seen" timestamp.
+\item
+  Read receipts: sent \(\rightarrow\) delivered \(\rightarrow\) read.
+\item
+  Push notifications for offline users.
+\item
+  Message history persisted; searchable.
+\item
+  Media: images, files (\textless{} 100 MB each).
+\end{enumerate}
+
+\textbf{Non-Functional Requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  500 million DAU; 100 billion messages/day.
+\item
+  Message delivery latency \textless{} 500 ms (online users).
+\item
+  High availability: 99.99\%.
+\item
+  Messages delivered exactly once and in order.
+\item
+  End-to-end encryption support (Signal Protocol) --- note architecture impact.
+\end{itemize}
+
+\subsubsection{2. Capacity Estimation}\label{2-capacity-estimation-3}
+
+\textbf{Assumptions:}
+
+\begin{itemize}
+\tightlist
+\item
+  500 million DAU.
+\item
+  Each user sends 40 messages/day \(\rightarrow\) 20 billion messages/day (1:1 + group).
+\item
+  Average message size: 100 bytes (text).
+\item
+  Average group has 10 members \(\rightarrow\) group message creates 9 additional deliveries.
+\item
+  Media: 5\% of messages are media \(\rightarrow\) 1 billion media messages/day.
+\end{itemize}
+
+\textbf{Message write QPS:}
+
+\begin{verbatim}
+20,000,000,000 / 86,400 ≈ 231,481 msg/sec  ≈ ~230,000 messages/sec
+Peak (3×):                                  ≈ ~700,000 messages/sec
+\end{verbatim}
+
+\textbf{Storage:}
+
+\begin{verbatim}
+Text messages:  20B/day × 100 B         = 2 TB/day
+Media:          1B/day × 1 MB avg       = 1 PB/day  → S3/GCS
+Metadata:       20B/day × 50 B          = 1 TB/day
+Total text+meta ≈ 3 TB/day → 1.1 PB/year (text only)
+\end{verbatim}
+
+\textbf{Concurrent WebSocket connections:}
+
+\begin{verbatim}
+500M DAU × 30% online simultaneously = 150M concurrent connections
+Each connection: 65KB OS overhead
+Total: 150M × 65KB ≈ 9.75 TB RAM just for connections
+→ Need ~100,000 chat servers @ 1,500 connections each
+(In practice: use event-driven servers; Nginx/Go handles 100K connections per server)
+→ 1,500 servers (100K connections each)
+\end{verbatim}
+
+\subsubsection{3. API Design}\label{3-api-design-3}
+
+\begin{verbatim}
+# WebSocket connection (real-time channel)
+ws://chat.example.com/ws?token=<auth_token>
+
+# WebSocket message format (client → server)
+{
+  "type":      "message",
+  "msg_id":    "client-generated-uuid",   // for deduplication
+  "to":        "user:5678",               // or "group:9999"
+  "content":   "Hey!",
+  "media_url": null,
+  "timestamp": 1718000000000             // client time ms
+}
+
+# WebSocket message format (server → client, push delivery)
+{
+  "type":        "message",
+  "msg_id":      "server-assigned-uuid",
+  "from":        "user:1234",
+  "to":          "user:5678",
+  "content":     "Hey!",
+  "server_ts":   1718000000050,          // server timestamp (canonical ordering)
+  "seq":         100034                  // sequence number in conversation
+}
+
+# ACK (client → server, delivery acknowledgement)
+{ "type": "ack", "msg_id": "...", "ack_type": "delivered" }
+{ "type": "ack", "msg_id": "...", "ack_type": "read" }
+
+# REST: Send message (fallback for HTTP clients)
+POST /api/v1/messages
+Request:  { "to": "user:5678", "content": "Hey!" }
+Response: { "msg_id": "...", "server_ts": 1718000000050 }
+
+# REST: Fetch message history
+GET /api/v1/conversations/{conversation_id}/messages?before=<msg_id>&limit=50
+Response: { "messages": [...], "has_more": true }
+
+# REST: Upload media
+POST /api/v1/media/upload
+Response: { "media_url": "https://cdn.example.com/m/abc.jpg", "expires_in": 86400 }
+
+# REST: Get online status
+GET /api/v1/users/{user_id}/presence
+Response: { "online": false, "last_seen": "2026-06-14T09:55:00Z" }
+\end{verbatim}
+
+\subsubsection{4. Data Model}\label{4-data-model-3}
+
+\textbf{Storage choices:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Messages:} HBase / Cassandra --- write-heavy time-series; partition by conversation, cluster by time.
+\item
+  \textbf{Conversations/Groups:} Cassandra or DynamoDB.
+\item
+  \textbf{User data:} PostgreSQL (low write, complex queries).
+\item
+  \textbf{Presence (online status):} Redis (ephemeral, TTL-based).
+\item
+  \textbf{Message queue for offline delivery:} Kafka or internal queues.
+\item
+  \textbf{Media:} S3 / GCS (blob).
+\end{itemize}
+
+\textbf{Messages Table (HBase / Cassandra):}
+
+\begin{verbatim}
+messages
+
+conversation_id   TEXT       PARTITION KEY    -- "conv:{user1}_{user2}" or "group:{id}"
+seq_num           BIGINT     CLUSTERING KEY DESC  -- monotonically increasing per conversation
+msg_id            UUID       -- globally unique
+sender_id         UUID
+content           TEXT
+media_url         TEXT
+msg_type          TEXT       -- "text", "image", "video", "system"
+status            TEXT       -- "sent", "delivered", "read"
+created_at        TIMESTAMP
+\end{verbatim}
+
+\textbf{Conversations Table:}
+
+\begin{verbatim}
+conversations
+
+conversation_id   TEXT    PRIMARY KEY
+participants      LIST<UUID>
+group_name        TEXT    (null for 1:1)
+last_msg_id       UUID
+last_msg_at       TIMESTAMP
+\end{verbatim}
+
+\textbf{User Conversations Index (reverse lookup):}
+
+\begin{verbatim}
+user_conversations   -- "what conversations is user X in?"
+
+user_id              UUID    PARTITION KEY
+conversation_id      TEXT    CLUSTERING KEY
+last_msg_at          TIMESTAMP  (for sorting)
+unread_count         INT
+\end{verbatim}
+
+\textbf{Presence Table (Redis):}
+
+\begin{verbatim}
+Key:   "presence:{user_id}"
+Value: { "online": true, "last_heartbeat": 1718000000000 }
+TTL:   30 seconds (refreshed by heartbeat every 10s)
+\end{verbatim}
+
+\subsubsection{5. High-Level Architecture}\label{5-high-level-architecture-3}
+
+\begin{verbatim}
+                    ┌──────────────────────────────────────────────┐
+                    │               Clients                         │
+                    │     (iOS / Android / Web / Desktop)           │
+                    └─────┬──────────────┬───────────────┬──────────┘
+                          │ WebSocket    │ REST          │ REST
+                          │             │(history/media)│(auth/profile)
+               ┌──────────▼──────────┐  │               │
+               │  WebSocket LB        │  │               │
+               │  (L4, sticky by     │  │               │
+               │   connection)        │  │               │
+               └──────────┬──────────┘  │               │
+                          │             │               │
+         ┌────────────────▼──┐          │               │
+         │  Chat Servers      │          │               │
+         │  (WebSocket mgmt) │          │               │
+         │  [Stateful —      │          │               │
+         │   hold connections]│         │               │
+         └─────┬──────┬──────┘          │               │
+               │      │                 │               │
+  ┌────────────▼──┐ ┌──▼────────────┐   │               │
+  │    Kafka      │ │  Redis        │   │               │
+  │  (message    │ │  (presence,   │   │               │
+  │   routing,   │ │   connection  │   │               │
+  │   delivery   │ │   registry)   │   │               │
+  │   queue)     │ └───────────────┘   │               │
+  └────────┬─────┘                     │               │
+           │                           │               │
+  ┌────────▼──────────┐     ┌──────────▼──────┐  ┌─────▼──────────┐
+  │  Message Service  │     │  History API    │  │  User Service  │
+  │  (store, route,   │     │  (REST reads)   │  │  (auth, profile│
+  │   push notifs)    │     └────────┬────────┘  └────────────────┘
+  └────────┬──────────┘              │
+           │                         │
+  ┌────────▼───────────────────────▼─────────────┐
+  │                 Cassandra / HBase             │
+  │              (messages, conversations)        │
+  └───────────────────────────────────────────────┘
+           │
+  ┌────────▼──────────┐         ┌──────────────────┐
+  │  Push Notif Svc   │         │   S3 / GCS       │
+  │  (APNs, FCM)      │         │   (media blobs)  │
+  └───────────────────┘         └──────────────────┘
+\end{verbatim}
+
+\textbf{Message delivery flow (1:1, both online):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Sender client sends message over WebSocket to \textbf{Chat Server A}.
+\item
+  Chat Server A writes message to \textbf{Kafka} (topic: \texttt{messages}).
+\item
+  \textbf{Message Service} consumes from Kafka, persists to Cassandra.
+\item
+  Message Service looks up which \textbf{Chat Server} the recipient is connected to (via Redis connection registry: \texttt{"ws\_server:\{user\_id\}"\ →\ "chat-server-B"}).
+\item
+  Message Service pushes message to \textbf{Chat Server B} (via internal pub/sub).
+\item
+  Chat Server B delivers to recipient\textquotesingle s WebSocket.
+\item
+  Recipient client sends \texttt{ack:\ delivered} \(\rightarrow\) Chat Server B \(\rightarrow\) Message Service \(\rightarrow\) Cassandra (update status) \(\rightarrow\) Kafka \(\rightarrow\) Chat Server A \(\rightarrow\) sender gets double-tick.
+\end{enumerate}
+
+\subsubsection{6. Deep Dives}\label{6-deep-dives-3}
+
+\paragraph{6.1 WebSocket Connection Management}\label{61-websocket-connection-management}
+
+\textbf{Why WebSocket instead of HTTP polling?}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1719}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3025}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2005}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3251}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Short polling & Client polls every N seconds & Simple & Wasted requests; high latency (up to N sec) \\
+Long polling & Server holds request until message or timeout & Fewer round trips & Still HTTP overhead; server holds threads \\
+\textbf{WebSocket} & Full-duplex TCP connection & True real-time; low overhead & Stateful --- servers must track who is connected where \\
+SSE (Server-Sent Events) & Server pushes, client uses XHR for sends & Simpler than WS & Unidirectional; need separate channel for sends \\
+\end{longtable}
+
+\textbf{Key Decision: WebSocket for all real-time delivery.}
+
+\textbf{Connection registry in Redis:}
+
+\begin{verbatim}
+SET "conn:{user_id}" "chat-server-47" EX 300
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Refreshed every 60s by Chat Server via heartbeat.
+\item
+  If key expires (server crash), user treated as offline \(\rightarrow\) push notification path.
+\end{itemize}
+
+\textbf{Load balancing WebSocket connections:}
+
+\begin{itemize}
+\tightlist
+\item
+  L4 load balancer (not L7) --- connections are long-lived TCP; no HTTP termination per request.
+\item
+  Use consistent hashing on \texttt{user\_id} for connection routing (optional but reduces cross-server lookups).
+\end{itemize}
+
+\paragraph{6.2 Message Delivery: Online vs Offline}\label{62-message-delivery-online-vs-offline}
+
+\begin{verbatim}
+Sender posts message
+        │
+        ▼
+   Is recipient online? (check Redis presence key)
+        │
+   YES  │  NO
+        │         ├──► Persist to Cassandra
+        │         └──► Enqueue push notification (APNs/FCM)
+        ▼                    │
+  Route to recipient's       │
+  Chat Server via Redis      ▼
+  connection registry   Push Notif Svc sends silent push
+        │               → device wakes up, fetches history
+        ▼               via REST, renders notification
+  Deliver via WebSocket
+\end{verbatim}
+
+\textbf{Message deduplication:}
+
+\begin{itemize}
+\tightlist
+\item
+  Client generates a UUID (\texttt{client\_msg\_id}) before sending.
+\item
+  Server stores \texttt{client\_msg\_id} \(\rightarrow\) \texttt{server\_msg\_id} mapping for 24 hours.
+\item
+  If retry received with same \texttt{client\_msg\_id}, return existing \texttt{server\_msg\_id} (idempotent).
+\end{itemize}
+
+\paragraph{6.3 Group Chat Delivery}\label{63-group-chat-delivery}
+
+\textbf{Small groups (\(\leq\) 500 members):}
+
+\begin{itemize}
+\tightlist
+\item
+  Fanout on message write: write one message record, but create one delivery record per member.
+\item
+  Alternative: write one message, each member\textquotesingle s client polls for group updates using a \texttt{last\_read\_seq} cursor.
+\end{itemize}
+
+\textbf{Recommended for \(\leq\) 500 members:}
+
+\begin{verbatim}
+Message write → Kafka
+Kafka consumer → write 1 message to messages table
+                → write N "unread" records to user_conversation table (one per member)
+Online members → WebSocket push
+Offline members → Push notification
+\end{verbatim}
+
+\textbf{Very large groups (\textgreater{} 500, e.g., broadcast channels):}
+
+\begin{itemize}
+\tightlist
+\item
+  Switch to fanout-on-read: message is in one place, members\textquotesingle{} clients pull new messages using \texttt{seq\_num} cursor.
+\item
+  Similar to news feed pull model.
+\end{itemize}
+
+\paragraph{6.4 Message Ordering and Sequence Numbers}\label{64-message-ordering-and-sequence-numbers}
+
+\textbf{Problem:} Two users send messages simultaneously. Who goes first?
+
+\textbf{Solution: Sequence number per conversation (not global).}
+
+\begin{itemize}
+\tightlist
+\item
+  Each conversation has a monotonic \texttt{seq\_num} counter stored in Redis or a coordination service (like Zookeeper).
+\item
+  When Message Service processes a message, it atomically increments \texttt{seq\_num} for that \texttt{conversation\_id} and assigns it to the message.
+\item
+  Messages displayed in \texttt{seq\_num} order on all clients.
+\end{itemize}
+
+\textbf{Clock skew:} Client timestamps cannot be trusted. Always use server-assigned \texttt{seq\_num} for ordering. Client timestamp only shown as display time.
+
+\begin{verbatim}
+INCR "seq:{conversation_id}"  → returns 100034 (atomic in Redis)
+Store message with seq=100034
+\end{verbatim}
+
+\paragraph{6.5 Online Presence}\label{65-online-presence}
+
+\textbf{Heartbeat protocol:}
+
+\begin{itemize}
+\tightlist
+\item
+  Client sends WebSocket heartbeat every 10 seconds.
+\item
+  Chat Server updates Redis: \texttt{SET\ "presence:\{user\_id\}"\ 1\ EX\ 30}.
+\item
+  Key expires in 30s if no heartbeat \(\rightarrow\) user considered offline.
+\end{itemize}
+
+\textbf{Displaying presence:}
+
+\begin{itemize}
+\tightlist
+\item
+  When user A opens a chat with user B: fetch \texttt{GET\ "presence:\{user\_id\_B\}"}.
+\item
+  "Last seen": stored as \texttt{last\_seen:\{user\_id\}} on heartbeat stop (WebSocket disconnect or timeout).
+\end{itemize}
+
+\textbf{Scale challenge:}
+
+\begin{itemize}
+\tightlist
+\item
+  500M DAU \(\times\) heartbeat every 10s = 50M presence writes/sec to Redis.
+\item
+  \textbf{Optimization:} Only send heartbeat if the user is actively viewing a conversation. Idle app = slower heartbeat (30s). Closed app = no heartbeat.
+\item
+  Use presence fanout sparingly: only push presence updates to contacts who have a conversation open with that user.
+\end{itemize}
+
+\paragraph{6.6 Read Receipts}\label{66-read-receipts}
+
+\textbf{States:} \texttt{sent} \(\rightarrow\) \texttt{delivered} \(\rightarrow\) \texttt{read}.
+
+\begin{verbatim}
+sent:       Message reached the chat server (ack from server to sender).
+delivered:  Message delivered to recipient's device (ack from recipient device).
+read:       Recipient opened the conversation (client sends "read" ack).
+\end{verbatim}
+
+\textbf{Implementation:}
+
+\begin{itemize}
+\tightlist
+\item
+  Each message has a \texttt{status} field in Cassandra.
+\item
+  Recipient sends \texttt{\{"type":"ack","msg\_id":"...","ack\_type":"read"\}} over WebSocket.
+\item
+  Chat Server \(\rightarrow\) Message Service \(\rightarrow\) update Cassandra status \(\rightarrow\) forward read receipt to sender\textquotesingle s Chat Server \(\rightarrow\) sender gets green double-tick.
+\end{itemize}
+
+\textbf{Group read receipts:}
+
+\begin{itemize}
+\tightlist
+\item
+  Store \texttt{read\_by:\ Map\textless{}user\_id,\ timestamp\textgreater{}} per message in Cassandra.
+\item
+  "Delivered to all" = all members\textquotesingle{} devices have acknowledged \texttt{delivered}.
+\item
+  Show "Read by X, Y, Z" as clients send individual read acks.
+\end{itemize}
+
+\subsubsection{7. Bottlenecks \& Scaling}\label{7-bottlenecks--scaling-3}
+
+\textbf{150 million concurrent WebSocket connections:}
+
+\begin{itemize}
+\tightlist
+\item
+  Each Chat Server handles \textasciitilde50K--100K connections (Go or Node.js event loop).
+\item
+  Need \textasciitilde1,500--3,000 Chat Servers.
+\item
+  Chat Servers are stateful but share no business logic --- scale horizontally, no coupling.
+\end{itemize}
+
+\textbf{Kafka throughput (230K messages/sec):}
+
+\begin{itemize}
+\tightlist
+\item
+  Partition by \texttt{conversation\_id} (ensures ordering per conversation).
+\item
+  230K msg/sec \(\times\) 1 KB = 230 MB/s --- Kafka handles this easily with dozens of brokers.
+\item
+  Message Service consumer group: scale consumers to match Kafka partition count.
+\end{itemize}
+
+\textbf{Cassandra message storage (3 TB/day):}
+
+\begin{itemize}
+\tightlist
+\item
+  Partition by \texttt{conversation\_id} ensures messages in same conversation are co-located.
+\item
+  Hot conversation: one partition gets hammered \(\rightarrow\) add \texttt{bucket} (time shard) to partition key.
+\item
+  3 TB/day \(\times\) 365 = \textasciitilde1.1 PB/year. Cassandra compresses \textasciitilde3:1 \(\rightarrow\) \textasciitilde370 TB/year of disk.
+\item
+  TTL old messages: archive messages \textgreater{} 1 year to cold storage (S3 Glacier), keep last 1 year hot.
+\end{itemize}
+
+\textbf{Media delivery:}
+
+\begin{itemize}
+\tightlist
+\item
+  Don\textquotesingle t send media over WebSocket --- too large.
+\item
+  Client uploads directly to S3 (pre-signed URL from Media Service).
+\item
+  Sends media URL in the chat message. Recipients download from CDN-fronted S3.
+\end{itemize}
+
+\textbf{Push notification scale:}
+
+\begin{itemize}
+\tightlist
+\item
+  500M users. At any time, 70\% offline.
+\item
+  Surge: celebrity group sends a message \(\rightarrow\) 1M push notifications simultaneously.
+\item
+  Use async workers + APNs/FCM batch APIs. Rate limit per APNs connection (use multiple connections).
+\end{itemize}
+
+\subsubsection{8. Trade-offs Summary}\label{8-trade-offs-summary-3}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1382}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2910}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2110}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3598}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Decision
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Choice Made
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Alternative
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Real-time transport & \textbf{WebSocket} & Long polling / SSE & Full-duplex; lowest latency; widely supported \\
+Message storage & \textbf{Cassandra (conv-partitioned)} & MySQL (sharded) & Write throughput; time-series access pattern; no joins needed \\
+Connection registry & \textbf{Redis (TTL-based)} & Consistent hash routing & Fast lookup; auto-evicts stale connections on TTL expiry \\
+Message ordering & \textbf{Server-assigned seq\_num (Redis INCR)} & Vector clocks & Simple; sufficient for single-conversation ordering \\
+Group delivery & \textbf{Fanout to members (\textless{} 500) / pull (\textgreater{} 500)} & Always pull & Balances latency vs write amplification by group size \\
+Presence heartbeat & \textbf{10s client heartbeat, 30s TTL} & Server-push disconnect events & Handles silent disconnects (network failure, app killed) \\
+Read receipts & \textbf{Per-message status in Cassandra} & Separate receipt table & Avoids join; co-located with message data \\
+Media & \textbf{S3 + CDN (URL in message)} & In-message blob & Media over WebSocket is impractical at scale \\
+\end{longtable}
+
+\emph{End of Part 1 --- Foundational System Design Problems.}
+
+\end{document}

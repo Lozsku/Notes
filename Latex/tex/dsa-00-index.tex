@@ -1,0 +1,73 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{DSA — Index}
+\newcommand{\ThemeKicker}{DSA Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{be123c}{fb7185}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{DSA / Coding-Round Pack}\label{dsa--coding-round-pack}
+
+The coding interview is the \#1 filter at FAANG. These three files cover \textbf{pattern recognition}, \textbf{data structures}, and \textbf{algorithms} --- everything you need to recognize and solve LeetCode-style problems fast.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2454}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7546}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+File
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What\textquotesingle s inside
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\url{01-patterns-and-templates.md} & \textbf{Start here.} 22 coding patterns with "when you see X \(\rightarrow\) use Y" triggers + copy-pasteable Python templates. The pattern-recognition cheat table is the core. \\
+\url{02-data-structures.md} & Every DS from first principles: internals, ASCII diagrams, operation-complexity tables, when-to-use, language container mapping. \\
+\url{03-algorithms-and-complexity.md} & Big-O \& Master Theorem, sorting/searching, all graph algorithms, DP families, greedy, backtracking, bit tricks, number theory. \\
+\end{longtable}
+
+\subsection{How to use}\label{how-to-use}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Learn the patterns} (file 01) --- recognition is 80\% of the battle.
+\item
+  \textbf{Drill the complexity tables} (files 02 + 03) --- interviewers always ask "what\textquotesingle s the time complexity?"
+\item
+  \textbf{Map every LeetCode problem you do back to a pattern} in file 01\textquotesingle s cheat table.
+\end{enumerate}
+
+\subsection{The universal coding-interview loop}\label{the-universal-coding-interview-loop}
+
+\begin{verbatim}
+Clarify → Examples/edge cases → Brute force (state complexity)
+   → Optimize (pick a pattern) → Code cleanly → Test/dry-run → State final complexity
+\end{verbatim}
+
+\begin{quote}
+\textbf{Acceptable complexity vs N} (memorize): N\(\leq\)20 \(\rightarrow\) 2\^{}N/N! ok \(\cdot\) N\(\leq\)500 \(\rightarrow\) O(N\(^3\)) \(\cdot\) N\(\leq\)5000 \(\rightarrow\) O(N\(^2\)) \(\cdot\) N\(\leq\)10\(^6\) \(\rightarrow\) O(N log N) \(\cdot\) N\textgreater10\(^7\) \(\rightarrow\) O(N) or O(log N).
+\end{quote}
+
+\end{document}

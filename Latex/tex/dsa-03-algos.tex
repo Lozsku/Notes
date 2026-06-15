@@ -1,0 +1,2686 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Algorithms \& Complexity}
+\newcommand{\ThemeKicker}{DSA Track}
+\newcommand{\ThemeNumber}{03}
+
+\usepackage{interviewstyle}
+\setthemecolor{be123c}{fb7185}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\section{Core Algorithms \& Complexity Analysis}\label{core-algorithms--complexity-analysis}
+
+\begin{quote}
+Interview-ready reference: first principles, Python snippets, comparison tables, and cheat sheets.
+\end{quote}
+
+\subsection{Overview}\label{overview}
+
+Algorithmic thinking is the foundation of every coding interview. You are not just expected to solve problems --- you are expected to \textbf{reason about efficiency}, identify optimal approaches, and communicate trade-offs clearly. This file covers the complete algorithmic toolkit needed for top-tier software engineering interviews.
+
+\textbf{What interviewers evaluate:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Can you identify what kind of problem this is? (sorting, graph, DP, greedy\ldots)
+\item
+  Do you know the right algorithm and its complexity?
+\item
+  Can you implement it correctly under pressure?
+\item
+  Can you articulate trade-offs and edge cases?
+\end{enumerate}
+
+\textbf{Core skill loop:} Recognize \(\rightarrow\) Design \(\rightarrow\) Analyze \(\rightarrow\) Implement \(\rightarrow\) Verify \(\rightarrow\) Optimize
+
+\subsection{Complexity Analysis}\label{complexity-analysis}
+
+\subsubsection{Big-O / Big-Theta / Big-Omega}\label{big-o--big-theta--big-omega}
+
+Complexity notation describes \textbf{how resource usage scales with input size}, not actual runtime.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2738}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5833}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Notation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+O(f(n)) & Big-O (upper bound) & Algorithm runs in \textbf{at most} f(n) steps (worst case) \\
+\(\Omega\)(f(n)) & Big-Omega (lower bound) & Algorithm runs in \textbf{at least} f(n) steps (best case) \\
+\(\Theta\)(f(n)) & Big-Theta (tight bound) & Algorithm runs in \textbf{exactly} f(n) steps (avg case matches both) \\
+\end{longtable}
+
+\textbf{Formal definition --- Big-O:} T(n) = O(f(n)) if \(\exists\) constants c \textgreater{} 0 and n\(_0\) such that T(n) \(\leq\) c\(\cdot\)f(n) for all n \(\geq\) n\(_0\).
+
+\textbf{Complexity hierarchy (slowest to fastest growth):}
+
+\begin{verbatim}
+O(1) < O(log n) < O(√n) < O(n) < O(n log n) < O(n²) < O(n³) < O(2ⁿ) < O(n!)
+\end{verbatim}
+
+\textbf{Dropping constants and lower-order terms:}
+
+\begin{itemize}
+\tightlist
+\item
+  O(3n\(^2\) + 5n + 12) \(\rightarrow\) O(n\(^2\))
+\item
+  O(100) \(\rightarrow\) O(1)
+\item
+  O(n + n log n) \(\rightarrow\) O(n log n)
+\end{itemize}
+
+\textbf{Multi-variable complexity:} When input has multiple dimensions, keep all:
+
+\begin{itemize}
+\tightlist
+\item
+  O(V + E) for graph algorithms (V = vertices, E = edges)
+\item
+  O(m\(\cdot\)n) for 2D DP problems
+\end{itemize}
+
+\subsubsection{Amortized Analysis}\label{amortized-analysis}
+
+Amortized analysis gives the \textbf{average cost per operation over a sequence}, even if individual operations are expensive.
+
+\textbf{Example --- Dynamic Array (Python list append):}
+
+\begin{itemize}
+\tightlist
+\item
+  Most appends: O(1)
+\item
+  Occasional doubling: O(n)
+\item
+  Amortized cost per append: O(1) --- because doubling happens exponentially rarely
+\end{itemize}
+
+\textbf{Three methods:}
+\textbar{} Method \textbar{} Idea \textbar{} When to use \textbar{}
+\textbar-\/-\/-\/-\/-\/-\/-\/-\textbar-\/-\/-\/-\/-\/-\textbar-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\textbar{}
+\textbar{} Aggregate \textbar{} Total cost / n operations \textbar{} Simplest; works when all operations have same amortized cost \textbar{}
+\textbar{} Accounting \textbar{} Prepay credits for future expensive ops \textbar{} When operations have different costs \textbar{}
+\textbar{} Potential \textbar{} \(\Phi\)(state) function tracks "stored energy" \textbar{} Most general; used for complex data structures \textbar{}
+
+\textbf{Key amortized results:}
+
+\begin{itemize}
+\tightlist
+\item
+  Dynamic array append: O(1) amortized
+\item
+  Union-Find with union-by-rank + path compression: O(\(\alpha\)(n)) amortized \(\approx\) O(1)
+\item
+  Splay tree operations: O(log n) amortized
+\item
+  Fibonacci heap decrease-key: O(1) amortized
+\end{itemize}
+
+\subsubsection{Computing Time \& Space Complexity}\label{computing-time--space-complexity}
+
+\textbf{Time complexity rules:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Sequential statements:} Add costs --- O(A) + O(B) = O(max(A, B))
+\item
+  \textbf{Nested loops:} Multiply --- outer \(\times\) inner
+\item
+  \textbf{Function calls:} Substitute the called function\textquotesingle s complexity
+\item
+  \textbf{Recursion:} Use recurrence relations or Master Theorem
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# O(n) — single loop}
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+\NormalTok{    do\_constant\_work()}
+
+\CommentTok{\# O(n²) — nested loops}
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+    \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+\NormalTok{        do\_constant\_work()}
+
+\CommentTok{\# O(n log n) — loop + halving inner}
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+\NormalTok{    j }\OperatorTok{=}\NormalTok{ n}
+    \ControlFlowTok{while}\NormalTok{ j }\OperatorTok{\textgreater{}} \DecValTok{1}\NormalTok{:}
+\NormalTok{        j }\OperatorTok{//=} \DecValTok{2}   \CommentTok{\# log n iterations}
+
+\CommentTok{\# O(log n) — binary search}
+\NormalTok{lo, hi }\OperatorTok{=} \DecValTok{0}\NormalTok{, n}
+\ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}}\NormalTok{ hi:}
+\NormalTok{    mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+    \CommentTok{\# halves search space each time}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Space complexity --- what to count:}
+
+\begin{itemize}
+\tightlist
+\item
+  Input space (usually excluded unless asked for auxiliary space)
+\item
+  Call stack depth for recursion
+\item
+  Extra data structures allocated
+\item
+  \textbf{Auxiliary space} = space excluding input
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# O(1) space — no extra allocation}
+\KeywordTok{def}\NormalTok{ find\_max(arr):}
+\NormalTok{    m }\OperatorTok{=}\NormalTok{ arr[}\DecValTok{0}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ arr:}
+\NormalTok{        m }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(m, x)}
+    \ControlFlowTok{return}\NormalTok{ m}
+
+\CommentTok{\# O(n) space — stores extra array}
+\KeywordTok{def}\NormalTok{ prefix\_sum(arr):}
+\NormalTok{    ps }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (}\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{+} \DecValTok{1}\NormalTok{)  }\CommentTok{\# O(n)}
+    \ControlFlowTok{for}\NormalTok{ i, x }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(arr):}
+\NormalTok{        ps[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{=}\NormalTok{ ps[i] }\OperatorTok{+}\NormalTok{ x}
+    \ControlFlowTok{return}\NormalTok{ ps}
+
+\CommentTok{\# O(n) space — call stack for recursion}
+\KeywordTok{def}\NormalTok{ factorial(n):}
+    \ControlFlowTok{if}\NormalTok{ n }\OperatorTok{\textless{}=} \DecValTok{1}\NormalTok{: }\ControlFlowTok{return} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ n }\OperatorTok{*}\NormalTok{ factorial(n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)  }\CommentTok{\# n frames on stack}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Recursion Tree \& Master Theorem}\label{recursion-tree--master-theorem}
+
+\textbf{Recursion tree method:} Draw the tree of recursive calls, compute cost at each level, sum all levels.
+
+\begin{verbatim}
+T(n) = 2T(n/2) + n    (merge sort)
+
+Level 0:  n                    → cost n
+Level 1:  n/2 + n/2            → cost n
+Level 2:  n/4 + n/4 + n/4 + n/4 → cost n
+...
+Level log n: n leaves of size 1 → cost n
+
+Total: n × (log n + 1) = O(n log n)
+\end{verbatim}
+
+\textbf{Master Theorem:} For recurrences of the form T(n) = a\(\cdot\)T(n/b) + f(n) where a \(\geq\) 1, b \textgreater{} 1:
+
+Let critical exponent: \emph{\emph{c} = log\_b(a)}*
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4236}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3385}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1830}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Case
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Condition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Result
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Intuition
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Case 1 & f(n) = O(n\^{}(c*\(-\)\(\varepsilon\))) for some \(\varepsilon\) \textgreater{} 0 & T(n) = \(\Theta\)(n\^{}c*) & Leaves dominate \\
+Case 2 & f(n) = \(\Theta\)(n\^{}c* \(\cdot\) log\^{}k n), k \(\geq\) 0 & T(n) = \(\Theta\)(n\^{}c* \(\cdot\) log\^{}(k+1) n) & Equal work per level \\
+Case 3 & f(n) = \(\Omega\)(n\^{}(c*+\(\varepsilon\))) and regularity holds & T(n) = \(\Theta\)(f(n)) & Root dominates \\
+\end{longtable}
+
+\textbf{Master Theorem examples:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2755}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2617}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0634}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2342}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Recurrence
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+a
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+b
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+c*
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+f(n)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Case
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Result
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+T(n) = 2T(n/2) + n & 2 & 2 & 1 & n = \(\Theta\)(n¹) & 2 & \(\Theta\)(n log n) \\
+T(n) = 2T(n/2) + 1 & 2 & 2 & 1 & 1 = O(n\^{}0.5) & 1 & \(\Theta\)(n) \\
+T(n) = 4T(n/2) + n\(^2\) & 4 & 2 & 2 & n\(^2\) = \(\Theta\)(n\(^2\)) & 2 & \(\Theta\)(n\(^2\) log n) \\
+T(n) = 4T(n/2) + n\(^3\) & 4 & 2 & 2 & n\(^3\) = \(\Omega\)(n\^{}2.5) & 3 & \(\Theta\)(n\(^3\)) \\
+T(n) = T(n/2) + 1 & 1 & 2 & 0 & 1 = \(\Theta\)(1) & 2 & \(\Theta\)(log n) \\
+T(n) = 3T(n/3) + n & 3 & 3 & 1 & n = \(\Theta\)(n¹) & 2 & \(\Theta\)(n log n) \\
+\end{longtable}
+
+\textbf{Master Theorem does NOT apply when:}
+
+\begin{itemize}
+\tightlist
+\item
+  Not in form a\(\cdot\)T(n/b) + f(n) --- e.g., T(n) = T(n\(-\)1) + n (linear decrease, not fraction)
+\item
+  T(n) = T(n/2) + T(n/3) + n (unequal subproblems)
+\item
+  For T(n) = T(n\(-\)1) + n \(\rightarrow\) sum 1+2+\ldots+n = O(n\(^2\))
+\item
+  For T(n) = T(n\(-\)1) + 1 \(\rightarrow\) n recursive calls \(\rightarrow\) O(n)
+\end{itemize}
+
+\subsubsection{\texorpdfstring{Input Size \(\rightarrow\) Acceptable Complexity}{Input Size \textbackslash rightarrow Acceptable Complexity}}\label{input-size-rightarrow-acceptable-complexity}
+
+Use this table to instantly identify which algorithms are feasible given constraints.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2054}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3474}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4471}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+n (input size)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Max acceptable complexity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Typical algorithm
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+n \(\leq\) 10 & O(n!) or O(n\^{}n) & Brute-force, permutations \\
+n \(\leq\) 20 & O(2\(^n\)\(\cdot\)n) & Bitmask DP, meet in the middle \\
+n \(\leq\) 100 & O(n\(^3\)) or O(n\(^4\)) & Floyd-Warshall, naive string matching \\
+n \(\leq\) 1,000 & O(n\(^2\)) & Insertion sort, naive DP \\
+n \(\leq\) 10,000 & O(n\(^2\) log n) & Slower O(n\(^2\)) algorithms \\
+n \(\leq\) 100,000 & O(n log n) or O(n\(\surd\)n) & Merge sort, segment tree, sqrt decomp \\
+n \(\leq\) 1,000,000 & O(n log n) & Merge sort, heap operations \\
+n \(\leq\) 10,000,000 & O(n) & Linear scans, counting sort \\
+n \textgreater{} 10\^{}8 & O(log n) or O(1) & Binary search, math formulas \\
+\end{longtable}
+
+\textbf{Rule of thumb:} Modern computers do \textasciitilde10\^{}8 simple operations/second. Design accordingly.
+
+\subsection{Algorithms}\label{algorithms}
+
+\subsubsection{Sorting}\label{sorting}
+
+\paragraph{Comparison-Based Sorts}\label{comparison-based-sorts}
+
+Comparison sorts have a theoretical lower bound of \textbf{\(\Omega\)(n log n)} --- you cannot do better with only comparison operations.
+
+\textbf{Merge Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ merge\_sort(arr):}
+    \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{\textless{}=} \DecValTok{1}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ arr}
+\NormalTok{    mid }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{//} \DecValTok{2}
+\NormalTok{    left }\OperatorTok{=}\NormalTok{ merge\_sort(arr[:mid])}
+\NormalTok{    right }\OperatorTok{=}\NormalTok{ merge\_sort(arr[mid:])}
+    \ControlFlowTok{return}\NormalTok{ merge(left, right)}
+
+\KeywordTok{def}\NormalTok{ merge(left, right):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    i }\OperatorTok{=}\NormalTok{ j }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(left) }\KeywordTok{and}\NormalTok{ j }\OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(right):}
+        \ControlFlowTok{if}\NormalTok{ left[i] }\OperatorTok{\textless{}=}\NormalTok{ right[j]:   }\CommentTok{\# \textless{}= preserves stability}
+\NormalTok{            result.append(left[i])}\OperatorTok{;}\NormalTok{ i }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            result.append(right[j])}\OperatorTok{;}\NormalTok{ j }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{    result.extend(left[i:])}
+\NormalTok{    result.extend(right[j:])}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key insight:} Divide conquer and merge. Recurrence T(n) = 2T(n/2) + n \(\rightarrow\) \textbf{O(n log n)} always.
+\textbf{Stability:} Yes --- equal elements keep original relative order.
+\textbf{Drawback:} O(n) extra space; cache-unfriendly for large arrays.
+
+\textbf{Quick Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ random}
+
+\KeywordTok{def}\NormalTok{ quicksort(arr, lo, hi):}
+    \ControlFlowTok{if}\NormalTok{ lo }\OperatorTok{\textless{}}\NormalTok{ hi:}
+\NormalTok{        p }\OperatorTok{=}\NormalTok{ partition(arr, lo, hi)}
+\NormalTok{        quicksort(arr, lo, p }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)}
+\NormalTok{        quicksort(arr, p }\OperatorTok{+} \DecValTok{1}\NormalTok{, hi)}
+
+\KeywordTok{def}\NormalTok{ partition(arr, lo, hi):}
+    \CommentTok{\# Lomuto partition scheme}
+    \CommentTok{\# Randomize pivot to avoid worst{-}case O(n²) on sorted input}
+\NormalTok{    rand\_idx }\OperatorTok{=}\NormalTok{ random.randint(lo, hi)}
+\NormalTok{    arr[rand\_idx], arr[hi] }\OperatorTok{=}\NormalTok{ arr[hi], arr[rand\_idx]}
+\NormalTok{    pivot }\OperatorTok{=}\NormalTok{ arr[hi]}
+\NormalTok{    i }\OperatorTok{=}\NormalTok{ lo }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(lo, hi):}
+        \ControlFlowTok{if}\NormalTok{ arr[j] }\OperatorTok{\textless{}=}\NormalTok{ pivot:}
+\NormalTok{            i }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{            arr[i], arr[j] }\OperatorTok{=}\NormalTok{ arr[j], arr[i]}
+\NormalTok{    arr[i }\OperatorTok{+} \DecValTok{1}\NormalTok{], arr[hi] }\OperatorTok{=}\NormalTok{ arr[hi], arr[i }\OperatorTok{+} \DecValTok{1}\NormalTok{]}
+    \ControlFlowTok{return}\NormalTok{ i }\OperatorTok{+} \DecValTok{1}
+
+\CommentTok{\# Hoare partition (more efficient in practice):}
+\KeywordTok{def}\NormalTok{ hoare\_partition(arr, lo, hi):}
+\NormalTok{    pivot }\OperatorTok{=}\NormalTok{ arr[(lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}\NormalTok{]}
+\NormalTok{    i, j }\OperatorTok{=}\NormalTok{ lo }\OperatorTok{{-}} \DecValTok{1}\NormalTok{, hi }\OperatorTok{+} \DecValTok{1}
+    \ControlFlowTok{while} \VariableTok{True}\NormalTok{:}
+\NormalTok{        i }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{while}\NormalTok{ arr[i] }\OperatorTok{\textless{}}\NormalTok{ pivot: i }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{        j }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{while}\NormalTok{ arr[j] }\OperatorTok{\textgreater{}}\NormalTok{ pivot: j }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ i }\OperatorTok{\textgreater{}=}\NormalTok{ j: }\ControlFlowTok{return}\NormalTok{ j}
+\NormalTok{        arr[i], arr[j] }\OperatorTok{=}\NormalTok{ arr[j], arr[i]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key insight:} Pick pivot, partition so left \(\leq\) pivot \(\leq\) right, recurse on both sides.
+\textbf{Pivot strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  Last element: O(n\(^2\)) on sorted/reverse-sorted input
+\item
+  Random pivot: Expected O(n log n), avoids adversarial inputs
+\item
+  Median-of-three: Good heuristic
+\item
+  \textbf{3-way partition (Dutch National Flag):} Best for arrays with many duplicates --- partitions into \texttt{\textless{}\ pivot}, \texttt{==\ pivot}, \texttt{\textgreater{}\ pivot}
+\end{itemize}
+
+\textbf{Stability:} No --- partition swaps break relative order.
+
+\textbf{Heap Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ heap\_sort(arr):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(arr)}
+    \CommentTok{\# Build max{-}heap (heapify from last internal node)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{//} \DecValTok{2} \OperatorTok{{-}} \DecValTok{1}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{):}
+\NormalTok{        heapify(arr, n, i)}
+    \CommentTok{\# Extract elements}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{):}
+\NormalTok{        arr[}\DecValTok{0}\NormalTok{], arr[i] }\OperatorTok{=}\NormalTok{ arr[i], arr[}\DecValTok{0}\NormalTok{]  }\CommentTok{\# move max to end}
+\NormalTok{        heapify(arr, i, }\DecValTok{0}\NormalTok{)}
+
+\KeywordTok{def}\NormalTok{ heapify(arr, n, i):}
+\NormalTok{    largest }\OperatorTok{=}\NormalTok{ i}
+\NormalTok{    left, right }\OperatorTok{=} \DecValTok{2}\OperatorTok{*}\NormalTok{i }\OperatorTok{+} \DecValTok{1}\NormalTok{, }\DecValTok{2}\OperatorTok{*}\NormalTok{i }\OperatorTok{+} \DecValTok{2}
+    \ControlFlowTok{if}\NormalTok{ left }\OperatorTok{\textless{}}\NormalTok{ n }\KeywordTok{and}\NormalTok{ arr[left] }\OperatorTok{\textgreater{}}\NormalTok{ arr[largest]: largest }\OperatorTok{=}\NormalTok{ left}
+    \ControlFlowTok{if}\NormalTok{ right }\OperatorTok{\textless{}}\NormalTok{ n }\KeywordTok{and}\NormalTok{ arr[right] }\OperatorTok{\textgreater{}}\NormalTok{ arr[largest]: largest }\OperatorTok{=}\NormalTok{ right}
+    \ControlFlowTok{if}\NormalTok{ largest }\OperatorTok{!=}\NormalTok{ i:}
+\NormalTok{        arr[i], arr[largest] }\OperatorTok{=}\NormalTok{ arr[largest], arr[i]}
+\NormalTok{        heapify(arr, n, largest)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key insight:} Build max-heap in O(n), then repeatedly extract-max in O(log n) each.
+\textbf{Stability:} No. \textbf{Space:} O(1) in-place (advantage over merge sort).
+
+\textbf{Insertion Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ insertion\_sort(arr):}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr)):}
+\NormalTok{        key }\OperatorTok{=}\NormalTok{ arr[i]}
+\NormalTok{        j }\OperatorTok{=}\NormalTok{ i }\OperatorTok{{-}} \DecValTok{1}
+        \ControlFlowTok{while}\NormalTok{ j }\OperatorTok{\textgreater{}=} \DecValTok{0} \KeywordTok{and}\NormalTok{ arr[j] }\OperatorTok{\textgreater{}}\NormalTok{ key:}
+\NormalTok{            arr[j }\OperatorTok{+} \DecValTok{1}\NormalTok{] }\OperatorTok{=}\NormalTok{ arr[j]}
+\NormalTok{            j }\OperatorTok{{-}=} \DecValTok{1}
+\NormalTok{        arr[j }\OperatorTok{+} \DecValTok{1}\NormalTok{] }\OperatorTok{=}\NormalTok{ key}
+    \ControlFlowTok{return}\NormalTok{ arr}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key insight:} Build sorted portion left-to-right by inserting each element in its correct position.
+\textbf{Best case:} O(n) when already sorted (inner loop never executes).
+\textbf{When to use:} Small arrays (n \textless{} 20), nearly-sorted data, online algorithms (elements arrive one by one).
+\textbf{Stability:} Yes.
+
+\paragraph{Non-Comparison Sorts}\label{non-comparison-sorts}
+
+Non-comparison sorts break the O(n log n) barrier by exploiting structure of keys.
+
+\textbf{Counting Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ counting\_sort(arr, max\_val):}
+\NormalTok{    count }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (max\_val }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ arr:}
+\NormalTok{        count[x] }\OperatorTok{+=} \DecValTok{1}
+    \CommentTok{\# Build cumulative counts for stability}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, max\_val }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+\NormalTok{        count[i] }\OperatorTok{+=}\NormalTok{ count[i }\OperatorTok{{-}} \DecValTok{1}\NormalTok{]}
+\NormalTok{    output }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*} \BuiltInTok{len}\NormalTok{(arr)}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \BuiltInTok{reversed}\NormalTok{(arr):     }\CommentTok{\# reverse for stability}
+\NormalTok{        output[count[x] }\OperatorTok{{-}} \DecValTok{1}\NormalTok{] }\OperatorTok{=}\NormalTok{ x}
+\NormalTok{        count[x] }\OperatorTok{{-}=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ output}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(n + k) time, O(n + k) space where k = range of values.
+\textbf{When to use:} Keys are integers in a known small range. Useless if k \textgreater\textgreater{} n.
+
+\textbf{Radix Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ radix\_sort(arr):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ arr: }\ControlFlowTok{return}\NormalTok{ arr}
+\NormalTok{    max\_val }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(arr)}
+\NormalTok{    exp }\OperatorTok{=} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ max\_val }\OperatorTok{//}\NormalTok{ exp }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{:}
+\NormalTok{        arr }\OperatorTok{=}\NormalTok{ counting\_sort\_by\_digit(arr, exp)}
+\NormalTok{        exp }\OperatorTok{*=} \DecValTok{10}
+    \ControlFlowTok{return}\NormalTok{ arr}
+
+\KeywordTok{def}\NormalTok{ counting\_sort\_by\_digit(arr, exp):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(arr)}
+\NormalTok{    output }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    count }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*} \DecValTok{10}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ arr:}
+\NormalTok{        count[(x }\OperatorTok{//}\NormalTok{ exp) }\OperatorTok{\%} \DecValTok{10}\NormalTok{] }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{):}
+\NormalTok{        count[i] }\OperatorTok{+=}\NormalTok{ count[i }\OperatorTok{{-}} \DecValTok{1}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \BuiltInTok{reversed}\NormalTok{(arr):}
+\NormalTok{        idx }\OperatorTok{=}\NormalTok{ (x }\OperatorTok{//}\NormalTok{ exp) }\OperatorTok{\%} \DecValTok{10}
+\NormalTok{        output[count[idx] }\OperatorTok{{-}} \DecValTok{1}\NormalTok{] }\OperatorTok{=}\NormalTok{ x}
+\NormalTok{        count[idx] }\OperatorTok{{-}=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ output}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(d\(\cdot\)(n + k)) where d = digits, k = base (10 for decimal). Effectively O(n) for fixed-width integers.
+\textbf{Stability:} Requires stable inner sort (counting sort). Must process digits from \textbf{least significant} to most significant (LSD radix sort).
+
+\textbf{Bucket Sort}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ bucket\_sort(arr, num\_buckets}\OperatorTok{=}\DecValTok{10}\NormalTok{):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ arr: }\ControlFlowTok{return}\NormalTok{ arr}
+\NormalTok{    min\_val, max\_val }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(arr), }\BuiltInTok{max}\NormalTok{(arr)}
+\NormalTok{    bucket\_range }\OperatorTok{=}\NormalTok{ (max\_val }\OperatorTok{{-}}\NormalTok{ min\_val) }\OperatorTok{/}\NormalTok{ num\_buckets }\OperatorTok{+} \FloatTok{1e{-}9}
+\NormalTok{    buckets }\OperatorTok{=}\NormalTok{ [[] }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(num\_buckets)]}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ arr:}
+\NormalTok{        idx }\OperatorTok{=} \BuiltInTok{int}\NormalTok{((x }\OperatorTok{{-}}\NormalTok{ min\_val) }\OperatorTok{/}\NormalTok{ bucket\_range)}
+\NormalTok{        idx }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(idx, num\_buckets }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)}
+\NormalTok{        buckets[idx].append(x)}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ b }\KeywordTok{in}\NormalTok{ buckets:}
+\NormalTok{        b.sort()        }\CommentTok{\# insertion sort works well for small buckets}
+\NormalTok{        result.extend(b)}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(n + k) average when data is uniformly distributed; O(n\(^2\)) worst case if all elements land in one bucket.
+\textbf{When to use:} Floating-point numbers in a known range, uniformly distributed data.
+
+\paragraph{Sorting Comparison Table}\label{sorting-comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1395}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0997}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0997}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0997}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0897}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0688}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.4031}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Average
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Worst
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Space
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Merge Sort & O(n log n) & O(n log n) & O(n log n) & O(n) & Yes & Guaranteed; good for linked lists \\
+Quick Sort & O(n log n) & O(n log n) & O(n\(^2\)) & O(log n)* & No & Fastest in practice; randomize pivot \\
+Heap Sort & O(n log n) & O(n log n) & O(n log n) & O(1) & No & Cache-unfriendly \\
+Insertion Sort & O(n) & O(n\(^2\)) & O(n\(^2\)) & O(1) & Yes & Best for small/nearly-sorted \\
+Selection Sort & O(n\(^2\)) & O(n\(^2\)) & O(n\(^2\)) & O(1) & No & Never use in interviews \\
+Bubble Sort & O(n) & O(n\(^2\)) & O(n\(^2\)) & O(1) & Yes & Never use in interviews \\
+Counting Sort & O(n+k) & O(n+k) & O(n+k) & O(n+k) & Yes & Only integers in small range \\
+Radix Sort & O(d\(\cdot\)n) & O(d\(\cdot\)n) & O(d\(\cdot\)n) & O(n+k) & Yes & Fixed-width keys \\
+Bucket Sort & O(n+k) & O(n+k) & O(n\(^2\)) & O(n+k) & Yes & Uniform float data \\
+Tim Sort & O(n) & O(n log n) & O(n log n) & O(n) & Yes & Python\textquotesingle s built-in; hybrid merge+insertion \\
+\end{longtable}
+
+*Quick sort call stack: O(log n) average, O(n) worst.
+
+\textbf{Stability matters when:} You sort by multiple keys sequentially, or the original order of equal elements has meaning (e.g., sort students by grade then by name).
+
+\textbf{When to use which:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{General purpose:} Quick sort (in-place, fast cache) or merge sort (stable)
+\item
+  \textbf{Guaranteed worst case:} Merge sort or heap sort
+\item
+  \textbf{Memory-constrained:} Heap sort (O(1) space)
+\item
+  \textbf{Nearly sorted:} Insertion sort or Tim sort
+\item
+  \textbf{Integer keys, small range:} Counting sort
+\item
+  \textbf{Large integers, many of same size:} Radix sort
+\item
+  \textbf{Floating point, uniform:} Bucket sort
+\item
+  \textbf{Linked lists:} Merge sort (no random access needed)
+\end{itemize}
+
+\subsubsection{Searching}\label{searching}
+
+\paragraph{Linear Search}\label{linear-search}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ linear\_search(arr, target):}
+    \ControlFlowTok{for}\NormalTok{ i, x }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(arr):}
+        \ControlFlowTok{if}\NormalTok{ x }\OperatorTok{==}\NormalTok{ target:}
+            \ControlFlowTok{return}\NormalTok{ i}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+O(n) time, O(1) space. Use only when array is unsorted or n is tiny.
+
+\paragraph{Binary Search}\label{binary-search}
+
+\textbf{Standard binary search:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ binary\_search(arr, target):}
+\NormalTok{    lo, hi }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}=}\NormalTok{ hi:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ lo }\OperatorTok{+}\NormalTok{ (hi }\OperatorTok{{-}}\NormalTok{ lo) }\OperatorTok{//} \DecValTok{2}   \CommentTok{\# avoids integer overflow}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{==}\NormalTok{ target:}
+            \ControlFlowTok{return}\NormalTok{ mid}
+        \ControlFlowTok{elif}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{First occurrence of target:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ first\_occurrence(arr, target):}
+\NormalTok{    lo, hi }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+\NormalTok{    result }\OperatorTok{=} \OperatorTok{{-}}\DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}=}\NormalTok{ hi:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{==}\NormalTok{ target:}
+\NormalTok{            result }\OperatorTok{=}\NormalTok{ mid}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}    \CommentTok{\# keep searching left}
+        \ControlFlowTok{elif}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Last occurrence of target:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ last\_occurrence(arr, target):}
+\NormalTok{    lo, hi }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+\NormalTok{    result }\OperatorTok{=} \OperatorTok{{-}}\DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}=}\NormalTok{ hi:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{==}\NormalTok{ target:}
+\NormalTok{            result }\OperatorTok{=}\NormalTok{ mid}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}    \CommentTok{\# keep searching right}
+        \ControlFlowTok{elif}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Lower bound (first index where arr{[}i{]} \textgreater= target):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ bisect}
+
+\KeywordTok{def}\NormalTok{ lower\_bound(arr, target):}
+    \ControlFlowTok{return}\NormalTok{ bisect.bisect\_left(arr, target)}
+
+\CommentTok{\# Manual implementation:}
+\KeywordTok{def}\NormalTok{ lower\_bound\_manual(arr, target):}
+\NormalTok{    lo, hi }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr)   }\CommentTok{\# hi = len(arr), not len{-}1}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}}\NormalTok{ hi:          }\CommentTok{\# lo \textless{} hi, not lo \textless{}= hi}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target:}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid        }\CommentTok{\# not mid{-}1}
+    \ControlFlowTok{return}\NormalTok{ lo}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Binary search on rotated sorted array:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ search\_rotated(arr, target):}
+\NormalTok{    lo, hi }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(arr) }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}=}\NormalTok{ hi:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{==}\NormalTok{ target:}
+            \ControlFlowTok{return}\NormalTok{ mid}
+        \CommentTok{\# Left half is sorted}
+        \ControlFlowTok{if}\NormalTok{ arr[lo] }\OperatorTok{\textless{}=}\NormalTok{ arr[mid]:}
+            \ControlFlowTok{if}\NormalTok{ arr[lo] }\OperatorTok{\textless{}=}\NormalTok{ target }\OperatorTok{\textless{}}\NormalTok{ arr[mid]:}
+\NormalTok{                hi }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}
+            \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+        \CommentTok{\# Right half is sorted}
+        \ControlFlowTok{else}\NormalTok{:}
+            \ControlFlowTok{if}\NormalTok{ arr[mid] }\OperatorTok{\textless{}}\NormalTok{ target }\OperatorTok{\textless{}=}\NormalTok{ arr[hi]:}
+\NormalTok{                lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}
+            \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                hi }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Binary search on answer space (parametric search):}
+
+The most powerful binary search pattern: instead of searching an array, search for the \textbf{answer itself}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Example: Koko eating bananas — find minimum eating speed}
+\KeywordTok{def}\NormalTok{ min\_eating\_speed(piles, h):}
+    \KeywordTok{def}\NormalTok{ can\_finish(speed):}
+        \ControlFlowTok{return} \BuiltInTok{sum}\NormalTok{((p }\OperatorTok{+}\NormalTok{ speed }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{//}\NormalTok{ speed }\ControlFlowTok{for}\NormalTok{ p }\KeywordTok{in}\NormalTok{ piles) }\OperatorTok{\textless{}=}\NormalTok{ h}
+
+\NormalTok{    lo, hi }\OperatorTok{=} \DecValTok{1}\NormalTok{, }\BuiltInTok{max}\NormalTok{(piles)}
+    \ControlFlowTok{while}\NormalTok{ lo }\OperatorTok{\textless{}}\NormalTok{ hi:}
+\NormalTok{        mid }\OperatorTok{=}\NormalTok{ (lo }\OperatorTok{+}\NormalTok{ hi) }\OperatorTok{//} \DecValTok{2}
+        \ControlFlowTok{if}\NormalTok{ can\_finish(mid):}
+\NormalTok{            hi }\OperatorTok{=}\NormalTok{ mid        }\CommentTok{\# mid works, try smaller}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            lo }\OperatorTok{=}\NormalTok{ mid }\OperatorTok{+} \DecValTok{1}    \CommentTok{\# too slow, need faster}
+    \ControlFlowTok{return}\NormalTok{ lo}
+
+\CommentTok{\# Template: "find minimum X such that condition(X) is True"}
+\CommentTok{\# lo = min possible, hi = max possible}
+\CommentTok{\# condition is monotone: False...False...True...True}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Binary search complexity:} O(log n) time, O(1) space.
+
+\textbf{Binary search mental model:} Maintain an invariant --- the answer is always in {[}lo, hi{]}. Shrink the range by half each iteration. When lo == hi, that\textquotesingle s the answer.
+
+\subsubsection{Graph Algorithms}\label{graph-algorithms}
+
+Graphs: G = (V, E) where V = vertices (nodes), E = edges.
+
+\textbf{Representations:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Adjacency list:} \texttt{graph{[}u{]}\ =\ {[}(v,\ weight),\ ...{]}} --- O(V + E) space, efficient for sparse graphs
+\item
+  \textbf{Adjacency matrix:} \texttt{graph{[}u{]}{[}v{]}\ =\ weight} --- O(V\(^2\)) space, O(1) edge lookup, efficient for dense graphs
+\end{itemize}
+
+\paragraph{BFS (Breadth-First Search)}\label{bfs-breadth-first-search}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+
+\KeywordTok{def}\NormalTok{ bfs(graph, start):}
+\NormalTok{    visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{([start])}
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque([start])}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ queue.popleft()}
+\NormalTok{        order.append(node)}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                visited.add(neighbor)}
+\NormalTok{                queue.append(neighbor)}
+    \ControlFlowTok{return}\NormalTok{ order}
+
+\CommentTok{\# BFS shortest path (unweighted graph):}
+\KeywordTok{def}\NormalTok{ bfs\_shortest\_path(graph, start, end):}
+    \ControlFlowTok{if}\NormalTok{ start }\OperatorTok{==}\NormalTok{ end: }\ControlFlowTok{return}\NormalTok{ [start]}
+\NormalTok{    visited }\OperatorTok{=}\NormalTok{ \{start: }\VariableTok{None}\NormalTok{\}   }\CommentTok{\# node {-}\textgreater{} parent}
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque([start])}
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ queue.popleft()}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                visited[neighbor] }\OperatorTok{=}\NormalTok{ node}
+                \ControlFlowTok{if}\NormalTok{ neighbor }\OperatorTok{==}\NormalTok{ end:}
+\NormalTok{                    path }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{                    cur }\OperatorTok{=}\NormalTok{ end}
+                    \ControlFlowTok{while}\NormalTok{ cur }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:}
+\NormalTok{                        path.append(cur)}
+\NormalTok{                        cur }\OperatorTok{=}\NormalTok{ visited[cur]}
+                    \ControlFlowTok{return}\NormalTok{ path[::}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+\NormalTok{                queue.append(neighbor)}
+    \ControlFlowTok{return}\NormalTok{ []   }\CommentTok{\# no path}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(V + E)
+\textbf{Use when:} Shortest path in unweighted graph, level-order traversal, connected components, bipartite check.
+\textbf{Key property:} Visits nodes in order of distance from source --- guarantees shortest path in unweighted graphs.
+
+\paragraph{DFS (Depth-First Search)}\label{dfs-depth-first-search}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ dfs\_iterative(graph, start):}
+\NormalTok{    visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+\NormalTok{    stack }\OperatorTok{=}\NormalTok{ [start]}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{while}\NormalTok{ stack:}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ stack.pop()}
+        \ControlFlowTok{if}\NormalTok{ node }\KeywordTok{in}\NormalTok{ visited:}
+            \ControlFlowTok{continue}
+\NormalTok{        visited.add(node)}
+\NormalTok{        order.append(node)}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                stack.append(neighbor)}
+    \ControlFlowTok{return}\NormalTok{ order}
+
+\KeywordTok{def}\NormalTok{ dfs\_recursive(graph, node, visited}\OperatorTok{=}\VariableTok{None}\NormalTok{):}
+    \ControlFlowTok{if}\NormalTok{ visited }\KeywordTok{is} \VariableTok{None}\NormalTok{: visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+\NormalTok{    visited.add(node)}
+    \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+        \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{            dfs\_recursive(graph, neighbor, visited)}
+    \ControlFlowTok{return}\NormalTok{ visited}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(V + E)
+\textbf{Use when:} Cycle detection, topological sort, connected components, path existence, flood fill.
+\textbf{Key property:} Explores as deep as possible before backtracking.
+
+\paragraph{Topological Sort}\label{topological-sort}
+
+Valid only for \textbf{Directed Acyclic Graphs (DAGs)}.
+
+\textbf{Kahn\textquotesingle s Algorithm (BFS-based):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+
+\KeywordTok{def}\NormalTok{ topological\_sort\_kahn(graph, n):}
+    \CommentTok{"""}
+\CommentTok{    graph: adjacency list \{node: [neighbors]\}}
+\CommentTok{    n: number of nodes (0 to n{-}1)}
+\CommentTok{    Returns topological order, or empty list if cycle exists.}
+\CommentTok{    """}
+\NormalTok{    in\_degree }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+    \ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+\NormalTok{            in\_degree[v] }\OperatorTok{+=} \DecValTok{1}
+
+\NormalTok{    queue }\OperatorTok{=}\NormalTok{ deque(u }\ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n) }\ControlFlowTok{if}\NormalTok{ in\_degree[u] }\OperatorTok{==} \DecValTok{0}\NormalTok{)}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+
+    \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{        u }\OperatorTok{=}\NormalTok{ queue.popleft()}
+\NormalTok{        order.append(u)}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+\NormalTok{            in\_degree[v] }\OperatorTok{{-}=} \DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ in\_degree[v] }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+\NormalTok{                queue.append(v)}
+
+    \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(order) }\OperatorTok{!=}\NormalTok{ n:}
+        \ControlFlowTok{return}\NormalTok{ []  }\CommentTok{\# cycle detected — not a DAG}
+    \ControlFlowTok{return}\NormalTok{ order}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{DFS-based topological sort:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ topological\_sort\_dfs(graph, n):}
+\NormalTok{    WHITE, GRAY, BLACK }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}
+\NormalTok{    color }\OperatorTok{=}\NormalTok{ [WHITE] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    has\_cycle }\OperatorTok{=}\NormalTok{ [}\VariableTok{False}\NormalTok{]}
+
+    \KeywordTok{def}\NormalTok{ dfs(u):}
+        \ControlFlowTok{if}\NormalTok{ has\_cycle[}\DecValTok{0}\NormalTok{]: }\ControlFlowTok{return}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ GRAY}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ GRAY:}
+\NormalTok{                has\_cycle[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \VariableTok{True}
+                \ControlFlowTok{return}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ WHITE:}
+\NormalTok{                dfs(v)}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ BLACK}
+\NormalTok{        order.append(u)   }\CommentTok{\# add to order AFTER all descendants}
+
+    \ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{if}\NormalTok{ color[u] }\OperatorTok{==}\NormalTok{ WHITE:}
+\NormalTok{            dfs(u)}
+
+    \ControlFlowTok{if}\NormalTok{ has\_cycle[}\DecValTok{0}\NormalTok{]:}
+        \ControlFlowTok{return}\NormalTok{ []}
+    \ControlFlowTok{return}\NormalTok{ order[::}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]    }\CommentTok{\# reverse post{-}order = topological order}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(V + E) for both methods.
+\textbf{Kahn vs DFS:}
+
+\begin{itemize}
+\tightlist
+\item
+  Kahn: Intuitive, easy cycle detection (len(order) != n), produces lexicographically smallest order with a min-heap
+\item
+  DFS: More natural for recursive thinking, easier to add finish-time ordering
+\end{itemize}
+
+\textbf{Use cases:} Build systems (Makefile), course prerequisites, task scheduling, dependency resolution.
+
+\paragraph{Dijkstra\textquotesingle s Algorithm}\label{dijkstras-algorithm}
+
+Shortest path from single source; \textbf{requires non-negative edge weights}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ heapq}
+
+\KeywordTok{def}\NormalTok{ dijkstra(graph, start, n):}
+    \CommentTok{"""}
+\CommentTok{    graph: adjacency list \{u: [(v, weight), ...]\}}
+\CommentTok{    Returns dist[] where dist[v] = shortest distance from start to v.}
+\CommentTok{    """}
+\NormalTok{    dist }\OperatorTok{=}\NormalTok{ [}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    dist[start] }\OperatorTok{=} \DecValTok{0}
+    \CommentTok{\# Min{-}heap: (distance, node)}
+\NormalTok{    pq }\OperatorTok{=}\NormalTok{ [(}\DecValTok{0}\NormalTok{, start)]}
+
+    \ControlFlowTok{while}\NormalTok{ pq:}
+\NormalTok{        d, u }\OperatorTok{=}\NormalTok{ heapq.heappop(pq)}
+        \ControlFlowTok{if}\NormalTok{ d }\OperatorTok{\textgreater{}}\NormalTok{ dist[u]:}
+            \ControlFlowTok{continue}    \CommentTok{\# stale entry — already found shorter path}
+        \ControlFlowTok{for}\NormalTok{ v, w }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w }\OperatorTok{\textless{}}\NormalTok{ dist[v]:}
+\NormalTok{                dist[v] }\OperatorTok{=}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w}
+\NormalTok{                heapq.heappush(pq, (dist[v], v))}
+
+    \ControlFlowTok{return}\NormalTok{ dist}
+
+\CommentTok{\# With path reconstruction:}
+\KeywordTok{def}\NormalTok{ dijkstra\_with\_path(graph, start, end, n):}
+\NormalTok{    dist }\OperatorTok{=}\NormalTok{ [}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    prev }\OperatorTok{=}\NormalTok{ [}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    dist[start] }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    pq }\OperatorTok{=}\NormalTok{ [(}\DecValTok{0}\NormalTok{, start)]}
+    \ControlFlowTok{while}\NormalTok{ pq:}
+\NormalTok{        d, u }\OperatorTok{=}\NormalTok{ heapq.heappop(pq)}
+        \ControlFlowTok{if}\NormalTok{ d }\OperatorTok{\textgreater{}}\NormalTok{ dist[u]: }\ControlFlowTok{continue}
+        \ControlFlowTok{if}\NormalTok{ u }\OperatorTok{==}\NormalTok{ end: }\ControlFlowTok{break}
+        \ControlFlowTok{for}\NormalTok{ v, w }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w }\OperatorTok{\textless{}}\NormalTok{ dist[v]:}
+\NormalTok{                dist[v] }\OperatorTok{=}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w}
+\NormalTok{                prev[v] }\OperatorTok{=}\NormalTok{ u}
+\NormalTok{                heapq.heappush(pq, (dist[v], v))}
+    \CommentTok{\# Reconstruct path}
+\NormalTok{    path }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    cur }\OperatorTok{=}\NormalTok{ end}
+    \ControlFlowTok{while}\NormalTok{ cur }\OperatorTok{!=} \OperatorTok{{-}}\DecValTok{1}\NormalTok{:}
+\NormalTok{        path.append(cur)}
+\NormalTok{        cur }\OperatorTok{=}\NormalTok{ prev[cur]}
+    \ControlFlowTok{return}\NormalTok{ dist[end], path[::}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O((V + E) log V) with binary heap, O(V\(^2\) + E) with array (dense graphs).
+\textbf{When to use:} Single-source shortest path, non-negative weights.
+\textbf{Does NOT work with negative edges} --- use Bellman-Ford instead.
+
+\paragraph{Bellman-Ford Algorithm}\label{bellman-ford-algorithm}
+
+Shortest path from single source; \textbf{handles negative edge weights}; detects negative cycles.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ bellman\_ford(edges, n, start):}
+    \CommentTok{"""}
+\CommentTok{    edges: list of (u, v, weight)}
+\CommentTok{    Returns dist[] or None if negative cycle reachable from start.}
+\CommentTok{    """}
+\NormalTok{    dist }\OperatorTok{=}\NormalTok{ [}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)] }\OperatorTok{*}\NormalTok{ n}
+\NormalTok{    dist[start] }\OperatorTok{=} \DecValTok{0}
+
+    \CommentTok{\# Relax all edges V{-}1 times}
+    \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{):}
+\NormalTok{        updated }\OperatorTok{=} \VariableTok{False}
+        \ControlFlowTok{for}\NormalTok{ u, v, w }\KeywordTok{in}\NormalTok{ edges:}
+            \ControlFlowTok{if}\NormalTok{ dist[u] }\OperatorTok{!=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{) }\KeywordTok{and}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w }\OperatorTok{\textless{}}\NormalTok{ dist[v]:}
+\NormalTok{                dist[v] }\OperatorTok{=}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w}
+\NormalTok{                updated }\OperatorTok{=} \VariableTok{True}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ updated:}
+            \ControlFlowTok{break}   \CommentTok{\# converged early}
+
+    \CommentTok{\# Check for negative cycles (V{-}th relaxation)}
+    \ControlFlowTok{for}\NormalTok{ u, v, w }\KeywordTok{in}\NormalTok{ edges:}
+        \ControlFlowTok{if}\NormalTok{ dist[u] }\OperatorTok{!=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{) }\KeywordTok{and}\NormalTok{ dist[u] }\OperatorTok{+}\NormalTok{ w }\OperatorTok{\textless{}}\NormalTok{ dist[v]:}
+            \ControlFlowTok{return} \VariableTok{None}  \CommentTok{\# negative cycle detected}
+
+    \ControlFlowTok{return}\NormalTok{ dist}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(V\(\cdot\)E)
+\textbf{When to use:} Negative edge weights, detecting negative cycles (e.g., currency arbitrage).
+\textbf{Guaranteed correct after V\(-\)1 iterations} because any shortest path visits at most V\(-\)1 edges (in a graph with no negative cycles).
+
+\paragraph{Floyd-Warshall Algorithm}\label{floyd-warshall-algorithm}
+
+All-pairs shortest paths; handles negative edges; detects negative cycles.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ floyd\_warshall(n, edges):}
+    \CommentTok{"""Returns dist[i][j] = shortest path from i to j."""}
+\NormalTok{    INF }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)}
+\NormalTok{    dist }\OperatorTok{=}\NormalTok{ [[INF] }\OperatorTok{*}\NormalTok{ n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+\NormalTok{        dist[i][i] }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ u, v, w }\KeywordTok{in}\NormalTok{ edges:}
+\NormalTok{        dist[u][v] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(dist[u][v], w)   }\CommentTok{\# handle multi{-}edges}
+
+    \ControlFlowTok{for}\NormalTok{ k }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):          }\CommentTok{\# intermediate vertex}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+            \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+                \ControlFlowTok{if}\NormalTok{ dist[i][k] }\OperatorTok{+}\NormalTok{ dist[k][j] }\OperatorTok{\textless{}}\NormalTok{ dist[i][j]:}
+\NormalTok{                    dist[i][j] }\OperatorTok{=}\NormalTok{ dist[i][k] }\OperatorTok{+}\NormalTok{ dist[k][j]}
+
+    \CommentTok{\# Check negative cycles: dist[i][i] \textless{} 0 for some i}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{if}\NormalTok{ dist[i][i] }\OperatorTok{\textless{}} \DecValTok{0}\NormalTok{:}
+            \ControlFlowTok{return} \VariableTok{None}  \CommentTok{\# negative cycle}
+
+    \ControlFlowTok{return}\NormalTok{ dist}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Complexity:} O(V\(^3\)) time, O(V\(^2\)) space.
+\textbf{When to use:} All-pairs shortest paths, transitive closure, detecting negative cycles.
+
+\paragraph{Graph Algorithm Comparison Table}\label{graph-algorithm-comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1171}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1742}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1822}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1267}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0964}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.3034}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Handles Negative Edges
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Handles Negative Cycles
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Single/All Pairs
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Complexity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Dijkstra & No & No & Single source & O((V+E) log V) & Fastest for non-negative; use with priority queue \\
+Bellman-Ford & Yes & Detects & Single source & O(V\(\cdot\)E) & Use when negative edges exist \\
+Floyd-Warshall & Yes & Detects & All pairs & O(V\(^3\)) & Best for dense graphs, all-pairs \\
+BFS & No (unit weights only) & No & Single source & O(V+E) & Optimal for unweighted graphs \\
+DAG Shortest Path & Yes (DAG only) & N/A & Single source & O(V+E) & Topo sort + relax; fastest for DAGs \\
+\end{longtable}
+
+\paragraph{Minimum Spanning Tree (MST)}\label{minimum-spanning-tree-mst}
+
+MST of a connected weighted undirected graph: a spanning tree with minimum total edge weight.
+
+\textbf{Kruskal\textquotesingle s Algorithm:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ kruskal(n, edges):}
+    \CommentTok{"""}
+\CommentTok{    edges: list of (weight, u, v)}
+\CommentTok{    Returns MST weight and edges.}
+\CommentTok{    """}
+\NormalTok{    edges.sort()   }\CommentTok{\# sort by weight}
+\NormalTok{    parent }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(n))}
+\NormalTok{    rank }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+
+    \KeywordTok{def}\NormalTok{ find(x):}
+        \ControlFlowTok{while}\NormalTok{ parent[x] }\OperatorTok{!=}\NormalTok{ x:}
+\NormalTok{            parent[x] }\OperatorTok{=}\NormalTok{ parent[parent[x]]  }\CommentTok{\# path compression (2{-}step)}
+\NormalTok{            x }\OperatorTok{=}\NormalTok{ parent[x]}
+        \ControlFlowTok{return}\NormalTok{ x}
+
+    \KeywordTok{def}\NormalTok{ union(x, y):}
+\NormalTok{        px, py }\OperatorTok{=}\NormalTok{ find(x), find(y)}
+        \ControlFlowTok{if}\NormalTok{ px }\OperatorTok{==}\NormalTok{ py: }\ControlFlowTok{return} \VariableTok{False}   \CommentTok{\# same component — cycle}
+        \ControlFlowTok{if}\NormalTok{ rank[px] }\OperatorTok{\textless{}}\NormalTok{ rank[py]:}
+\NormalTok{            px, py }\OperatorTok{=}\NormalTok{ py, px}
+\NormalTok{        parent[py] }\OperatorTok{=}\NormalTok{ px}
+        \ControlFlowTok{if}\NormalTok{ rank[px] }\OperatorTok{==}\NormalTok{ rank[py]:}
+\NormalTok{            rank[px] }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{return} \VariableTok{True}
+
+\NormalTok{    mst\_weight }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    mst\_edges }\OperatorTok{=}\NormalTok{ []}
+    \ControlFlowTok{for}\NormalTok{ w, u, v }\KeywordTok{in}\NormalTok{ edges:}
+        \ControlFlowTok{if}\NormalTok{ union(u, v):}
+\NormalTok{            mst\_weight }\OperatorTok{+=}\NormalTok{ w}
+\NormalTok{            mst\_edges.append((u, v, w))}
+            \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(mst\_edges) }\OperatorTok{==}\NormalTok{ n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{:}
+                \ControlFlowTok{break}
+
+    \ControlFlowTok{return}\NormalTok{ mst\_weight, mst\_edges}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Prim\textquotesingle s Algorithm:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ heapq}
+
+\KeywordTok{def}\NormalTok{ prim(graph, n):}
+    \CommentTok{"""}
+\CommentTok{    graph: adjacency list \{u: [(v, weight), ...]\}}
+\CommentTok{    Returns MST weight.}
+\CommentTok{    """}
+\NormalTok{    visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+    \CommentTok{\# Start from node 0: (weight, node)}
+\NormalTok{    pq }\OperatorTok{=}\NormalTok{ [(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)]}
+\NormalTok{    mst\_weight }\OperatorTok{=} \DecValTok{0}
+
+    \ControlFlowTok{while}\NormalTok{ pq }\KeywordTok{and} \BuiltInTok{len}\NormalTok{(visited) }\OperatorTok{\textless{}}\NormalTok{ n:}
+\NormalTok{        w, u }\OperatorTok{=}\NormalTok{ heapq.heappop(pq)}
+        \ControlFlowTok{if}\NormalTok{ u }\KeywordTok{in}\NormalTok{ visited:}
+            \ControlFlowTok{continue}
+\NormalTok{        visited.add(u)}
+\NormalTok{        mst\_weight }\OperatorTok{+=}\NormalTok{ w}
+        \ControlFlowTok{for}\NormalTok{ v, weight }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ v }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                heapq.heappush(pq, (weight, v))}
+
+    \ControlFlowTok{return}\NormalTok{ mst\_weight }\ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(visited) }\OperatorTok{==}\NormalTok{ n }\ControlFlowTok{else} \OperatorTok{{-}}\DecValTok{1}  \CommentTok{\# {-}1 if disconnected}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Kruskal vs Prim:}
+\textbar{} \textbar{} Kruskal \textbar{} Prim \textbar{}
+\textbar-\textbar-\/-\/-\/-\/-\/-\/-\/-\/-\textbar-\/-\/-\/-\/-\/-\textbar{}
+\textbar{} Approach \textbar{} Edge-centric: sort all edges, add if no cycle \textbar{} Vertex-centric: grow tree from one vertex \textbar{}
+\textbar{} Complexity \textbar{} O(E log E) \textbar{} O((V+E) log V) with heap \textbar{}
+\textbar{} Best for \textbar{} Sparse graphs \textbar{} Dense graphs \textbar{}
+\textbar{} Data structure \textbar{} Union-Find \textbar{} Priority queue \textbar{}
+
+\paragraph{Union-Find (Disjoint Set Union)}\label{union-find-disjoint-set-union}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ UnionFind:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, n):}
+        \VariableTok{self}\NormalTok{.parent }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(n))}
+        \VariableTok{self}\NormalTok{.rank }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+        \VariableTok{self}\NormalTok{.components }\OperatorTok{=}\NormalTok{ n}
+
+    \KeywordTok{def}\NormalTok{ find(}\VariableTok{self}\NormalTok{, x):}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.parent[x] }\OperatorTok{!=}\NormalTok{ x:}
+            \VariableTok{self}\NormalTok{.parent[x] }\OperatorTok{=} \VariableTok{self}\NormalTok{.find(}\VariableTok{self}\NormalTok{.parent[x])   }\CommentTok{\# path compression}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.parent[x]}
+
+    \KeywordTok{def}\NormalTok{ union(}\VariableTok{self}\NormalTok{, x, y):}
+\NormalTok{        px, py }\OperatorTok{=} \VariableTok{self}\NormalTok{.find(x), }\VariableTok{self}\NormalTok{.find(y)}
+        \ControlFlowTok{if}\NormalTok{ px }\OperatorTok{==}\NormalTok{ py: }\ControlFlowTok{return} \VariableTok{False}
+        \CommentTok{\# Union by rank}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.rank[px] }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.rank[py]:}
+\NormalTok{            px, py }\OperatorTok{=}\NormalTok{ py, px}
+        \VariableTok{self}\NormalTok{.parent[py] }\OperatorTok{=}\NormalTok{ px}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.rank[px] }\OperatorTok{==} \VariableTok{self}\NormalTok{.rank[py]:}
+            \VariableTok{self}\NormalTok{.rank[px] }\OperatorTok{+=} \DecValTok{1}
+        \VariableTok{self}\NormalTok{.components }\OperatorTok{{-}=} \DecValTok{1}
+        \ControlFlowTok{return} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ connected(}\VariableTok{self}\NormalTok{, x, y):}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.find(x) }\OperatorTok{==} \VariableTok{self}\NormalTok{.find(y)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Amortized complexity:} O(\(\alpha\)(n)) per operation where \(\alpha\) is inverse Ackermann --- effectively O(1).
+\textbf{Use for:} Cycle detection, Kruskal\textquotesingle s MST, connected components, dynamic connectivity.
+
+\paragraph{Cycle Detection}\label{cycle-detection}
+
+\textbf{Undirected graph --- Union-Find:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ has\_cycle\_undirected(n, edges):}
+\NormalTok{    uf }\OperatorTok{=}\NormalTok{ UnionFind(n)}
+    \ControlFlowTok{for}\NormalTok{ u, v }\KeywordTok{in}\NormalTok{ edges:}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ uf.union(u, v):}
+            \ControlFlowTok{return} \VariableTok{True}   \CommentTok{\# u and v already in same component}
+    \ControlFlowTok{return} \VariableTok{False}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Undirected graph --- DFS (coloring):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ has\_cycle\_undirected\_dfs(graph, n):}
+\NormalTok{    visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+    \KeywordTok{def}\NormalTok{ dfs(node, parent):}
+\NormalTok{        visited.add(node)}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+                \ControlFlowTok{if}\NormalTok{ dfs(neighbor, node): }\ControlFlowTok{return} \VariableTok{True}
+            \ControlFlowTok{elif}\NormalTok{ neighbor }\OperatorTok{!=}\NormalTok{ parent:    }\CommentTok{\# back edge to non{-}parent = cycle}
+                \ControlFlowTok{return} \VariableTok{True}
+        \ControlFlowTok{return} \VariableTok{False}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{if}\NormalTok{ i }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+            \ControlFlowTok{if}\NormalTok{ dfs(i, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{): }\ControlFlowTok{return} \VariableTok{True}
+    \ControlFlowTok{return} \VariableTok{False}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Directed graph --- DFS with 3-color:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ has\_cycle\_directed(graph, n):}
+\NormalTok{    WHITE, GRAY, BLACK }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}
+\NormalTok{    color }\OperatorTok{=}\NormalTok{ [WHITE] }\OperatorTok{*}\NormalTok{ n}
+    \KeywordTok{def}\NormalTok{ dfs(u):}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ GRAY}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ GRAY: }\ControlFlowTok{return} \VariableTok{True}    \CommentTok{\# back edge = cycle}
+            \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ WHITE }\KeywordTok{and}\NormalTok{ dfs(v): }\ControlFlowTok{return} \VariableTok{True}
+\NormalTok{        color[u] }\OperatorTok{=}\NormalTok{ BLACK}
+        \ControlFlowTok{return} \VariableTok{False}
+    \ControlFlowTok{return} \BuiltInTok{any}\NormalTok{(dfs(u) }\ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n) }\ControlFlowTok{if}\NormalTok{ color[u] }\OperatorTok{==}\NormalTok{ WHITE)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key difference:} In undirected graphs, visiting a neighbor (other than parent) that\textquotesingle s already visited = cycle. In directed graphs, visiting a GRAY (currently-being-processed) node = cycle (back edge).
+
+\paragraph{Connected Components}\label{connected-components}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ connected\_components(graph, n):}
+\NormalTok{    visited }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+\NormalTok{    components }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ dfs(node, component):}
+\NormalTok{        visited.add(node)}
+\NormalTok{        component.append(node)}
+        \ControlFlowTok{for}\NormalTok{ neighbor }\KeywordTok{in}\NormalTok{ graph[node]:}
+            \ControlFlowTok{if}\NormalTok{ neighbor }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{                dfs(neighbor, component)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{if}\NormalTok{ i }\KeywordTok{not} \KeywordTok{in}\NormalTok{ visited:}
+\NormalTok{            component }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{            dfs(i, component)}
+\NormalTok{            components.append(component)}
+    \ControlFlowTok{return}\NormalTok{ components}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Bipartite Check}\label{bipartite-check}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+
+\KeywordTok{def}\NormalTok{ is\_bipartite(graph, n):}
+\NormalTok{    color }\OperatorTok{=}\NormalTok{ [}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+    \ControlFlowTok{for}\NormalTok{ start }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+        \ControlFlowTok{if}\NormalTok{ color[start] }\OperatorTok{!=} \OperatorTok{{-}}\DecValTok{1}\NormalTok{: }\ControlFlowTok{continue}
+\NormalTok{        color[start] }\OperatorTok{=} \DecValTok{0}
+\NormalTok{        queue }\OperatorTok{=}\NormalTok{ deque([start])}
+        \ControlFlowTok{while}\NormalTok{ queue:}
+\NormalTok{            u }\OperatorTok{=}\NormalTok{ queue.popleft()}
+            \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ graph[u]:}
+                \ControlFlowTok{if}\NormalTok{ color[v] }\OperatorTok{==} \OperatorTok{{-}}\DecValTok{1}\NormalTok{:}
+\NormalTok{                    color[v] }\OperatorTok{=} \DecValTok{1} \OperatorTok{{-}}\NormalTok{ color[u]}
+\NormalTok{                    queue.append(v)}
+                \ControlFlowTok{elif}\NormalTok{ color[v] }\OperatorTok{==}\NormalTok{ color[u]:}
+                    \ControlFlowTok{return} \VariableTok{False}    \CommentTok{\# same color = odd cycle = not bipartite}
+    \ControlFlowTok{return} \VariableTok{True}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{A graph is bipartite iff it has no odd-length cycles.} Two-color with BFS; if conflict found, not bipartite.
+
+\subsubsection{Dynamic Programming}\label{dynamic-programming}
+
+DP solves problems by \textbf{breaking them into overlapping subproblems} and storing results to avoid recomputation.
+
+\paragraph{Memoization vs Tabulation}\label{memoization-vs-tabulation}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1528}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4306}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4167}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Memoization (Top-Down)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tabulation (Bottom-Up)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Approach & Recursive with cache & Iterative, fill table \\
+Direction & Problem \(\rightarrow\) subproblems & Base cases \(\rightarrow\) problem \\
+Space & O(depth) stack + memo & O(states) table \\
+Complexity & Same asymptotically & Often faster constants \\
+Ease & Easier to implement & Better for optimization \\
+When to use & Not all subproblems needed & All subproblems computed \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Memoization (Fibonacci):}
+\ImportTok{from}\NormalTok{ functools }\ImportTok{import}\NormalTok{ lru\_cache}
+
+\AttributeTok{@lru\_cache}\NormalTok{(maxsize}\OperatorTok{=}\VariableTok{None}\NormalTok{)}
+\KeywordTok{def}\NormalTok{ fib\_memo(n):}
+    \ControlFlowTok{if}\NormalTok{ n }\OperatorTok{\textless{}=} \DecValTok{1}\NormalTok{: }\ControlFlowTok{return}\NormalTok{ n}
+    \ControlFlowTok{return}\NormalTok{ fib\_memo(n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{) }\OperatorTok{+}\NormalTok{ fib\_memo(n}\OperatorTok{{-}}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\# Tabulation (Fibonacci):}
+\KeywordTok{def}\NormalTok{ fib\_tab(n):}
+    \ControlFlowTok{if}\NormalTok{ n }\OperatorTok{\textless{}=} \DecValTok{1}\NormalTok{: }\ControlFlowTok{return}\NormalTok{ n}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{2}\NormalTok{, n}\OperatorTok{+}\DecValTok{1}\NormalTok{):}
+\NormalTok{        dp.append(dp[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{+}\NormalTok{ dp[}\OperatorTok{{-}}\DecValTok{2}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[n]}
+
+\CommentTok{\# Space{-}optimized (only need last 2):}
+\KeywordTok{def}\NormalTok{ fib\_opt(n):}
+\NormalTok{    a, b }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\DecValTok{1}
+    \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+\NormalTok{        a, b }\OperatorTok{=}\NormalTok{ b, a }\OperatorTok{+}\NormalTok{ b}
+    \ControlFlowTok{return}\NormalTok{ a}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{How to Identify DP Problems}\label{how-to-identify-dp-problems}
+
+\textbf{DP applies when:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Problem asks for \textbf{optimal value} (min/max) or \textbf{count of ways}
+\item
+  Subproblems \textbf{overlap} (same subproblem solved repeatedly)
+\item
+  Problem has \textbf{optimal substructure} (optimal solution uses optimal solutions to subproblems)
+\item
+  Problem asks: "is it possible to achieve X?"
+\end{enumerate}
+
+\textbf{DP does NOT apply when:}
+
+\begin{itemize}
+\tightlist
+\item
+  No overlapping subproblems (use divide and conquer)
+\item
+  Greedy works (exchange argument)
+\item
+  Subproblems are independent
+\end{itemize}
+
+\textbf{DP design recipe:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define the \textbf{state} --- what information uniquely identifies a subproblem?
+\item
+  Write the \textbf{recurrence} (transition function)
+\item
+  Identify \textbf{base cases}
+\item
+  Determine \textbf{computation order} (which states depend on which)
+\item
+  Answer --- which state(s) give the final answer?
+\end{enumerate}
+
+\paragraph{Classic DP Families}\label{classic-dp-families}
+
+\textbf{0/1 Knapsack:}
+Items with weight and value; capacity W; each item used at most once.
+Recurrence: \texttt{dp{[}i{]}{[}w{]}\ =\ max(dp{[}i-1{]}{[}w{]},\ dp{[}i-1{]}{[}w-weight{[}i{]}{]}\ +\ value{[}i{]})}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ knapsack\_01(weights, values, W):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(weights)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (W }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{+} \DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ w }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(W }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+\NormalTok{            dp[i][w] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][w]   }\CommentTok{\# don\textquotesingle{}t take item i}
+            \ControlFlowTok{if}\NormalTok{ weights[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{\textless{}=}\NormalTok{ w:}
+\NormalTok{                dp[i][w] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[i][w], dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][w }\OperatorTok{{-}}\NormalTok{ weights[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]] }\OperatorTok{+}\NormalTok{ values[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[n][W]}
+
+\CommentTok{\# Space{-}optimized (1D DP) — iterate w in reverse:}
+\KeywordTok{def}\NormalTok{ knapsack\_01\_opt(weights, values, W):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (W }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(weights)):}
+        \ControlFlowTok{for}\NormalTok{ w }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(W, weights[i] }\OperatorTok{{-}} \DecValTok{1}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{):   }\CommentTok{\# MUST go right to left}
+\NormalTok{            dp[w] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[w], dp[w }\OperatorTok{{-}}\NormalTok{ weights[i]] }\OperatorTok{+}\NormalTok{ values[i])}
+    \ControlFlowTok{return}\NormalTok{ dp[W]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Unbounded Knapsack (items can be reused):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ knapsack\_unbounded(weights, values, W):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (W }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ w }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(W }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(weights)):}
+            \ControlFlowTok{if}\NormalTok{ weights[i] }\OperatorTok{\textless{}=}\NormalTok{ w:}
+\NormalTok{                dp[w] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[w], dp[w }\OperatorTok{{-}}\NormalTok{ weights[i]] }\OperatorTok{+}\NormalTok{ values[i])}
+    \ControlFlowTok{return}\NormalTok{ dp[W]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Coin Change (minimum coins):}
+Recurrence: \texttt{dp{[}amount{]}\ =\ min(dp{[}amount\ -\ coin{]}\ +\ 1)\ for\ each\ coin}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ coin\_change(coins, amount):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)] }\OperatorTok{*}\NormalTok{ (amount }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{    dp[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ a }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, amount }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ coin }\KeywordTok{in}\NormalTok{ coins:}
+            \ControlFlowTok{if}\NormalTok{ coin }\OperatorTok{\textless{}=}\NormalTok{ a:}
+\NormalTok{                dp[a] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(dp[a], dp[a }\OperatorTok{{-}}\NormalTok{ coin] }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ dp[amount] }\ControlFlowTok{if}\NormalTok{ dp[amount] }\OperatorTok{!=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{) }\ControlFlowTok{else} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Coin Change (number of ways):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ coin\_change\_ways(coins, amount):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (amount }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{    dp[}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \DecValTok{1}
+    \ControlFlowTok{for}\NormalTok{ coin }\KeywordTok{in}\NormalTok{ coins:          }\CommentTok{\# order matters: outer=coins for combinations}
+        \ControlFlowTok{for}\NormalTok{ a }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(coin, amount }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+\NormalTok{            dp[a] }\OperatorTok{+=}\NormalTok{ dp[a }\OperatorTok{{-}}\NormalTok{ coin]}
+    \ControlFlowTok{return}\NormalTok{ dp[amount]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Longest Common Subsequence (LCS):}
+Recurrence:
+
+\begin{itemize}
+\tightlist
+\item
+  If s1{[}i{]} == s2{[}j{]}: \texttt{dp{[}i{]}{[}j{]}\ =\ dp{[}i-1{]}{[}j-1{]}\ +\ 1}
+\item
+  Else: \texttt{dp{[}i{]}{[}j{]}\ =\ max(dp{[}i-1{]}{[}j{]},\ dp{[}i{]}{[}j-1{]})}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ lcs(s1, s2):}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(s1), }\BuiltInTok{len}\NormalTok{(s2)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m }\OperatorTok{+} \DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+            \ControlFlowTok{if}\NormalTok{ s1[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{==}\NormalTok{ s2[j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]:}
+\NormalTok{                dp[i][j] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{+} \DecValTok{1}
+            \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                dp[i][j] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j], dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[m][n]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Edit Distance (Levenshtein):}
+Operations: insert, delete, replace (each cost 1).
+Recurrence:
+
+\begin{itemize}
+\tightlist
+\item
+  If s1{[}i{]} == s2{[}j{]}: \texttt{dp{[}i{]}{[}j{]}\ =\ dp{[}i-1{]}{[}j-1{]}}
+\item
+  Else: \texttt{dp{[}i{]}{[}j{]}\ =\ 1\ +\ min(dp{[}i-1{]}{[}j{]},\ dp{[}i{]}{[}j-1{]},\ dp{[}i-1{]}{[}j-1{]})}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ edit\_distance(s1, s2):}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(s1), }\BuiltInTok{len}\NormalTok{(s2)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m }\OperatorTok{+} \DecValTok{1}\NormalTok{)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m }\OperatorTok{+} \DecValTok{1}\NormalTok{): dp[i][}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ i}
+    \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{+} \DecValTok{1}\NormalTok{): dp[}\DecValTok{0}\NormalTok{][j] }\OperatorTok{=}\NormalTok{ j}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+            \ControlFlowTok{if}\NormalTok{ s1[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{==}\NormalTok{ s2[j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]:}
+\NormalTok{                dp[i][j] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+            \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{                dp[i][j] }\OperatorTok{=} \DecValTok{1} \OperatorTok{+} \BuiltInTok{min}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j],     }\CommentTok{\# delete from s1}
+\NormalTok{                                   dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{],      }\CommentTok{\# insert into s1}
+\NormalTok{                                   dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])    }\CommentTok{\# replace}
+    \ControlFlowTok{return}\NormalTok{ dp[m][n]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Longest Increasing Subsequence (LIS):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# O(n²) DP:}
+\KeywordTok{def}\NormalTok{ lis\_n2(arr):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(arr)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(i):}
+            \ControlFlowTok{if}\NormalTok{ arr[j] }\OperatorTok{\textless{}}\NormalTok{ arr[i]:}
+\NormalTok{                dp[i] }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(dp[i], dp[j] }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{return} \BuiltInTok{max}\NormalTok{(dp)}
+
+\CommentTok{\# O(n log n) patience sorting:}
+\ImportTok{import}\NormalTok{ bisect}
+
+\KeywordTok{def}\NormalTok{ lis\_nlogn(arr):}
+\NormalTok{    tails }\OperatorTok{=}\NormalTok{ []  }\CommentTok{\# tails[i] = smallest tail element of all IS of length i+1}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ arr:}
+\NormalTok{        pos }\OperatorTok{=}\NormalTok{ bisect.bisect\_left(tails, x)}
+        \ControlFlowTok{if}\NormalTok{ pos }\OperatorTok{==} \BuiltInTok{len}\NormalTok{(tails):}
+\NormalTok{            tails.append(x)}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            tails[pos] }\OperatorTok{=}\NormalTok{ x}
+    \ControlFlowTok{return} \BuiltInTok{len}\NormalTok{(tails)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Matrix Chain Multiplication (Interval DP):}
+Recurrence: \texttt{dp{[}i{]}{[}j{]}\ =\ min\ over\ k\ of\ (dp{[}i{]}{[}k{]}\ +\ dp{[}k+1{]}{[}j{]}\ +\ dims{[}i-1{]}*dims{[}k{]}*dims{[}j{]})}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ matrix\_chain(dims):}
+\NormalTok{    n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(dims) }\OperatorTok{{-}} \DecValTok{1}   \CommentTok{\# number of matrices}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n)]}
+    \ControlFlowTok{for}\NormalTok{ length }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{2}\NormalTok{, n }\OperatorTok{+} \DecValTok{1}\NormalTok{):      }\CommentTok{\# subproblem length}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n }\OperatorTok{{-}}\NormalTok{ length }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+\NormalTok{            j }\OperatorTok{=}\NormalTok{ i }\OperatorTok{+}\NormalTok{ length }\OperatorTok{{-}} \DecValTok{1}
+\NormalTok{            dp[i][j] }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)}
+            \ControlFlowTok{for}\NormalTok{ k }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(i, j):}
+\NormalTok{                cost }\OperatorTok{=}\NormalTok{ dp[i][k] }\OperatorTok{+}\NormalTok{ dp[k}\OperatorTok{+}\DecValTok{1}\NormalTok{][j] }\OperatorTok{+}\NormalTok{ dims[i] }\OperatorTok{*}\NormalTok{ dims[k}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ dims[j}\OperatorTok{+}\DecValTok{1}\NormalTok{]}
+\NormalTok{                dp[i][j] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(dp[i][j], cost)}
+    \ControlFlowTok{return}\NormalTok{ dp[}\DecValTok{0}\NormalTok{][n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Matrix Paths (unique paths, min cost path):}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ unique\_paths(m, n):}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m)]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n):}
+\NormalTok{            dp[i][j] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j] }\OperatorTok{+}\NormalTok{ dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+    \ControlFlowTok{return}\NormalTok{ dp[m}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+
+\KeywordTok{def}\NormalTok{ min\_path\_sum(grid):}
+\NormalTok{    m, n }\OperatorTok{=} \BuiltInTok{len}\NormalTok{(grid), }\BuiltInTok{len}\NormalTok{(grid[}\DecValTok{0}\NormalTok{])}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{] }\OperatorTok{*}\NormalTok{ n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(m)]}
+\NormalTok{    dp[}\DecValTok{0}\NormalTok{][}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ grid[}\DecValTok{0}\NormalTok{][}\DecValTok{0}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m): dp[i][}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][}\DecValTok{0}\NormalTok{] }\OperatorTok{+}\NormalTok{ grid[i][}\DecValTok{0}\NormalTok{]}
+    \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n): dp[}\DecValTok{0}\NormalTok{][j] }\OperatorTok{=}\NormalTok{ dp[}\DecValTok{0}\NormalTok{][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{+}\NormalTok{ grid[}\DecValTok{0}\NormalTok{][j]}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, m):}
+        \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n):}
+\NormalTok{            dp[i][j] }\OperatorTok{=}\NormalTok{ grid[i][j] }\OperatorTok{+} \BuiltInTok{min}\NormalTok{(dp[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][j], dp[i][j}\OperatorTok{{-}}\DecValTok{1}\NormalTok{])}
+    \ControlFlowTok{return}\NormalTok{ dp[m}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{DP on Trees:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ tree\_dp\_max\_independent\_set(adj, n):}
+    \CommentTok{\# dp[node][0] = max IS if node NOT included}
+    \CommentTok{\# dp[node][1] = max IS if node included}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n)]   }\CommentTok{\# [0] = not taken, [1] = taken (value 1)}
+
+    \KeywordTok{def}\NormalTok{ dfs(u, parent):}
+        \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in}\NormalTok{ adj[u]:}
+            \ControlFlowTok{if}\NormalTok{ v }\OperatorTok{==}\NormalTok{ parent: }\ControlFlowTok{continue}
+\NormalTok{            dfs(v, u)}
+            \CommentTok{\# If u not taken, v can be taken or not}
+\NormalTok{            dp[u][}\DecValTok{0}\NormalTok{] }\OperatorTok{+=} \BuiltInTok{max}\NormalTok{(dp[v][}\DecValTok{0}\NormalTok{], dp[v][}\DecValTok{1}\NormalTok{])}
+            \CommentTok{\# If u taken, v cannot be taken}
+\NormalTok{            dp[u][}\DecValTok{1}\NormalTok{] }\OperatorTok{+=}\NormalTok{ dp[v][}\DecValTok{0}\NormalTok{]}
+
+\NormalTok{    dfs(}\DecValTok{0}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{return} \BuiltInTok{max}\NormalTok{(dp[}\DecValTok{0}\NormalTok{][}\DecValTok{0}\NormalTok{], dp[}\DecValTok{0}\NormalTok{][}\DecValTok{1}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Bitmask DP (Travelling Salesman):}
+State: \texttt{dp{[}mask{]}{[}i{]}} = minimum cost to visit all cities in \texttt{mask}, ending at city \texttt{i}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ tsp(dist, n):}
+\NormalTok{    INF }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}inf\textquotesingle{}}\NormalTok{)}
+\NormalTok{    dp }\OperatorTok{=}\NormalTok{ [[INF] }\OperatorTok{*}\NormalTok{ n }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ n)]}
+\NormalTok{    dp[}\DecValTok{1}\NormalTok{][}\DecValTok{0}\NormalTok{] }\OperatorTok{=} \DecValTok{0}   \CommentTok{\# visited city 0, at city 0}
+
+    \ControlFlowTok{for}\NormalTok{ mask }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ n):}
+        \ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+            \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ (mask }\OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ u }\OperatorTok{\&} \DecValTok{1}\NormalTok{): }\ControlFlowTok{continue}
+            \ControlFlowTok{if}\NormalTok{ dp[mask][u] }\OperatorTok{==}\NormalTok{ INF: }\ControlFlowTok{continue}
+            \ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+                \ControlFlowTok{if}\NormalTok{ mask }\OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ v }\OperatorTok{\&} \DecValTok{1}\NormalTok{: }\ControlFlowTok{continue}   \CommentTok{\# already visited}
+\NormalTok{                new\_mask }\OperatorTok{=}\NormalTok{ mask }\OperatorTok{|}\NormalTok{ (}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ v)}
+\NormalTok{                dp[new\_mask][v] }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(dp[new\_mask][v], dp[mask][u] }\OperatorTok{+}\NormalTok{ dist[u][v])}
+
+\NormalTok{    full }\OperatorTok{=}\NormalTok{ (}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ n) }\OperatorTok{{-}} \DecValTok{1}
+    \ControlFlowTok{return} \BuiltInTok{min}\NormalTok{(dp[full][v] }\OperatorTok{+}\NormalTok{ dist[v][}\DecValTok{0}\NormalTok{] }\ControlFlowTok{for}\NormalTok{ v }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n))}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{DP Key Takeaways:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State is everything} --- spend most time defining what uniquely describes a subproblem
+\item
+  \textbf{Recurrence is mechanical} --- once state is defined, transitions follow naturally
+\item
+  \textbf{Base cases are critical} --- wrong base cases cause wrong answers even with correct recurrence
+\item
+  \textbf{Space optimization:} 2D DP can often become 1D; 1D can become O(1) if only adjacent states needed
+\end{itemize}
+
+\subsubsection{Greedy Algorithms}\label{greedy-algorithms}
+
+Greedy algorithms make the \textbf{locally optimal choice at each step} hoping to reach a global optimum.
+
+\paragraph{When Greedy Works}\label{when-greedy-works}
+
+Greedy is correct when two conditions hold:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Greedy choice property:} A globally optimal solution can always be reached by making locally optimal choices
+\item
+  \textbf{Optimal substructure:} Optimal solution contains optimal solutions to subproblems
+\end{enumerate}
+
+\textbf{Exchange argument:} Standard proof technique. Assume greedy is not optimal. Show that any optimal solution can be transformed (by swapping) to match greedy without increasing cost --- contradiction.
+
+\paragraph{Classic Greedy Problems}\label{classic-greedy-problems}
+
+\textbf{Activity Selection (Interval Scheduling):}
+Select maximum number of non-overlapping intervals.
+Strategy: Sort by end time; always pick the activity that finishes earliest.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ activity\_selection(intervals):}
+\NormalTok{    intervals.sort(key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: x[}\DecValTok{1}\NormalTok{])   }\CommentTok{\# sort by end time}
+\NormalTok{    count }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    last\_end }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(}\StringTok{\textquotesingle{}{-}inf\textquotesingle{}}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ start, end }\KeywordTok{in}\NormalTok{ intervals:}
+        \ControlFlowTok{if}\NormalTok{ start }\OperatorTok{\textgreater{}=}\NormalTok{ last\_end:}
+\NormalTok{            count }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{            last\_end }\OperatorTok{=}\NormalTok{ end}
+    \ControlFlowTok{return}\NormalTok{ count}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Huffman Coding:} Build optimal prefix-free codes using a min-heap. Greedy: always merge the two lowest-frequency nodes.
+
+\textbf{Fractional Knapsack:} (unlike 0/1 knapsack, greedy works here)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ fractional\_knapsack(weights, values, W):}
+\NormalTok{    ratios }\OperatorTok{=} \BuiltInTok{sorted}\NormalTok{(}\BuiltInTok{zip}\NormalTok{(values, weights), key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: x[}\DecValTok{0}\NormalTok{]}\OperatorTok{/}\NormalTok{x[}\DecValTok{1}\NormalTok{], reverse}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{    total }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ v, w }\KeywordTok{in}\NormalTok{ ratios:}
+        \ControlFlowTok{if}\NormalTok{ W }\OperatorTok{\textgreater{}=}\NormalTok{ w:}
+\NormalTok{            total }\OperatorTok{+=}\NormalTok{ v}\OperatorTok{;}\NormalTok{ W }\OperatorTok{{-}=}\NormalTok{ w}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            total }\OperatorTok{+=}\NormalTok{ v }\OperatorTok{*}\NormalTok{ W }\OperatorTok{/}\NormalTok{ w}\OperatorTok{;} \ControlFlowTok{break}
+    \ControlFlowTok{return}\NormalTok{ total}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Jump Game:} Can you reach the end of an array where each element is max jump length?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ can\_jump(nums):}
+\NormalTok{    max\_reach }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ i, jump }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(nums):}
+        \ControlFlowTok{if}\NormalTok{ i }\OperatorTok{\textgreater{}}\NormalTok{ max\_reach: }\ControlFlowTok{return} \VariableTok{False}
+\NormalTok{        max\_reach }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(max\_reach, i }\OperatorTok{+}\NormalTok{ jump)}
+    \ControlFlowTok{return} \VariableTok{True}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Task Scheduling:} Schedule tasks with deadlines to maximize profit.
+Strategy: Sort by profit descending; greedily assign tasks to latest available slot.
+
+\textbf{Gas Station:} Find starting station to complete circular tour.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ can\_complete\_circuit(gas, cost):}
+\NormalTok{    total\_surplus }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    surplus }\OperatorTok{=} \DecValTok{0}
+\NormalTok{    start }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(gas)):}
+\NormalTok{        diff }\OperatorTok{=}\NormalTok{ gas[i] }\OperatorTok{{-}}\NormalTok{ cost[i]}
+\NormalTok{        total\_surplus }\OperatorTok{+=}\NormalTok{ diff}
+\NormalTok{        surplus }\OperatorTok{+=}\NormalTok{ diff}
+        \ControlFlowTok{if}\NormalTok{ surplus }\OperatorTok{\textless{}} \DecValTok{0}\NormalTok{:}
+\NormalTok{            start }\OperatorTok{=}\NormalTok{ i }\OperatorTok{+} \DecValTok{1}
+\NormalTok{            surplus }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{return}\NormalTok{ start }\ControlFlowTok{if}\NormalTok{ total\_surplus }\OperatorTok{\textgreater{}=} \DecValTok{0} \ControlFlowTok{else} \OperatorTok{{-}}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Greedy vs DP:} Greedy is O(n log n) or O(n); DP is O(n\(^2\)) or worse. \textbf{Prefer greedy when provably correct} (exchange argument or known greedy structure). DP is the safe fallback.
+
+\subsubsection{Recursion \& Backtracking}\label{recursion--backtracking}
+
+\paragraph{Recursion Template}\label{recursion-template}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ solve(state, ...):}
+    \CommentTok{\# Base case}
+    \ControlFlowTok{if}\NormalTok{ is\_complete(state):}
+\NormalTok{        record\_solution(state)}
+        \ControlFlowTok{return}
+
+    \CommentTok{\# Recursive case}
+    \ControlFlowTok{for}\NormalTok{ choice }\KeywordTok{in}\NormalTok{ get\_choices(state):}
+        \ControlFlowTok{if}\NormalTok{ is\_valid(choice, state):}
+\NormalTok{            make\_choice(state, choice)}
+\NormalTok{            solve(state, ...)}
+\NormalTok{            undo\_choice(state, choice)   }\CommentTok{\# backtrack}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Backtracking Framework}\label{backtracking-framework}
+
+Backtracking = DFS on the decision tree with \textbf{pruning} to avoid exploring invalid paths.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Subsets (power set):}
+\KeywordTok{def}\NormalTok{ subsets(nums):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ backtrack(start, path):}
+\NormalTok{        result.append(path[:])}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(start, }\BuiltInTok{len}\NormalTok{(nums)):}
+\NormalTok{            path.append(nums[i])}
+\NormalTok{            backtrack(i }\OperatorTok{+} \DecValTok{1}\NormalTok{, path)}
+\NormalTok{            path.pop()}
+\NormalTok{    backtrack(}\DecValTok{0}\NormalTok{, [])}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Permutations:}
+\KeywordTok{def}\NormalTok{ permutations(nums):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ backtrack(path, used):}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(path) }\OperatorTok{==} \BuiltInTok{len}\NormalTok{(nums):}
+\NormalTok{            result.append(path[:])}
+            \ControlFlowTok{return}
+        \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\BuiltInTok{len}\NormalTok{(nums)):}
+            \ControlFlowTok{if}\NormalTok{ used[i]: }\ControlFlowTok{continue}
+\NormalTok{            used[i] }\OperatorTok{=} \VariableTok{True}
+\NormalTok{            path.append(nums[i])}
+\NormalTok{            backtrack(path, used)}
+\NormalTok{            path.pop()}
+\NormalTok{            used[i] }\OperatorTok{=} \VariableTok{False}
+\NormalTok{    backtrack([], [}\VariableTok{False}\NormalTok{] }\OperatorTok{*} \BuiltInTok{len}\NormalTok{(nums))}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# N{-}Queens:}
+\KeywordTok{def}\NormalTok{ solve\_n\_queens(n):}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    cols }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}\OperatorTok{;}\NormalTok{ diag1 }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}\OperatorTok{;}\NormalTok{ diag2 }\OperatorTok{=} \BuiltInTok{set}\NormalTok{()}
+\NormalTok{    board }\OperatorTok{=}\NormalTok{ [[}\StringTok{\textquotesingle{}.\textquotesingle{}} \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n)] }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n)]}
+    \KeywordTok{def}\NormalTok{ backtrack(row):}
+        \ControlFlowTok{if}\NormalTok{ row }\OperatorTok{==}\NormalTok{ n:}
+\NormalTok{            result.append([}\StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{.join(r) }\ControlFlowTok{for}\NormalTok{ r }\KeywordTok{in}\NormalTok{ board])}
+            \ControlFlowTok{return}
+        \ControlFlowTok{for}\NormalTok{ col }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n):}
+            \ControlFlowTok{if}\NormalTok{ col }\KeywordTok{in}\NormalTok{ cols }\KeywordTok{or}\NormalTok{ (row}\OperatorTok{{-}}\NormalTok{col) }\KeywordTok{in}\NormalTok{ diag1 }\KeywordTok{or}\NormalTok{ (row}\OperatorTok{+}\NormalTok{col) }\KeywordTok{in}\NormalTok{ diag2:}
+                \ControlFlowTok{continue}
+\NormalTok{            cols.add(col)}\OperatorTok{;}\NormalTok{ diag1.add(row}\OperatorTok{{-}}\NormalTok{col)}\OperatorTok{;}\NormalTok{ diag2.add(row}\OperatorTok{+}\NormalTok{col)}
+\NormalTok{            board[row][col] }\OperatorTok{=} \StringTok{\textquotesingle{}Q\textquotesingle{}}
+\NormalTok{            backtrack(row }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{            cols.remove(col)}\OperatorTok{;}\NormalTok{ diag1.remove(row}\OperatorTok{{-}}\NormalTok{col)}\OperatorTok{;}\NormalTok{ diag2.remove(row}\OperatorTok{+}\NormalTok{col)}
+\NormalTok{            board[row][col] }\OperatorTok{=} \StringTok{\textquotesingle{}.\textquotesingle{}}
+\NormalTok{    backtrack(}\DecValTok{0}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Pruning strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Constraint propagation:} Skip branches that violate constraints immediately
+\item
+  \textbf{Bound pruning:} Skip branches that cannot improve on best known solution
+\item
+  \textbf{Symmetry breaking:} Avoid exploring symmetrically equivalent states
+\item
+  \textbf{Early termination:} Return as soon as one solution found (if only need one)
+\end{itemize}
+
+\textbf{Backtracking complexity:} Exponential in worst case (O(n!), O(2\(^n\))), but pruning can dramatically reduce actual runtime.
+
+\textbf{Backtracking is NOT DP:} Backtracking explores all possibilities with pruning; DP stores subproblem results to avoid recomputation. Backtracking problems don\textquotesingle t have overlapping subproblems.
+
+\subsubsection{Bit Manipulation}\label{bit-manipulation}
+
+Computers operate on binary; bit tricks exploit this for O(1) operations.
+
+\paragraph{Core Operations}\label{core-operations}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2619}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4048}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Operation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expression
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effect
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Set bit k & `n & = (1 \textless\textless{} k)` \\
+Clear bit k & \texttt{n\ \&=\ \textasciitilde{}(1\ \textless{}\textless{}\ k)} & Force bit k to 0 \\
+Toggle bit k & \texttt{n\ \^{}=\ (1\ \textless{}\textless{}\ k)} & Flip bit k \\
+Check bit k & \texttt{(n\ \textgreater{}\textgreater{}\ k)\ \&\ 1} & Get value of bit k \\
+Clear lowest set bit & \texttt{n\ \&\ (n\ -\ 1)} & Removes rightmost 1 bit \\
+Isolate lowest set bit & \texttt{n\ \&\ (-n)} & Gets rightmost 1 bit only \\
+Check power of 2 & \texttt{n\ \textgreater{}\ 0\ and\ (n\ \&\ (n-1))\ ==\ 0} & True iff exactly one bit set \\
+Count set bits & \texttt{bin(n).count(\textquotesingle{}1\textquotesingle{})} or \texttt{n.bit\_count()} & Hamming weight \\
+\end{longtable}
+
+\paragraph{Key XOR Tricks}\label{key-xor-tricks}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# XOR properties:}
+\CommentTok{\# a \^{} a = 0 (anything XOR itself = 0)}
+\CommentTok{\# a \^{} 0 = a (anything XOR 0 = itself)}
+\CommentTok{\# XOR is commutative and associative}
+
+\CommentTok{\# Find single number in array where all others appear twice:}
+\KeywordTok{def}\NormalTok{ single\_number(nums):}
+\NormalTok{    result }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ nums:}
+\NormalTok{        result }\OperatorTok{\^{}=}\NormalTok{ x   }\CommentTok{\# pairs cancel out}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Find two unique numbers when all others appear twice:}
+\KeywordTok{def}\NormalTok{ single\_number\_two(nums):}
+\NormalTok{    xor }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ nums: xor }\OperatorTok{\^{}=}\NormalTok{ x   }\CommentTok{\# xor of the two unique numbers}
+    \CommentTok{\# Find any set bit in xor (they differ in this bit)}
+\NormalTok{    diff\_bit }\OperatorTok{=}\NormalTok{ xor }\OperatorTok{\&}\NormalTok{ (}\OperatorTok{{-}}\NormalTok{xor)}
+\NormalTok{    a }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in}\NormalTok{ nums:}
+        \ControlFlowTok{if}\NormalTok{ x }\OperatorTok{\&}\NormalTok{ diff\_bit:}
+\NormalTok{            a }\OperatorTok{\^{}=}\NormalTok{ x   }\CommentTok{\# group by this bit}
+    \ControlFlowTok{return}\NormalTok{ a, xor }\OperatorTok{\^{}}\NormalTok{ a}
+
+\CommentTok{\# Swap without temp:}
+\NormalTok{a }\OperatorTok{\^{}=}\NormalTok{ b}\OperatorTok{;}\NormalTok{ b }\OperatorTok{\^{}=}\NormalTok{ a}\OperatorTok{;}\NormalTok{ a }\OperatorTok{\^{}=}\NormalTok{ b}
+
+\CommentTok{\# Check if two integers have opposite signs:}
+\KeywordTok{def}\NormalTok{ opposite\_signs(a, b):}
+    \ControlFlowTok{return}\NormalTok{ (a }\OperatorTok{\^{}}\NormalTok{ b) }\OperatorTok{\textless{}} \DecValTok{0}   \CommentTok{\# MSB will be 1 if signs differ}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Bitmask DP}\label{bitmask-dp}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Enumerate all subsets of a bitmask:}
+\NormalTok{mask }\OperatorTok{=} \BaseNTok{0b1011}   \CommentTok{\# some bitmask}
+\NormalTok{sub }\OperatorTok{=}\NormalTok{ mask}
+\ControlFlowTok{while}\NormalTok{ sub }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{:}
+\NormalTok{    process(sub)   }\CommentTok{\# sub is a subset of mask}
+\NormalTok{    sub }\OperatorTok{=}\NormalTok{ (sub }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{\&}\NormalTok{ mask   }\CommentTok{\# get next subset}
+
+\CommentTok{\# Check if bit i is set in mask:}
+\ControlFlowTok{if}\NormalTok{ mask }\OperatorTok{\&}\NormalTok{ (}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ i):}
+    \ControlFlowTok{pass}
+
+\CommentTok{\# Count set bits (Brian Kernighan\textquotesingle{}s algorithm):}
+\KeywordTok{def}\NormalTok{ count\_bits(n):}
+\NormalTok{    count }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{while}\NormalTok{ n:}
+\NormalTok{        n }\OperatorTok{\&=}\NormalTok{ (n }\OperatorTok{{-}} \DecValTok{1}\NormalTok{)   }\CommentTok{\# remove lowest set bit}
+\NormalTok{        count }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ count}
+
+\CommentTok{\# Generate all 2\^{}n subsets:}
+\NormalTok{n }\OperatorTok{=} \DecValTok{4}
+\ControlFlowTok{for}\NormalTok{ mask }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ n):}
+\NormalTok{    subset }\OperatorTok{=}\NormalTok{ [i }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n) }\ControlFlowTok{if}\NormalTok{ mask }\OperatorTok{\&}\NormalTok{ (}\DecValTok{1} \OperatorTok{\textless{}\textless{}}\NormalTok{ i)]}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Bit Tricks Summary}\label{bit-tricks-summary}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Multiply/divide by power of 2:}
+\NormalTok{x }\OperatorTok{\textless{}\textless{}}\NormalTok{ k  }\OperatorTok{==}\NormalTok{ x }\OperatorTok{*} \DecValTok{2}\OperatorTok{\^{}}\NormalTok{k}
+\NormalTok{x }\OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ k  }\OperatorTok{==}\NormalTok{ x }\OperatorTok{//} \DecValTok{2}\OperatorTok{\^{}}\NormalTok{k}
+
+\CommentTok{\# Modulo by power of 2:}
+\NormalTok{x }\OperatorTok{\&}\NormalTok{ (m }\OperatorTok{{-}} \DecValTok{1}\NormalTok{) }\OperatorTok{==}\NormalTok{ x }\OperatorTok{\%}\NormalTok{ m   }\CommentTok{\# only works when m is power of 2}
+
+\CommentTok{\# Average without overflow:}
+\NormalTok{avg }\OperatorTok{=}\NormalTok{ (a }\OperatorTok{\&}\NormalTok{ b) }\OperatorTok{+}\NormalTok{ ((a }\OperatorTok{\^{}}\NormalTok{ b) }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Absolute value (no branching):}
+\NormalTok{mask }\OperatorTok{=}\NormalTok{ x }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{31}   \CommentTok{\# {-}1 if negative, 0 if positive}
+\NormalTok{abs\_x }\OperatorTok{=}\NormalTok{ (x }\OperatorTok{+}\NormalTok{ mask) }\OperatorTok{\^{}}\NormalTok{ mask}
+
+\CommentTok{\# Next power of 2:}
+\KeywordTok{def}\NormalTok{ next\_power\_of\_2(n):}
+\NormalTok{    n }\OperatorTok{{-}=} \DecValTok{1}
+\NormalTok{    n }\OperatorTok{|=}\NormalTok{ n }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{1}\OperatorTok{;}\NormalTok{ n }\OperatorTok{|=}\NormalTok{ n }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{2}\OperatorTok{;}\NormalTok{ n }\OperatorTok{|=}\NormalTok{ n }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{4}
+\NormalTok{    n }\OperatorTok{|=}\NormalTok{ n }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{8}\OperatorTok{;}\NormalTok{ n }\OperatorTok{|=}\NormalTok{ n }\OperatorTok{\textgreater{}\textgreater{}} \DecValTok{16}
+    \ControlFlowTok{return}\NormalTok{ n }\OperatorTok{+} \DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Number Theory / Math}\label{number-theory--math}
+
+\paragraph{GCD and LCM}\label{gcd-and-lcm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ math}
+
+\CommentTok{\# GCD using Euclidean algorithm: gcd(a, b) = gcd(b, a \% b)}
+\KeywordTok{def}\NormalTok{ gcd(a, b):}
+    \ControlFlowTok{while}\NormalTok{ b:}
+\NormalTok{        a, b }\OperatorTok{=}\NormalTok{ b, a }\OperatorTok{\%}\NormalTok{ b}
+    \ControlFlowTok{return}\NormalTok{ a}
+
+\CommentTok{\# LCM: lcm(a, b) = a * b / gcd(a, b)}
+\KeywordTok{def}\NormalTok{ lcm(a, b):}
+    \ControlFlowTok{return}\NormalTok{ a }\OperatorTok{*}\NormalTok{ b }\OperatorTok{//}\NormalTok{ gcd(a, b)}
+
+\CommentTok{\# Python 3.9+:}
+\NormalTok{math.gcd(a, b)}
+\NormalTok{math.lcm(a, b)}
+
+\CommentTok{\# GCD complexity: O(log(min(a, b))) — Fibonacci numbers are worst case}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Extended Euclidean Algorithm:} Finds x, y such that a\(\cdot\)x + b\(\cdot\)y = gcd(a, b):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ extended\_gcd(a, b):}
+    \ControlFlowTok{if}\NormalTok{ b }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ a, }\DecValTok{1}\NormalTok{, }\DecValTok{0}
+\NormalTok{    g, x, y }\OperatorTok{=}\NormalTok{ extended\_gcd(b, a }\OperatorTok{\%}\NormalTok{ b)}
+    \ControlFlowTok{return}\NormalTok{ g, y, x }\OperatorTok{{-}}\NormalTok{ (a }\OperatorTok{//}\NormalTok{ b) }\OperatorTok{*}\NormalTok{ y}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Sieve of Eratosthenes}\label{sieve-of-eratosthenes}
+
+Find all primes up to n in O(n log log n):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ sieve(n):}
+\NormalTok{    is\_prime }\OperatorTok{=}\NormalTok{ [}\VariableTok{True}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{    is\_prime[}\DecValTok{0}\NormalTok{] }\OperatorTok{=}\NormalTok{ is\_prime[}\DecValTok{1}\NormalTok{] }\OperatorTok{=} \VariableTok{False}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{2}\NormalTok{, }\BuiltInTok{int}\NormalTok{(n}\OperatorTok{**}\FloatTok{0.5}\NormalTok{) }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{if}\NormalTok{ is\_prime[i]:}
+            \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(i}\OperatorTok{*}\NormalTok{i, n}\OperatorTok{+}\DecValTok{1}\NormalTok{, i):   }\CommentTok{\# start from i² (smaller multiples already marked)}
+\NormalTok{                is\_prime[j] }\OperatorTok{=} \VariableTok{False}
+    \ControlFlowTok{return}\NormalTok{ [i }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n}\OperatorTok{+}\DecValTok{1}\NormalTok{) }\ControlFlowTok{if}\NormalTok{ is\_prime[i]]}
+
+\CommentTok{\# Segmented sieve for large ranges:}
+\CommentTok{\# Prime factorization using sieve (smallest prime factor):}
+\KeywordTok{def}\NormalTok{ smallest\_prime\_factor(n):}
+\NormalTok{    spf }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(n }\OperatorTok{+} \DecValTok{1}\NormalTok{))}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{2}\NormalTok{, }\BuiltInTok{int}\NormalTok{(n}\OperatorTok{**}\FloatTok{0.5}\NormalTok{) }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+        \ControlFlowTok{if}\NormalTok{ spf[i] }\OperatorTok{==}\NormalTok{ i:   }\CommentTok{\# i is prime}
+            \ControlFlowTok{for}\NormalTok{ j }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(i}\OperatorTok{*}\NormalTok{i, n}\OperatorTok{+}\DecValTok{1}\NormalTok{, i):}
+                \ControlFlowTok{if}\NormalTok{ spf[j] }\OperatorTok{==}\NormalTok{ j:}
+\NormalTok{                    spf[j] }\OperatorTok{=}\NormalTok{ i}
+    \ControlFlowTok{return}\NormalTok{ spf}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Modular Arithmetic}\label{modular-arithmetic}
+
+For large number problems where answer is \texttt{mod\ 10\^{}9\ +\ 7}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MOD }\OperatorTok{=} \DecValTok{10}\OperatorTok{**}\DecValTok{9} \OperatorTok{+} \DecValTok{7}
+
+\CommentTok{\# Basic operations:}
+\NormalTok{(a }\OperatorTok{+}\NormalTok{ b) }\OperatorTok{\%}\NormalTok{ MOD}
+\NormalTok{(a }\OperatorTok{{-}}\NormalTok{ b }\OperatorTok{+}\NormalTok{ MOD) }\OperatorTok{\%}\NormalTok{ MOD   }\CommentTok{\# add MOD before \% to avoid negative}
+\NormalTok{(a }\OperatorTok{*}\NormalTok{ b) }\OperatorTok{\%}\NormalTok{ MOD}
+\NormalTok{(a }\OperatorTok{**}\NormalTok{ b) }\OperatorTok{\%}\NormalTok{ MOD }\OperatorTok{==} \BuiltInTok{pow}\NormalTok{(a, b, MOD)   }\CommentTok{\# Python\textquotesingle{}s built{-}in is efficient}
+
+\CommentTok{\# Modular inverse (when MOD is prime, use Fermat\textquotesingle{}s little theorem):}
+\CommentTok{\# a\^{}(MOD{-}1) ≡ 1 (mod MOD) when MOD is prime}
+\CommentTok{\# Therefore a\^{}({-}1) ≡ a\^{}(MOD{-}2) (mod MOD)}
+\KeywordTok{def}\NormalTok{ mod\_inverse(a, mod):}
+    \ControlFlowTok{return} \BuiltInTok{pow}\NormalTok{(a, mod }\OperatorTok{{-}} \DecValTok{2}\NormalTok{, mod)   }\CommentTok{\# O(log mod)}
+
+\CommentTok{\# Modular inverse using extended GCD (works for any mod, gcd(a,mod)=1):}
+\KeywordTok{def}\NormalTok{ mod\_inverse\_gcd(a, mod):}
+\NormalTok{    g, x, \_ }\OperatorTok{=}\NormalTok{ extended\_gcd(a, mod)}
+    \ControlFlowTok{if}\NormalTok{ g }\OperatorTok{!=} \DecValTok{1}\NormalTok{: }\ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"Inverse doesn\textquotesingle{}t exist"}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ x }\OperatorTok{\%}\NormalTok{ mod}
+
+\CommentTok{\# Modular combinations:}
+\KeywordTok{def}\NormalTok{ mod\_choose(n, k, mod}\OperatorTok{=}\DecValTok{10}\OperatorTok{**}\DecValTok{9}\OperatorTok{+}\DecValTok{7}\NormalTok{):}
+    \ControlFlowTok{if}\NormalTok{ k }\OperatorTok{\textgreater{}}\NormalTok{ n: }\ControlFlowTok{return} \DecValTok{0}
+    \CommentTok{\# Precompute factorials}
+\NormalTok{    fact }\OperatorTok{=}\NormalTok{ [}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, n}\OperatorTok{+}\DecValTok{1}\NormalTok{):}
+\NormalTok{        fact[i] }\OperatorTok{=}\NormalTok{ fact[i}\OperatorTok{{-}}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ i }\OperatorTok{\%}\NormalTok{ mod}
+\NormalTok{    inv\_fact }\OperatorTok{=}\NormalTok{ [}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ (n }\OperatorTok{+} \DecValTok{1}\NormalTok{)}
+\NormalTok{    inv\_fact[n] }\OperatorTok{=} \BuiltInTok{pow}\NormalTok{(fact[n], mod }\OperatorTok{{-}} \DecValTok{2}\NormalTok{, mod)}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(n}\OperatorTok{{-}}\DecValTok{1}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{, }\OperatorTok{{-}}\DecValTok{1}\NormalTok{):}
+\NormalTok{        inv\_fact[i] }\OperatorTok{=}\NormalTok{ inv\_fact[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{*}\NormalTok{ (i}\OperatorTok{+}\DecValTok{1}\NormalTok{) }\OperatorTok{\%}\NormalTok{ mod}
+    \ControlFlowTok{return}\NormalTok{ fact[n] }\OperatorTok{*}\NormalTok{ inv\_fact[k] }\OperatorTok{\%}\NormalTok{ mod }\OperatorTok{*}\NormalTok{ inv\_fact[n}\OperatorTok{{-}}\NormalTok{k] }\OperatorTok{\%}\NormalTok{ mod}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Fast Exponentiation (Binary Exponentiation)}\label{fast-exponentiation-binary-exponentiation}
+
+Compute a\^{}b in O(log b):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ fast\_pow(base, exp, mod}\OperatorTok{=}\VariableTok{None}\NormalTok{):}
+\NormalTok{    result }\OperatorTok{=} \DecValTok{1}
+    \ControlFlowTok{while}\NormalTok{ exp }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ exp }\OperatorTok{\&} \DecValTok{1}\NormalTok{:               }\CommentTok{\# if current bit is 1}
+\NormalTok{            result }\OperatorTok{=}\NormalTok{ result }\OperatorTok{*}\NormalTok{ base}
+            \ControlFlowTok{if}\NormalTok{ mod: result }\OperatorTok{\%=}\NormalTok{ mod}
+\NormalTok{        base }\OperatorTok{=}\NormalTok{ base }\OperatorTok{*}\NormalTok{ base}
+        \ControlFlowTok{if}\NormalTok{ mod: base }\OperatorTok{\%=}\NormalTok{ mod}
+\NormalTok{        exp }\OperatorTok{\textgreater{}\textgreater{}=} \DecValTok{1}                 \CommentTok{\# shift right (divide by 2)}
+    \ControlFlowTok{return}\NormalTok{ result}
+
+\CommentTok{\# Python\textquotesingle{}s built{-}in pow(a, b, mod) uses this algorithm}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key idea:} a\^{}13 = a\^{}(1101 in binary) = a\^{}8 \(\cdot\) a\^{}4 \(\cdot\) a\^{}1. Square the base repeatedly, multiply result when bit is 1.
+
+\paragraph{Prime Factorization}\label{prime-factorization}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ prime\_factors(n):}
+\NormalTok{    factors }\OperatorTok{=}\NormalTok{ \{\}}
+\NormalTok{    d }\OperatorTok{=} \DecValTok{2}
+    \ControlFlowTok{while}\NormalTok{ d }\OperatorTok{*}\NormalTok{ d }\OperatorTok{\textless{}=}\NormalTok{ n:}
+        \ControlFlowTok{while}\NormalTok{ n }\OperatorTok{\%}\NormalTok{ d }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+\NormalTok{            factors[d] }\OperatorTok{=}\NormalTok{ factors.get(d, }\DecValTok{0}\NormalTok{) }\OperatorTok{+} \DecValTok{1}
+\NormalTok{            n }\OperatorTok{//=}\NormalTok{ d}
+\NormalTok{        d }\OperatorTok{+=} \DecValTok{1}
+    \ControlFlowTok{if}\NormalTok{ n }\OperatorTok{\textgreater{}} \DecValTok{1}\NormalTok{:}
+\NormalTok{        factors[n] }\OperatorTok{=}\NormalTok{ factors.get(n, }\DecValTok{0}\NormalTok{) }\OperatorTok{+} \DecValTok{1}
+    \ControlFlowTok{return}\NormalTok{ factors}
+\CommentTok{\# Complexity: O(√n)}
+\end{Highlighting}
+\end{Shaded}
+
+\paragraph{Useful Math Facts}\label{useful-math-facts}
+
+\begin{itemize}
+\tightlist
+\item
+  Number of divisors of n: O(n\^{}(1/3)) on average
+\item
+  Sum of 1 to n: n(n+1)/2
+\item
+  Sum of squares 1 to n: n(n+1)(2n+1)/6
+\item
+  Catalan numbers: C(2n,n)/(n+1) --- counts BSTs, valid parentheses, polygon triangulations
+\item
+  \textbf{Pigeonhole principle:} n+1 items in n containers \(\rightarrow\) at least one container has \(\geq\) 2 items
+\item
+  \textbf{Stars and bars:} Distribute n identical items into k bins: C(n+k-1, k-1)
+\end{itemize}
+
+\subsection{Algorithm Selection Cheat Table}\label{algorithm-selection-cheat-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2991}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2564}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2222}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Problem Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Signal
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Recommended Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Complexity
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Shortest path, unweighted & BFS in grid/graph & BFS & O(V+E) \\
+Shortest path, non-negative weights & Edge weights, single source & Dijkstra & O((V+E)log V) \\
+Shortest path, negative weights & Negative edges allowed & Bellman-Ford & O(VE) \\
+All-pairs shortest path & Need dist between all pairs & Floyd-Warshall & O(V\(^3\)) \\
+Minimum spanning tree & Connect all nodes cheaply & Kruskal or Prim & O(E log E) \\
+Sort, general & n \(\leq\) 10\^{}6 & Quick sort / Merge sort & O(n log n) \\
+Sort, small integer range & Keys in {[}0, k{]} & Counting sort / Radix sort & O(n+k) \\
+Cycle detection, undirected & Find cycle in graph & Union-Find or DFS & O(\(\alpha\)(n)) or O(V+E) \\
+Cycle detection, directed & Find cycle in digraph & DFS (3-color) & O(V+E) \\
+Topological order & DAG dependency order & Kahn\textquotesingle s or DFS topo & O(V+E) \\
+Connected components & Group nodes & DFS/BFS + visited set & O(V+E) \\
+Optimal value with choices & Overlapping subproblems & Dynamic Programming & Varies \\
+Make decisions greedily & Exchange argument holds & Greedy & O(n log n) or O(n) \\
+All subsets/permutations & Enumerate possibilities & Backtracking & O(2\^{}n) or O(n!) \\
+Find element in sorted array & Array is sorted & Binary search & O(log n) \\
+Find minimum X satisfying condition & Monotone predicate on integers & Binary search on answer & O(log n \(\cdot\) check) \\
+Frequency counting & Count occurrences & Hash map / Counting array & O(n) \\
+Range minimum/maximum & Static range queries & Sparse table & O(n log n) pre, O(1) query \\
+Range sum queries & Prefix sums or updates & Prefix sum / Fenwick tree & O(n) or O(n log n) \\
+Substring search & Pattern in text & KMP / Rabin-Karp & O(n+m) \\
+Disjoint set operations & Dynamic connectivity & Union-Find & O(\(\alpha\)(n)) amortized \\
+Large integers, divisibility & Modular arithmetic & Fermat\textquotesingle s theorem, sieve & O(log n) \\
+Find unique / pair in XOR & XOR properties & Bit manipulation & O(n) \\
+Multiple choices at each step & Combinatorial search & Backtracking + pruning & Exponential \\
+Maximize non-overlapping intervals & Interval scheduling & Greedy (sort by end time) & O(n log n) \\
+\end{longtable}
+
+\subsection{Real-Life Analogies}\label{real-life-analogies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3239}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6761}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm / Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Real-Life Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BFS & Ripple in a pond --- spreads layer by layer from center \\
+DFS & Solving a maze by always turning left until you hit a wall, then backtracking \\
+Dijkstra & Google Maps routing --- always expand the nearest unvisited city \\
+Bellman-Ford & Send rumors through a network; after n-1 rounds, everyone knows the shortest path \\
+Dynamic Programming & Filling out a tax form --- use last year\textquotesingle s answers to compute this year\textquotesingle s \\
+Memoization & Sticky notes --- write down each sub-answer once so you never recalculate it \\
+Greedy (interval scheduling) & Booking meeting rooms --- always pick the meeting that ends soonest \\
+Merge Sort & Library sorting books by splitting into piles, sorting each pile, then merging \\
+Quick Sort & Separating audience by height relative to a pivot person, then recursing \\
+Binary Search & Guessing a number --- always guess the middle of the remaining range \\
+Topological Sort & Course prerequisite ordering --- take prerequisites before the main course \\
+Union-Find & Friend groups --- if A and B are friends, merge their groups; check if same group \\
+Backtracking & Trying all keys on a keyring --- discard a key as soon as it doesn\textquotesingle t fit \\
+Sieve of Eratosthenes & Crossing out multiples on a number grid to find primes \\
+Amortized Analysis & Buying coffee with a punch card --- most coffees are cheap, the 10th is free \\
+Big-O & Speed limit signs --- tells you the worst that can happen, not typical speed \\
+MST (Kruskal) & Building cheapest road network by adding roads from cheapest to most expensive \\
+Hash Table & Lockers with assigned numbers --- direct access by computing the locker number \\
+Heap & Hospital triage --- the most critical patient always treated next \\
+\end{longtable}
+
+\subsection{Common Interview Questions}\label{common-interview-questions}
+
+\subsubsection{Complexity Analysis}\label{complexity-analysis-1}
+
+\begin{itemize}
+\tightlist
+\item
+  What is the time complexity of Python\textquotesingle s \texttt{list.sort()}? (O(n log n) --- Tim Sort)
+\item
+  What is the amortized complexity of appending to a Python list? (O(1))
+\item
+  Given a recursive function, derive its time complexity using Master Theorem
+\item
+  What is the space complexity of BFS vs DFS? (BFS: O(V) for queue; DFS: O(V) for stack/recursion depth)
+\end{itemize}
+
+\subsubsection{Sorting}\label{sorting-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Sort an array of 0s, 1s, and 2s without using built-in sort (Dutch National Flag --- O(n))
+\item
+  Find the k-th largest element in an array (QuickSelect --- O(n) avg, or heap --- O(n log k))
+\item
+  Check if an array is sorted in O(n)
+\item
+  Merge two sorted arrays in-place
+\end{itemize}
+
+\subsubsection{Binary Search}\label{binary-search-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Find first and last position of element in sorted array (LeetCode 34)
+\item
+  Search in rotated sorted array (LeetCode 33)
+\item
+  Find minimum in rotated sorted array (LeetCode 153)
+\item
+  Koko eating bananas / minimum capacity ship (binary search on answer space)
+\item
+  Find peak element (LeetCode 162 --- binary search on unsorted array!)
+\end{itemize}
+
+\subsubsection{Graphs}\label{graphs}
+
+\begin{itemize}
+\tightlist
+\item
+  Number of islands (DFS/BFS on grid --- LeetCode 200)
+\item
+  Course schedule --- detect cycle in directed graph (LeetCode 207)
+\item
+  Word ladder --- BFS shortest path (LeetCode 127)
+\item
+  Clone graph (DFS with memo)
+\item
+  Cheapest flights within k stops (modified Dijkstra/Bellman-Ford)
+\item
+  Reconstruct itinerary (Eulerian path via DFS)
+\item
+  Network delay time (Dijkstra --- LeetCode 743)
+\item
+  Find if path exists --- Union-Find
+\item
+  Minimum cost to connect all points --- Prim\textquotesingle s MST (LeetCode 1584)
+\item
+  Critical connections / bridges (Tarjan\textquotesingle s algorithm)
+\end{itemize}
+
+\subsubsection{Dynamic Programming}\label{dynamic-programming-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Climbing stairs / coin change (basic 1D DP)
+\item
+  Longest common subsequence (classic 2D DP)
+\item
+  Knapsack variants (0/1, unbounded, multi-dimensional)
+\item
+  Longest increasing subsequence (O(n\(^2\)) DP or O(n log n) patience sort)
+\item
+  Edit distance / regular expression matching
+\item
+  Maximum subarray sum (Kadane\textquotesingle s algorithm --- O(n) DP)
+\item
+  Maximum product subarray
+\item
+  House robber / house robber II (circular)
+\item
+  Unique paths / minimum path sum in grid
+\item
+  Burst balloons (interval DP --- LeetCode 312)
+\item
+  Word break (1D DP + hash set)
+\item
+  Partition equal subset sum (subset sum DP)
+\end{itemize}
+
+\subsubsection{Backtracking}\label{backtracking}
+
+\begin{itemize}
+\tightlist
+\item
+  N-Queens (LeetCode 51)
+\item
+  Sudoku solver (LeetCode 37)
+\item
+  Generate all valid parentheses (LeetCode 22)
+\item
+  Subsets / permutations / combinations (LeetCode 78, 46, 77)
+\item
+  Word search in grid (LeetCode 79)
+\end{itemize}
+
+\subsubsection{Greedy}\label{greedy}
+
+\begin{itemize}
+\tightlist
+\item
+  Merge overlapping intervals (LeetCode 56)
+\item
+  Non-overlapping intervals (LeetCode 435)
+\item
+  Jump game I and II (LeetCode 55, 45)
+\item
+  Task scheduler (LeetCode 621)
+\item
+  Minimum number of arrows to burst balloons (LeetCode 452)
+\end{itemize}
+
+\subsection{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\subsubsection{Complexity Analysis Mistakes}\label{complexity-analysis-mistakes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Forgetting recursion call stack space} --- O(n) space for O(n) deep recursion
+\item
+  \textbf{Counting operations instead of asymptotic complexity} --- writing "O(2n)" instead of "O(n)"
+\item
+  \textbf{Wrong space complexity for BFS} --- BFS can hold O(V) nodes in queue, not O(1)
+\item
+  \textbf{Not accounting for sorting} --- saying a solution is O(n) when it first sorts in O(n log n)
+\item
+  \textbf{Misapplying Master Theorem} --- forgetting to check regularity condition for Case 3
+\end{itemize}
+
+\subsubsection{Graph Algorithm Mistakes}\label{graph-algorithm-mistakes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Using Dijkstra with negative edges} --- it will produce wrong results
+\item
+  \textbf{Not handling disconnected graphs} --- BFS/DFS from single source misses other components
+\item
+  \textbf{Off-by-one in Bellman-Ford} --- need exactly V-1 iterations, not V
+\item
+  \textbf{Forgetting to check for cycles in topological sort} --- not verifying all nodes are processed
+\item
+  \textbf{Confusing directed and undirected cycle detection} --- using undirected method on directed graph
+\item
+  \textbf{Not initializing all distances to infinity} --- leaving 0 causes wrong Dijkstra results
+\end{itemize}
+
+\subsubsection{Sorting Mistakes}\label{sorting-mistakes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Using comparison sort when counting/radix would be O(n)}
+\item
+  \textbf{Forgetting stability requirements} --- using unstable sort when stability matters
+\item
+  \textbf{Not randomizing quicksort pivot} --- gets O(n\(^2\)) on sorted input in interviews where test cases include sorted arrays
+\item
+  \textbf{Forgetting in-place constraint} --- using merge sort when O(1) space needed
+\end{itemize}
+
+\subsubsection{Dynamic Programming Mistakes}\label{dynamic-programming-mistakes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Defining state incorrectly} --- most DP bugs come from wrong state definition
+\item
+  \textbf{Wrong iteration order} --- 1D knapsack must iterate weights in reverse for 0/1; forward for unbounded
+\item
+  \textbf{Off-by-one in indices} --- dp{[}i{]} represents item i or first i items?
+\item
+  \textbf{Not thinking about base cases} --- wrong base cases cause cascade of wrong answers
+\item
+  \textbf{Confusing DP with backtracking} --- implementing exponential backtracking when DP is needed
+\item
+  \textbf{Forgetting to return correct cell} --- computing dp{[}n{]}{[}m{]} when answer is in dp{[}n-1{]}{[}m-1{]}
+\end{itemize}
+
+\subsubsection{Binary Search Mistakes}\label{binary-search-mistakes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Integer overflow with mid = (lo + hi) / 2} --- use \texttt{lo\ +\ (hi\ -\ lo)\ //\ 2}
+\item
+  \textbf{Infinite loop} --- wrong loop condition or mid not shrinking the range
+\item
+  \textbf{Off-by-one in boundary} --- \texttt{lo\ \textless{}\ hi} vs \texttt{lo\ \textless{}=\ hi}; \texttt{hi\ =\ mid} vs \texttt{hi\ =\ mid\ -\ 1}
+\item
+  \textbf{Wrong convergence} --- \texttt{lower\_bound} needs \texttt{hi\ =\ len(arr)}, not \texttt{len(arr)\ -\ 1}
+\end{itemize}
+
+\subsubsection{General Interview Mistakes}\label{general-interview-mistakes}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Not clarifying constraints} --- solution for n=10 differs from n=10\^{}9
+\item
+  \textbf{Not discussing complexity} --- implementing a solution without analyzing it
+\item
+  \textbf{Jumping to code} --- not spending time designing the algorithm first
+\item
+  \textbf{Not testing with edge cases} --- empty input, single element, all duplicates
+\item
+  \textbf{Over-engineering} --- writing complex code when a simple O(n\(^2\)) is acceptable for given n
+\end{itemize}
+
+\subsection{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsubsection{Must-Know Complexities}\label{must-know-complexities}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2973}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Operation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Data Structure
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Access by index & Array & O(1) \\
+Search & Array (unsorted) & O(n) \\
+Search & Array (sorted) & O(log n) \\
+Insert/Delete & Array (arbitrary position) & O(n) \\
+Insert/Delete & Linked List & O(1) at head; O(n) to find \\
+Push/Pop & Stack/Queue & O(1) \\
+Insert/Delete/Search & Hash Table & O(1) avg, O(n) worst \\
+Insert/Delete/Search & BST (balanced) & O(log n) \\
+Insert/Extract-Min & Min-Heap & O(log n) \\
+Build heap from array & Heap & O(n) \\
+DFS/BFS & Graph & O(V+E) \\
+Dijkstra & Graph (non-neg) & O((V+E) log V) \\
+Bellman-Ford & Graph & O(VE) \\
+Floyd-Warshall & Graph & O(V\(^3\)) \\
+Kruskal/Prim & Graph & O(E log E) \\
+Merge Sort / Heap Sort & Array & O(n log n) \\
+Quick Sort & Array & O(n log n) avg \\
+Counting Sort & Array & O(n+k) \\
+Binary Search & Sorted Array & O(log n) \\
+Union-Find & DSU & O(\(\alpha\)(n)) amortized \\
+Sieve of Eratosthenes & - & O(n log log n) \\
+GCD & - & O(log(min(a,b))) \\
+Fast Exponentiation & - & O(log n) \\
+\end{longtable}
+
+\subsubsection{Algorithm Triggers (What to Think When You See...)}\label{algorithm-triggers-what-to-think-when-you-see}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4595}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5405}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+You see...
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Think...
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Shortest path, no weights & BFS \\
+Shortest path, positive weights & Dijkstra \\
+Shortest path, negative weights & Bellman-Ford \\
+All-pairs shortest path & Floyd-Warshall \\
+Minimum spanning tree & Kruskal (sparse) / Prim (dense) \\
+"Connected components" or "groups" & Union-Find or DFS \\
+"Cycle in directed graph" & Topological sort (Kahn\textquotesingle s) or DFS 3-color \\
+"Dependency ordering" & Topological sort \\
+"Count ways", "min/max cost" & Dynamic Programming \\
+"Optimal choice at each step" & Greedy (verify with exchange argument) \\
+"All possibilities / enumerate" & Backtracking \\
+"Sorted array, find X" & Binary search \\
+"Find minimum X such that..." & Binary search on answer \\
+"Sliding window, subarray" & Two pointers or sliding window \\
+"Top K elements" & Heap (size K) \\
+"Anagram / frequency" & Hash map or counting array \\
+"Intervals, overlapping" & Sort by start/end + greedy \\
+"Parentheses, matching" & Stack \\
+"Next greater element" & Monotonic stack \\
+"Integer keys, small range" & Counting sort / bucket \\
+"Large integers mod prime" & Modular arithmetic + Fermat \\
+"Find single number in pairs" & XOR trick \\
+"Power of 2 / bit patterns" & Bit manipulation \\
+"String matching" & KMP / Rabin-Karp \\
+"2D grid, path finding" & BFS (shortest) / DFS (any path) \\
+"Subsets, combinations" & Backtracking or bitmask \\
+"Repeated subproblems visible" & Memoize it \(\rightarrow\) DP \\
+\end{longtable}
+
+\subsubsection{Golden Rules}\label{golden-rules}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Always clarify constraints before coding} --- n determines your algorithm
+\item
+  \textbf{State complexity before implementation} --- shows algorithmic thinking
+\item
+  \textbf{Draw examples} --- small examples reveal patterns
+\item
+  \textbf{Code the brute force first if stuck} --- then optimize
+\item
+  \textbf{Test edge cases explicitly} --- empty, single element, all same, already sorted
+\item
+  \textbf{For graphs:} always check --- directed or undirected? weighted? negative edges? disconnected?
+\item
+  \textbf{For DP:} define state precisely, write recurrence, then code
+\item
+  \textbf{For greedy:} justify why local optimal = global optimal
+\item
+  \textbf{Binary search:} maintain invariant, never drop the answer
+\item
+  \textbf{Recursion:} trust the recursion --- define what it returns, use it correctly
+\end{enumerate}
+
+\clearpage
+\section{Visual Reference}
+\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
+\visualfigure{../figures/dsa-03-algos/01-big-o-growth.pdf}{Asymptotic class, not constant factors, decides scalability. Beyond modest n, an O(n log n) algorithm crushes O(n$^2$); exponential is infeasible past ~n=30.}
+\end{document}
