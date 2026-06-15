@@ -1885,4 +1885,9 @@ Deadlock resolution? & DB kills victim; application retries \\
 Index not used by planner? & Check selectivity, stale stats, OR conditions, functions on column \\
 \end{longtable}
 
+\clearpage
+\section{Visual Reference}
+\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
+\visualfigure{../figures/08-databases/01-btree.pdf}{B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap.}
+\visualfigure{../figures/08-databases/02-isolation-levels.pdf}{Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed.}
 \end{document}

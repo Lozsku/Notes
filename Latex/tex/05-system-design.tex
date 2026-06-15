@@ -2320,4 +2320,9 @@ Push vs Pull notifications & Push (FCM/APNs) for mobile; SSE/WebSocket for web r
 
 \emph{Study tip: Practice narrating each design out loud for 45 minutes. Silence is your enemy in a system design interview. Build the habit of communicating continuously.}
 
+\clearpage
+\section{Visual Reference}
+\noindent A set of figures distilling the key quantitative intuitions of this topic.\par\vspace{4pt}
+\visualfigure{../figures/05-system-design/01-web-architecture.pdf}{The canonical pattern: stateless app servers behind a load balancer, a CDN for static edge content, a cache to absorb reads, and a primary DB with read replicas.}
+\visualfigure{../figures/05-system-design/02-latency-utilization.pdf}{Latency stays flat until utilization approaches capacity, then rises sharply as queues build. Plan for headroom — running hot (>70-80\%) is a tail-latency trap.}
 \end{document}
