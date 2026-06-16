@@ -354,5 +354,37 @@
       "Observer",
       "after"
     ]
+  ],
+  "12-oop": [
+    [
+      "01-oop-pillars.pdf",
+      "OOP rests on four pillars (A-PIE). Abstraction and encapsulation manage complexity; inheritance and polymorphism enable reuse and extension.",
+      "THE FOUR PILLARS OF OOP",
+      "replace"
+    ],
+    [
+      "02-uml-relationships.pdf",
+      "The UML vocabulary for class relationships, weakest to strongest: dependency, association, aggregation (hollow diamond), composition (filled diamond), inheritance (hollow triangle).",
+      "inheritance  (A is-a B; hollow triangle)",
+      "replace"
+    ],
+    [
+      "03-inheritance-vs-composition.pdf",
+      "Inheritance hard-wires an is-a hierarchy at compile time; composition assembles behavior from swappable parts. Favor composition \u2014 it stays flexible and testable.",
+      "INHERITANCE (is-a)",
+      "replace"
+    ],
+    [
+      "04-solid.pdf",
+      "SOLID keeps object-oriented code changeable: each class focused (S), extended not edited (O), substitutable (L), with lean interfaces (I) and inverted dependencies (D).",
+      "Single Responsibility   one class, one reason to change",
+      "replace"
+    ],
+    [
+      "05-dynamic-dispatch.pdf",
+      "A virtual call resolves to the runtime object's method via a vtable (C++/Java) or MRO lookup (Python). This is what lets one line of code drive types written later.",
+      "vtable / MRO lookup on the ACTUAL object type",
+      "replace"
+    ]
   ]
 }

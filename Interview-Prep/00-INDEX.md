@@ -50,6 +50,7 @@ Publication-quality, magazine-style PDFs of every topic — custom typography, f
 | 4 | Cloud & Infrastructure | [04-cloud-infrastructure.md](04-cloud-infrastructure.md) |
 | 5 | System Design | [05-system-design.md](05-system-design.md) |
 | 6 | Low-Level Design (LLD) | [06-low-level-design.md](06-low-level-design.md) |
+| 6½ | Object-Oriented Programming (OOP) | [12-oop-concepts.md](12-oop-concepts.md) |
 | 7 | Distributed Systems | [07-distributed-systems.md](07-distributed-systems.md) |
 | 8 | Databases | [08-databases.md](08-databases.md) |
 | 9 | Performance Engineering | [09-performance-engineering.md](09-performance-engineering.md) |

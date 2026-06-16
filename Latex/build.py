@@ -44,6 +44,7 @@ REG = [
   ("04-cloud",      "04-cloud-infrastructure.md",                  "Cloud \\& Infrastructure",             "Platform Track",        "04", "7c3aed","a78bfa"),
   ("05-system-design","05-system-design.md",                       "System Design",                        "Design Track",          "05", "db2777","f472b6"),
   ("06-lld",        "06-low-level-design.md",                      "Low-Level Design",                     "Design Track",          "06", "ea580c","fb923c"),
+  ("12-oop",        "12-oop-concepts.md",                          "Object-Oriented Programming",          "Design Track",          "",   "0d9488","2dd4bf"),
   ("07-distributed","07-distributed-systems.md",                   "Distributed Systems",                  "Systems Track",         "07", "0891b2","22d3ee"),
   ("08-databases",  "08-databases.md",                             "Databases",                            "Data Track",            "08", "059669","34d399"),
   ("09-performance","09-performance-engineering.md",               "Performance Engineering",              "Systems Track",         "09", "d97706","fbbf24"),

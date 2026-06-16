@@ -20,7 +20,7 @@ Latex/
 ```
 
 Key outputs in `pdf/`:
-- One PDF per topic (e.g. `01-concurrency.pdf`, `aiml-04-tf.pdf`, …) — **27 editions**.
+- One PDF per topic (e.g. `01-concurrency.pdf`, `12-oop.pdf`, `aiml-04-tf.pdf`, …) — **28 editions**.
 - `00-Collection-Index.pdf` — cover + catalogue of all editions.
 - `Complete-Collection.pdf` — every edition merged into one ~790-page book, with a full
   **PDF bookmark tree** (per-edition entries + nested sections) for navigation.
@@ -75,7 +75,7 @@ interrupted run continues from where it stopped.
   and inline `§N` references become **clickable** links to that section.
 - The merged `Complete-Collection.pdf` is assembled with **pypdf** (`make_index.py`), which
   preserves each edition's internal bookmarks and nests them under a per-edition entry.
-- **52 hand-crafted diagrams** (`diagrams.py` → vector PDFs in `figures/`), each placed
+- **57 hand-crafted diagrams** (`diagrams.py` → vector PDFs in `figures/`), each placed
   **inline in the section that discusses it** (not in a bottom gallery). Two placement modes
   in `build.py` (`place_figures`): `ANCHORS` (insert after a matching heading) and `REPLACE`
   (swap a specific ASCII block for the bespoke figure in place). Architecture/box diagrams,

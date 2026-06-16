@@ -75,6 +75,11 @@ REPLACE = {
  "02-genai-decision": "START: What's the problem?",
  "02-ride-state-machine": "REQUESTED ──► SEARCHING",
  "03-pattern-decision-tree": "Is array sorted or can we sort it?",
+ "01-oop-pillars": "THE FOUR PILLARS OF OOP",
+ "02-uml-relationships": "inheritance  (A is-a B; hollow triangle)",
+ "03-inheritance-vs-composition": "INHERITANCE (is-a)",
+ "04-solid": "Single Responsibility   one class, one reason to change",
+ "05-dynamic-dispatch": "vtable / MRO lookup on the ACTUAL object type",
 }
 
 def _save(key, name, fig, caption):
@@ -93,6 +98,7 @@ def acc(key, default="#6366f1"):
     return {
         "01-concurrency": "#6366f1", "02-os": "#0ea5a4", "03-networks": "#2563eb",
         "04-cloud": "#7c3aed", "05-system-design": "#db2777", "06-lld": "#ea580c",
+        "12-oop": "#0d9488",
         "07-distributed": "#0891b2", "08-databases": "#059669", "09-performance": "#d97706",
         "10-security": "#dc2626", "11-behavioral": "#9333ea",
         "dsa-01-patterns": "#be123c", "dsa-02-ds": "#be123c", "dsa-03-algos": "#be123c",
@@ -1318,6 +1324,130 @@ def pattern_tree():
           "Most coding-interview problems map to a small set of patterns. Read the input shape and "
           "the asked-for quantity, and this guide points you to the right tool.")
 
+def oop_pillars():
+    key = "12-oop"; c = acc(key)
+    fig, ax = _canvas((7.4, 3.6), "The four pillars of OOP  (A-PIE)", (0, 16), (0, 9))
+    pil = [("Abstraction", "expose WHAT,\nhide HOW", "interface /\nabstract class", "#2563eb"),
+           ("Polymorphism", "one interface,\nmany forms", "overload +\noverride", "#7c3aed"),
+           ("Inheritance", "reuse via\nis-a", "extends /\nbase class", "#d97706"),
+           ("Encapsulation", "bundle data +\nhide internals", "private fields +\npublic methods", c)]
+    for i, (name, desc, how, col) in enumerate(pil):
+        x = 2.0 + i*4.0
+        ax.add_patch(FancyBboxPatch((x-1.8, 1.0), 3.6, 7.0, boxstyle="round,pad=0.04,rounding_size=0.2",
+                     fc=_tint(col, 0.9), ec=col, lw=1.8))
+        ax.add_patch(FancyBboxPatch((x-1.8, 6.6), 3.6, 1.4, boxstyle="round,pad=0.04,rounding_size=0.2",
+                     fc=col, ec=col))
+        ax.text(x, 7.3, name, ha="center", va="center", fontsize=10, weight="bold", color="white")
+        ax.text(x, 4.6, desc, ha="center", va="center", fontsize=8.6, color=INK)
+        ax.text(x, 2.2, how, ha="center", va="center", fontsize=7.8, color=INK2, style="italic")
+    _save(key, "01-oop-pillars", fig,
+          "OOP rests on four pillars (A-PIE). Abstraction and encapsulation manage complexity; "
+          "inheritance and polymorphism enable reuse and extension.")
+
+def _uml_end(ax, x, y, kind, color, left=False):
+    s = -1 if left else 1
+    if kind == "triangle":      # inheritance: hollow triangle
+        ax.add_patch(Polygon([(x, y), (x-0.5*s, y+0.28), (x-0.5*s, y-0.28)], closed=True,
+                     fc="white", ec=color, lw=1.5))
+    elif kind in ("diamond_h", "diamond_f"):
+        fc = color if kind == "diamond_f" else "white"
+        ax.add_patch(Polygon([(x, y), (x-0.45*s, y+0.26), (x-0.9*s, y), (x-0.45*s, y-0.26)],
+                     closed=True, fc=fc, ec=color, lw=1.5))
+    elif kind == "arrow":
+        ax.add_patch(Polygon([(x, y), (x-0.45*s, y+0.24), (x-0.45*s, y-0.24)], closed=True,
+                     fc=color, ec=color))
+
+def uml_relationships():
+    key = "12-oop"; c = acc(key)
+    fig, ax = _canvas((7.2, 4.4), "UML class-relationship notation", (0, 12), (0, 12))
+    rows = [("Inheritance", "is-a", "triangle", "-", "#d97706"),
+            ("Realization", "implements", "triangle", "--", "#7c3aed"),
+            ("Dependency", "uses-a", "arrow", "--", "#64748b"),
+            ("Association", "knows-a", "arrow", "-", "#2563eb"),
+            ("Aggregation", "weak has-a", "diamond_h", "-", "#0891b2"),
+            ("Composition", "owns-a", "diamond_f", "-", c)]
+    y = 10.6
+    for name, sub, end, ls, col in rows:
+        _box(ax, 2.2, y, 2.0, 0.9, "A", ec=col, fs=9)
+        _box(ax, 7.0, y, 2.0, 0.9, "B", ec=col, fs=9)
+        ax.plot([3.2, 6.0], [y, y], color=col, lw=1.6, ls=("--" if ls == "--" else "-"))
+        _uml_end(ax, 6.0, y, end, col, left=False)
+        ax.text(9.4, y, f"{name}", ha="left", va="center", fontsize=8.8, weight="bold", color=INK)
+        ax.text(9.4, y-0.42, sub, ha="left", va="center", fontsize=7.4, color=INK2, style="italic")
+        y -= 1.75
+    _save(key, "02-uml-relationships", fig,
+          "The UML vocabulary for class relationships, weakest to strongest: dependency, "
+          "association, aggregation (hollow diamond), composition (filled diamond), inheritance "
+          "(hollow triangle).")
+
+def inheritance_vs_composition():
+    key = "12-oop"; c = acc(key)
+    fig, ax = _canvas((7.4, 3.8), "Inheritance (is-a) vs Composition (has-a)", (0, 16), (0, 10))
+    # left: inheritance
+    _box(ax, 3.2, 8.2, 2.6, 1.1, "Vehicle", ec="#d97706")
+    _box(ax, 1.6, 4.6, 2.2, 1.0, "Car", ec="#d97706", fs=8.6)
+    _box(ax, 4.8, 4.6, 2.2, 1.0, "Truck", ec="#d97706", fs=8.6)
+    _uml_end(ax, 3.2, 7.65, "triangle", "#d97706")
+    ax.plot([3.2, 1.6], [7.5, 5.1], color="#d97706", lw=1.4)
+    ax.plot([3.2, 4.8], [7.5, 5.1], color="#d97706", lw=1.4)
+    ax.text(3.2, 2.6, "rigid · compile-time\nclasses locked at design", ha="center",
+            fontsize=8, color=INK2, style="italic")
+    ax.text(3.2, 9.6, "INHERITANCE", ha="center", fontsize=9.5, weight="bold", color="#d97706")
+    # divider
+    ax.plot([8, 8], [1.5, 9.2], color="#cbd5e1", lw=1.0, ls=":")
+    # right: composition
+    _box(ax, 11.0, 8.2, 2.6, 1.1, "Car", ec=c)
+    for i, part in enumerate(["Engine", "Wheels", "GPS"]):
+        _box(ax, 11.0, 5.6-i*1.5, 2.4, 1.0, part, ec="#0891b2", fs=8.6)
+        ax.plot([11.0, 11.0], [7.65, 6.15-i*1.5], color=c, lw=1.3)
+        _uml_end(ax, 11.0, 7.6, "diamond_f", c, left=False)
+    ax.text(13.6, 5.6, "swappable\nat runtime", ha="center", fontsize=7.6, color="#0891b2",
+            va="center")
+    ax.text(11.0, 1.0, "flexible · runtime · testable", ha="center", fontsize=8, color=INK2, style="italic")
+    ax.text(11.0, 9.6, "COMPOSITION", ha="center", fontsize=9.5, weight="bold", color=c)
+    _save(key, "03-inheritance-vs-composition", fig,
+          "Inheritance hard-wires an is-a hierarchy at compile time; composition assembles "
+          "behavior from swappable parts. Favor composition — it stays flexible and testable.")
+
+def solid_principles():
+    key = "12-oop"; c = acc(key)
+    fig, ax = plt.subplots(figsize=(7.0, 3.8)); ax.axis("off")
+    rows = [("S", "Single Responsibility", "one class, one reason to change", "#dc2626"),
+            ("O", "Open / Closed", "open for extension, closed for modification", "#d97706"),
+            ("L", "Liskov Substitution", "subtypes must be substitutable for their base", "#059669"),
+            ("I", "Interface Segregation", "many small interfaces beat one fat interface", "#2563eb"),
+            ("D", "Dependency Inversion", "depend on abstractions, inject concretions", "#7c3aed")]
+    y = 5
+    for L, name, desc, col in rows:
+        ax.add_patch(FancyBboxPatch((0.3, y-0.05), 0.9, 0.9, boxstyle="round,pad=0.02,rounding_size=0.12",
+                     fc=col, ec=col))
+        ax.text(0.75, y+0.4, L, ha="center", va="center", fontsize=16, weight="bold", color="white")
+        ax.text(1.5, y+0.58, name, ha="left", va="center", fontsize=10.5, weight="bold", color=INK)
+        ax.text(1.5, y+0.18, desc, ha="left", va="center", fontsize=8.6, color=INK2)
+        y -= 1.0
+    ax.set_xlim(0, 10); ax.set_ylim(-0.2, 6.2)
+    ax.set_title("SOLID — five principles for maintainable OO design", color=INK,
+                 fontsize=12.5, weight="bold")
+    _save(key, "04-solid", fig,
+          "SOLID keeps object-oriented code changeable: each class focused (S), extended not "
+          "edited (O), substitutable (L), with lean interfaces (I) and inverted dependencies (D).")
+
+def dynamic_dispatch():
+    key = "12-oop"; c = acc(key)
+    fig, ax = _canvas((6.8, 3.6), "Runtime polymorphism (dynamic dispatch)", (0, 12), (0, 9))
+    _box(ax, 6, 7.8, 3.0, 1.0, "shape.draw()", ec=c, fs=9.5)
+    _box(ax, 6, 5.4, 5.2, 1.0, "vtable / MRO lookup\non the actual object type", ec="#7c3aed", fs=8.4)
+    _arrow(ax, (6, 7.3), (6, 5.95), INK2)
+    impls = [("Circle\n.draw()", 1.8), ("Square\n.draw()", 4.6), ("Triangle\n.draw()", 7.4), ("…", 10.0)]
+    for label, x in impls:
+        _box(ax, x, 2.4, 2.2, 1.1, label, ec="#059669", fs=8.2)
+        _arrow(ax, (6, 4.85), (x, 3.0), "#7c3aed", rad=0.0)
+    ax.text(6, 0.7, "the SAME call runs each object's OWN override — chosen at run time",
+            ha="center", fontsize=8, color=INK2, style="italic")
+    _save(key, "05-dynamic-dispatch", fig,
+          "A virtual call resolves to the runtime object's method via a vtable (C++/Java) or MRO "
+          "lookup (Python). This is what lets one line of code drive types written later.")
+
 def main():
     figset = [
         # original 12
@@ -1335,6 +1465,9 @@ def main():
         consistent_hashing, two_phase_commit, dns_resolution, address_space, mlp_network,
         cnn_arch, caching_patterns, latency_path, flame_graph, infra_stack,
         kafka_partitions, genai_decision, ride_state, pattern_tree,
+        # OOP edition
+        oop_pillars, uml_relationships, inheritance_vs_composition, solid_principles,
+        dynamic_dispatch,
     ]
     for f in figset:
         try:

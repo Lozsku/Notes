@@ -1,6 +1,6 @@
 # Anki flashcards
 
-Auto-generated from the Q&A sections of the notes — **108 cards**.
+Auto-generated from the Q&A sections of the notes — **118 cards**.
 
 ## Import into Anki
 1. Anki → File → Import → choose `ALL-flashcards.tsv` (or a single topic's `.tsv`).
@@ -16,6 +16,7 @@ Auto-generated from the Q&A sections of the notes — **108 cards**.
 - Cloud & Infrastructure: 8
 - System Design: 1
 - Low-Level Design: 1
+- Object-Oriented Programming: 10
 - Distributed Systems: 9
 - Databases: 7
 - Performance Engineering: 5
