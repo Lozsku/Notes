@@ -1,0 +1,2391 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Message Queues \& Streaming}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{7c3aed}{a78bfa}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} Read deeply once to build mechanism-level intuition (not just vocabulary), trace each diagram by hand, then use the Revision Cheat Sheet before interviews. The goal is to be able to \emph{design} an async pipeline end-to-end --- topics, partitioning, idempotency, DLQs, ordering, scaling --- and defend every trade-off under follow-up pressure.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+A \textbf{message queue} (more broadly, \textbf{asynchronous messaging middleware}) is infrastructure that lets one component (a \textbf{producer}) hand off work or facts to another component (a \textbf{consumer}) \emph{without waiting for the consumer to finish --- or even to be online}. The middleware durably holds the message in between.
+
+That single sentence hides three separate guarantees that are the whole reason the category exists:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Temporal decoupling} --- producer and consumer do not need to be available at the same instant. The broker buffers.
+\item
+  \textbf{Spatial decoupling} --- the producer does not need to know who the consumers are, how many there are, or where they run. It addresses a \emph{destination} (a queue or topic), not a \emph{peer}.
+\item
+  \textbf{Durability of in-flight work} --- once the broker accepts (ACKs) a message, it survives consumer crashes, restarts, and (with replication) broker crashes.
+\end{enumerate}
+
+There are three structurally different shapes this takes, and confusing them is the \#1 vocabulary mistake candidates make:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1335}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2581}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6084}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Shape
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Canonical example
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-line mental model
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Work queue} & RabbitMQ queue, AWS SQS & A to-do list. Each task goes to \emph{exactly one} worker; once done (ACKed) it\textquotesingle s \textbf{deleted}. \\
+\rowcolor{zebra}
+\textbf{Pub/Sub} & SNS, RabbitMQ fanout exchange & A loudspeaker. Each event is broadcast to \emph{every} interested subscriber. \\
+\textbf{Distributed log} & Apache Kafka, AWS Kinesis & An append-only ledger. Events are \textbf{retained} and \textbf{replayable}; consumers track their own position (offset). \\
+\end{longtable}
+
+\textbf{The defining distinction} of the log model (Kafka/Kinesis) vs the broker model (RabbitMQ/SQS): in a broker, reading is \emph{destructive} (delete-on-ack); in a log, reading is \emph{non-destructive} (the consumer just advances a cursor, the data stays). This one property cascades into everything: replay, multiple independent consumer groups, retention, stream processing, event sourcing.
+
+\setcodelang{}
+
+\begin{verbatim}
+BROKER (RabbitMQ/SQS)                  LOG (Kafka/Kinesis)
+─────────────────────                  ───────────────────
+[m1][m2][m3]  queue                    offset:  0   1   2   3   4
+   │                                   log:    [m0][m1][m2][m3][m4] ──► (append)
+   ▼ consumer reads m1                          ▲           ▲
+   │ processes, ACKs                            │           │
+   ▼ broker DELETES m1                    group-A at 4   group-B at 1
+[m2][m3]  ← m1 is GONE                   (both read the SAME data, independently;
+                                          nothing is deleted on read)
+\end{verbatim}
+
+\textbf{Interview takeaway:} "A queue is a to-do list you cross items off; a log is a ledger you keep. The moment you say \textquotesingle I need to replay events\textquotesingle{} or \textquotesingle two independent teams consume the same stream,\textquotesingle{} you\textquotesingle ve chosen a log (Kafka), not a queue (SQS/RabbitMQ)."
+
+\section{Why It Exists}\label{why-it-exists}
+
+Asynchronous messaging exists to break the \textbf{synchronous coupling} that makes naive distributed systems fragile, slow, and impossible to scale independently. Walk through the failure modes it removes.
+
+\subsection{Sync vs Async Trade-offs}\label{sync-vs-async-trade-offs}
+
+In a \textbf{synchronous} call, the caller blocks until the callee responds. This is simple and gives you an immediate answer --- but it welds the two services together:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Availability is multiplicative.} If \texttt{OrderService} synchronously calls \texttt{EmailService}, \texttt{InventoryService}, and \texttt{AnalyticsService}, the order endpoint is up only when \emph{all four} are up. With 99.9\% each, end-to-end availability \(\approx\) 0.999\(^4\) \(\approx\) \textbf{99.6\%} (\(\approx\) 35 hours/year down vs 8.7 hours for one service). Every synchronous dependency you add \emph{lowers} your availability.
+\item
+  \textbf{Latency is additive.} The user waits for the \emph{sum} of all downstream latencies. Sending a welcome email (200 ms) should not be on the critical path of "place order."
+\item
+  \textbf{Failure cascades.} If \texttt{EmailService} gets slow, threads in \texttt{OrderService} pile up waiting on it, the thread pool exhausts, and \texttt{OrderService} falls over too --- even though placing an order has nothing to do with email. This is the cascading-failure pattern.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+SYNCHRONOUS (tightly coupled)                ASYNCHRONOUS (decoupled)
+─────────────────────────────                ────────────────────────
+Client                                       Client
+  │ POST /order                                │ POST /order
+  ▼                                            ▼
+OrderService                                 OrderService ── writes order to DB
+  ├─►(block)─► InventoryService                │            ── publishes OrderCreated ─►[ QUEUE ]
+  ├─►(block)─► PaymentService                  ▼                                            │
+  ├─►(block)─► EmailService  (200ms)         200ms response to client            ┌──────────┼──────────┐
+  └─►(block)─► AnalyticsService                                                  ▼          ▼          ▼
+  ▼                                                                          Email     Analytics   Shipping
+response after SUM of all latencies                                        (own pace, own failures)
+availability = product of all services       availability of /order is independent of consumers
+\end{verbatim}
+
+\textbf{When sync is correct:} the caller genuinely needs the answer \emph{now} to proceed (a price quote, an auth check, a "is this username taken"). Async is wrong there --- you\textquotesingle d be inventing a request/response protocol on top of a queue, badly.
+
+\textbf{When async is correct:} the work can happen \emph{after} you respond to the user (notifications, indexing, analytics, fan-out to many consumers, anything that absorbs load spikes).
+
+\subsection{Decoupling (the deeper point)}\label{decoupling-the-deeper-point}
+
+Decoupling is not just "don\textquotesingle t block." It\textquotesingle s that the \textbf{producer has no compile-time or runtime knowledge of consumers.} You can add a new consumer (say, a fraud-detection service that also wants \texttt{OrderCreated} events) \emph{without touching the producer or redeploying it.} In a synchronous design, adding a fifth downstream call means editing and redeploying \texttt{OrderService}. This is why event-driven architectures scale \emph{organizationally} --- teams add consumers independently. (Conway\textquotesingle s Law in action.)
+
+\subsection{Load Leveling (Spike Absorption)}\label{load-leveling-spike-absorption}
+
+A queue acts as a \textbf{shock absorber} between a bursty producer and a fixed-capacity consumer. The producer can spike to 10,000 req/s; the consumers drain at a steady 1,000 msg/s; the queue depth rises, then falls. Nothing is dropped, nothing is overloaded --- the spike is \emph{spread over time}.
+
+\setcodelang{}
+
+\begin{verbatim}
+SPIKE ABSORPTION (numbers)
+
+Incoming rate (Black Friday flash sale):
+   t=0s   500/s   ░░░░░
+   t=10s  9000/s  ████████████████████████████  ← 18x normal
+   t=30s  9000/s  ████████████████████████████
+   t=60s  500/s   ░░░░░
+
+Consumer capacity: 1000 msg/s (fixed — 10 workers × 100 msg/s)
+
+WITHOUT a queue:  9000/s hits the DB directly → DB connection pool (say 200)
+                  saturates → timeouts → cascading 500s → outage.
+
+WITH a queue:
+   Queue depth over time (in = 9000/s for 20s, out = 1000/s):
+     accumulated backlog at t=30s ≈ (9000-1000)×20 = 160,000 messages
+     drain time after spike      ≈ 160,000 / 1000  = 160s
+   Result: users get a fast 202 Accepted; the backlog drains over ~3 min;
+           the DB never sees more than 1000 writes/s. No outage.
+\end{verbatim}
+
+The cost of load leveling is \textbf{latency under load}: during the spike, a message might sit in the queue for up to \textasciitilde160 s before processing. You trade tail latency for survival. For order \emph{confirmation emails} that\textquotesingle s fine; for \emph{fraud blocking before charge} it may not be --- which tells you which work belongs async.
+
+\subsection{Back-Pressure}\label{back-pressure}
+
+The flip side of load leveling: what happens when consumers \emph{permanently} can\textquotesingle t keep up (not a transient spike)? The queue grows \textbf{unboundedly}, you run out of disk/memory, and eventually the broker dies --- taking everyone with it. \textbf{Back-pressure} is the set of mechanisms that push the "slow down" signal back toward the source:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Bounded queues / lag alerts:} Kafka can\textquotesingle t bound a topic (it\textquotesingle s a log), but you alarm on \textbf{consumer lag}. RabbitMQ supports \texttt{x-max-length} queues that drop or dead-letter overflow.
+\item
+  \textbf{Pull-based consumption (Kafka/SQS):} consumers \emph{pull} at their own rate; they simply ask for less. A push broker (classic RabbitMQ) must use \textbf{prefetch (QoS)} limits so it doesn\textquotesingle t shove more at a consumer than it can handle.
+\item
+  \textbf{Publisher throttling / rejection:} when the queue is over a high-water mark, reject new publishes (RabbitMQ\textquotesingle s flow control, returning 429/503 to the API layer). This propagates pressure all the way to the client, who retries with backoff.
+\item
+  \textbf{Reactive Streams / TCP-style credit:} consumer advertises how much it can take; producer never exceeds that credit.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Producer ──(too fast)──► [ Queue grows ] ──► Consumer (saturated)
+                              │
+        BACK-PRESSURE signal ◄┘  "slow down / I'll pull when ready / queue full → 503"
+\end{verbatim}
+
+\textbf{Interview takeaway:} "A queue absorbs \emph{spikes} (temporary) via load-leveling, but it cannot absorb a \emph{sustained} overload --- that just moves the failure from \textquotesingle consumer falls over\textquotesingle{} to \textquotesingle broker fills up.\textquotesingle{} The fix is back-pressure: pull-based consumers, prefetch limits, lag alarms, and publisher rejection that propagates the slow-down back to the client."
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4340}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5187}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What they run
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What they probe in interviews
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Amazon} & SQS and SNS are \emph{foundational} AWS services; internal order/fulfillment pipelines are async; Kinesis for streaming & Async decoupling, SQS visibility timeout \& DLQs, SNS\(\rightarrow\)SQS fan-out, exactly-once \emph{processing} with idempotency, the dual-write/outbox problem \\
+\rowcolor{zebra}
+\textbf{LinkedIn} & \textbf{Invented Kafka.} Their entire data backbone is Kafka (activity tracking, metrics, CDC, stream processing with Samza) & Kafka partitions/consumer groups/ISR cold; log compaction; exactly-once; schema evolution with their Avro schema registry \\
+\textbf{Meta} & Scribe (log aggregation), Wormhole (pub/sub CDC), LogDevice (distributed log) & High-fan-out delivery, ordering guarantees, at-least-once + idempotency, backfill/replay \\
+\rowcolor{zebra}
+\textbf{Netflix} & Kafka (Keystone pipeline, trillions of events/day), SQS, Flink for stream processing & Stream processing, windowing, back-pressure, DLQ + retry strategies, multi-region \\
+\textbf{Google} & Cloud Pub/Sub, Dataflow (Apache Beam), internal pub/sub & Exactly-once \emph{processing}, event-time vs processing-time, watermarks, windowing \\
+\rowcolor{zebra}
+\textbf{Uber} & Massive Kafka deployment, Flink for real-time pricing/ETA & Ordering per key (per-rider/per-trip), consumer lag, exactly-once, dead-letter handling \\
+\end{longtable}
+
+\textbf{Universal signal:} can you (1) decide \emph{whether} a piece of work should be async, (2) choose the right shape (queue vs log), (3) reason about delivery semantics and make consumers idempotent, and (4) name the failure modes (poison messages, dual writes, ordering loss, lag) \emph{before being asked}? Saying "I\textquotesingle ll just throw it on a queue" without addressing duplicates, ordering, and DLQs is the junior tell.
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Producer, Broker, Consumer}\label{producer-broker-consumer}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Producer (publisher):} creates messages and sends them to a destination (queue/topic/exchange). Cares about: did the broker durably accept this? (the \textbf{ack/confirm}).
+\item
+  \textbf{Broker:} the server (cluster) that receives, stores, routes, and delivers messages. Provides durability (disk + replication), routing, and delivery tracking.
+\item
+  \textbf{Consumer (subscriber):} reads messages and does work. Cares about: only mark "done" \emph{after} the work succeeds (the \textbf{consumer ack/commit}).
+\end{itemize}
+
+\subsection{Message Anatomy}\label{message-anatomy}
+
+\setcodelang{}
+
+\begin{verbatim}
+┌────────────────────────────────────────────────┐
+│ Headers/metadata: messageId, timestamp,         │  ← used for dedup, routing,
+│   correlationId, contentType, schemaId,         │    tracing, idempotency
+│   routingKey/partitionKey, retryCount           │
+├────────────────────────────────────────────────┤
+│ Key (optional): e.g. "user-42"                  │  ← determines partition/ordering
+├────────────────────────────────────────────────┤
+│ Payload/body: serialized event                  │  ← JSON / Avro / Protobuf
+│   {"event":"OrderCreated","orderId":...}        │
+└────────────────────────────────────────────────┘
+\end{verbatim}
+
+Two header fields earn their keep in every serious design: a \textbf{messageId/idempotency key} (for dedup) and a \textbf{key/partition key} (for ordering). Memorize that.
+
+\subsection{ACK, NACK, and Redelivery}\label{ack-nack-and-redelivery}
+
+The consumer ack is the heart of reliability. The lifecycle:
+
+\setcodelang{}
+
+\begin{verbatim}
+1. Broker delivers msg to consumer (marks it "in-flight / unacked")
+2. Consumer processes it
+3a. Success → ACK   → broker deletes (queue) / consumer commits offset (log)
+3b. Failure → NACK/reject → broker REDELIVERS (requeue) or dead-letters
+3c. Consumer crashes before ACK → broker times out the in-flight msg → REDELIVERS
+\end{verbatim}
+
+The crucial subtlety: \textbf{when does the in-flight message become visible again?} In SQS it\textquotesingle s the \textbf{visibility timeout}. In RabbitMQ it\textquotesingle s \emph{when the channel/connection drops} (or on explicit nack). In Kafka there\textquotesingle s no per-message ack at all --- the consumer periodically \textbf{commits an offset} marking "I\textquotesingle ve processed up to here."
+
+\subsection{Offset / Cursor (log model only)}\label{offset--cursor-log-model-only}
+
+In a log, each consumer (group) maintains an \textbf{offset} per partition: the position of the next message to read. This is \emph{the} difference from a broker. Because the offset is just a number the consumer controls, you can:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Replay}: reset offset to 0 (or a timestamp) and reprocess history.
+\item
+  \textbf{Skip}: jump past a poison message.
+\item
+  \textbf{Run multiple independent consumers}: each group has its own offsets over the same retained data.
+\end{itemize}
+
+\subsection{Dead Letter Queue (DLQ)}\label{dead-letter-queue-dlq}
+
+A side queue where messages go after exhausting retries (a "poison message" that keeps failing). Lets you (a) stop blocking the main queue, (b) inspect/alert/replay later. Every production design must have one.
+
+\subsection{Consumer Group}\label{consumer-group}
+
+A set of cooperating consumers that \emph{share} the work of a topic/queue. In Kafka, each partition is assigned to exactly one consumer in the group (that\textquotesingle s the parallelism unit). In SQS, multiple consumers polling the same queue \emph{are} effectively a group (the queue load-balances). The key invariant: \textbf{within a group, a message is processed once; across groups, every group sees everything} (log model).
+
+\section{Queue vs Pub/Sub vs Log}\label{queue-vs-pubsub-vs-log}
+
+This is the most important conceptual section. Get the semantics exactly right.
+
+\subsection{Point-to-Point Queue (Work Queue)}\label{point-to-point-queue-work-queue}
+
+\setcodelang{}
+
+\begin{verbatim}
+                       ┌─────────────────────────┐
+Producer ──[task]────► │ Queue: [t1][t2][t3][t4] │
+Producer ──[task]────► └───────┬─────────┬───────┘
+                               │         │     (competing consumers)
+                          ┌────▼───┐ ┌───▼────┐
+                          │Worker A│ │Worker B│
+                          └────────┘ └────────┘
+   t1→A, t2→B, t3→A, t4→B   (each task to EXACTLY ONE worker; ACK → delete)
+\end{verbatim}
+
+\textbf{Semantics:} competing consumers. The broker distributes each message to \emph{one} of the available workers, then \textbf{deletes} it on ack. Adding workers = more throughput (they split the work). This is the \emph{task distribution} model.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Use when:} "process this job once" --- image resizing, sending one email, charging one card, a background job.
+\item
+  \textbf{Brokers:} RabbitMQ (default queue), SQS, Celery/Sidekiq backends.
+\end{itemize}
+
+\subsection{Publish/Subscribe (Fan-out)}\label{publishsubscribe-fan-out}
+
+\setcodelang{}
+
+\begin{verbatim}
+                          ┌──────────────┐
+Producer ──[event]──────► │  Topic/      │
+                          │  Exchange    │
+                          └──┬───┬───┬───┘   (every subscriber gets a COPY)
+                       ┌─────▼┐ ┌▼───┐ ┌▼────┐
+                       │ Sub1 │ │Sub2│ │Sub3 │
+                       └──────┘ └────┘ └─────┘
+   1 event → delivered to ALL subscribers
+\end{verbatim}
+
+\textbf{Semantics:} broadcast. Each subscriber gets its \emph{own copy} of every message. Adding a subscriber does \emph{not} reduce what others get --- it\textquotesingle s a new independent recipient. This is the \emph{event notification} model.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Use when:} one fact, many interested parties --- \texttt{OrderCreated} should notify shipping, analytics, email, and fraud, each independently.
+\item
+  \textbf{Brokers:} SNS, RabbitMQ fanout/topic exchange, Kafka with multiple consumer groups, Google Pub/Sub, Redis Pub/Sub.
+\end{itemize}
+
+\subsection{Distributed Log (Retained, Replayable)}\label{distributed-log-retained-replayable}
+
+\setcodelang{}
+
+\begin{verbatim}
+Topic "orders", partition 0:
+offset:   0    1    2    3    4    5    6  ──► (append-only, retained N days)
+log:    [e0] [e1] [e2] [e3] [e4] [e5] [e6]
+          ▲                   ▲              ▲
+          │                   │              │
+   group "audit"@0     group "ship"@4   group "analytics"@6
+   (replaying history) (caught up)      (real-time)
+\end{verbatim}
+
+\textbf{Semantics:} the log is \emph{both} a queue (within one consumer group, partitions are split across consumers \(\rightarrow\) work queue behavior) \emph{and} pub/sub (multiple groups each see everything) --- \textbf{plus retention and replay.} The data is not deleted on read; it\textquotesingle s deleted by a \textbf{retention policy} (time/size) or \textbf{compaction}.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Use when:} you need replay, event sourcing, multiple independent downstreams, stream processing, CDC, or very high throughput.
+\item
+  \textbf{Brokers:} Kafka, Kinesis, Pulsar, Redpanda.
+\end{itemize}
+
+\subsection{Broker-Centric vs Log-Centric --- Deep Comparison}\label{broker-centric-vs-log-centric--deep-comparison}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2190}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3774}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4036}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Dimension
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Broker-centric (RabbitMQ, SQS)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Log-centric (Kafka, Kinesis)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Read model} & Destructive --- delete on ack & Non-destructive --- advance offset \\
+\rowcolor{zebra}
+\textbf{Storage} & Holds until consumed (then gone) & Retains for a window (hours\(\rightarrow\)forever) regardless of consumption \\
+\textbf{Replay} & No (it\textquotesingle s gone) & Yes --- reset offset / seek by time \\
+\rowcolor{zebra}
+\textbf{Multiple independent consumers} & Need a separate queue/binding per consumer & Free --- each group has its own offsets \\
+\textbf{Ordering} & Per-queue (FIFO variants); broken by competing consumers + requeue & Strict \textbf{per-partition} \\
+\rowcolor{zebra}
+\textbf{Routing} & Rich (exchanges, routing keys, headers) & Dumb --- partition by key hash; routing logic lives in consumers/stream apps \\
+\textbf{Throughput} & High (tens--hundreds of K/s) & Very high (millions/s) --- sequential disk, zero-copy, batching \\
+\rowcolor{zebra}
+\textbf{Per-message ops} & Per-message ack/nack/priority/TTL/delay & No per-message ack; coarse offset commits; no priorities \\
+\textbf{Mental model} & Smart broker, dumb consumer & Dumb broker, smart consumer \\
+\rowcolor{zebra}
+\textbf{Backlog visibility} & Queue depth & Consumer lag (end offset \(-\) committed offset) \\
+\end{longtable}
+
+\textbf{The crisp heuristic:}
+
+\begin{itemize}
+\tightlist
+\item
+  Need \textbf{complex routing}, per-message TTL/priority/delay, classic task queues, or RPC-style request/reply? \(\rightarrow\) \textbf{RabbitMQ} (smart broker).
+\item
+  Need \textbf{replay, retention, many independent consumers, event sourcing, CDC, stream processing, extreme throughput}? \(\rightarrow\) \textbf{Kafka} (smart consumer, dumb broker).
+\item
+  Want \textbf{zero ops, AWS-native, simple decoupling}? \(\rightarrow\) \textbf{SQS} (queue) / \textbf{SNS} (fan-out) / \textbf{Kinesis} (when you need log semantics on AWS).
+\end{itemize}
+
+\textbf{Interview takeaway:} "RabbitMQ is a smart broker with a dumb consumer --- routing logic lives in the broker. Kafka is a dumb broker with a smart consumer --- the broker just appends to a log; consumers own their offsets and any routing. That single architectural choice is why Kafka replays and RabbitMQ doesn\textquotesingle t."
+
+\section{Delivery Semantics}\label{delivery-semantics}
+
+There are three theoretical guarantees. Understanding \emph{which is achievable and why} is a top FAANG discriminator.
+
+\subsection{At-Most-Once}\label{at-most-once}
+
+Message delivered zero or one times. Never duplicates; \textbf{may lose} messages.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{How:} fire-and-forget. Producer doesn\textquotesingle t wait for broker ack (\texttt{acks=0}); or consumer \textbf{commits the offset before processing} (so a crash mid-process loses the message).
+\item
+  \textbf{Use when:} loss is acceptable and duplicates are costly --- high-volume metrics, some logging, sampled telemetry.
+\end{itemize}
+
+\subsection{At-Least-Once}\label{at-least-once}
+
+Message delivered one or more times. Never loses; \textbf{may duplicate}.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{How:} producer retries until it gets a broker ack (\texttt{acks=all} + retries); consumer \textbf{commits the offset / acks only AFTER processing} succeeds. If the consumer crashes after processing but before committing, the message is redelivered \(\rightarrow\) duplicate.
+\item
+  \textbf{Use when:} the default for almost everything, \emph{paired with idempotent consumers}. This is the workhorse.
+\end{itemize}
+
+\subsection{Exactly-Once}\label{exactly-once}
+
+Delivered and processed precisely once. The holy grail --- and \textbf{end-to-end exactly-once \emph{delivery} is provably impossible} across an unreliable network with crashes.
+
+\subsubsection{\texorpdfstring{Why Exactly-Once \emph{Delivery} Is Impossible (Two Generals)}{Why Exactly-Once Delivery Is Impossible (Two Generals)}}\label{why-exactly-once-delivery-is-impossible-two-generals}
+
+The \textbf{Two Generals Problem}: two generals must agree to attack at the same time, coordinating only via messengers who may be captured (lost messages). General A sends "attack at dawn." Did it arrive? A needs an ACK. B sends an ACK. Did \emph{that} arrive? B now needs an ACK-of-the-ACK. This regresses infinitely --- \textbf{no finite protocol can guarantee both sides know with certainty} over a lossy channel.
+
+Map this to messaging: a consumer processes a message, then must tell the broker "done" (ack). If the \textbf{ack is lost} (network drop, consumer crash \emph{right after} processing but \emph{before} the ack lands), the broker cannot distinguish "consumer processed it and the ack was lost" from "consumer died before processing." Its only safe choices:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Redeliver} \(\rightarrow\) risk a duplicate (at-least-once).
+\item
+  \textbf{Don\textquotesingle t redeliver} \(\rightarrow\) risk a loss (at-most-once).
+\end{itemize}
+
+There is \emph{no third option} for \emph{delivery}. You cannot get exactly-once delivery. Full stop.
+
+\setcodelang{}
+
+\begin{verbatim}
+Consumer: process(msg) ──► send ACK ──X──► (ACK LOST)
+Broker: "I never heard back. Did it process or die?"
+   redeliver → DUPLICATE   |   give up → LOSS
+   ↑ no way to know which is correct → exactly-once DELIVERY impossible
+\end{verbatim}
+
+\subsubsection{\texorpdfstring{What \emph{Is} Achievable: At-Least-Once + Idempotent Consumer = Effectively-Once}{What Is Achievable: At-Least-Once + Idempotent Consumer = Effectively-Once}}\label{what-is-achievable-at-least-once--idempotent-consumer--effectively-once}
+
+Since you can\textquotesingle t prevent duplicate \emph{delivery}, you make duplicate \emph{processing} harmless. The consumer detects "I\textquotesingle ve already handled this message" and no-ops. This is \textbf{effectively-once / exactly-once \emph{processing}} --- and it\textquotesingle s what virtually every real system does.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# At{-}least{-}once delivery + idempotent consumer via a dedup table.}
+\CommentTok{\# The dedup insert and the business write happen in ONE DB transaction,}
+\CommentTok{\# so they commit or roll back atomically.}
+
+\KeywordTok{def}\NormalTok{ handle(msg, db):}
+\NormalTok{    msg\_id }\OperatorTok{=}\NormalTok{ msg.headers[}\StringTok{"messageId"}\NormalTok{]   }\CommentTok{\# producer{-}assigned unique id}
+    \ControlFlowTok{with}\NormalTok{ db.transaction() }\ImportTok{as}\NormalTok{ tx:}
+        \ControlFlowTok{try}\NormalTok{:}
+            \CommentTok{\# Unique constraint on processed\_messages(message\_id) is the guard.}
+\NormalTok{            tx.execute(}
+                \StringTok{"INSERT INTO processed\_messages(message\_id, processed\_at) "}
+                \StringTok{"VALUES (}\SpecialCharTok{\%s}\StringTok{, now())"}\NormalTok{,}
+\NormalTok{                (msg\_id,),}
+\NormalTok{            )}
+        \ControlFlowTok{except}\NormalTok{ UniqueViolation:}
+            \CommentTok{\# Already processed → this is a redelivery. No{-}op, ack, done.}
+            \ControlFlowTok{return}\NormalTok{ ACK}
+
+        \CommentTok{\# First time we\textquotesingle{}ve seen this id → do the real work in the SAME tx.}
+\NormalTok{        apply\_business\_effect(tx, msg)     }\CommentTok{\# e.g. credit account, create order}
+        \CommentTok{\# tx commits: dedup row + business effect together, atomically.}
+    \ControlFlowTok{return}\NormalTok{ ACK}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ processed\_messages (}
+\NormalTok{    message\_id   UUID }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,        }\CommentTok{{-}{-} the idempotency guard}
+\NormalTok{    processed\_at TIMESTAMPTZ }\KeywordTok{NOT} \KeywordTok{NULL}
+\NormalTok{);}
+\CommentTok{{-}{-} TTL/cleanup: periodically delete rows older than the broker\textquotesingle{}s max}
+\CommentTok{{-}{-} redelivery window (e.g. retention + visibility timeout). You only need}
+\CommentTok{{-}{-} to remember an id as long as it could possibly be redelivered.}
+\end{Highlighting}
+\end{Shaded}
+
+Why the transaction matters: if you \texttt{INSERT} the dedup row in one transaction and do the business effect in another, a crash between them gives you a recorded-but-not-applied message (loss) or applied-but-not-recorded (future duplicate). One transaction makes "remembered" and "applied" the same event.
+
+\subsubsection{\texorpdfstring{Exactly-Once \emph{Processing} via Kafka Transactions}{Exactly-Once Processing via Kafka Transactions}}\label{exactly-once-processing-via-kafka-transactions}
+
+Kafka offers true exactly-once \emph{within the Kafka boundary} by combining:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Idempotent producer} --- each producer gets a Producer ID (PID) and per-partition sequence numbers; the broker drops duplicate batches caused by producer retries (so \texttt{acks=all} retries don\textquotesingle t create duplicates).
+\item
+  \textbf{Transactions} --- a producer can atomically write to multiple partitions/topics \emph{and commit the consumer offsets} in one transaction. The classic \textbf{consume-process-produce} loop becomes atomic: "read from input topic, transform, write to output topic, commit input offsets" either all happens or none does.
+\end{enumerate}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{producer}\OperatorTok{.}\FunctionTok{initTransactions}\OperatorTok{();}
+\ControlFlowTok{while} \OperatorTok{(}\KeywordTok{true}\OperatorTok{)} \OperatorTok{\{}
+\NormalTok{    ConsumerRecords}\OperatorTok{\textless{}}\BuiltInTok{String}\OperatorTok{,}\BuiltInTok{String}\OperatorTok{\textgreater{}}\NormalTok{ records }\OperatorTok{=}\NormalTok{ consumer}\OperatorTok{.}\FunctionTok{poll}\OperatorTok{(}\BuiltInTok{Duration}\OperatorTok{.}\FunctionTok{ofMillis}\OperatorTok{(}\DecValTok{100}\OperatorTok{));}
+\NormalTok{    producer}\OperatorTok{.}\FunctionTok{beginTransaction}\OperatorTok{();}
+    \ControlFlowTok{for} \OperatorTok{(}\NormalTok{ConsumerRecord}\OperatorTok{\textless{}}\BuiltInTok{String}\OperatorTok{,}\BuiltInTok{String}\OperatorTok{\textgreater{}}\NormalTok{ r }\OperatorTok{:}\NormalTok{ records}\OperatorTok{)} \OperatorTok{\{}
+\NormalTok{        ProducerRecord}\OperatorTok{\textless{}}\BuiltInTok{String}\OperatorTok{,}\BuiltInTok{String}\OperatorTok{\textgreater{}}\NormalTok{ out }\OperatorTok{=} \FunctionTok{transform}\OperatorTok{(}\NormalTok{r}\OperatorTok{);}
+\NormalTok{        producer}\OperatorTok{.}\FunctionTok{send}\OperatorTok{(}\NormalTok{out}\OperatorTok{);}                       \CommentTok{// write to output topic}
+    \OperatorTok{\}}
+    \CommentTok{// Commit the INPUT offsets as part of the SAME transaction:}
+\NormalTok{    producer}\OperatorTok{.}\FunctionTok{sendOffsetsToTransaction}\OperatorTok{(}\FunctionTok{offsetsOf}\OperatorTok{(}\NormalTok{records}\OperatorTok{),}\NormalTok{ consumer}\OperatorTok{.}\FunctionTok{groupMetadata}\OperatorTok{());}
+\NormalTok{    producer}\OperatorTok{.}\FunctionTok{commitTransaction}\OperatorTok{();}                 \CommentTok{// all{-}or{-}nothing}
+\OperatorTok{\}}
+\CommentTok{// Consumers of the output topic set isolation.level=read\_committed}
+\CommentTok{// so they never see records from aborted transactions.}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{The big caveat:} this is exactly-once only \emph{inside Kafka} (Kafka \(\rightarrow\) Kafka). The moment your consumer writes to an \emph{external} system (a SQL DB, an HTTP API, sending an email), Kafka transactions don\textquotesingle t cover it --- you\textquotesingle re back to at-least-once across that boundary and you need the \textbf{idempotent-consumer / dedup-table} pattern (or to enroll the external write in the same DB transaction as the offset).
+
+\subsection{Ack Timing --- The Loss vs Duplicate Lever}\label{ack-timing--the-loss-vs-duplicate-lever}
+
+Where you place the offset commit / ack relative to processing \emph{chooses your semantics}:
+
+\setcodelang{}
+
+\begin{verbatim}
+PATTERN A — commit BEFORE processing (at-most-once):
+  read msg → COMMIT offset → process
+  crash after commit, before process → message LOST (offset already advanced)
+
+PATTERN B — commit AFTER processing (at-least-once):  ✅ the right default
+  read msg → process → COMMIT offset
+  crash after process, before commit → message REDELIVERED → DUPLICATE
+  (harmless if consumer is idempotent)
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# At{-}least{-}once: commit only after the side effect is durable.}
+\ControlFlowTok{for}\NormalTok{ msg }\KeywordTok{in}\NormalTok{ consumer:}
+\NormalTok{    process\_and\_persist(msg)     }\CommentTok{\# do the work, make it durable}
+\NormalTok{    consumer.commit(msg.offset)  }\CommentTok{\# only NOW advance the cursor}
+    \CommentTok{\# If we crash between the two lines, msg is redelivered. Idempotency saves us.}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} "Exactly-once \emph{delivery} is impossible --- the Two Generals Problem proves the ACK can always be lost, forcing a choice between redeliver (duplicate) or not (loss). So you pick at-least-once (commit \emph{after} processing) and make the consumer idempotent. That yields exactly-once \emph{processing}, which is what everyone actually means. Kafka transactions give true exactly-once, but only Kafka-to-Kafka."
+
+\section{Kafka Deep Dive}\label{kafka-deep-dive}
+
+Kafka is the most-probed messaging system in senior interviews. Know it mechanism-deep.
+
+\subsection{Topics and Partitions}\label{topics-and-partitions}
+
+A \textbf{topic} is a named stream. It\textquotesingle s split into \textbf{partitions} --- each partition is an independent, ordered, append-only log on disk. Partitions are \emph{the} fundamental unit of two things at once:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Parallelism:} N partitions \(\Rightarrow\) up to N consumers in a group can read in parallel. Partition count is your max consumer parallelism.
+\item
+  \textbf{Ordering:} order is guaranteed \emph{only within a partition}. Across partitions there is no global order.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Topic "orders" (3 partitions, replication-factor=3)
+
+Partition 0: [o0][o3][o6][o9]...   (an ordered log)
+Partition 1: [o1][o4][o7]...
+Partition 2: [o2][o5][o8]...
+
+Producer chooses partition:
+  • key present → partition = hash(key) % numPartitions   (sticky per key)
+  • key null    → round-robin / sticky batching across partitions
+\end{verbatim}
+
+\textbf{Partition-by-key} is the linchpin of ordering: if all events for \texttt{orderId=42} use key \texttt{"42"}, they hash to the \emph{same} partition, so they\textquotesingle re strictly ordered relative to each other. Events for different orders may interleave across partitions --- and that\textquotesingle s fine, because they\textquotesingle re independent.
+
+\textbf{Choosing partition count:} more partitions = more parallelism + throughput, but also more open file handles, more memory, longer leader-election/rebalance times, and worse end-to-end latency. You can \emph{increase} partitions later but it \textbf{breaks key\(\rightarrow\)partition mapping} (existing keys rehash to different partitions, scrambling ordering for in-flight data). So over-provision modestly up front. Rule of thumb: target a partition per expected concurrent consumer, sized so each handles a manageable MB/s.
+
+\subsection{Consumer Groups and Rebalancing}\label{consumer-groups-and-rebalancing}
+
+A \textbf{consumer group} shares a topic\textquotesingle s partitions: each partition is owned by exactly one consumer in the group at a time. If you have 3 partitions and 3 consumers, each gets one. With 4 consumers, one sits idle (more consumers than partitions = wasted consumers). With 2 consumers, one handles 2 partitions.
+
+\setcodelang{}
+
+\begin{verbatim}
+Topic: 3 partitions     Group "billing":
+  P0 ──► Consumer A
+  P1 ──► Consumer B
+  P2 ──► Consumer C
+Consumer C dies → REBALANCE → P2 reassigned to A or B.
+\end{verbatim}
+
+\textbf{Rebalancing} reassigns partitions when consumers join/leave or partitions change. The catch:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Eager (stop-the-world) rebalancing} (older default): \emph{all} consumers revoke \emph{all} partitions, then everyone gets new assignments. Processing halts entirely during the rebalance --- a latency spike for the whole group. Bad if rebalances are frequent.
+\item
+  \textbf{Cooperative / incremental rebalancing} (Kafka 2.4+): only the partitions that actually need to move are revoked; the rest keep processing. Much less disruptive.
+\item
+  \textbf{Static membership} (\texttt{group.instance.id}): a consumer that restarts within \texttt{session.timeout.ms} keeps its assignment, avoiding a rebalance on rolling restarts entirely.
+\end{itemize}
+
+A common operational pain: a slow consumer misses heartbeats / exceeds \texttt{max.poll.interval.ms}, gets kicked from the group, triggers a rebalance, and the redelivered messages cause duplicates. Tune \texttt{max.poll.records} and processing time, or move heavy work off the poll thread.
+
+\subsection{Offsets: Committed vs Current, Auto vs Manual}\label{offsets-committed-vs-current-auto-vs-manual}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Current/position offset:} where the consumer will read next (advances as it polls).
+\item
+  \textbf{Committed offset:} the last offset durably saved (to the internal \texttt{\_\_consumer\_offsets} topic) as "processed." On restart/rebalance, the consumer resumes from the committed offset.
+\item
+  \textbf{Lag} = log-end-offset \(-\) committed-offset = how far behind you are.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Partition 0:  ...[e97][e98][e99][e100][e101][e102]
+                              ▲committed          ▲log-end (latest)
+                              position=e100
+              lag = 102 - 99 = 3 messages behind
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Auto-commit} (\texttt{enable.auto.commit=true}): commits the \emph{current} position every \texttt{auto.commit.interval.ms}. Dangerous --- it can commit offsets for messages you \emph{polled} but haven\textquotesingle t \emph{finished processing}, so a crash loses them (silent at-most-once-ish). Convenient but a footgun.
+\item
+  \textbf{Manual commit} (\texttt{enable.auto.commit=false}): you call \texttt{commitSync()} / \texttt{commitAsync()} \emph{after} processing. This is the correct choice for at-least-once. Commit after the batch is durably handled.
+\end{itemize}
+
+\subsection{Replication, ISR, Leader Election}\label{replication-isr-leader-election}
+
+Each partition has one \textbf{leader} and \texttt{replication.factor\ −\ 1} \textbf{followers} on other brokers. All reads/writes go to the leader; followers replicate from it.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ISR (In-Sync Replicas):} the set of replicas (including the leader) that are caught up with the leader (within \texttt{replica.lag.time.max.ms}). A replica that falls behind drops out of the ISR; when it catches up, it rejoins.
+\item
+  \textbf{Leader election:} if the leader broker dies, a \emph{new leader is elected from the ISR} (because only in-sync replicas are guaranteed to have all committed data). If you allow \texttt{unclean.leader.election=true}, an out-of-sync replica \emph{can} become leader --- restoring availability but \textbf{losing data} (it\textquotesingle s missing recent writes). Default is \texttt{false}: prefer durability over availability.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Partition 0, replication.factor=3:
+  Broker1 (LEADER) ──► Broker2 (follower, in ISR) ──► Broker3 (follower, lagging → OUT of ISR)
+  ISR = {B1, B2}
+  B1 dies → new leader elected from ISR = B2 (has all committed data). B3 cannot win (clean election).
+\end{verbatim}
+
+\subsection{\texorpdfstring{\texttt{acks} and \texttt{min.insync.replicas} --- The Durability Dial}{acks and min.insync.replicas --- The Durability Dial}}\label{acks-and-mininsyncreplicas--the-durability-dial}
+
+Producer \texttt{acks} controls how many replicas must confirm a write before the producer considers it successful:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0691}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2161}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.4118}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0696}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2334}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\texttt{acks}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Waits for
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Durability
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Latency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Semantics
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{0} & Nothing (fire-and-forget) & Lowest --- message can vanish & Lowest & At-most-once \\
+\rowcolor{zebra}
+\texttt{1} & Leader only & Medium --- lost if leader dies before a follower replicates & Medium & Can lose on leader failover \\
+\texttt{all} (\texttt{-1}) & All in-sync replicas & Highest --- survives leader loss & Highest & Basis for at-least-once \\
+\end{longtable}
+
+\texttt{acks=all} alone isn\textquotesingle t enough. If the ISR has shrunk to \emph{just the leader} (followers lagging), \texttt{acks=all} means "ack from 1 replica" --- no real redundancy. \textbf{\texttt{min.insync.replicas}} sets the floor: with \texttt{min.insync.replicas=2} and \texttt{acks=all}, a write is rejected (producer gets \texttt{NotEnoughReplicas}) unless at least 2 replicas are in sync. The durable-config triad:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{replication.factor }\OperatorTok{=} \DecValTok{3}
+\BuiltInTok{min}\NormalTok{.insync.replicas }\OperatorTok{=} \DecValTok{2}\NormalTok{     (tolerate }\DecValTok{1}\NormalTok{ broker down }\KeywordTok{and}\NormalTok{ still accept writes)}
+\NormalTok{acks }\OperatorTok{=} \BuiltInTok{all}\NormalTok{                  (wait }\ControlFlowTok{for} \BuiltInTok{all}\NormalTok{ ISR members, ≥ }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+This survives one broker failure with zero data loss and keeps accepting writes. Lose two brokers \(\rightarrow\) writes are \emph{rejected} (CP choice: refuse rather than risk loss).
+
+\subsection{Log Retention and Compaction}\label{log-retention-and-compaction}
+
+Kafka deletes data by policy, not by consumption.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Time/size retention} (\texttt{cleanup.policy=delete}): keep the last \texttt{retention.ms} (e.g., 7 days) or \texttt{retention.bytes}. Old segments are deleted wholesale. This is for \emph{event streams}.
+\item
+  \textbf{Log compaction} (\texttt{cleanup.policy=compact}): keep \emph{at least the latest value per key}, deleting older values for the same key. This turns a topic into a \textbf{changelog / materialized state} --- replay it to rebuild a key\(\rightarrow\)latest-value table. Used for CDC, Kafka Streams state stores, and \texttt{\_\_consumer\_offsets} itself.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+LOG COMPACTION (cleanup.policy=compact)
+
+Before:  k=A v=1 | k=B v=1 | k=A v=2 | k=C v=1 | k=B v=2 | k=A v=3
+                              ─────              ─────     ─────
+After:                        k=C v=1 | k=B v=2 | k=A v=3
+(only the LATEST value per key survives; a tombstone `k=X v=null` deletes a key)
+\end{verbatim}
+
+\subsection{Exactly-Once (Idempotent Producer + Transactions)}\label{exactly-once-idempotent-producer--transactions}
+
+Covered in Delivery Semantics --- \texttt{enable.idempotence=true} (default in modern Kafka) gives per-partition dedup via PID+sequence; \texttt{transactional.id} + \texttt{read\_committed} consumers gives atomic consume-process-produce. Remember: \textbf{Kafka-to-Kafka only.}
+
+\subsection{Throughput Tuning}\label{throughput-tuning}
+
+Kafka is fast because of sequential disk writes, the OS page cache, \textbf{zero-copy} (\texttt{sendfile} --- disk\(\rightarrow\)socket without copying to user space), and \textbf{batching}. Producer knobs:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{batch.size}} --- max bytes per partition batch. Bigger = fewer requests, more throughput, more latency.
+\item
+  \textbf{\texttt{linger.ms}} --- how long to wait to fill a batch before sending. \texttt{linger.ms=0} = send immediately (low latency); \texttt{linger.ms=20} = wait up to 20 ms to batch (high throughput). The core latency-vs-throughput dial.
+\item
+  \textbf{\texttt{compression.type}} --- \texttt{lz4}/\texttt{zstd}/\texttt{snappy}. Compresses the \emph{batch} (so bigger batches compress better). Trades CPU for network/disk and storage.
+\item
+  \textbf{\texttt{max.in.flight.requests.per.connection}} --- with idempotence on, can be up to 5 while preserving ordering; without idempotence, \textgreater1 risks reordering on retry.
+\end{itemize}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{props}\OperatorTok{.}\FunctionTok{put}\OperatorTok{(}\StringTok{"acks"}\OperatorTok{,} \StringTok{"all"}\OperatorTok{);}
+\NormalTok{props}\OperatorTok{.}\FunctionTok{put}\OperatorTok{(}\StringTok{"enable.idempotence"}\OperatorTok{,} \KeywordTok{true}\OperatorTok{);}
+\NormalTok{props}\OperatorTok{.}\FunctionTok{put}\OperatorTok{(}\StringTok{"linger.ms"}\OperatorTok{,} \DecValTok{20}\OperatorTok{);}          \CommentTok{// batch for up to 20ms}
+\NormalTok{props}\OperatorTok{.}\FunctionTok{put}\OperatorTok{(}\StringTok{"batch.size"}\OperatorTok{,} \DecValTok{65536}\OperatorTok{);}      \CommentTok{// 64KB batches}
+\NormalTok{props}\OperatorTok{.}\FunctionTok{put}\OperatorTok{(}\StringTok{"compression.type"}\OperatorTok{,} \StringTok{"zstd"}\OperatorTok{);}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Consumer Lag}\label{consumer-lag}
+
+The single most important Kafka health metric. \textbf{Lag = end offset \(-\) committed offset}, per partition. Rising lag = consumers can\textquotesingle t keep up (need more consumers up to \#partitions, or faster processing, or more partitions). Flat-high lag during a spike is normal load-leveling; \emph{monotonically rising} lag is an outage forming. Alert on it.
+
+\subsection{Full Topic Diagram}\label{full-topic-diagram}
+
+\setcodelang{}
+
+\begin{verbatim}
+Topic "user-events"  (4 partitions, replication-factor=3, retention=7d)
+
+Brokers:    B1            B2            B3
+Part 0:   LEADER       follower      follower      ISR={B1,B2,B3}
+Part 1:   follower     LEADER        follower      ISR={B2,B3}
+Part 2:   follower     follower      LEADER        ISR={B1,B3}
+Part 3:   LEADER       follower      follower      ISR={B1,B2}
+
+Producers (key = userId):
+  userId=10 → hash → P2     userId=11 → hash → P0     userId=12 → hash → P3
+
+Consumer Group "analytics" (3 consumers):
+  Consumer X → P0, P3      Consumer Y → P1      Consumer Z → P2
+  (4 partitions, 3 consumers → one consumer owns two partitions)
+
+Consumer Group "fraud" (2 consumers):   ← independent group, own offsets
+  Consumer P → P0, P1      Consumer Q → P2, P3
+  (sees EVERY message independently of "analytics")
+
+Rules:
+  • each partition → exactly ONE consumer per group
+  • ordering guaranteed WITHIN a partition (all of userId=10's events ordered)
+  • each group commits its own offsets → independent positions & replay
+\end{verbatim}
+
+\section{RabbitMQ Deep Dive}\label{rabbitmq-deep-dive}
+
+RabbitMQ implements \textbf{AMQP 0-9-1} --- a "smart broker" with rich routing. The model has more moving parts than Kafka but gives you per-message control.
+
+\subsection{\texorpdfstring{The AMQP Model: Exchanges \(\rightarrow\) Bindings \(\rightarrow\) Queues}{The AMQP Model: Exchanges \textbackslash rightarrow Bindings \textbackslash rightarrow Queues}}\label{the-amqp-model-exchanges-rightarrow-bindings-rightarrow-queues}
+
+Producers \textbf{never publish to queues directly.} They publish to an \textbf{exchange} with a \textbf{routing key}. The exchange uses \textbf{bindings} (rules) to route the message into zero or more \textbf{queues}. Consumers read from queues.
+
+\setcodelang{}
+
+\begin{verbatim}
+Producer ──publish(routingKey)──► [ EXCHANGE ] ──(bindings)──► [ Queue1 ] ──► Consumer
+                                       │                       [ Queue2 ] ──► Consumer
+                                       └──routes by type+key──► [ Queue3 ] ──► Consumer
+\end{verbatim}
+
+\subsection{Exchange Types}\label{exchange-types}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4203}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5228}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Routing logic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Direct} & Deliver to queues whose binding key \emph{exactly equals} the routing key & routingKey \texttt{"order.created"} \(\rightarrow\) queue bound with \texttt{"order.created"} \\
+\rowcolor{zebra}
+\textbf{Topic} & Wildcard match: \texttt{*} = one word, \texttt{\#} = zero+ words & binding \texttt{"order.*.eu"} matches \texttt{"order.created.eu"}; \texttt{"order.\#"} matches \texttt{"order.created.eu.priority"} \\
+\textbf{Fanout} & Ignore the key --- broadcast to \emph{all} bound queues (pub/sub) & event bus: every bound queue gets a copy \\
+\rowcolor{zebra}
+\textbf{Headers} & Match on message \emph{header} attributes instead of routing key & \texttt{x-match=all} with \texttt{\{type:order,\ region:eu\}} \\
+\end{longtable}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TOPIC EXCHANGE example}
+\NormalTok{publish routingKey }\OperatorTok{=} \StringTok{"order.created.eu"}
+
+\NormalTok{bindings:}
+\NormalTok{  Queue }\StringTok{"all{-}orders"}\NormalTok{     ⟵ }\StringTok{"order.\#"}\NormalTok{          ✅ matches}
+\NormalTok{  Queue }\StringTok{"eu{-}orders"}\NormalTok{      ⟵ }\StringTok{"order.*.eu"}\NormalTok{       ✅ matches}
+\NormalTok{  Queue }\StringTok{"created{-}orders"}\NormalTok{ ⟵ }\StringTok{"order.created.*"}\NormalTok{  ✅ matches}
+\NormalTok{  Queue }\StringTok{"us{-}orders"}\NormalTok{      ⟵ }\StringTok{"order.*.us"}\NormalTok{       ❌ no match}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Direct exchange + ack/nack + prefetch (pika)}
+\NormalTok{ch.exchange\_declare(exchange}\OperatorTok{=}\StringTok{"orders"}\NormalTok{, exchange\_type}\OperatorTok{=}\StringTok{"direct"}\NormalTok{, durable}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{ch.queue\_declare(queue}\OperatorTok{=}\StringTok{"order{-}created"}\NormalTok{, durable}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{ch.queue\_bind(queue}\OperatorTok{=}\StringTok{"order{-}created"}\NormalTok{, exchange}\OperatorTok{=}\StringTok{"orders"}\NormalTok{, routing\_key}\OperatorTok{=}\StringTok{"order.created"}\NormalTok{)}
+
+\CommentTok{\# Persistent message (survives broker restart) — durability needs BOTH}
+\CommentTok{\# durable queue AND persistent message (delivery\_mode=2).}
+\NormalTok{ch.basic\_publish(}
+\NormalTok{    exchange}\OperatorTok{=}\StringTok{"orders"}\NormalTok{, routing\_key}\OperatorTok{=}\StringTok{"order.created"}\NormalTok{,}
+\NormalTok{    body}\OperatorTok{=}\NormalTok{payload,}
+\NormalTok{    properties}\OperatorTok{=}\NormalTok{pika.BasicProperties(delivery\_mode}\OperatorTok{=}\DecValTok{2}\NormalTok{),}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{ACK / NACK / Reject and Requeue}\label{ack--nack--reject-and-requeue}
+
+The consumer must acknowledge. Options:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{basic.ack}} --- processed successfully \(\rightarrow\) broker deletes it.
+\item
+  \textbf{\texttt{basic.nack}} / \textbf{\texttt{basic.reject}} --- failed. \texttt{requeue=true} \(\rightarrow\) put it back (retry); \texttt{requeue=false} \(\rightarrow\) drop or send to the \textbf{DLX} (dead-letter exchange).
+\item
+  \textbf{No ack + connection drops} --- broker assumes failure and \textbf{requeues} to another consumer (this is how crashes are handled).
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ on\_message(ch, method, props, body):}
+    \ControlFlowTok{try}\NormalTok{:}
+\NormalTok{        process(body)}
+\NormalTok{        ch.basic\_ack(delivery\_tag}\OperatorTok{=}\NormalTok{method.delivery\_tag)        }\CommentTok{\# success}
+    \ControlFlowTok{except}\NormalTok{ TransientError:}
+\NormalTok{        ch.basic\_nack(delivery\_tag}\OperatorTok{=}\NormalTok{method.delivery\_tag, requeue}\OperatorTok{=}\VariableTok{True}\NormalTok{)   }\CommentTok{\# retry}
+    \ControlFlowTok{except}\NormalTok{ PoisonError:}
+\NormalTok{        ch.basic\_nack(delivery\_tag}\OperatorTok{=}\NormalTok{method.delivery\_tag, requeue}\OperatorTok{=}\VariableTok{False}\NormalTok{)  }\CommentTok{\# → DLX}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Requeue caution:} \texttt{requeue=true} on a poison message creates a hot loop --- it\textquotesingle s redelivered instantly, fails again, forever, pinning a CPU. Use a \textbf{retry-with-delay + max-attempts \(\rightarrow\) DLX} strategy instead (see Reliability Patterns).
+
+\subsection{Prefetch (QoS) --- Consumer Back-Pressure}\label{prefetch-qos--consumer-back-pressure}
+
+By default RabbitMQ \emph{pushes} messages to consumers as fast as it can --- a slow consumer gets buried. \textbf{\texttt{basic.qos(prefetch\_count=N)}} caps the number of \emph{unacked} messages a consumer may hold at once. With \texttt{prefetch=1}, the broker won\textquotesingle t send a second message until the first is acked \(\rightarrow\) perfect fair dispatch for uneven task durations. Higher prefetch = more throughput but risks one consumer hoarding work.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ch.basic\_qos(prefetch\_count}\OperatorTok{=}\DecValTok{10}\NormalTok{)   }\CommentTok{\# at most 10 in{-}flight unacked per consumer}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Dead Letter Exchange (DLX), TTL, Priority, Confirms}\label{dead-letter-exchange-dlx-ttl-priority-confirms}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DLX:} a queue declared with \texttt{x-dead-letter-exchange} sends messages there when they\textquotesingle re rejected (\texttt{requeue=false}), expire (TTL), or exceed \texttt{x-max-length}. The DLQ is for inspection/replay.
+\item
+  \textbf{TTL} (\texttt{x-message-ttl}): messages expire after N ms \(\rightarrow\) dead-lettered. Combine with DLX to build \textbf{delayed retry}: publish to a "wait" queue with TTL=30s and DLX pointing back to the work queue \(\rightarrow\) message reappears after 30s.
+\item
+  \textbf{Priority queues} (\texttt{x-max-priority}): higher-priority messages jump ahead. (Kafka has \emph{no} priorities --- a real RabbitMQ advantage.)
+\item
+  \textbf{Publisher confirms} (\texttt{confirm\_select}): the broker asynchronously acks the \emph{producer} once the message is safely persisted/replicated. This is RabbitMQ\textquotesingle s \texttt{acks=all} equivalent --- without it, a publish that the broker drops is silently lost.
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ch.confirm\_select()                       }\CommentTok{\# enable publisher confirms}
+\ControlFlowTok{if} \KeywordTok{not}\NormalTok{ ch.basic\_publish(..., mandatory}\OperatorTok{=}\VariableTok{True}\NormalTok{):}
+    \ControlFlowTok{raise}\NormalTok{ PublishFailed                   }\CommentTok{\# broker did not confirm → retry}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{AMQP Model Summary Diagram}\label{amqp-model-summary-diagram}
+
+\setcodelang{}
+
+\begin{verbatim}
+              ┌──────────────────────────────────────────────┐
+Producer ───► │ EXCHANGE (direct/topic/fanout/headers)        │
+ (+confirms)  └───┬───────────────┬───────────────┬───────────┘
+                  │ binding        │ binding        │ binding
+                  ▼                ▼                ▼
+            [ Queue A ]      [ Queue B ]      [ Queue C ]  ──(reject/TTL/overflow)──► [ DLX → DLQ ]
+              prefetch=10      x-max-priority    x-message-ttl
+                  │                │                │
+               Consumer         Consumer         Consumer
+              (ack/nack)        (ack/nack)       (ack/nack)
+\end{verbatim}
+
+\section{Cloud Brokers (SQS/SNS/Kinesis)}\label{cloud-brokers-sqssnskinesis}
+
+The managed AWS trio --- zero ops, pay-per-use, the default for AWS-native designs.
+
+\subsection{SQS --- Standard vs FIFO}\label{sqs--standard-vs-fifo}
+
+A fully managed queue (work-queue / point-to-point model). Two flavors:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1048}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4382}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4570}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Standard}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{FIFO}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Ordering & Best-effort (mostly ordered, not guaranteed) & Strict, per \textbf{MessageGroupId} \\
+\rowcolor{zebra}
+Delivery & At-least-once (rare duplicates) & Exactly-once \emph{processing} (5-min dedup) \\
+Throughput & Nearly unlimited & 300 msg/s (3,000 with batching) per group \\
+\rowcolor{zebra}
+Dedup & None (you handle it) & Content-based or explicit \texttt{MessageDeduplicationId} \\
+Use & Default, high throughput & Order matters \& duplicates unacceptable \\
+\end{longtable}
+
+\textbf{Visibility timeout} --- the core SQS mechanism. When a consumer receives a message, SQS makes it \textbf{invisible} to other consumers for the visibility timeout (default 30 s). The consumer processes, then calls \texttt{DeleteMessage} (the ack). If it deletes in time \(\rightarrow\) done. If it crashes or runs long \(\rightarrow\) the timeout expires \(\rightarrow\) the message reappears \(\rightarrow\) redelivered (at-least-once). Set the timeout \textgreater{} your p99 processing time, or extend it with \texttt{ChangeMessageVisibility} for long jobs.
+
+\setcodelang{}
+
+\begin{verbatim}
+t=0   receive(msg) → SQS hides msg for 30s (visibility timeout)
+t=5   consumer crashes (no DeleteMessage)
+t=30  timeout expires → msg visible again → another consumer receives it (redelivery)
+      ── if instead: t=10 DeleteMessage → msg gone, no redelivery
+\end{verbatim}
+
+\textbf{Long polling} (\texttt{WaitTimeSeconds=20}): instead of returning instantly empty (short polling \(\rightarrow\) wasteful, costly, many empty receives), the \texttt{ReceiveMessage} call waits up to 20 s for a message to arrive. Fewer empty responses, lower cost, lower latency. Always use long polling.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{resp }\OperatorTok{=}\NormalTok{ sqs.receive\_message(QueueUrl}\OperatorTok{=}\NormalTok{url, WaitTimeSeconds}\OperatorTok{=}\DecValTok{20}\NormalTok{, MaxNumberOfMessages}\OperatorTok{=}\DecValTok{10}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ m }\KeywordTok{in}\NormalTok{ resp.get(}\StringTok{"Messages"}\NormalTok{, []):}
+\NormalTok{    process(m)}
+\NormalTok{    sqs.delete\_message(QueueUrl}\OperatorTok{=}\NormalTok{url, ReceiptHandle}\OperatorTok{=}\NormalTok{m[}\StringTok{"ReceiptHandle"}\NormalTok{])  }\CommentTok{\# ack}
+\end{Highlighting}
+\end{Shaded}
+
+SQS DLQs: configure a \texttt{RedrivePolicy} with \texttt{maxReceiveCount} (e.g., 5). After 5 failed receives (message keeps reappearing), SQS moves it to the DLQ automatically.
+
+\subsection{SNS --- Fan-out (Pub/Sub)}\label{sns--fan-out-pubsub}
+
+Simple Notification Service is the \textbf{pub/sub} half. Publish once to an SNS \textbf{topic}; SNS pushes a copy to every \textbf{subscription} (SQS queues, Lambda, HTTP endpoints, email, SMS).
+
+\textbf{The canonical AWS pattern: SNS \(\rightarrow\) SQS fan-out.} One event must reach several independent consumers, each with its own retry/DLQ/back-pressure. SNS fans out to multiple SQS queues; each consumer owns a queue.
+
+\setcodelang{}
+
+\begin{verbatim}
+                         ┌──────────────► [ SQS: email-queue ]   ──► Email Lambda
+Producer ──► [ SNS topic ]──────────────► [ SQS: ship-queue ]    ──► Shipping svc
+   "OrderCreated"        └──────────────► [ SQS: analytics-q ]   ──► Analytics
+   (SNS = fan-out;  each SQS = durable buffer + independent retry/DLQ per consumer)
+\end{verbatim}
+
+Why SNS\(\rightarrow\)SQS rather than SNS\(\rightarrow\)Lambda directly? The SQS in the middle gives each consumer \textbf{durability and back-pressure} --- if the analytics worker is down, its queue buffers; the email path is unaffected. SNS alone would drop or retry-and-give-up.
+
+\subsection{Kinesis --- Managed Log (Shards)}\label{kinesis--managed-log-shards}
+
+Kinesis Data Streams is AWS\textquotesingle s \textbf{Kafka analog} --- a retained, replayable log. The partition unit is a \textbf{shard} (\(\approx\) Kafka partition):
+
+\begin{itemize}
+\tightlist
+\item
+  Each shard: \textasciitilde1 MB/s or 1,000 records/s ingest; 2 MB/s read.
+\item
+  \textbf{Partition key} \(\rightarrow\) hashed \(\rightarrow\) shard (same per-key ordering as Kafka).
+\item
+  Retention: 24 h default, up to 365 days. Replay by sequence number / timestamp.
+\item
+  \textbf{Consumers} read per-shard; with \textbf{enhanced fan-out}, each consumer gets dedicated 2 MB/s/shard throughput (vs shared standard).
+\item
+  Scale by \textbf{resharding} (split/merge shards) --- analogous to changing Kafka partitions, with the same key-remapping caveat.
+\end{itemize}
+
+\textbf{SQS vs Kinesis} (a favorite question): SQS = queue, delete-on-read, no replay, one logical consumer set, auto-scales throughput. Kinesis = log, retained, replayable, many independent consumers, fixed shard throughput you provision. "Need replay or multiple independent readers? Kinesis. Just decouple work? SQS."
+
+\section{Ordering \& Idempotency}\label{ordering--idempotency}
+
+\subsection{Ordering Is Per-Partition Only}\label{ordering-is-per-partition-only}
+
+The hard truth: \textbf{no scalable broker gives total global order across a topic.} Global order requires a single serialization point (one partition / one queue / one consumer) --- which kills parallelism. So every system gives \textbf{ordering within a partition/group only}:
+
+\begin{itemize}
+\tightlist
+\item
+  Kafka: ordered within a partition.
+\item
+  Kinesis: ordered within a shard.
+\item
+  SQS FIFO: ordered within a \texttt{MessageGroupId}.
+\item
+  RabbitMQ: ordered within a queue \emph{with a single consumer} (competing consumers + requeue break it).
+\end{itemize}
+
+\subsection{Partition-by-Key}\label{partition-by-key}
+
+To get the ordering you \emph{actually} need, route all causally-related events to the same partition via a \textbf{key}. You don\textquotesingle t need \emph{global} order --- you need order \emph{per entity}:
+
+\begin{itemize}
+\tightlist
+\item
+  All events for one \textbf{order} \(\rightarrow\) key = \texttt{orderId} \(\rightarrow\) same partition \(\rightarrow\) strictly ordered.
+\item
+  All events for one \textbf{account} \(\rightarrow\) key = \texttt{accountId}.
+\item
+  All events for one \textbf{chat conversation} \(\rightarrow\) key = \texttt{conversationId}.
+\end{itemize}
+
+Different orders/accounts/chats interleave freely across partitions --- and that\textquotesingle s correct, because they\textquotesingle re independent. You preserve the order that matters while keeping full parallelism \emph{across} keys.
+
+\setcodelang{}
+
+\begin{verbatim}
+Events: O1.create, O2.create, O1.pay, O1.ship, O2.cancel
+key = orderId:
+  P0: [O1.create][O1.pay][O1.ship]     ← O1 strictly ordered ✅
+  P1: [O2.create][O2.cancel]           ← O2 strictly ordered ✅
+  (O1 vs O2 interleaving is irrelevant — independent entities)
+\end{verbatim}
+
+\subsection{The Global-Ordering-Kills-Parallelism Trade-off}\label{the-global-ordering-kills-parallelism-trade-off}
+
+If you genuinely need total order, you must use \textbf{one partition} \(\rightarrow\) \textbf{one consumer} \(\rightarrow\) throughput capped at a single consumer\textquotesingle s rate, no horizontal scaling. This is occasionally required (a global sequence of ledger entries), but it\textquotesingle s a deliberate, expensive choice. The senior move is to question whether you \emph{really} need global order or just per-entity order (almost always the latter).
+
+\setcodelang{}
+
+\begin{verbatim}
+Global order: [1 partition] → [1 consumer]   throughput = 1 consumer  (no scaling)
+Per-key order: [N partitions] → [N consumers] throughput = N consumers (scales)
+                                              order preserved per key, not globally
+\end{verbatim}
+
+\subsection{Out-of-Order Handling}\label{out-of-order-handling}
+
+Even with keys, things arrive out of order across partitions, on replay, or after retries. Strategies:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sequence numbers / versions:} each event carries a monotonic version; the consumer ignores any event with version \(\leq\) what it has applied (last-write-wins by version). Makes reordering safe.
+\item
+  \textbf{Event-time buffering / watermarks:} in stream processing, buffer briefly and reorder by event timestamp before emitting (see Stream Processing).
+\item
+  \textbf{Idempotent + commutative operations:} design so order doesn\textquotesingle t matter (set-based merges, CRDTs).
+\end{itemize}
+
+\subsection{Idempotency (Mechanism Recap)}\label{idempotency-mechanism-recap}
+
+An operation is idempotent if doing it twice equals doing it once. Because at-least-once \emph{will} deliver duplicates, idempotency is mandatory:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Idempotency key + dedup table} (the dedup-table code in Delivery Semantics) --- the general-purpose answer.
+\item
+  \textbf{Natural idempotency:} \texttt{SET\ status=\textquotesingle{}PAID\textquotesingle{}} (idempotent) instead of \texttt{balance\ =\ balance\ -\ 100} (not). Upsert by primary key instead of insert.
+\item
+  \textbf{Conditional writes / optimistic concurrency:} \texttt{UPDATE\ ...\ WHERE\ version\ =\ 7} --- a duplicate with stale version no-ops.
+\end{itemize}
+
+\textbf{Interview takeaway:} "You never need global ordering; you need per-entity ordering, which you get by partitioning on the entity key. And because at-least-once delivers duplicates, every consumer must be idempotent --- by a dedup table, a natural set-operation, or a version-conditional write."
+
+\section{Reliability Patterns}\label{reliability-patterns}
+
+The patterns that separate a toy queue demo from a production pipeline.
+
+\subsection{Idempotent Consumers}\label{idempotent-consumers}
+
+Already covered (dedup table / natural idempotency / conditional writes). The non-negotiable foundation --- \emph{every} at-least-once consumer needs it.
+
+\subsection{DLQ + Retry with Exponential Backoff + Jitter}\label{dlq--retry-with-exponential-backoff--jitter}
+
+A transient failure (downstream blip) should be \textbf{retried}; a permanent failure (malformed message) should be \textbf{dead-lettered}. Retrying immediately and forever is wrong on both counts: it hammers a struggling downstream and loops forever on poison.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Exponential backoff:} wait 1s, 2s, 4s, 8s\ldots{} --- give the downstream room to recover, don\textquotesingle t thundering-herd it.
+\item
+  \textbf{Jitter:} add randomness so that N consumers retrying don\textquotesingle t all fire at the same instant (synchronized retries re-create the spike). Full jitter: \texttt{sleep\ =\ random(0,\ base\ *\ 2\^{}attempt)}.
+\item
+  \textbf{Max attempts \(\rightarrow\) DLQ:} after K attempts, stop and dead-letter for human inspection / later replay.
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ random}
+
+\NormalTok{MAX\_ATTEMPTS }\OperatorTok{=} \DecValTok{5}
+\NormalTok{BASE }\OperatorTok{=} \FloatTok{1.0}  \CommentTok{\# seconds}
+
+\KeywordTok{def}\NormalTok{ consume(msg):}
+\NormalTok{    attempt }\OperatorTok{=} \BuiltInTok{int}\NormalTok{(msg.headers.get(}\StringTok{"retryCount"}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+    \ControlFlowTok{try}\NormalTok{:}
+\NormalTok{        process(msg)}
+\NormalTok{        ack(msg)}
+    \ControlFlowTok{except}\NormalTok{ TransientError:}
+        \ControlFlowTok{if}\NormalTok{ attempt }\OperatorTok{+} \DecValTok{1} \OperatorTok{\textgreater{}=}\NormalTok{ MAX\_ATTEMPTS:}
+\NormalTok{            send\_to\_dlq(msg)          }\CommentTok{\# exhausted → DLQ for inspection/replay}
+\NormalTok{            ack(msg)                  }\CommentTok{\# remove from main queue}
+            \ControlFlowTok{return}
+        \CommentTok{\# exponential backoff with FULL JITTER}
+\NormalTok{        delay }\OperatorTok{=}\NormalTok{ random.uniform(}\DecValTok{0}\NormalTok{, BASE }\OperatorTok{*}\NormalTok{ (}\DecValTok{2} \OperatorTok{**}\NormalTok{ attempt))   }\CommentTok{\# 0..1, 0..2, 0..4, ...}
+\NormalTok{        msg.headers[}\StringTok{"retryCount"}\NormalTok{] }\OperatorTok{=}\NormalTok{ attempt }\OperatorTok{+} \DecValTok{1}
+\NormalTok{        schedule\_retry(msg, delay)    }\CommentTok{\# re{-}publish to a delay queue / set visibility}
+\NormalTok{        ack(msg)                      }\CommentTok{\# remove current copy}
+    \ControlFlowTok{except}\NormalTok{ PoisonError:}
+\NormalTok{        send\_to\_dlq(msg)}\OperatorTok{;}\NormalTok{ ack(msg)    }\CommentTok{\# permanent → straight to DLQ, no retries}
+\end{Highlighting}
+\end{Shaded}
+
+In practice: SQS uses \texttt{maxReceiveCount} + redrive to DLQ; RabbitMQ uses a TTL "wait" queue + DLX to back off then retry; Kafka uses a retry-topic chain (\texttt{orders.retry.5s}, \texttt{orders.retry.30s}, \ldots{} \(\rightarrow\) \texttt{orders.DLT}) à la Spring Kafka.
+
+\setcodelang{}
+
+\begin{verbatim}
+RETRY TOPIC CHAIN (Kafka)
+orders ──fail──► orders.retry.5s ──(5s later)──► reprocess ──fail──► orders.retry.30s
+                                                                          │ fail
+                                                                          ▼
+                                                                   orders.DLT (dead-letter)
+\end{verbatim}
+
+\subsection{Poison Messages}\label{poison-messages}
+
+A \textbf{poison message} can never be processed (corrupt payload, deleted referenced entity, schema mismatch). Without a max-retry/DLQ cutoff it blocks the partition/queue forever (a "head-of-line block" --- everything behind it stalls). The DLQ exists precisely to \emph{get the poison out of the way} so the rest of the stream flows, while preserving the bad message for debugging. Always cap retries.
+
+\subsection{The Dual-Write Problem + Outbox Pattern}\label{the-dual-write-problem--outbox-pattern}
+
+\textbf{The dual-write problem} is the single most important reliability pitfall in event-driven systems. A service often needs to do two things atomically: (1) update its database, and (2) publish an event. But the DB and the broker are \emph{separate systems} --- you cannot write to both in one transaction.
+
+\setcodelang{}
+
+\begin{verbatim}
+PROBLEM:
+  tx.commit(order)        ✅ committed to DB
+  broker.publish(event)   ❌ broker down / process crashes here
+  → DB has the order, but NO event ever fired. Downstreams never learn. (LOST EVENT)
+
+  OR the reverse:
+  broker.publish(event)   ✅ event fired
+  tx.rollback(order)      ❌ DB write failed
+  → event fired for an order that DOESN'T EXIST. (PHANTOM EVENT)
+\end{verbatim}
+
+Naively wrapping them ("publish then commit" or "commit then publish") \emph{cannot} fix this --- there\textquotesingle s always a crash window between the two. The robust solution is the \textbf{Transactional Outbox}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  In the \emph{same DB transaction} as the business write, insert a row into an \textbf{\texttt{outbox}} table.
+\item
+  A separate \textbf{relay} (poller or CDC) reads the outbox and publishes to the broker, marking rows as sent.
+\end{enumerate}
+
+Because the order and the outbox row commit in one transaction, they\textquotesingle re atomic --- you can\textquotesingle t have one without the other. The relay then guarantees at-least-once publish (it retries until the broker acks), and consumers dedup.
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{BEGIN}\NormalTok{;}
+  \KeywordTok{INSERT} \KeywordTok{INTO}\NormalTok{ orders(}\KeywordTok{id}\NormalTok{, user\_id, total, status) }\KeywordTok{VALUES}\NormalTok{ (}\OperatorTok{..}\NormalTok{.);}
+  \KeywordTok{INSERT} \KeywordTok{INTO}\NormalTok{ outbox(}\KeywordTok{id}\NormalTok{, aggregate\_id, }\KeywordTok{type}\NormalTok{, payload, created\_at, sent)}
+         \KeywordTok{VALUES}\NormalTok{ (gen\_random\_uuid(), }\CharTok{:orderId}\NormalTok{, }\StringTok{\textquotesingle{}OrderCreated\textquotesingle{}}\NormalTok{, }\CharTok{:json}\NormalTok{, now(), }\KeywordTok{false}\NormalTok{);}
+\KeywordTok{COMMIT}\NormalTok{;   }\CommentTok{{-}{-} order + outbox row commit ATOMICALLY (one DB, one tx)}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# RELAY: poll the outbox and publish (at{-}least{-}once; consumers dedup).}
+\KeywordTok{def}\NormalTok{ relay\_loop(db, broker):}
+    \ControlFlowTok{while} \VariableTok{True}\NormalTok{:}
+\NormalTok{        rows }\OperatorTok{=}\NormalTok{ db.query(}
+            \StringTok{"SELECT * FROM outbox WHERE sent = false ORDER BY created\_at LIMIT 100 "}
+            \StringTok{"FOR UPDATE SKIP LOCKED"}\NormalTok{)            }\CommentTok{\# SKIP LOCKED → run multiple relays safely}
+        \ControlFlowTok{for}\NormalTok{ r }\KeywordTok{in}\NormalTok{ rows:}
+\NormalTok{            broker.publish(topic}\OperatorTok{=}\NormalTok{r.}\BuiltInTok{type}\NormalTok{, key}\OperatorTok{=}\NormalTok{r.aggregate\_id, value}\OperatorTok{=}\NormalTok{r.payload)}
+\NormalTok{            db.execute(}\StringTok{"UPDATE outbox SET sent = true WHERE id = }\SpecialCharTok{\%s}\StringTok{"}\NormalTok{, (r.}\BuiltInTok{id}\NormalTok{,))}
+\NormalTok{        sleep(}\FloatTok{0.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{CDC variant (preferred at scale):} instead of polling, use \textbf{Change Data Capture} --- Debezium tails the database\textquotesingle s write-ahead log (binlog/WAL) and streams every committed row change (including outbox inserts) into Kafka. No polling lag, no extra DB load, exactly-once-ish from the log position. This is how LinkedIn/Netflix-scale systems do it.
+
+\setcodelang{}
+
+\begin{verbatim}
+APP ──tx──► [ orders + outbox ] (Postgres)
+                    │ WAL
+                    ▼
+              Debezium (CDC) ──► Kafka topic "OrderCreated" ──► consumers (idempotent)
+\end{verbatim}
+
+\subsection{The Inbox Pattern}\label{the-inbox-pattern}
+
+The consumer-side mirror of the outbox. Before processing, record the incoming \texttt{messageId} in an \textbf{\texttt{inbox}} table (unique constraint) \emph{in the same transaction} as the side effect. On redelivery, the insert fails the unique constraint \(\rightarrow\) skip. This is the dedup-table pattern formalized --- "outbox guarantees you \emph{publish} once-effectively; inbox guarantees you \emph{consume} once-effectively."
+
+\subsection{Saga Pattern (Distributed Transactions)}\label{saga-pattern-distributed-transactions}
+
+When a business operation spans multiple services (each with its own DB), you can\textquotesingle t use a single ACID transaction or 2PC (too slow, blocks on coordinator failure). A \textbf{Saga} breaks it into a sequence of local transactions, each publishing an event; if a step fails, \textbf{compensating transactions} undo the prior steps. You get \emph{eventual} consistency, not atomicity.
+
+\setcodelang{}
+
+\begin{verbatim}
+Order Saga (happy path):
+  CreateOrder → ReserveInventory → ChargePayment → ScheduleShipping → ConfirmOrder
+
+If ChargePayment FAILS, run compensations in reverse:
+  ReleaseInventory ← CancelOrder
+\end{verbatim}
+
+\textbf{Choreography vs Orchestration:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1379}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4062}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4559}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Choreography}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Orchestration}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Coordination & None central --- each service listens for events and reacts, emitting the next event & A central \textbf{orchestrator} tells each service what to do next \\
+\rowcolor{zebra}
+Coupling & Loose, fully event-driven & Services coupled to the orchestrator \\
+Flow visibility & Hard --- the logic is smeared across services ("what\textquotesingle s the flow?") & Easy --- one place holds the state machine \\
+\rowcolor{zebra}
+Failure/compensation & Each service must know its own compensation triggers & Orchestrator drives compensations explicitly \\
+Best for & Few steps, simple flows & Many steps, complex branching, need observability \\
+\rowcolor{zebra}
+Risk & Cyclic event dependencies, hard to debug & Orchestrator is a SPOF/bottleneck (mitigate: durable state machine --- AWS Step Functions, Temporal) \\
+\end{longtable}
+
+\setcodelang{}
+
+\begin{verbatim}
+CHOREOGRAPHY                              ORCHESTRATION
+Order ─OrderCreated─► Inventory           Orchestrator ──► Order
+Inventory ─Reserved─► Payment                  │   ◄──events──┘
+Payment ─Charged─► Shipping                    ├──► Inventory
+(each step listens & emits)                    ├──► Payment
+                                               └──► Shipping
+                                          (central state machine drives + compensates)
+\end{verbatim}
+
+\subsection{Schema Registry + Avro/Protobuf Compatibility}\label{schema-registry--avroprotobuf-compatibility}
+
+Producers and consumers evolve independently. If a producer adds a field and an old consumer chokes, you\textquotesingle ve broken production. A \textbf{schema registry} (Confluent Schema Registry, AWS Glue) stores versioned schemas; producers register a schema and write only the schema \textbf{ID} + compact binary (Avro/Protobuf, not JSON). Consumers fetch the schema by ID to deserialize, and the registry \textbf{enforces compatibility} on registration:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Backward compatible:} new schema can read old data (e.g., adding a field with a default). New consumers, old data. \(\rightarrow\) safe to upgrade consumers first.
+\item
+  \textbf{Forward compatible:} old schema can read new data (e.g., adding optional fields old readers ignore). Old consumers, new data. \(\rightarrow\) safe to upgrade producers first.
+\item
+  \textbf{Full:} both.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Producer ──(register schema v2)──► [ Schema Registry ] ──(reject if incompatible)──┐
+   writes [schemaId=42][avro bytes] ──► Kafka                                       │
+Consumer reads [schemaId=42] → fetch schema 42 from registry → deserialize ◄────────┘
+\end{verbatim}
+
+Avro/Protobuf over JSON: smaller (no field names on the wire), faster, and \emph{schema-enforced} --- you can\textquotesingle t accidentally ship a breaking change.
+
+\textbf{Interview takeaway:} "The two failure modes people forget: the \textbf{dual-write problem} (DB and broker can\textquotesingle t share a transaction \(\rightarrow\) use the Outbox + CDC), and \textbf{schema evolution} (producer/consumer drift \(\rightarrow\) use a schema registry with compatibility checks). Mentioning these unprompted is a strong senior signal."
+
+\section{Stream Processing}\label{stream-processing}
+
+Beyond moving messages, you often need to \emph{compute} over the stream continuously --- aggregations, joins, enrichment. This is \textbf{stream processing} (Kafka Streams, Apache Flink, Spark Structured Streaming, Beam/Dataflow).
+
+\subsection{Kafka Streams vs Flink (Basics)}\label{kafka-streams-vs-flink-basics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Kafka Streams:} a \emph{library} (no separate cluster) that runs in your app, reads/writes Kafka topics, and keeps local state (RocksDB) backed by compacted \textbf{changelog topics} for fault tolerance. Great for Kafka-to-Kafka transforms, joins, aggregations. Scales by adding instances (rebalance like a consumer group).
+\item
+  \textbf{Apache Flink:} a \emph{distributed cluster} with true streaming, sophisticated state, event-time processing, exactly-once via \textbf{checkpoints} (periodic consistent snapshots of all operator state to durable storage; on failure, restore from the last checkpoint). The choice for complex, large-scale, low-latency stateful processing (Uber pricing, Netflix). Heavier to operate.
+\end{itemize}
+
+\subsection{Stateless vs Stateful Processing}\label{stateless-vs-stateful-processing}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Stateless:} each record processed independently --- \texttt{filter}, \texttt{map}, \texttt{enrich-by-lookup}. Trivial to scale and recover (no state to lose).
+\item
+  \textbf{Stateful:} the result depends on prior records --- counts, sums, joins, windows, deduplication. Requires durable, partitioned state and fault-tolerant recovery (changelog/checkpoints). This is where the hard problems live.
+\end{itemize}
+
+\subsection{Windowing}\label{windowing}
+
+Unbounded streams have no "end," so aggregations operate over \textbf{windows} of time:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TUMBLING (fixed, non}\OperatorTok{{-}}\NormalTok{overlapping):   [}\DecValTok{0}\NormalTok{–}\DecValTok{5}\NormalTok{)[}\DecValTok{5}\NormalTok{–}\DecValTok{10}\NormalTok{)[}\DecValTok{10}\NormalTok{–}\DecValTok{15}\NormalTok{)   each event }\KeywordTok{in}\NormalTok{ exactly ONE window}
+                                     \OperatorTok{|}\NormalTok{████}\OperatorTok{|}\NormalTok{████}\OperatorTok{|}\NormalTok{████}\OperatorTok{|}\NormalTok{     e.g. }\StringTok{"count per 5{-}min bucket"}
+
+\NormalTok{SLIDING }\OperatorTok{/}\NormalTok{ HOPPING (overlapping):     [}\DecValTok{0}\NormalTok{–}\DecValTok{5}\NormalTok{)                each event }\KeywordTok{in}\NormalTok{ MULTIPLE windows}
+\NormalTok{                                       [}\DecValTok{2}\NormalTok{–}\DecValTok{7}\NormalTok{)               e.g. }\StringTok{"5{-}min count, updated every 2 min"}
+\NormalTok{                                         [}\DecValTok{4}\NormalTok{–}\DecValTok{9}\NormalTok{)}
+
+\NormalTok{SESSION (activity}\OperatorTok{{-}}\NormalTok{gap based):        [}\OperatorTok{==}\NormalTok{ burst }\OperatorTok{==}\NormalTok{]  gap   [}\OperatorTok{==}\NormalTok{ burst }\OperatorTok{==}\NormalTok{]}
+\NormalTok{                                     window closes after N idle minutes}\OperatorTok{;}\NormalTok{ per}\OperatorTok{{-}}\NormalTok{key}
+\NormalTok{                                     e.g. }\StringTok{"user session = activity until 30{-}min idle"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1563}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3752}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4685}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Window
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shape
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Tumbling} & Fixed, contiguous, no overlap & Per-interval metrics ("orders per minute") \\
+\rowcolor{zebra}
+\textbf{Sliding/Hopping} & Fixed size, overlapping by a step & Moving averages, "last 5 min refreshed every 1 min" \\
+\textbf{Session} & Dynamic, closes after inactivity gap & User sessions, bursty per-entity activity \\
+\end{longtable}
+
+\subsection{Event Time vs Processing Time, and Watermarks}\label{event-time-vs-processing-time-and-watermarks}
+
+The deep problem of stream processing:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Event time:} when the event \emph{actually happened} (timestamp in the event --- e.g., the click happened at 12:00:03).
+\item
+  \textbf{Processing time:} when your system \emph{processes} it (e.g., it arrived at 12:00:09 due to a mobile network delay).
+\end{itemize}
+
+These diverge because of network delays, retries, offline buffering, and out-of-order delivery. If you window by \emph{processing time}, a late-but-important event lands in the wrong bucket \(\rightarrow\) wrong analytics. Correct systems window by \textbf{event time}.
+
+But event-time windows raise a question: when is a window "complete" if late events can still trickle in? You can\textquotesingle t wait forever. The answer is a \textbf{watermark} --- a heuristic assertion "I believe I\textquotesingle ve now seen all events up to event-time T." When the watermark passes a window\textquotesingle s end, the window is \emph{closed and emitted}. Events arriving after the watermark are \textbf{late} and handled by policy (drop, side-output, or update via allowed-lateness).
+
+\setcodelang{}
+
+\begin{verbatim}
+event time:  12:00:00 ─────────────────────────► 12:00:10
+arrivals (processing order):  03, 01, 05, 04, [09 arrives but ts=02 ← out of order]
+watermark advances:  "seen everything up to 12:00:04" → close window [00–05)
+   the ts=02 event arriving AFTER the watermark = LATE → drop or side-output
+\end{verbatim}
+
+\textbf{Interview takeaway:} "The hard part of stream processing isn\textquotesingle t the aggregation --- it\textquotesingle s \emph{time}. Process by \textbf{event time}, not arrival time, and use \textbf{watermarks} to decide when a window is complete and how to treat late events. Fault tolerance for the resulting state comes from changelog topics (Kafka Streams) or checkpoints (Flink)."
+
+\section{Designing an Async Pipeline (Worked Example)}\label{designing-an-async-pipeline-worked-example}
+
+\textbf{Prompt:} Design the backend for \textbf{order processing + notifications} at an e-commerce site. When a user places an order we must: persist it, reserve inventory, charge payment, schedule shipping, and notify the user (email/SMS/push) --- reliably, at scale, without blocking the checkout response.
+
+\subsection{1. What\textquotesingle s sync vs async?}\label{1-whats-sync-vs-async}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sync (on the critical path):} validate cart, check inventory availability (a quick read), authorize payment \emph{hold} (user must know immediately if the card is declined), persist the order. Respond \texttt{201\ Created} fast.
+\item
+  \textbf{Async (off the path):} capture/settle payment, decrement inventory, schedule shipping, send notifications, update analytics/search index, fraud scoring. None of these should make the user wait.
+\end{itemize}
+
+\subsection{2. Topology}\label{2-topology}
+
+\setcodelang{}
+
+\begin{verbatim}
+                                            ┌─────────────────────────────────────┐
+Client ──POST /orders──► OrderService       │            KAFKA                      │
+                           │ tx:             │  topic "orders"  (key=orderId)        │
+                           │  - INSERT order │     ┌── group: payment                │
+                           │  - INSERT outbox├─CDC─►│   ── group: inventory           │
+                           ▼                 │     └── group: notifications ─► SNS    │
+                        201 Created          │  topic "order.retry.*" + "orders.DLT"  │
+                                             └─────────────────────────────────────┘
+                                                              │ (notifications)
+                                                              ▼
+                                              SNS "notify" ──► SQS email-q  ──► Email worker
+                                                          └──► SQS sms-q    ──► SMS worker
+                                                          └──► SQS push-q   ──► Push worker
+\end{verbatim}
+
+\subsection{3. Why these choices}\label{3-why-these-choices}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Kafka for the core event backbone:} we need \emph{multiple independent consumers} (payment, inventory, notifications, fraud, analytics) of the \emph{same} \texttt{OrderCreated} event, plus \textbf{replay} (reprocess a day\textquotesingle s orders after a bug) and \textbf{retention} (audit). That\textquotesingle s the log model \(\rightarrow\) Kafka, not SQS.
+\item
+  \textbf{Outbox + CDC} on \texttt{OrderService}: persisting the order and emitting \texttt{OrderCreated} must be atomic --- the \textbf{dual-write problem}. We write the order and an \texttt{outbox} row in one DB transaction; Debezium (CDC) tails the WAL and publishes to Kafka. No lost or phantom events.
+\item
+  \textbf{SNS\(\rightarrow\)SQS fan-out for notifications:} email/SMS/push are independent side-effects with different rate limits and failure profiles. SNS broadcasts; each SQS queue gives that channel its own buffer, retry, and DLQ. If the SMS provider is down, its queue backs up without affecting email.
+\end{itemize}
+
+\subsection{4. Partitioning \& ordering}\label{4-partitioning--ordering}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{orders} topic keyed by \textbf{\texttt{orderId}} \(\rightarrow\) all events for one order (\texttt{Created}, \texttt{PaymentCaptured}, \texttt{Shipped}) are strictly ordered within a partition. Different orders parallelize across partitions.
+\item
+  \textbf{Partition count:} size for peak. Say peak 5,000 orders/s, a consumer handles \textasciitilde500/s \(\rightarrow\) \textasciitilde10--12 partitions (round up to leave headroom; over-provision modestly since increasing later rescrambles keys). Replication factor 3, \texttt{min.insync.replicas=2}, \texttt{acks=all}.
+\end{itemize}
+
+\subsection{5. Delivery semantics \& idempotency}\label{5-delivery-semantics--idempotency}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{At-least-once} everywhere: producers \texttt{acks=all}+idempotent; consumers commit offsets \emph{after} processing.
+\item
+  \textbf{Idempotent consumers} are mandatory --- redelivery \emph{will} happen. The \textbf{payment} consumer is the scariest: a duplicate must not double-charge.
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ handle\_order\_created(event, db):}
+\NormalTok{    order\_id }\OperatorTok{=}\NormalTok{ event[}\StringTok{"orderId"}\NormalTok{]}
+    \ControlFlowTok{with}\NormalTok{ db.transaction() }\ImportTok{as}\NormalTok{ tx:}
+        \CommentTok{\# inbox/dedup: charge at most once per order}
+        \ControlFlowTok{try}\NormalTok{:}
+\NormalTok{            tx.execute(}\StringTok{"INSERT INTO charged\_orders(order\_id) VALUES (}\SpecialCharTok{\%s}\StringTok{)"}\NormalTok{, (order\_id,))}
+        \ControlFlowTok{except}\NormalTok{ UniqueViolation:}
+            \ControlFlowTok{return}\NormalTok{ ACK                      }\CommentTok{\# already charged → no{-}op}
+        \CommentTok{\# also pass an idempotency key to the payment gateway as a second guard}
+\NormalTok{        payment\_gateway.charge(}
+\NormalTok{            idempotency\_key}\OperatorTok{=}\SpecialStringTok{f"order{-}}\SpecialCharTok{\{}\NormalTok{order\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{,}
+\NormalTok{            amount}\OperatorTok{=}\NormalTok{event[}\StringTok{"total"}\NormalTok{], card}\OperatorTok{=}\NormalTok{event[}\StringTok{"cardToken"}\NormalTok{],}
+\NormalTok{        )}
+    \ControlFlowTok{return}\NormalTok{ ACK}
+\end{Highlighting}
+\end{Shaded}
+
+Two layers of protection: our \texttt{charged\_orders} dedup table \emph{and} the payment gateway\textquotesingle s own \texttt{idempotency\_key}. Belt and suspenders for money.
+
+\subsection{6. Reliability: DLQ, retries, poison}\label{6-reliability-dlq-retries-poison}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Transient failures} (payment gateway 503, inventory service timeout) \(\rightarrow\) \textbf{exponential backoff + jitter} via retry topics (\texttt{orders.retry.5s} \(\rightarrow\) \texttt{orders.retry.1m} \(\rightarrow\) \ldots), max 5 attempts \(\rightarrow\) \texttt{orders.DLT}.
+\item
+  \textbf{Poison messages} (malformed event, deleted product) \(\rightarrow\) straight to \texttt{orders.DLT}, alert on-call, never block the partition.
+\item
+  A DLT consumer/dashboard lets ops inspect and \textbf{replay} fixed messages back onto \texttt{orders}.
+\end{itemize}
+
+\subsection{7. Saga for the cross-service transaction}\label{7-saga-for-the-cross-service-transaction}
+
+Reserve-inventory \(\rightarrow\) charge-payment \(\rightarrow\) schedule-shipping spans three services. Use an \textbf{orchestration saga} (durable state machine, e.g. Temporal/Step Functions) because the flow has branches and we want visibility + clean compensation:
+
+\setcodelang{}
+
+\begin{verbatim}
+ReserveInventory → ChargePayment → ScheduleShipping → ConfirmOrder
+   if ChargePayment fails → compensate: ReleaseInventory, CancelOrder, NotifyUser
+\end{verbatim}
+
+\subsection{8. Notifications: ordering \& dedup}\label{8-notifications-ordering--dedup}
+
+\begin{itemize}
+\tightlist
+\item
+  Order doesn\textquotesingle t matter much across channels, but a user shouldn\textquotesingle t get \emph{two} "order confirmed" emails on redelivery \(\rightarrow\) notification workers dedup on \texttt{(orderId,\ channel,\ templateId)}.
+\item
+  SNS\(\rightarrow\)SQS gives each channel independent back-pressure; SQS DLQ (\texttt{maxReceiveCount=5}) catches a permanently failing address.
+\end{itemize}
+
+\subsection{9. Scaling \& operations}\label{9-scaling--operations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Scale consumers} up to \#partitions; if you need more parallelism, add partitions (accepting the key-remap cost) or split topics.
+\item
+  \textbf{Monitor consumer lag} per group --- rising lag on \texttt{payment} = add consumers or the gateway is slow. Alarm before the backlog becomes user-visible.
+\item
+  \textbf{Schema registry} with backward compatibility so producers can add fields without breaking the fraud/analytics consumers that lag behind on deploys.
+\item
+  \textbf{Multi-AZ} brokers; \texttt{unclean.leader.election=false} (we\textquotesingle d rather reject a write than lose a paid order).
+\end{itemize}
+
+\subsection{10. Recap of the patterns used}\label{10-recap-of-the-patterns-used}
+
+Outbox + CDC (dual-write), at-least-once + idempotent consumers (delivery), partition-by-key (ordering), DLQ + backoff/jitter (poison/transient), SNS\(\rightarrow\)SQS fan-out (independent consumers), saga (distributed transaction), schema registry (evolution), consumer-lag monitoring (back-pressure). That\textquotesingle s the full senior checklist applied to one problem.
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{Async Decoupling (the canonical picture)}\label{async-decoupling-the-canonical-picture}
+
+\setcodelang{}
+
+\begin{verbatim}
+┌──────────┐  publish   ┌──────────────────────┐   consume   ┌──────────┐
+│ Producer │ ─────────► │   BROKER / LOG         │ ──────────►│Consumer 1│
+│(API tier)│            │  durable, replicated   │ ──────────►│Consumer 2│  (group A)
+└──────────┘            │  buffers spikes        │ ──────────►│Consumer 3│
+   fast 202             └──────────┬─────────────┘            └──────────┘
+                          replay   │  fan-out
+                                   └──────────────► (group B: independent offsets)
+\end{verbatim}
+
+\subsection{Kafka vs RabbitMQ Mental Models}\label{kafka-vs-rabbitmq-mental-models}
+
+\setcodelang{}
+
+\begin{verbatim}
+KAFKA (dumb broker, smart consumer)        RABBITMQ (smart broker, dumb consumer)
+log: append-only, retained                 exchange routes → queues (delete on ack)
+consumer owns offset → replay              broker pushes; prefetch limits in-flight
+ordering: per partition                    ordering: per queue (1 consumer)
+routing: hash(key)→partition               routing: direct/topic/fanout/headers
+\end{verbatim}
+
+\subsection{Outbox + CDC Flow}\label{outbox--cdc-flow}
+
+\setcodelang{}
+
+\begin{verbatim}
+   ┌─────────────────────────────────────┐
+   │  APP   BEGIN                          │
+   │   INSERT order                        │  ← single DB transaction
+   │   INSERT outbox(OrderCreated)         │
+   │        COMMIT                         │
+   └──────────────┬──────────────────────┘
+                  │ WAL / binlog
+                  ▼
+            Debezium (CDC)
+                  │ publish
+                  ▼
+        Kafka topic "OrderCreated" ──► consumers (idempotent, dedup by messageId)
+\end{verbatim}
+
+\subsection{Saga (Orchestration) with Compensation}\label{saga-orchestration-with-compensation}
+
+\setcodelang{}
+
+\begin{verbatim}
+                 ┌────────────── ORCHESTRATOR (durable state machine) ──────────────┐
+ start ──►  ReserveInventory ──► ChargePayment ──► ScheduleShipping ──► ConfirmOrder
+                 │ fail              │ fail             │ fail
+                 ▼                   ▼                  ▼
+            (none)            ReleaseInventory   RefundPayment + ReleaseInventory
+                                  + CancelOrder        + CancelOrder
+\end{verbatim}
+
+\subsection{Retry + DLQ Pipeline}\label{retry--dlq-pipeline}
+
+\setcodelang{}
+
+\begin{verbatim}
+main queue ──fail──► retry(5s) ──fail──► retry(30s) ──fail──► retry(5m) ──fail──► DLQ
+   │ success                                                                       │
+   ▼ ack/delete                                                          inspect / fix / replay → main
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1799}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2352}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5849}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+System
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tech
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pattern / Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{LinkedIn activity tracking} & Kafka (origin) & Every page view/click \(\rightarrow\) Kafka \(\rightarrow\) Samza/Flink \(\rightarrow\) search, analytics, recommendations. Replay for new ML features. \\
+\rowcolor{zebra}
+\textbf{Uber dispatch/pricing} & Kafka + Flink & Per-trip ordering (key=tripId); Flink computes real-time surge pricing/ETA with event-time windows. \\
+\textbf{Netflix Keystone} & Kafka (trillions/day) + Flink & Ingest events \(\rightarrow\) route to S3/Elasticsearch/analytics; back-pressure and DLQ at massive scale. \\
+\rowcolor{zebra}
+\textbf{Amazon order pipeline} & SQS + SNS + Kinesis & Decoupled fulfillment; SNS\(\rightarrow\)SQS fan-out; visibility timeout + DLQ; idempotent workers. \\
+\textbf{Stripe payments} & Internal queues + idempotency keys & Every API call takes an \texttt{Idempotency-Key}; retries never double-charge --- textbook idempotent consumer. \\
+\rowcolor{zebra}
+\textbf{Robinhood / trading} & Kafka & Per-account ordering (key=accountId); outbox for order-event consistency; strict at-least-once + dedup. \\
+\textbf{Slack messaging} & Kafka + per-channel ordering & key=channelId \(\rightarrow\) message order preserved per channel; fan-out to all members\textquotesingle{} clients. \\
+\rowcolor{zebra}
+\textbf{CDC pipelines (everywhere)} & Debezium \(\rightarrow\) Kafka & DB changes streamed as events \(\rightarrow\) cache invalidation, search indexing, data lake, microservice sync. \\
+\end{longtable}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One bustling town and its mail/dispatch systems --- every concept is a counter, a courier, or a ledger.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2021}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7979}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Message Queue} & The town\textquotesingle s parcel depot. You drop a parcel and leave; the depot holds it until the right courier is free to deliver. You never wait at the counter for the recipient to receive it. \\
+\rowcolor{zebra}
+\textbf{Decoupling} & You address parcels to "the bakery," not to "Maria who works Tuesdays." The bakery can change staff, hire ten more bakers, or close on Sundays --- your parcel still arrives, and you never had to know who\textquotesingle d handle it. \\
+\textbf{Load leveling} & On festival day a thousand parcels flood in at noon; the depot\textquotesingle s six couriers deliver steadily through the evening. The rush is \emph{spread over hours} instead of trampling the couriers all at once. \\
+\rowcolor{zebra}
+\textbf{Back-pressure} & When the depot\textquotesingle s shelves are full, the front desk stops accepting new parcels and tells senders "come back in an hour" --- the "full" signal travels back to the senders so the depot never collapses under its own backlog. \\
+\textbf{Queue vs Pub/Sub} & A \emph{work queue} is the depot\textquotesingle s job board --- each delivery slip is taken by exactly one courier and torn down once done. \emph{Pub/sub} is the town crier --- he shouts the news once and \emph{every} shopkeeper hears their own copy. \\
+\rowcolor{zebra}
+\textbf{Log (Kafka)} & The town\textquotesingle s permanent ledger of every event, written in ink and never erased. Each reader keeps a bookmark (offset); two historians can read the same ledger at their own pace, and anyone can flip back to re-read last year. \\
+\textbf{Delete-on-ack vs retained} & The job board \emph{tears down} a slip when the courier reports done (it\textquotesingle s gone). The ledger \emph{keeps} every entry; readers just move their bookmark forward --- the ink stays. \\
+\rowcolor{zebra}
+\textbf{At-least-once + idempotency} & A nervous courier, unsure the first delivery registered, delivers the same parcel twice. The shopkeeper checks the parcel\textquotesingle s seal number against her logbook: already received \(\rightarrow\) she sets it aside instead of paying for it again. \\
+\textbf{Exactly-once impossibility (Two Generals)} & Two captains across a foggy valley must attack together, sending runners who may be caught. Each runner needs a runner back confirming receipt, then a runner confirming \emph{that}\ldots{} forever. No number of runners makes both certain --- so they plan for "the order might arrive twice or not at all." \\
+\rowcolor{zebra}
+\textbf{Partition-by-key / ordering} & The depot sorts all of one household\textquotesingle s parcels onto a single shelf so they\textquotesingle re delivered in the order sent; different households\textquotesingle{} shelves are worked in parallel. You never need \emph{the whole town} in one order --- just each household\textquotesingle s parcels in order. \\
+\textbf{Global ordering kills parallelism} & Insisting \emph{every} parcel in town be delivered in strict order means one courier doing everything single-file --- the other five stand idle. Per-household order lets all six work at once. \\
+\rowcolor{zebra}
+\textbf{Dead Letter Queue} & The depot\textquotesingle s "undeliverable" bin: a parcel with a smudged address that\textquotesingle s failed delivery five times is set aside there so the rest of the round flows, and a supervisor investigates it later. \\
+\textbf{Poison message} & A parcel rigged to jam the sorting machine. Without an "undeliverable" bin, it jams the line forever and nothing behind it moves. The bin gets it out of the way. \\
+\rowcolor{zebra}
+\textbf{Dual-write / Outbox} & You must both record a sale in your shop\textquotesingle s ledger \emph{and} notify the depot. Instead of two risky separate acts, you write the sale \emph{and} an outgoing-notice in the same ledger stroke; a clerk later reads the outgoing-notices and walks them to the depot --- so a power cut can never leave one done without the other. \\
+\textbf{Saga} & A multi-shop layaway: the tailor cuts cloth, the dyer colours it, the seamstress sews. If the dyer\textquotesingle s vat spills, each shop has a written \emph{undo} note --- the tailor un-cuts (returns the bolt), and the layaway unwinds cleanly instead of leaving a half-made coat nobody paid for. \\
+\rowcolor{zebra}
+\textbf{Schema registry} & The town\textquotesingle s standard parcel-label format kept at the post office. Before printing new labels, you check them against the standard; old depots can still read new labels (they ignore the extra fields), so nobody\textquotesingle s deliveries break when the format evolves. \\
+\textbf{Consumer lag} & The height of the depot\textquotesingle s unworked-parcel pile. A pile that\textquotesingle s steady during a rush is fine; a pile that keeps \emph{growing} means you need more couriers before customers start complaining. \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\subsection{Three shapes: "QPL --- Queue, Publish, Log"}\label{three-shapes-qpl--queue-publish-log}
+
+\setcodelang{}
+
+\begin{verbatim}
+Q ueue  → to-do list, ONE worker, delete-on-ack       (RabbitMQ, SQS)
+P ub/sub→ loudspeaker, EVERY subscriber gets a copy    (SNS, fanout)
+L og    → ledger, retained + replayable, own offset    (Kafka, Kinesis)
+\end{verbatim}
+
+\subsection{\texorpdfstring{Delivery semantics: "0-1-\(\infty\)"}{Delivery semantics: "0-1-\textbackslash infty"}}\label{delivery-semantics-0-1-infty}
+
+\setcodelang{}
+
+\begin{verbatim}
+At-MOST-once  (0 or 1) → may LOSE,     never dup → commit BEFORE process, acks=0
+At-LEAST-once (1+)     → never lose,    may DUP   → commit AFTER process, acks=all  ✅default
+Exactly-once  (1)      → DELIVERY impossible (Two Generals) → at-least-once + idempotent
+\end{verbatim}
+
+\subsection{Ack timing: "Commit After = At-least-once"}\label{ack-timing-commit-after--at-least-once}
+
+\setcodelang{}
+
+\begin{verbatim}
+commit BEFORE process → crash = LOSS   (at-most-once)
+commit AFTER  process → crash = DUP    (at-least-once)  → idempotency saves you
+\end{verbatim}
+
+\subsection{Kafka durability triad: "3, 2, all"}\label{kafka-durability-triad-3-2-all}
+
+\setcodelang{}
+
+\begin{verbatim}
+Replication.factor = 3
+Min.insync.replicas = 2
+Acks = all
+→ survives 1 broker down, zero loss
+\end{verbatim}
+
+\subsection{Kafka invariant: "One partition, one consumer (per group)"}\label{kafka-invariant-one-partition-one-consumer-per-group}
+
+\setcodelang{}
+
+\begin{verbatim}
+partition = unit of PARALLELISM + ORDERING
+#consumers > #partitions → idle consumers
+ordering only WITHIN a partition → partition by KEY
+\end{verbatim}
+
+\subsection{RabbitMQ exchanges: "D-T-F-H"}\label{rabbitmq-exchanges-d-t-f-h}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Direct  }\OperatorTok{=}\NormalTok{ exact key match}
+\NormalTok{Topic   }\OperatorTok{=}\NormalTok{ wildcard (}\OperatorTok{*}\NormalTok{ one word, }\CommentTok{\# many)}
+\NormalTok{Fanout  }\OperatorTok{=}\NormalTok{ broadcast (ignore key)}
+\NormalTok{Headers }\OperatorTok{=}\NormalTok{ match on attributes}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Reliability checklist: "I-D-O-S" (say all four, every design)}\label{reliability-checklist-i-d-o-s-say-all-four-every-design}
+
+\setcodelang{}
+
+\begin{verbatim}
+I dempotent consumers (dedup table)
+D LQ + retry with backoff + jitter (poison)
+O utbox + CDC (dual-write)
+S aga (distributed transaction)
+\end{verbatim}
+
+\subsection{Outbox vs Inbox}\label{outbox-vs-inbox}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{OUTBOX }\OperatorTok{=}\NormalTok{ produce}\OperatorTok{{-}}\NormalTok{once}\OperatorTok{{-}}\NormalTok{effectively  (write event }\KeywordTok{in}\NormalTok{ same tx }\ImportTok{as}\NormalTok{ business data)}
+\NormalTok{INBOX  }\OperatorTok{=}\NormalTok{ consume}\OperatorTok{{-}}\NormalTok{once}\OperatorTok{{-}}\NormalTok{effectively  (record messageId }\KeywordTok{in}\NormalTok{ same tx }\ImportTok{as}\NormalTok{ side effect)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Stream-processing hard part: "Event time + Watermark"}\label{stream-processing-hard-part-event-time--watermark}
+
+\setcodelang{}
+
+\begin{verbatim}
+window by EVENT time, not arrival time
+WATERMARK = "I've seen everything up to T" → close window; later = LATE
+\end{verbatim}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: When would you use a message queue instead of a synchronous API call?}\label{q1-when-would-you-use-a-message-queue-instead-of-a-synchronous-api-call}
+
+\textbf{Model answer:} "Use async messaging when the work can happen \emph{after} you respond to the user, and you want to decouple availability and latency. Three triggers: (1) \textbf{load leveling} --- the producer is bursty and a queue smooths spikes so the consumer (and DB) aren\textquotesingle t overwhelmed; (2) \textbf{decoupling} --- you want to add consumers without touching the producer, or one event has many independent consumers; (3) \textbf{resilience} --- if a downstream is down, the queue buffers instead of failing the user\textquotesingle s request. Keep it synchronous when the caller genuinely needs the answer to proceed --- a price quote, an auth check, an inventory-availability read. The tell is: \textquotesingle does the user need this result before we can respond?\textquotesingle{} If no \(\rightarrow\) async."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{What\textquotesingle s the cost of going async?} \(\rightarrow\) Eventual consistency, duplicate handling, ordering concerns, operational complexity (DLQs, lag monitoring), and latency under load.
+\item
+  \emph{How does availability change?} \(\rightarrow\) Sync chains multiply availability (0.999\(^4\) \(\approx\) 99.6\%); async makes the producer\textquotesingle s availability independent of consumers.
+\end{itemize}
+
+\subsection{Q2: Explain the difference between a queue, pub/sub, and a log.}\label{q2-explain-the-difference-between-a-queue-pubsub-and-a-log}
+
+\textbf{Model answer:} "A \textbf{queue} is point-to-point: each message goes to exactly one of the competing consumers and is deleted on ack --- a to-do list (RabbitMQ, SQS). \textbf{Pub/sub} is fan-out: each subscriber gets its own copy of every message --- a broadcast (SNS, fanout exchange). A \textbf{log} is append-only and retained: consumers track their own offset, reading is non-destructive, so you get replay, multiple independent consumer groups, and event sourcing (Kafka, Kinesis). The defining axis is \emph{delete-on-read} (broker-centric) vs \emph{retained-and-replayable} (log-centric). The moment a requirement mentions replay or multiple independent downstreams, choose a log."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Kafka does both queue and pub/sub --- how?} \(\rightarrow\) Within one consumer group, partitions split across consumers (queue behavior); across groups, every group sees everything (pub/sub) --- plus retention.
+\item
+  \emph{When RabbitMQ over Kafka?} \(\rightarrow\) Complex routing, per-message TTL/priority/delay, RPC patterns, lower-throughput task queues.
+\end{itemize}
+
+\subsection{Q3: Why is exactly-once delivery impossible, and what do you do instead?}\label{q3-why-is-exactly-once-delivery-impossible-and-what-do-you-do-instead}
+
+\textbf{Model answer:} "It\textquotesingle s the Two Generals Problem. After a consumer processes a message it must ack the broker, but the ack can be lost --- by a network drop or a crash right after processing. The broker then can\textquotesingle t tell \textquotesingle processed, ack lost\textquotesingle{} from \textquotesingle crashed before processing.\textquotesingle{} Its only options are redeliver (risk duplicate) or not (risk loss); there\textquotesingle s no third choice, so exactly-once \emph{delivery} is impossible. The practical answer is \textbf{at-least-once delivery + idempotent consumers}: commit the offset \emph{after} processing (never lose), and make processing dedup duplicates --- typically a dedup/inbox table keyed by messageId, written in the same transaction as the side effect. That gives exactly-once \emph{processing}, which is what people actually want. Kafka transactions give true exactly-once, but only Kafka-to-Kafka --- the moment you write to an external DB or call an API, you\textquotesingle re back to idempotency."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Show the dedup code.} \(\rightarrow\) Insert messageId with a unique constraint in the same tx as the business write; UniqueViolation \(\rightarrow\) no-op.
+\item
+  \emph{What about double-charging a card?} \(\rightarrow\) Two layers: your dedup table \emph{and} the gateway\textquotesingle s idempotency key.
+\end{itemize}
+
+\subsection{Q4: How does Kafka guarantee ordering, and what are the limits?}\label{q4-how-does-kafka-guarantee-ordering-and-what-are-the-limits}
+
+\textbf{Model answer:} "Ordering is guaranteed \textbf{only within a partition} --- each partition is an append-only log. There\textquotesingle s no global order across a topic, because that would require a single serialization point and kill parallelism. To get the ordering you need, you partition by \textbf{key}: all events for one entity (orderId, accountId) hash to the same partition and are strictly ordered relative to each other, while different entities parallelize across partitions. You almost never need global order --- you need per-entity order, and partition-by-key gives exactly that. The catch: ordering breaks if you increase partition count (keys rehash) or run more than one in-flight request without idempotence (retries can reorder)."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{If you truly need global order?} \(\rightarrow\) One partition, one consumer --- no horizontal scaling. Question whether the requirement is real.
+\item
+  \emph{How do you handle out-of-order events?} \(\rightarrow\) Version numbers / last-write-wins, or event-time buffering with watermarks.
+\end{itemize}
+
+\subsection{Q5: What is the dual-write problem and how do you solve it?}\label{q5-what-is-the-dual-write-problem-and-how-do-you-solve-it}
+
+\textbf{Model answer:} "A service often needs to update its DB \emph{and} publish an event atomically, but the DB and broker are separate systems --- you can\textquotesingle t put both in one transaction. So a crash between them leaves either a committed order with no event (lost event) or a published event for an order that rolled back (phantom event). Wrapping them in either order can\textquotesingle t fix the crash window. The solution is the \textbf{transactional outbox}: in the same DB transaction as the business write, insert a row into an \texttt{outbox} table. A separate relay --- a poller or, better, CDC (Debezium tailing the WAL) --- reads the outbox and publishes to the broker at-least-once. Because the order and outbox row commit together, you can\textquotesingle t have one without the other; consumers dedup on messageId to absorb the at-least-once relay."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Poll vs CDC?} \(\rightarrow\) CDC has no polling lag, no extra DB query load, and reads straight from the WAL --- preferred at scale.
+\item
+  \emph{What\textquotesingle s the consumer-side mirror?} \(\rightarrow\) The inbox pattern: record messageId in the same tx as the side effect.
+\end{itemize}
+
+\subsection{Q6: Walk me through SQS visibility timeout and DLQs.}\label{q6-walk-me-through-sqs-visibility-timeout-and-dlqs}
+
+\textbf{Model answer:} "When a consumer receives an SQS message, SQS hides it from other consumers for the \textbf{visibility timeout} (default 30s). The consumer processes and calls \texttt{DeleteMessage} (the ack). If it deletes in time, done. If it crashes or runs long, the timeout expires, the message reappears, and another consumer gets it --- that\textquotesingle s how SQS achieves at-least-once. You set the timeout above your p99 processing time, or extend it dynamically with \texttt{ChangeMessageVisibility} for long jobs. For poison messages, you configure a \textbf{redrive policy} with \texttt{maxReceiveCount}: after, say, 5 receives, SQS automatically moves the message to a \textbf{DLQ} for inspection and replay, so it stops cycling through your workers. Always use \textbf{long polling} (\texttt{WaitTimeSeconds=20}) to avoid wasteful empty receives."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Standard vs FIFO?} \(\rightarrow\) Standard: best-effort order, at-least-once, huge throughput. FIFO: strict order per MessageGroupId, exactly-once processing (5-min dedup), 300/s per group.
+\item
+  \emph{Why SNS\(\rightarrow\)SQS rather than SNS\(\rightarrow\)Lambda?} \(\rightarrow\) The SQS buffer gives each consumer durability and back-pressure; one slow consumer doesn\textquotesingle t affect others.
+\end{itemize}
+
+\subsection{Q7: Design a notification system that sends email, SMS, and push for an event.}\label{q7-design-a-notification-system-that-sends-email-sms-and-push-for-an-event}
+
+\textbf{Model answer:} "One event, three independent channels with different rate limits and failure profiles \(\rightarrow\) \textbf{SNS\(\rightarrow\)SQS fan-out}. The producer publishes \texttt{NotifyUser} once to an SNS topic; SNS delivers a copy to three SQS queues (email, sms, push), each consumed by its own worker pool. Each queue is an independent buffer with its own retry and DLQ, so if the SMS provider is down, its queue backs up without touching email. Workers are \textbf{idempotent} --- dedup on \texttt{(userId,\ eventId,\ channel)} so a redelivery doesn\textquotesingle t send a second email. Retries use \textbf{exponential backoff + jitter}; after max attempts \(\rightarrow\) DLQ + alert. For provider rate limits, the pull-based SQS consumers throttle naturally (back-pressure). If I needed replay or analytics on notifications, I\textquotesingle d put Kafka in front instead of/alongside SNS."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Ordering?} \(\rightarrow\) Usually irrelevant across channels; if a user mustn\textquotesingle t get \textquotesingle shipped\textquotesingle{} before \textquotesingle confirmed,\textquotesingle{} partition by userId in Kafka.
+\item
+  \emph{Dedup window?} \(\rightarrow\) Keep processed eventIds as long as the message could be redelivered (retention + visibility timeout).
+\end{itemize}
+
+\subsection{Q8: What is a poison message and how do you handle it?}\label{q8-what-is-a-poison-message-and-how-do-you-handle-it}
+
+\textbf{Model answer:} "A poison message is one that can never be processed successfully --- corrupt payload, schema mismatch, or a referenced entity that no longer exists. The danger is head-of-line blocking: if you retry it forever (or \texttt{requeue=true} in RabbitMQ), it loops, pins a worker, and in an ordered partition blocks everything behind it. The fix is a \textbf{retry cap + DLQ}: retry transient failures a bounded number of times with exponential backoff and jitter, and after the cap, move the message to a dead-letter queue. That unblocks the stream, preserves the bad message for debugging, and lets ops fix and replay it. Distinguishing transient (retry) from permanent (DLQ immediately) failures in code avoids wasting retries on hopeless messages."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{RabbitMQ specifics?} \(\rightarrow\) \texttt{basic.nack(requeue=false)} \(\rightarrow\) DLX; never \texttt{requeue=true} on poison (hot loop).
+\item
+  \emph{Kafka specifics?} \(\rightarrow\) Retry-topic chain + a dead-letter topic; skip the offset past it if needed.
+\end{itemize}
+
+\subsection{Q9: Compare Kafka and RabbitMQ. When would you pick each?}\label{q9-compare-kafka-and-rabbitmq-when-would-you-pick-each}
+
+\textbf{Model answer:} "RabbitMQ is a \textbf{smart broker, dumb consumer} --- routing logic (direct/topic/fanout/headers exchanges) lives in the broker, messages are deleted on ack, and you get per-message control: TTL, priority, delayed delivery, requeue. Kafka is a \textbf{dumb broker, smart consumer} --- the broker just appends to a partitioned log; consumers own their offsets, data is retained and replayable, and ordering is per-partition. Pick \textbf{RabbitMQ} for complex routing, task queues, RPC patterns, per-message priorities/TTL, and moderate throughput. Pick \textbf{Kafka} for event streaming, replay, event sourcing, CDC, many independent consumer groups, stream processing, and extreme throughput (millions/s via sequential disk, zero-copy, batching). If a requirement says \textquotesingle replay history\textquotesingle{} or \textquotesingle three teams independently consume the same stream,\textquotesingle{} that\textquotesingle s Kafka."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why is Kafka so fast?} \(\rightarrow\) Sequential disk writes + page cache, zero-copy sendfile, batching, compression.
+\item
+  \emph{Does RabbitMQ scale?} \(\rightarrow\) Yes (clustering, quorum queues), but its model favors routing flexibility over the raw throughput and retention Kafka gives.
+\end{itemize}
+
+\subsection{Q10: What\textquotesingle s the difference between at-least-once and exactly-once, and how do you make a consumer idempotent?}\label{q10-whats-the-difference-between-at-least-once-and-exactly-once-and-how-do-you-make-a-consumer-idempotent}
+
+\textbf{Model answer:} "At-least-once never loses but may duplicate (commit offset after processing, producer retries on ack failure). Exactly-once delivery is impossible, so we approximate it with at-least-once + idempotency = exactly-once \emph{processing}. To make a consumer idempotent: (1) a \textbf{dedup/inbox table} --- insert the messageId with a unique constraint in the same transaction as the side effect; a duplicate hits the constraint and no-ops; (2) \textbf{natural idempotency} --- use set-operations (\texttt{status=\textquotesingle{}PAID\textquotesingle{}}) or upserts instead of increments/inserts; (3) \textbf{conditional writes} --- \texttt{UPDATE\ ...\ WHERE\ version\ =\ N} so a stale duplicate no-ops. The dedup row and the business effect must commit atomically, or a crash between them reintroduces loss or duplicates."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{How long do you keep dedup keys?} \(\rightarrow\) As long as a redelivery is possible (retention + visibility/redelivery window), then TTL them.
+\item
+  \emph{Kafka exactly-once?} \(\rightarrow\) Idempotent producer (PID+sequence) + transactions (atomic consume-process-produce with \texttt{read\_committed}), Kafka-to-Kafka only.
+\end{itemize}
+
+\subsection{Q11: How do consumer groups and rebalancing work in Kafka, and what\textquotesingle s the operational risk?}\label{q11-how-do-consumer-groups-and-rebalancing-work-in-kafka-and-whats-the-operational-risk}
+
+\textbf{Model answer:} "A consumer group shares a topic\textquotesingle s partitions --- each partition is owned by exactly one consumer in the group, so the group\textquotesingle s max parallelism is the partition count. When a consumer joins or leaves (deploy, crash, scale), Kafka \textbf{rebalances}: reassigns partitions. Old eager rebalancing was stop-the-world --- every consumer revoked everything and processing halted; \textbf{cooperative/incremental} rebalancing (2.4+) only moves the partitions that must move. The operational risk is \textbf{rebalance storms}: a slow consumer that exceeds \texttt{max.poll.interval.ms} gets evicted, triggering a rebalance, redelivery (duplicates), and a latency spike --- repeatedly. Mitigate with cooperative rebalancing, static membership (\texttt{group.instance.id}) to survive rolling restarts, tuning \texttt{max.poll.records}, and moving heavy work off the poll thread. Monitor \textbf{consumer lag} to know if you need more consumers (up to \#partitions)."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{More consumers than partitions?} \(\rightarrow\) Extras sit idle. Add partitions to scale further (accepting key remap).
+\item
+  \emph{Auto vs manual offset commit?} \(\rightarrow\) Manual commit after processing for at-least-once; auto-commit can advance past unprocessed messages (silent loss).
+\end{itemize}
+
+\subsection{Q12: Explain event time vs processing time and watermarks in stream processing.}\label{q12-explain-event-time-vs-processing-time-and-watermarks-in-stream-processing}
+
+\textbf{Model answer:} "Event time is when the event actually happened (a timestamp in the event); processing time is when your system handles it. They diverge due to network delays, retries, offline buffering, and out-of-order delivery --- a mobile click at 12:00:03 might arrive at 12:00:09. Windowing by processing time puts late events in the wrong bucket, corrupting analytics, so correct systems window by \textbf{event time}. But then you need to decide when an event-time window is \textquotesingle complete,\textquotesingle{} since late events can still trickle in. A \textbf{watermark} is a heuristic --- \textquotesingle I believe I\textquotesingle ve seen all events up to event-time T.\textquotesingle{} When the watermark passes a window\textquotesingle s end, the window closes and emits; events arriving after are \textquotesingle late\textquotesingle{} and handled by policy (drop, side-output, or update with allowed lateness). Fault tolerance for the windowed state comes from changelog topics (Kafka Streams) or checkpoints (Flink)."
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Window types?} \(\rightarrow\) Tumbling (fixed, non-overlapping), sliding/hopping (overlapping), session (activity-gap).
+\item
+  \emph{Kafka Streams vs Flink?} \(\rightarrow\) Streams is an embedded library (Kafka-to-Kafka, RocksDB state); Flink is a cluster with richer event-time/state and checkpoint-based exactly-once.
+\end{itemize}
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\subsection{The Exactly-Once Myth (system level)}\label{the-exactly-once-myth-system-level}
+
+Kafka markets "exactly-once semantics," but it\textquotesingle s exactly-once \emph{within the Kafka boundary}: idempotent producer dedups retries, transactions make consume-process-produce atomic, \texttt{read\_committed} hides aborted records. The instant a consumer writes to an external system (SQL, Redis, an HTTP API, an email), Kafka transactions no longer cover it --- you\textquotesingle re at-least-once across that boundary and \emph{must} use idempotent consumers. The only way to extend exactly-once outward is to enroll the external write and the offset commit in \emph{one} transactional store (e.g., write output and committed offset to the same Postgres in one tx). Always clarify "exactly-once \emph{processing}, end-to-end via idempotency" vs "Kafka\textquotesingle s internal exactly-once."
+
+\subsection{Throughput vs Latency Tuning}\label{throughput-vs-latency-tuning}
+
+\texttt{linger.ms} and \texttt{batch.size} are the explicit dial: \texttt{linger.ms=0} minimizes latency but sends tiny batches (more requests, less compression, lower throughput); \texttt{linger.ms=20}+\texttt{batch.size=64KB} maximizes throughput at the cost of up to 20ms added latency. Compression (\texttt{zstd}/\texttt{lz4}) trades CPU for network/storage and \emph{improves} with bigger batches. There\textquotesingle s no universal setting --- a clickstream pipeline wants throughput; a fraud-blocking path wants latency.
+
+\subsection{Choosing Partition Count Is a One-Way-ish Door}\label{choosing-partition-count-is-a-one-way-ish-door}
+
+Too few partitions caps consumer parallelism; too many costs file handles, memory, longer rebalances, and worse latency. Increasing partitions later \textbf{rescrambles key\(\rightarrow\)partition mapping}, breaking per-key ordering for in-flight data and any compaction assumptions. So you over-provision modestly up front (e.g., 2--3\(\times\) current need) rather than constantly resizing. This is a classic "explain the trade-off" senior probe.
+
+\subsection{Quorum Queues and Broker Durability}\label{quorum-queues-and-broker-durability}
+
+RabbitMQ classic mirrored queues had data-loss edge cases under partitions; \textbf{quorum queues} (Raft-based) are the modern durable choice --- analogous to Kafka\textquotesingle s ISR. Knowing that messaging brokers themselves are distributed systems (replication, leader election, split-brain) --- and that \texttt{acks}/\texttt{min.insync.replicas}/\texttt{unclean.leader.election} are exactly the CAP/quorum dials from distributed systems --- ties the whole topic together.
+
+\subsection{Back-Pressure vs Buffering Forever}\label{back-pressure-vs-buffering-forever}
+
+Load leveling only works for \emph{transient} spikes. A \emph{sustained} overload turns the queue into an unbounded buffer that eventually exhausts disk and takes the broker (and everyone) down. The senior insight: a queue is not a substitute for capacity --- it\textquotesingle s a shock absorber. You need back-pressure (lag alarms, pull-based consumers, publisher rejection propagating 503s to clients) and autoscaling of consumers tied to lag.
+
+\subsection{Ordering vs Idempotency vs Delivery Semantics Are Orthogonal}\label{ordering-vs-idempotency-vs-delivery-semantics-are-orthogonal}
+
+Candidates conflate them. Ordering is "in what sequence" (per-partition). Idempotency is "safe to reprocess" (dedup). Delivery semantics is "how many times" (at-least-once). You can have ordered-but-duplicated, unordered-but-deduped, etc. A complete design addresses all three explicitly.
+
+\subsection{Schema Evolution Is a Production Outage Waiting to Happen}\label{schema-evolution-is-a-production-outage-waiting-to-happen}
+
+Producer and consumer deploy on different schedules. A breaking schema change (renaming/removing a field, changing a type) deserializes into garbage or exceptions on the lagging side. A schema registry with enforced \textbf{backward} compatibility (so new consumers read old data) and \textbf{forward} compatibility (so old consumers tolerate new data) is what lets teams deploy independently --- the entire point of decoupling.
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3792}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6208}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mistake
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Correction
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+"I\textquotesingle ll use a queue" without specifying queue vs log & They have different semantics (delete-on-ack vs retained/replayable). Name which and why. \\
+\rowcolor{zebra}
+"Kafka guarantees exactly-once" (full stop) & Only within Kafka. External writes need idempotent consumers. Exactly-once \emph{delivery} is impossible (Two Generals). \\
+Treating exactly-once delivery as achievable & It\textquotesingle s provably impossible over a lossy channel. Do at-least-once + idempotency = exactly-once \emph{processing}. \\
+\rowcolor{zebra}
+Committing the offset / acking \emph{before} processing & That\textquotesingle s at-most-once --- a crash loses the message. Commit \emph{after} processing for at-least-once. \\
+Forgetting the \textbf{dual-write problem} & DB + broker can\textquotesingle t share a transaction \(\rightarrow\) lost/phantom events. Use the Outbox + CDC. \\
+\rowcolor{zebra}
+No idempotency on consumers & At-least-once \emph{will} deliver duplicates. Dedup table / natural idempotency / conditional writes are mandatory. \\
+Expecting global ordering from Kafka & Ordering is per-partition only. Partition by key for per-entity order; global order kills parallelism. \\
+\rowcolor{zebra}
+\texttt{requeue=true} on every failure (RabbitMQ) & Poison messages hot-loop forever. Use bounded retries with backoff \(\rightarrow\) DLX. \\
+No DLQ / no retry strategy & Poison messages block the stream (head-of-line). Always: bounded retries + backoff + jitter \(\rightarrow\) DLQ. \\
+\rowcolor{zebra}
+Retrying with no backoff/jitter & Hammers a struggling downstream and synchronizes retries into a new spike. Exponential backoff + jitter. \\
+Thinking a queue gives infinite capacity & It absorbs \emph{spikes}, not sustained overload. Need back-pressure + consumer autoscaling on lag. \\
+\rowcolor{zebra}
+Ignoring schema evolution & Producer/consumer drift breaks deserialization. Schema registry + compatibility checks. \\
+More consumers than partitions for "more speed" & Extra consumers sit idle. Parallelism is capped by partition count. \\
+\rowcolor{zebra}
+Windowing by processing time & Late events land in wrong buckets. Window by event time; use watermarks for completeness. \\
+\end{longtable}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\subsection{Distributed Systems}\label{distributed-systems}
+
+\begin{itemize}
+\tightlist
+\item
+  Brokers \emph{are} distributed systems: Kafka ISR/leader-election = quorum + consensus; \texttt{acks}/\texttt{min.insync.replicas} = the CAP/durability dial; \texttt{unclean.leader.election} = the AP-vs-CP choice (availability vs zero loss).
+\item
+  Saga = the distributed-transaction alternative to 2PC (eventual consistency, compensations, non-blocking).
+\item
+  At-least-once + idempotency is the same "effectively-once" idea from distributed systems.
+\end{itemize}
+
+\subsection{System Design}\label{system-design}
+
+\begin{itemize}
+\tightlist
+\item
+  The message queue is a core box in nearly every design diagram (between app servers and workers). Async fan-out enables the \textbf{fan-out-on-write} feed model, decoupled microservices, and CQRS/event-sourcing read models.
+\item
+  Load leveling protects the DB tier; back-pressure connects to rate limiting and circuit breakers.
+\end{itemize}
+
+\subsection{Databases}\label{databases}
+
+\begin{itemize}
+\tightlist
+\item
+  The Outbox pattern lives \emph{in} the database; CDC streams the WAL/binlog into Kafka. Log compaction turns a topic into a materialized changelog (a DB-like state store).
+\item
+  Idempotency relies on DB constraints (unique keys) and transactions; exactly-once processing requires the offset and the side effect in one transactional store.
+\end{itemize}
+
+\subsection{Concurrency}\label{concurrency}
+
+\begin{itemize}
+\tightlist
+\item
+  Consumer groups = work distribution across threads/processes; prefetch/QoS = bounded in-flight work = the producer-consumer concurrency pattern at distributed scale.
+\item
+  Back-pressure mirrors bounded buffers and Reactive Streams credit-based flow control.
+\end{itemize}
+
+\subsection{Performance Engineering}\label{performance-engineering}
+
+\begin{itemize}
+\tightlist
+\item
+  Kafka\textquotesingle s speed = sequential I/O + page cache + zero-copy + batching --- the same mechanical-sympathy principles as systems performance.
+\item
+  \texttt{linger.ms}/\texttt{batch.size}/compression are throughput-vs-latency tuning knobs.
+\end{itemize}
+
+\subsection{APIs / Networking}\label{apis--networking}
+
+\begin{itemize}
+\tightlist
+\item
+  Idempotency keys (Stripe-style \texttt{Idempotency-Key} header) make retried HTTP POSTs safe --- the same dedup idea at the API edge.
+\item
+  Webhooks are async fan-out over HTTP; at-least-once delivery means webhook receivers must be idempotent too.
+\end{itemize}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\textbf{In system-design rounds:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Decide sync vs async explicitly.} "Does the user need this result to respond? If not, push it async." Justify each async hop.
+\item
+  \textbf{Pick the shape out loud:} "I need replay and multiple independent consumers, so this is a log --- Kafka --- not an SQS queue."
+\item
+  \textbf{Volunteer the failure modes} before being asked: duplicates \(\rightarrow\) idempotent consumers; dual-write \(\rightarrow\) outbox; poison \(\rightarrow\) DLQ+backoff; ordering \(\rightarrow\) partition by key; back-pressure \(\rightarrow\) lag alarms. This is the senior differentiator.
+\item
+  \textbf{Quantify:} partition count from peak QPS / per-consumer rate; spike-absorption backlog and drain time; \texttt{acks=all} + \texttt{min.insync.replicas=2} + RF=3 for durability.
+\item
+  \textbf{Name the trade-off} every time: throughput vs latency (\texttt{linger.ms}), ordering vs parallelism (global vs per-key), consistency vs availability (\texttt{unclean.leader.election}).
+\end{enumerate}
+
+\textbf{In depth/knowledge rounds:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Know Kafka cold: partitions (parallelism+ordering), consumer groups + rebalancing, offsets (committed vs current, manual commit), ISR + leader election + \texttt{acks}/\texttt{min.insync.replicas}, retention vs compaction, idempotent producer + transactions, consumer lag.
+\item
+  Be able to \emph{derive} the Two Generals impossibility, then pivot to at-least-once + idempotent dedup-table code.
+\item
+  Be able to draw the Outbox + CDC flow and explain why naive publish-then-commit fails.
+\end{enumerate}
+
+\textbf{Communication patterns:}
+
+\begin{itemize}
+\tightlist
+\item
+  "The classic risk here is the dual-write problem; the standard fix is a transactional outbox with CDC."
+\item
+  "I\textquotesingle d partition by orderId so each order\textquotesingle s events are ordered, while different orders parallelize --- we don\textquotesingle t need global order."
+\item
+  "This is at-least-once, so the consumer must be idempotent --- I\textquotesingle ll dedup on messageId in the same transaction as the write."
+\end{itemize}
+
+\textbf{Red flags to avoid:} claiming exactly-once delivery; "just put it on a queue" with no duplicate/ordering/DLQ story; confusing queue vs log; ignoring the dual-write problem; expecting global ordering from Kafka.
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Why async:} decoupling (producer doesn\textquotesingle t know consumers), load leveling (absorb spikes), resilience (buffer downstream failures). Cost: eventual consistency, duplicates, ordering care, ops.
+\item
+  \textbf{Three shapes:} Queue (one consumer, delete-on-ack --- RabbitMQ/SQS), Pub/Sub (every subscriber a copy --- SNS), Log (retained, replayable, offsets --- Kafka/Kinesis).
+\item
+  \textbf{Broker vs log:} delete-on-read vs retained-and-replayable. Replay/multiple-consumers/event-sourcing \(\rightarrow\) log.
+\item
+  \textbf{Delivery:} at-most-once (commit before process, may lose), \textbf{at-least-once} (commit after process, may dup --- the default), exactly-once delivery = impossible (Two Generals).
+\item
+  \textbf{Effectively-once:} at-least-once + \textbf{idempotent consumer} (dedup table keyed by messageId, in same tx as side effect).
+\item
+  \textbf{Kafka exactly-once:} idempotent producer (PID+seq) + transactions (atomic consume-process-produce, \texttt{read\_committed}). Kafka-to-Kafka only.
+\item
+  \textbf{Kafka core:} partition = parallelism + ordering unit; partition by \textbf{key} for per-entity order; consumer group (one partition \(\rightarrow\) one consumer); offset (manual commit after processing); ISR + leader election; durability triad RF=3 / \texttt{min.insync.replicas=2} / \texttt{acks=all}; retention vs \textbf{compaction}; \textbf{lag} = key health metric.
+\item
+  \textbf{RabbitMQ:} publish to \textbf{exchange} (direct/topic/fanout/headers) \(\rightarrow\) bindings \(\rightarrow\) queues; ack/nack/reject; \textbf{prefetch (QoS)} = back-pressure; \textbf{DLX} + TTL + priority; publisher confirms.
+\item
+  \textbf{SQS/SNS/Kinesis:} SQS = queue + visibility timeout + long polling + DLQ (standard vs FIFO); SNS = fan-out (SNS\(\rightarrow\)SQS pattern); Kinesis = managed log (shards, replay).
+\item
+  \textbf{Ordering:} per-partition only; partition by key; global order kills parallelism; handle out-of-order with versions/watermarks.
+\item
+  \textbf{Reliability (I-D-O-S):} Idempotent consumers; DLQ + retry w/ backoff + jitter (poison); Outbox + CDC (dual-write); Saga (distributed tx, choreography vs orchestration). Plus schema registry for evolution.
+\item
+  \textbf{Stream processing:} Kafka Streams (library) vs Flink (cluster); tumbling/sliding/session windows; \textbf{event time} not processing time; \textbf{watermarks} for window completeness.
+\end{enumerate}
+
+\subsection{Key Comparison Tables}\label{key-comparison-tables}
+
+\textbf{Delivery semantics:}
+
+\setcodelang{}
+
+\begin{verbatim}
+at-most-once : commit BEFORE process, acks=0   → may LOSE, no dup
+at-least-once: commit AFTER  process, acks=all → no loss, may DUP  ✅ + idempotency
+exactly-once : DELIVERY impossible → at-least-once + idempotent = exactly-once PROCESSING
+\end{verbatim}
+
+\textbf{Queue vs Log:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Queue (RabbitMQ/SQS): delete-on-ack, no replay, routing-rich, one consumer set
+Log   (Kafka/Kinesis): retained, replayable, offsets, many groups, per-partition order
+\end{verbatim}
+
+\textbf{Kafka durability:}
+
+\setcodelang{}
+
+\begin{verbatim}
+RF=3 + min.insync.replicas=2 + acks=all → survive 1 broker down, zero loss
+unclean.leader.election=false → reject writes rather than lose data (CP)
+\end{verbatim}
+
+\textbf{RabbitMQ exchanges:}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{direct}\OperatorTok{=}\NormalTok{exact key }\OperatorTok{|}\NormalTok{ topic}\OperatorTok{=}\NormalTok{wildcard(}\OperatorTok{*}\NormalTok{,}\CommentTok{\#) | fanout=broadcast | headers=attributes}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Reliability patterns:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Idempotent consumer (dedup table)  | DLQ + backoff + jitter (poison)
+Outbox + CDC (dual-write)          | Saga (distributed tx: choreography vs orchestration)
+\end{verbatim}
+
+\subsection{Most Important Concepts (Priority Order)}\label{most-important-concepts-priority-order}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Sync-vs-async decision + decoupling/load-leveling/back-pressure
+\item
+  Queue vs pub/sub vs log semantics (and broker vs log)
+\item
+  Delivery semantics + Two Generals + at-least-once + idempotent consumer (with dedup code)
+\item
+  Kafka deep dive (partitions, consumer groups, offsets, ISR/acks, retention/compaction, lag)
+\item
+  Ordering: per-partition only + partition-by-key
+\item
+  Dual-write problem + Outbox + CDC
+\item
+  DLQ + retry/backoff/jitter + poison messages
+\item
+  RabbitMQ exchanges + prefetch + DLX
+\item
+  SQS/SNS/Kinesis (visibility timeout, fan-out, shards)
+\item
+  Saga (choreography vs orchestration)
+\item
+  Schema registry + compatibility
+\item
+  Stream processing (windowing, event time, watermarks)
+\end{enumerate}
+
+\emph{Study tip: for every concept, be able to (1) define it in one sentence, (2) name a real system that uses it, (3) state the trade-off, and (4) describe a failure scenario and its mitigation. If you can do that for "exactly-once," "ordering," "dual-write," and "back-pressure," you can carry any message-queue interview.}
+
+\end{document}

@@ -1,0 +1,2070 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Databases}
+\newcommand{\ThemeKicker}{Data Track}
+\newcommand{\ThemeNumber}{08}
+
+\usepackage{interviewstyle}
+\setthemecolor{059669}{34d399}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{Audience:} FAANG-level deep mastery. First-principles explanations, crisp mnemonics, heavy interview focus.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+A \textbf{database} is a structured, persistent store of data with controlled access, concurrency management, and durability guarantees.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1524}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4452}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4024}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Category
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Relational (SQL)} & Tables, rows, columns; schema-on-write; ACID by default & PostgreSQL, MySQL, Oracle, SQLite, SQL Server \\
+\rowcolor{zebra}
+\textbf{Key-Value} & Hash map at scale; fastest reads/writes & Redis, DynamoDB (simple use), Memcached \\
+\textbf{Document} & JSON/BSON documents, flexible schema & MongoDB, Couchbase, Firestore \\
+\rowcolor{zebra}
+\textbf{Column-Family} & Wide rows, optimized for large analytical scans & Cassandra, HBase, Bigtable \\
+\textbf{Graph} & Nodes + edges, relationship traversal & Neo4j, Amazon Neptune \\
+\rowcolor{zebra}
+\textbf{Time-Series} & Optimized for timestamp-indexed sequential writes & InfluxDB, TimescaleDB \\
+\textbf{NewSQL} & SQL semantics + distributed scalability & Google Spanner, CockroachDB, TiDB \\
+\end{longtable}
+
+\section{Why It Exists}\label{why-it-exists}
+
+\textbf{Core problem:} Applications need data to outlive the process that creates it. Without a database:
+
+\begin{itemize}
+\tightlist
+\item
+  Data lives only in RAM \(\rightarrow\) lost on crash
+\item
+  Concurrent writers corrupt each other\textquotesingle s changes
+\item
+  No way to search, filter, or aggregate efficiently
+\end{itemize}
+
+Databases solve four fundamental problems:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Persistence} --- Durability after crash/power loss
+\item
+  \textbf{Concurrency} --- Multiple readers/writers simultaneously without corruption
+\item
+  \textbf{Query efficiency} --- Find 1 row in 1 billion without scanning everything
+\item
+  \textbf{Integrity} --- Constraints (FK, UNIQUE, NOT NULL) prevent bad data
+\end{enumerate}
+
+\section{Why FAANG Cares (Company-Specific)}\label{why-faang-cares-company-specific}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0623}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3145}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6231}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Their DB Tech
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why They Care Deeply
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Amazon} & DynamoDB, Aurora, RDS & DynamoDB is their crown jewel. Every Amazonian must understand KV stores, partitioning, eventual consistency. Aurora reimagines log-structured storage. \\
+\rowcolor{zebra}
+\textbf{Google} & Spanner, Bigtable, Firestore & Spanner achieves global ACID via TrueTime. Bigtable invented the column-family model. Expect Spanner internals questions. \\
+\textbf{Meta} & MySQL (at insane scale), RocksDB, TAO & TAO is a graph KV store for social graph. RocksDB (LSM-tree) underpins dozens of systems. MySQL sharding at 10B+ users. \\
+\rowcolor{zebra}
+\textbf{Microsoft} & Azure SQL, Cosmos DB & Cosmos DB offers 5 tunable consistency levels. Azure SQL is SQL Server cloud-native. \\
+\textbf{Netflix} & Cassandra, EVCache (Memcached) & Cassandra for multi-region, always-available write patterns. EVCache for session/token caching. \\
+\rowcolor{zebra}
+\textbf{Uber} & MySQL \(\rightarrow\) Schemaless \(\rightarrow\) CockroachDB & Uber\textquotesingle s MySQL sharding war stories are famous. Schemaless is a custom document store on top of MySQL. \\
+\end{longtable}
+
+\textbf{Interview signal:} Knowing \emph{which company uses which DB and why} shows systems thinking, not just textbook knowledge.
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Relational Model}\label{relational-model}
+
+Data organized in \textbf{relations (tables)}. A table is a set of tuples (rows). Each column has a declared type. \textbf{Primary key} uniquely identifies a row. \textbf{Foreign key} references another table\textquotesingle s PK, enforcing referential integrity.
+
+\subsection{Schema}\label{schema}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Schema-on-write (SQL):} Schema defined upfront; data must conform at insert time. Safer, slower to evolve.
+\item
+  \textbf{Schema-on-read (NoSQL):} No schema enforcement at write; application interprets at read. More flexible, more dangerous.
+\end{itemize}
+
+\subsection{CAP Theorem Applied to Databases}\label{cap-theorem-applied-to-databases}
+
+Under a \textbf{network partition}, choose two of three:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Consistency} --- All reads see the latest write
+\item
+  \textbf{Availability} --- Every request gets a response
+\item
+  \textbf{Partition Tolerance} --- System works despite dropped messages
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+CAP Choices in Practice:
+  CP (Consistent + Partition-tolerant): HBase, Zookeeper, Spanner
+  AP (Available + Partition-tolerant): Cassandra, DynamoDB, CouchDB
+  CA (Consistent + Available): Traditional single-node RDBMS (not truly distributed)
+\end{verbatim}
+
+\textbf{PACELC} extends CAP: even when no partition, there\textquotesingle s a latency vs consistency trade-off.
+
+\subsection{Normalization vs Denormalization}\label{normalization-vs-denormalization}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1299}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4156}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4545}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Normalization
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Denormalization
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Goal} & Eliminate data redundancy & Optimize read performance \\
+\rowcolor{zebra}
+\textbf{Storage} & Less (no duplication) & More (intentional duplication) \\
+\textbf{Write cost} & Lower (update one place) & Higher (update multiple places) \\
+\rowcolor{zebra}
+\textbf{Read cost} & Higher (need joins) & Lower (data pre-joined) \\
+\textbf{Anomalies} & Prevented (update/delete/insert) & Possible \\
+\rowcolor{zebra}
+\textbf{Use when} & OLTP, data correctness critical & OLAP, denormalized reports, caching \\
+\end{longtable}
+
+\textbf{Normal Forms (quick):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{1NF:} Atomic values, no repeating groups
+\item
+  \textbf{2NF:} 1NF + no partial dependencies (every non-key col depends on full PK)
+\item
+  \textbf{3NF:} 2NF + no transitive dependencies (non-key col doesn\textquotesingle t depend on another non-key col)
+\item
+  \textbf{BCNF:} 3NF + every determinant is a candidate key
+\end{itemize}
+
+\textbf{Interview takeaway:} Most OLTP systems target 3NF. Most data warehouses intentionally denormalize (star/snowflake schema).
+
+\section{SQL Deep Dive}\label{sql-deep-dive}
+
+\subsection{Joins --- Complete Reference}\label{joins--complete-reference}
+
+\setcodelang{}
+
+\begin{verbatim}
+Tables:
+  employees:  id | name     | dept_id
+              1  | Alice    | 10
+              2  | Bob      | 20
+              3  | Charlie  | 30  ← dept doesn't exist
+
+  departments: id | dept_name
+               10 | Engineering
+               20 | Marketing
+               40 | HR         ← no employee
+\end{verbatim}
+
+\subsubsection{INNER JOIN --- Only matching rows}\label{inner-join--only-matching-rows}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ e.name, d.dept\_name}
+\KeywordTok{FROM}\NormalTok{ employees e}
+\KeywordTok{INNER} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Result:
+  name   | dept_name
+  Alice  | Engineering
+  Bob    | Marketing
+
+  [Charlie excluded — dept 30 not in departments]
+  [HR excluded — no employee in dept 40]
+\end{verbatim}
+
+\setcodelang{}
+
+\begin{verbatim}
+Venn diagram:
+  employees ●●●●●●●●  departments
+              [████]
+          ↑ only overlap
+\end{verbatim}
+
+\subsubsection{LEFT JOIN --- All left rows + matching right (NULLs if no match)}\label{left-join--all-left-rows--matching-right-nulls-if-no-match}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ e.name, d.dept\_name}
+\KeywordTok{FROM}\NormalTok{ employees e}
+\KeywordTok{LEFT} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Result:
+  name    | dept_name
+  Alice   | Engineering
+  Bob     | Marketing
+  Charlie | NULL          ← Charlie kept, dept is NULL
+\end{verbatim}
+
+\setcodelang{}
+
+\begin{verbatim}
+Venn diagram:
+  [████████████████]  departments
+  employees
+  ↑ all of left side
+\end{verbatim}
+
+\subsubsection{RIGHT JOIN --- All right rows + matching left}\label{right-join--all-right-rows--matching-left}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} All departments, even those without employees}
+\KeywordTok{SELECT}\NormalTok{ e.name, d.dept\_name}
+\KeywordTok{FROM}\NormalTok{ employees e}
+\KeywordTok{RIGHT} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Result:
+  name  | dept_name
+  Alice | Engineering
+  Bob   | Marketing
+  NULL  | HR           ← HR kept, employee is NULL
+\end{verbatim}
+
+\subsubsection{FULL OUTER JOIN --- Union of LEFT + RIGHT}\label{full-outer-join--union-of-left--right}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ e.name, d.dept\_name}
+\KeywordTok{FROM}\NormalTok{ employees e}
+\KeywordTok{FULL} \KeywordTok{OUTER} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Result:
+  name    | dept_name
+  Alice   | Engineering
+  Bob     | Marketing
+  Charlie | NULL
+  NULL    | HR
+\end{verbatim}
+
+\subsubsection{\texorpdfstring{CROSS JOIN --- Cartesian product (M \(\times\) N rows)}{CROSS JOIN --- Cartesian product (M \textbackslash times N rows)}}\label{cross-join--cartesian-product-m-times-n-rows}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ e.name, d.dept\_name}
+\KeywordTok{FROM}\NormalTok{ employees e }\KeywordTok{CROSS} \KeywordTok{JOIN}\NormalTok{ departments d;}
+\CommentTok{{-}{-} 3 employees × 3 departments = 9 rows}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{SELF JOIN --- Table joined with itself}\label{self-join--table-joined-with-itself}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Find employees with the same department}
+\KeywordTok{SELECT}\NormalTok{ a.name, b.name, a.dept\_id}
+\KeywordTok{FROM}\NormalTok{ employees a}
+\KeywordTok{JOIN}\NormalTok{ employees b }\KeywordTok{ON}\NormalTok{ a.dept\_id }\OperatorTok{=}\NormalTok{ b.dept\_id }\KeywordTok{AND}\NormalTok{ a.}\KeywordTok{id} \OperatorTok{\textless{}}\NormalTok{ b.}\KeywordTok{id}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Anti-Join pattern (find rows with no match)}\label{anti-join-pattern-find-rows-with-no-match}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Employees with no department}
+\KeywordTok{SELECT}\NormalTok{ e.name}
+\KeywordTok{FROM}\NormalTok{ employees e}
+\KeywordTok{LEFT} \KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ e.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}
+\KeywordTok{WHERE}\NormalTok{ d.}\KeywordTok{id} \KeywordTok{IS} \KeywordTok{NULL}\NormalTok{;}
+\CommentTok{{-}{-} Result: Charlie}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{CTEs (Common Table Expressions)}\label{ctes-common-table-expressions}
+
+\textbf{Purpose:} Name a subquery so it can be referenced (and reused) within a larger query. Makes complex queries readable. Can be \textbf{recursive} for tree/graph traversal.
+
+\subsubsection{Non-Recursive CTE Example}\label{non-recursive-cte-example}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Find departments where average salary \textgreater{} company average}
+\KeywordTok{WITH}\NormalTok{ dept\_avg }\KeywordTok{AS}\NormalTok{ (}
+    \KeywordTok{SELECT}\NormalTok{ dept\_id,}
+           \FunctionTok{AVG}\NormalTok{(salary) }\KeywordTok{AS}\NormalTok{ avg\_sal}
+    \KeywordTok{FROM}\NormalTok{ employees}
+    \KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ dept\_id}
+\NormalTok{),}
+\NormalTok{company\_avg }\KeywordTok{AS}\NormalTok{ (}
+    \KeywordTok{SELECT} \FunctionTok{AVG}\NormalTok{(salary) }\KeywordTok{AS}\NormalTok{ company\_avg\_sal}
+    \KeywordTok{FROM}\NormalTok{ employees}
+\NormalTok{)}
+\KeywordTok{SELECT}\NormalTok{ d.dept\_name, da.avg\_sal, ca.company\_avg\_sal}
+\KeywordTok{FROM}\NormalTok{ dept\_avg da}
+\KeywordTok{JOIN}\NormalTok{ departments d }\KeywordTok{ON}\NormalTok{ da.dept\_id }\OperatorTok{=}\NormalTok{ d.}\KeywordTok{id}
+\KeywordTok{CROSS} \KeywordTok{JOIN}\NormalTok{ company\_avg ca}
+\KeywordTok{WHERE}\NormalTok{ da.avg\_sal }\OperatorTok{\textgreater{}}\NormalTok{ ca.company\_avg\_sal;}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Output (hypothetical):
+  dept_name    | avg_sal | company_avg_sal
+  Engineering  | 120000  | 95000
+\end{verbatim}
+
+\subsubsection{Recursive CTE Example --- Org chart traversal}\label{recursive-cte-example--org-chart-traversal}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{WITH}\NormalTok{ RECURSIVE org\_chart }\KeywordTok{AS}\NormalTok{ (}
+    \CommentTok{{-}{-} Base case: find the CEO (no manager)}
+    \KeywordTok{SELECT} \KeywordTok{id}\NormalTok{, name, manager\_id, }\DecValTok{1} \KeywordTok{AS} \FunctionTok{depth}
+    \KeywordTok{FROM}\NormalTok{ employees}
+    \KeywordTok{WHERE}\NormalTok{ manager\_id }\KeywordTok{IS} \KeywordTok{NULL}
+
+    \KeywordTok{UNION} \KeywordTok{ALL}
+
+    \CommentTok{{-}{-} Recursive case: find direct reports}
+    \KeywordTok{SELECT}\NormalTok{ e.}\KeywordTok{id}\NormalTok{, e.name, e.manager\_id, oc.}\FunctionTok{depth} \OperatorTok{+} \DecValTok{1}
+    \KeywordTok{FROM}\NormalTok{ employees e}
+    \KeywordTok{JOIN}\NormalTok{ org\_chart oc }\KeywordTok{ON}\NormalTok{ e.manager\_id }\OperatorTok{=}\NormalTok{ oc.}\KeywordTok{id}
+\NormalTok{)}
+\KeywordTok{SELECT}\NormalTok{ name, }\FunctionTok{depth}
+\KeywordTok{FROM}\NormalTok{ org\_chart}
+\KeywordTok{ORDER} \KeywordTok{BY} \FunctionTok{depth}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Output:
+  name    | depth
+  CEO     | 1
+  CTO     | 2
+  VP Eng  | 3
+  Alice   | 4
+\end{verbatim}
+
+\textbf{Interview takeaway:} Recursive CTEs are the standard SQL answer for hierarchical/tree data. Know the base case + recursive case pattern.
+
+\subsection{Window Functions}\label{window-functions}
+
+\textbf{Key insight:} Window functions compute across a "window" of rows related to the current row, \textbf{without collapsing rows} like GROUP BY does.
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}
+\NormalTok{    name,}
+\NormalTok{    dept\_id,}
+\NormalTok{    salary,}
+    \FunctionTok{RANK}\NormalTok{()       }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS}\NormalTok{ dept\_rank,}
+    \FunctionTok{DENSE\_RANK}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS} \FunctionTok{dense\_rank}\NormalTok{,}
+    \FunctionTok{ROW\_NUMBER}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS}\NormalTok{ row\_num,}
+    \FunctionTok{LAG}\NormalTok{(salary)  }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS}\NormalTok{ prev\_salary,}
+    \FunctionTok{LEAD}\NormalTok{(salary) }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS}\NormalTok{ next\_salary,}
+    \FunctionTok{SUM}\NormalTok{(salary)  }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id)                      }\KeywordTok{AS}\NormalTok{ dept\_total,}
+    \FunctionTok{AVG}\NormalTok{(salary)  }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id)                      }\KeywordTok{AS}\NormalTok{ dept\_avg,}
+    \FunctionTok{SUM}\NormalTok{(salary)  }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{ROWS} \KeywordTok{BETWEEN} \KeywordTok{UNBOUNDED} \KeywordTok{PRECEDING} \KeywordTok{AND} \KeywordTok{CURRENT} \KeywordTok{ROW}\NormalTok{) }\KeywordTok{AS}\NormalTok{ running\_total}
+\KeywordTok{FROM}\NormalTok{ employees;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Sample Data:}
+
+\setcodelang{}
+
+\begin{verbatim}
+  name    | dept_id | salary
+  Alice   | 10      | 120000
+  Bob     | 10      | 90000
+  Charlie | 10      | 90000
+  Dave    | 20      | 80000
+\end{verbatim}
+
+\textbf{Output:}
+
+\setcodelang{}
+
+\begin{verbatim}
+  name    | dept | salary | dept_rank | dense_rank | row_num | prev_salary | next_salary | dept_total | dept_avg  | running_total
+  Alice   | 10   | 120000 | 1         | 1          | 1       | NULL        | 90000       | 300000     | 100000    | 120000
+  Bob     | 10   | 90000  | 2         | 2          | 2       | 120000      | 90000       | 300000     | 100000    | 210000
+  Charlie | 10   | 90000  | 2         | 2          | 3       | 90000       | NULL        | 300000     | 100000    | 300000
+  Dave    | 20   | 80000  | 1         | 1          | 1       | NULL        | NULL        | 80000      | 80000     | 380000
+\end{verbatim}
+
+\textbf{RANK vs DENSE\_RANK vs ROW\_NUMBER:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{RANK()}: gaps after ties (1, 2, 2, \textbf{4})
+\item
+  \texttt{DENSE\_RANK()}: no gaps (1, 2, 2, \textbf{3})
+\item
+  \texttt{ROW\_NUMBER()}: always unique (1, 2, 3, 4)
+\end{itemize}
+
+\textbf{Common window function interview patterns:}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Top N per group (most asked!)}
+\KeywordTok{SELECT} \OperatorTok{*} \KeywordTok{FROM}\NormalTok{ (}
+    \KeywordTok{SELECT} \OperatorTok{*}\NormalTok{, }\FunctionTok{ROW\_NUMBER}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ dept\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS}\NormalTok{ rn}
+    \KeywordTok{FROM}\NormalTok{ employees}
+\NormalTok{) ranked}
+\KeywordTok{WHERE}\NormalTok{ rn }\OperatorTok{\textless{}=} \DecValTok{3}\NormalTok{;}
+
+\CommentTok{{-}{-} Running totals}
+\KeywordTok{SELECT} \DataTypeTok{date}\NormalTok{, revenue,}
+       \FunctionTok{SUM}\NormalTok{(revenue) }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY} \DataTypeTok{date}\NormalTok{) }\KeywordTok{AS}\NormalTok{ cumulative\_revenue}
+\KeywordTok{FROM}\NormalTok{ daily\_sales;}
+
+\CommentTok{{-}{-} Moving average (last 7 days)}
+\KeywordTok{SELECT} \DataTypeTok{date}\NormalTok{, revenue,}
+       \FunctionTok{AVG}\NormalTok{(revenue) }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY} \DataTypeTok{date} \KeywordTok{ROWS} \KeywordTok{BETWEEN} \DecValTok{6} \KeywordTok{PRECEDING} \KeywordTok{AND} \KeywordTok{CURRENT} \KeywordTok{ROW}\NormalTok{) }\KeywordTok{AS}\NormalTok{ ma7}
+\KeywordTok{FROM}\NormalTok{ daily\_sales;}
+
+\CommentTok{{-}{-} Percent of total}
+\KeywordTok{SELECT}\NormalTok{ name, salary,}
+       \FunctionTok{ROUND}\NormalTok{(}\FloatTok{100.0} \OperatorTok{*}\NormalTok{ salary }\OperatorTok{/} \FunctionTok{SUM}\NormalTok{(salary) }\KeywordTok{OVER}\NormalTok{ (), }\DecValTok{2}\NormalTok{) }\KeywordTok{AS}\NormalTok{ pct\_of\_total}
+\KeywordTok{FROM}\NormalTok{ employees;}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Query Execution Plan / EXPLAIN}\label{query-execution-plan--explain}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{EXPLAIN} \KeywordTok{ANALYZE} \KeywordTok{SELECT} \OperatorTok{*} \KeywordTok{FROM}\NormalTok{ orders }\KeywordTok{WHERE}\NormalTok{ customer\_id }\OperatorTok{=} \DecValTok{42}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Key nodes in a query plan:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1975}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4691}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Node Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Seq Scan} & Full table scan --- reads every row & O(n), slow for large tables \\
+\rowcolor{zebra}
+\textbf{Index Scan} & Traverse B+tree, fetch rows by pointer & O(log n + k) for k results \\
+\textbf{Index Only Scan} & Answer from index alone, no heap fetch & Fastest --- "covering index" \\
+\rowcolor{zebra}
+\textbf{Bitmap Heap Scan} & Collect row pointers first, then fetch & Good for range queries \\
+\textbf{Nested Loop} & For each row in outer, scan inner & O(n*m) worst case \\
+\rowcolor{zebra}
+\textbf{Hash Join} & Build hash of smaller table, probe it & O(n+m), good for large \\
+\textbf{Merge Join} & Both tables sorted, merge & O(n log n + m log m) \\
+\end{longtable}
+
+\textbf{What to look for in EXPLAIN:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Seq Scan on large table} \(\rightarrow\) missing index
+\item
+  \textbf{High rows estimate vs actual} \(\rightarrow\) stale statistics \(\rightarrow\) run ANALYZE
+\item
+  \textbf{Nested Loop with large outer} \(\rightarrow\) wrong join order, no index on inner
+\item
+  \textbf{Sort on large result} \(\rightarrow\) consider index to avoid sort
+\item
+  \textbf{cost=X..Y} \(\rightarrow\) startup cost .. total cost (planner estimates)
+\end{enumerate}
+
+\section{Indexing \& Internals}\label{indexing--internals}
+
+\subsection{B-Tree vs B+Tree vs LSM-Tree}\label{b-tree-vs-btree-vs-lsm-tree}
+
+\visualfigure{../../figures/08-databases/01-btree.pdf}{B+ trees keep data sorted with a high branching factor, so lookups touch only O(log n) nodes (few disk pages). Linked leaves make range queries cheap.}
+
+\subsubsection{B+Tree (Used in PostgreSQL, MySQL InnoDB, SQL Server)}\label{btree-used-in-postgresql-mysql-innodb-sql-server}
+
+\setcodelang{}
+
+\begin{verbatim}
+Structure: All data in LEAF nodes only. Internal nodes = routing keys only.
+Leaf nodes linked as a doubly-linked list → efficient range scans.
+
+                    [30 | 70]
+                   /    |    \
+            [10|20]  [40|60]  [80|90]
+            /  |  \   |  |    |   \
+           10  20  30 40 60  80   90
+            ←————————————————————→  (leaf linked list)
+\end{verbatim}
+
+\textbf{Properties:}
+
+\begin{itemize}
+\tightlist
+\item
+  Height typically 3-4 for millions of rows (branching factor \textasciitilde100-1000)
+\item
+  All lookups: O(log n) with small constant
+\item
+  Range scans: traverse leaf linked list --- very cache-friendly
+\item
+  Reads and writes both O(log n)
+\item
+  \textbf{In-place updates} --- pages modified in place
+\end{itemize}
+
+\textbf{Why not B-Tree (non-plus)?}
+
+\begin{itemize}
+\tightlist
+\item
+  B-Trees store data in internal nodes too
+\item
+  Range scans require traversal through all levels
+\item
+  B+Trees are strictly better for databases
+\end{itemize}
+
+\subsubsection{LSM-Tree (Log-Structured Merge-Tree) --- Used in Cassandra, RocksDB, LevelDB, HBase}\label{lsm-tree-log-structured-merge-tree--used-in-cassandra-rocksdb-leveldb-hbase}
+
+\setcodelang{}
+
+\begin{verbatim}
+Write path:
+  Write → WAL → MemTable (in-memory sorted) → SSTable (immutable sorted file on disk)
+
+  MemTable: [  sorted key-value pairs in memory  ]
+      ↓ (when full, flush)
+  L0:   [SSTable1] [SSTable2] [SSTable3]  (may overlap)
+      ↓ (compaction)
+  L1:   [SSTable — sorted, no overlap]
+      ↓ (compaction)
+  L2:   [SSTable — sorted, no overlap, larger]
+\end{verbatim}
+
+\textbf{Compaction:}
+
+\setcodelang{}
+
+\begin{verbatim}
+  [file A: a=1, c=3, e=5]   [file B: b=2, c=4, d=6]
+          ↓  merge sort
+  [merged: a=1, b=2, c=4, d=6, e=5]   ← c=4 wins (newer)
+\end{verbatim}
+
+\textbf{Properties:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Writes:} Sequential only \(\rightarrow\) very fast (SSD-optimized, no random writes)
+\item
+  \textbf{Reads:} May need to check multiple SSTables \(\rightarrow\) use Bloom filters to skip files
+\item
+  \textbf{Space amplification:} Old versions accumulate until compaction
+\item
+  \textbf{Write amplification:} Data written multiple times during compaction
+\end{itemize}
+
+\subsubsection{Comparison Table}\label{comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2436}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3205}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4359}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+B+Tree
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+LSM-Tree
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Write performance} & Moderate (random I/O) & High (sequential I/O) \\
+\rowcolor{zebra}
+\textbf{Read performance} & High (direct lookup) & Moderate (multi-file check) \\
+\textbf{Range scans} & Excellent (leaf list) & Good (sorted SSTables) \\
+\rowcolor{zebra}
+\textbf{Space usage} & Efficient & Higher (until compaction) \\
+\textbf{Write amplification} & Low & High (compaction rewrites) \\
+\rowcolor{zebra}
+\textbf{Read amplification} & Low (one path) & Higher (check multiple files) \\
+\textbf{Best for} & Read-heavy, OLTP & Write-heavy, time-series, logging \\
+\rowcolor{zebra}
+\textbf{Used by} & PostgreSQL, MySQL, SQLite & Cassandra, RocksDB, LevelDB, HBase \\
+\end{longtable}
+
+\subsection{Clustered vs Non-Clustered Index}\label{clustered-vs-non-clustered-index}
+
+\subsubsection{Clustered Index}\label{clustered-index}
+
+\textbf{The actual table rows are stored in index order.} Only one per table.
+
+\setcodelang{}
+
+\begin{verbatim}
+Clustered Index (InnoDB Primary Key):
+  B+Tree leaf nodes ARE the actual row data
+
+  Leaf: [PK=1 | name=Alice | salary=120000 | ...]
+        [PK=2 | name=Bob   | salary=90000  | ...]
+        [PK=3 | name=...   | ...           | ...]
+        ← physically ordered by PK on disk
+\end{verbatim}
+
+\textbf{Implications:}
+
+\begin{itemize}
+\tightlist
+\item
+  PK lookups are fastest possible (no additional fetch)
+\item
+  Range scans by PK are very efficient (sequential disk I/O)
+\item
+  Inserts in PK order are fast; random PK order causes \textbf{page splits}
+\item
+  \textbf{UUID as PK is bad for InnoDB} --- random inserts cause constant page splits and fragmentation
+\end{itemize}
+
+\subsubsection{Non-Clustered (Secondary) Index}\label{non-clustered-secondary-index}
+
+\textbf{Index is separate structure; leaf nodes contain key + pointer to actual row.}
+
+\setcodelang{}
+
+\begin{verbatim}
+Secondary Index on (salary):
+
+  B+Tree leaf: [salary=90000 → row pointer (PK=2)]
+               [salary=120000 → row pointer (PK=1)]
+
+  To fetch full row:
+    1. Traverse secondary index → get PK
+    2. Traverse clustered index with PK → get full row
+    This second lookup = "bookmark lookup" or "key lookup"
+\end{verbatim}
+
+\textbf{Covering Index:} Index includes all columns the query needs --- no heap fetch required.
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Query:}
+\KeywordTok{SELECT}\NormalTok{ name, salary }\KeywordTok{FROM}\NormalTok{ employees }\KeywordTok{WHERE}\NormalTok{ dept\_id }\OperatorTok{=} \DecValTok{10}\NormalTok{;}
+
+\CommentTok{{-}{-} Covering index: (dept\_id, name, salary)}
+\CommentTok{{-}{-} Index leaf contains: [dept\_id=10 | name=Alice | salary=120000]}
+\CommentTok{{-}{-} No need to touch the actual table rows!}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} Secondary index lookup = 2 B+Tree traversals (secondary \(\rightarrow\) clustered). Covering index eliminates the second traversal. This is why you see "Index Only Scan" in EXPLAIN.
+
+\subsection{How Index Speeds Lookups}\label{how-index-speeds-lookups}
+
+Without index on \texttt{salary}:
+
+\setcodelang{}
+
+\begin{verbatim}
+SELECT * FROM employees WHERE salary = 90000;
+→ Full table scan: read all N rows, compare each
+→ O(N) time, O(N) I/O
+\end{verbatim}
+
+With B+Tree index on \texttt{salary}:
+
+\setcodelang{}
+
+\begin{verbatim}
+  1. Start at root of B+Tree
+  2. Compare 90000 with internal node keys → go right/left
+  3. Traverse ~log_100(N) levels (typically 3-4 for millions of rows)
+  4. Arrive at leaf node → row pointer
+  5. Fetch actual row by pointer
+→ O(log N) time, O(log N) I/O
+\end{verbatim}
+
+\textbf{Index selectivity:} High cardinality = high selectivity = better index.
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{salary} --- thousands of distinct values \(\rightarrow\) highly selective \(\rightarrow\) great index
+\item
+  \texttt{gender} --- 2 distinct values \(\rightarrow\) low selectivity \(\rightarrow\) index often not used (full scan faster)
+\end{itemize}
+
+\section{ACID, Isolation Levels \& Locking}\label{acid-isolation-levels--locking}
+
+\visualfigure{../../figures/08-databases/02-isolation-levels.pdf}{Stronger isolation prevents more anomalies but costs concurrency. Serializable is safest; most OLTP systems default to Read Committed and add locks where needed.}
+
+\subsection{ACID Properties}\label{acid-properties}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1222}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Property
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Implementation
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Atomicity} & Transaction is all-or-nothing & Rollback log (undo log) on failure \\
+\rowcolor{zebra}
+\textbf{Consistency} & DB goes from one valid state to another & Constraints, triggers, cascades enforced \\
+\textbf{Isolation} & Concurrent transactions don\textquotesingle t interfere & Locks, MVCC \\
+\rowcolor{zebra}
+\textbf{Durability} & Committed transactions survive crashes & WAL (Write-Ahead Log), fsync \\
+\end{longtable}
+
+\textbf{WAL (Write-Ahead Log):}
+
+\setcodelang{}
+
+\begin{verbatim}
+Before modifying any page on disk:
+  1. Write the change to the WAL (sequential, fast)
+  2. fsync the WAL
+  3. Only then modify actual data pages
+On crash: replay WAL to reconstruct committed state
+\end{verbatim}
+
+\subsection{\texorpdfstring{THE Isolation Level \(\times\) Anomaly Matrix}{THE Isolation Level \textbackslash times Anomaly Matrix}}\label{the-isolation-level-times-anomaly-matrix}
+
+This is \textbf{the most-asked DB theory question in FAANG interviews.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2239}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1493}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2836}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1791}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1642}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Isolation Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dirty Read
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Non-Repeatable Read
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Phantom Read
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lost Update
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Read Uncommitted} & Possible & Possible & Possible & Possible \\
+\rowcolor{zebra}
+\textbf{Read Committed} & \textbf{Prevented} & Possible & Possible & Possible \\
+\textbf{Repeatable Read} & \textbf{Prevented} & \textbf{Prevented} & Possible* & \textbf{Prevented} \\
+\rowcolor{zebra}
+\textbf{Serializable} & \textbf{Prevented} & \textbf{Prevented} & \textbf{Prevented} & \textbf{Prevented} \\
+\end{longtable}
+
+*MySQL InnoDB\textquotesingle s Repeatable Read also prevents phantom reads via gap locks (stronger than standard SQL spec)
+
+\subsubsection{Anomaly Definitions}\label{anomaly-definitions}
+
+\textbf{Dirty Read:} Reading uncommitted data from another transaction.
+
+\setcodelang{}
+
+\begin{verbatim}
+T1: UPDATE balance = 500 (not committed yet)
+T2: SELECT balance → sees 500  ← DIRTY READ
+T1: ROLLBACK
+T2 used data that never existed!
+\end{verbatim}
+
+\textbf{Non-Repeatable Read:} Same query returns different results within same transaction.
+
+\setcodelang{}
+
+\begin{verbatim}
+T1: SELECT salary → 90000
+T2: UPDATE salary = 100000; COMMIT
+T1: SELECT salary → 100000  ← DIFFERENT! Non-repeatable read
+\end{verbatim}
+
+\textbf{Phantom Read:} New rows appear in re-executed query.
+
+\setcodelang{}
+
+\begin{verbatim}
+T1: SELECT * WHERE salary > 80000 → 5 rows
+T2: INSERT new employee with salary=100000; COMMIT
+T1: SELECT * WHERE salary > 80000 → 6 rows  ← PHANTOM!
+\end{verbatim}
+
+\textbf{Lost Update:} Two transactions both read a value, both update it; one update is lost.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{T1: read balance}\OperatorTok{=}\DecValTok{1000}\NormalTok{, compute }\DecValTok{1000}\OperatorTok{+}\DecValTok{100}\OperatorTok{=}\DecValTok{1100}
+\NormalTok{T2: read balance}\OperatorTok{=}\DecValTok{1000}\NormalTok{, compute }\DecValTok{1000}\OperatorTok{+}\DecValTok{200}\OperatorTok{=}\DecValTok{1200}\NormalTok{, write }\DecValTok{1200}\OperatorTok{;}\NormalTok{ COMMIT}
+\NormalTok{T1: write }\DecValTok{1100}\OperatorTok{;}\NormalTok{ COMMIT}
+\NormalTok{Balance }\OperatorTok{=} \DecValTok{1100}\NormalTok{ — T2}\StringTok{\textquotesingle{}s +200 is LOST!}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{MVCC (Multi-Version Concurrency Control)}\label{mvcc-multi-version-concurrency-control}
+
+\textbf{Key insight:} Instead of locking rows for reads, keep \textbf{multiple versions} of each row. Readers see a consistent snapshot; writers create new versions without blocking readers.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PostgreSQL MVCC (simplified):}
+\NormalTok{  Row has: xmin (created by tx), xmax (deleted}\OperatorTok{/}\NormalTok{updated by tx)}
+
+\NormalTok{  INSERT (tx }\DecValTok{100}\NormalTok{): row \{xmin}\OperatorTok{=}\DecValTok{100}\NormalTok{, xmax}\OperatorTok{=}\NormalTok{NULL, data}\OperatorTok{=}\StringTok{"Alice, 90000"}\NormalTok{\}}
+\NormalTok{  UPDATE (tx }\DecValTok{200}\NormalTok{): old row \{xmin}\OperatorTok{=}\DecValTok{100}\NormalTok{, xmax}\OperatorTok{=}\DecValTok{200}\NormalTok{, data}\OperatorTok{=}\StringTok{"Alice, 90000"}\NormalTok{\}}
+\NormalTok{                   new row \{xmin}\OperatorTok{=}\DecValTok{200}\NormalTok{, xmax}\OperatorTok{=}\NormalTok{NULL, data}\OperatorTok{=}\StringTok{"Alice, 100000"}\NormalTok{\}}
+
+\NormalTok{  Tx }\DecValTok{150}\NormalTok{ (started before tx }\DecValTok{200}\NormalTok{): sees old row (xmin}\OperatorTok{=}\DecValTok{100} \OperatorTok{\textless{}} \DecValTok{150}\NormalTok{, xmax}\OperatorTok{=}\DecValTok{200} \OperatorTok{\textgreater{}} \DecValTok{150}\NormalTok{)}
+\NormalTok{  Tx }\DecValTok{250}\NormalTok{ (started after tx }\DecValTok{200}\NormalTok{ commits): sees new row (xmin}\OperatorTok{=}\DecValTok{200} \OperatorTok{\textless{}} \DecValTok{250}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Benefits:}
+
+\begin{itemize}
+\tightlist
+\item
+  Readers never block writers
+\item
+  Writers never block readers
+\item
+  Each transaction sees a consistent snapshot of the DB
+\end{itemize}
+
+\textbf{Downside:} Dead versions accumulate \(\rightarrow\) PostgreSQL\textquotesingle s \textbf{VACUUM} process cleans them up.
+
+\subsection{Optimistic vs Pessimistic Locking}\label{optimistic-vs-pessimistic-locking}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1601}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4626}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3774}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pessimistic Locking
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Optimistic Locking
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Assumption} & Conflicts are frequent & Conflicts are rare \\
+\rowcolor{zebra}
+\textbf{Mechanism} & Lock row at read time (SELECT FOR UPDATE) & Check version/timestamp at commit \\
+\textbf{Blocking} & Yes --- other txs wait & No --- detect conflict at commit \\
+\rowcolor{zebra}
+\textbf{Throughput} & Lower (lock contention) & Higher (no waiting) \\
+\textbf{Best for} & High-contention workloads, financial & Low-contention, read-heavy \\
+\rowcolor{zebra}
+\textbf{Implementation} & \texttt{SELECT\ ...\ FOR\ UPDATE}, \texttt{LOCK\ TABLE} & Version column, compare-and-swap \\
+\end{longtable}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Pessimistic locking}
+\ControlFlowTok{BEGIN}\NormalTok{;}
+\KeywordTok{SELECT} \OperatorTok{*} \KeywordTok{FROM}\NormalTok{ accounts }\KeywordTok{WHERE} \KeywordTok{id} \OperatorTok{=} \DecValTok{1} \ControlFlowTok{FOR} \KeywordTok{UPDATE}\NormalTok{;  }\CommentTok{{-}{-} locks the row}
+\KeywordTok{UPDATE}\NormalTok{ accounts }\KeywordTok{SET}\NormalTok{ balance }\OperatorTok{=}\NormalTok{ balance }\OperatorTok{{-}} \DecValTok{100} \KeywordTok{WHERE} \KeywordTok{id} \OperatorTok{=} \DecValTok{1}\NormalTok{;}
+\KeywordTok{COMMIT}\NormalTok{;}
+
+\CommentTok{{-}{-} Optimistic locking (application{-}level)}
+\KeywordTok{SELECT}\NormalTok{ balance, version }\KeywordTok{FROM}\NormalTok{ accounts }\KeywordTok{WHERE} \KeywordTok{id} \OperatorTok{=} \DecValTok{1}\NormalTok{;}
+\CommentTok{{-}{-} version = 5, balance = 1000}
+\CommentTok{{-}{-} ... compute new balance = 900}
+\KeywordTok{UPDATE}\NormalTok{ accounts}
+\KeywordTok{SET}\NormalTok{ balance }\OperatorTok{=} \DecValTok{900}\NormalTok{, version }\OperatorTok{=} \DecValTok{6}
+\KeywordTok{WHERE} \KeywordTok{id} \OperatorTok{=} \DecValTok{1} \KeywordTok{AND}\NormalTok{ version }\OperatorTok{=} \DecValTok{5}\NormalTok{;  }\CommentTok{{-}{-} only updates if version hasn\textquotesingle{}t changed}
+\CommentTok{{-}{-} If 0 rows updated → conflict! Retry.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Deadlocks in Databases}\label{deadlocks-in-databases}
+
+\textbf{Deadlock:} Transaction A waits for lock held by B; B waits for lock held by A. Circular wait.
+
+\setcodelang{}
+
+\begin{verbatim}
+T1: LOCK row 1 → waiting for row 2 lock (held by T2)
+T2: LOCK row 2 → waiting for row 1 lock (held by T1)
+    ← DEADLOCK!
+\end{verbatim}
+
+\textbf{Detection:} DB maintains a wait-for graph. Cycle = deadlock. One transaction chosen as victim and rolled back.
+
+\textbf{Prevention strategies:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Lock ordering:} Always acquire locks in the same order (e.g., lower ID first)
+\item
+  \textbf{Timeout:} Transaction aborts if it can\textquotesingle t acquire lock within N ms
+\item
+  \textbf{Wound-Wait / Wait-Die:} Timestamp-based schemes (older tx wounds/kills newer)
+\item
+  \textbf{Deadlock detection + victim selection:} Most RDBMS default approach
+\end{enumerate}
+
+\textbf{Interview takeaway:} Deadlock = circular dependency in the wait-for graph. DB detects and kills one victim. Application must retry on deadlock error.
+
+\subsection{Lock Types}\label{lock-types}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2376}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1782}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2574}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3267}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Lock
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Symbol
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Compatibility
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Usage
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Shared (S)} & Read lock & S+S compatible; S+X not & SELECT ... LOCK IN SHARE MODE \\
+\rowcolor{zebra}
+\textbf{Exclusive (X)} & Write lock & X incompatible with all & UPDATE, DELETE, SELECT FOR UPDATE \\
+\textbf{Intention Shared (IS)} & Table-level intent & Indicates row-level S lock & Auto-set before row S lock \\
+\rowcolor{zebra}
+\textbf{Intention Exclusive (IX)} & Table-level intent & Indicates row-level X lock & Auto-set before row X lock \\
+\textbf{Gap lock} & Range lock & Prevents phantom inserts & InnoDB Repeatable Read \\
+\rowcolor{zebra}
+\textbf{Next-key lock} & Row + gap & = row lock + gap lock & InnoDB default in RR \\
+\end{longtable}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{B+Tree Structure (Full ASCII)}\label{btree-structure-full-ascii}
+
+\setcodelang{}
+
+\begin{verbatim}
+                           ┌──────────────┐
+                           │  Root:  50   │
+                           └──────┬───────┘
+                    ┌─────────────┴───────────────┐
+                    ▼                             ▼
+            ┌───────────┐                 ┌───────────┐
+            │  25 | 37  │                 │  75 | 87  │
+            └──┬──┬──┬──┘                 └──┬──┬──┬──┘
+          ┌────┘  │  └──────┐         ┌──────┘  │  └────┐
+          ▼       ▼          ▼         ▼         ▼        ▼
+      ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐
+      │10│20 │→│25│30  │→│37│45  │→│50│65  │→│75│80  │→│87│95  │
+      └───────┘ └───────┘ └───────┘ └───────┘ └───────┘ └───────┘
+          └──────────────────────────────────────────────────────→
+                            Leaf linked list (→) enables range scans
+\end{verbatim}
+
+\subsection{LSM-Tree Compaction Flow}\label{lsm-tree-compaction-flow}
+
+\setcodelang{}
+
+\begin{verbatim}
+  Writes arrive:
+  ┌─────────────────────────────────┐
+  │  WAL (Write-Ahead Log)           │ ← sequential write, crash safety
+  └─────────────────┬───────────────┘
+                    ▼
+  ┌─────────────────────────────────┐
+  │  MemTable (sorted, in-memory)    │ ← fast writes, all keys sorted
+  └─────────────────┬───────────────┘
+    (when full)     ▼
+  ┌──────────────────────────────────────────────────────┐
+  │ L0: [SST1][SST2][SST3][SST4]   ← may have overlaps  │
+  └──────────────────────┬───────────────────────────────┘
+    (compaction)         ▼
+  ┌──────────────────────────────────────────────────────┐
+  │ L1: [SST_sorted_no_overlap ——————————————————]       │
+  └──────────────────────┬───────────────────────────────┘
+    (compaction)         ▼
+  ┌──────────────────────────────────────────────────────┐
+  │ L2: [SST_sorted_no_overlap — 10x larger ——————————]  │
+  └──────────────────────────────────────────────────────┘
+  
+  Read path: MemTable → L0 → L1 → L2 → ...
+  Bloom filters on each SSTable to skip misses quickly
+\end{verbatim}
+
+\subsection{Replication Topology}\label{replication-topology}
+
+\setcodelang{}
+
+\begin{verbatim}
+LEADER-FOLLOWER (Master-Slave):
+  ┌──────────┐
+  │  Leader  │◄── all writes
+  │ (Primary)│
+  └────┬─────┘
+       │ replication log (async or sync)
+  ┌────┴──────────────┐
+  ▼                   ▼
+┌──────────┐     ┌──────────┐
+│ Follower │     │ Follower │ ← reads can go here
+│(Replica) │     │(Replica) │
+└──────────┘     └──────────┘
+
+MULTI-LEADER (Active-Active):
+  ┌──────────┐     ┌──────────┐
+  │  Leader  │◄──► │  Leader  │ ← writes accepted at both
+  │ Region A │     │ Region B │
+  └──────────┘     └──────────┘
+    ↑ conflict resolution needed (last-write-wins, CRDT, custom)
+
+LEADERLESS (Dynamo-style):
+  ┌───────┐  ┌───────┐  ┌───────┐
+  │ Node  │  │ Node  │  │ Node  │
+  │  A    │  │  B    │  │  C    │
+  └───────┘  └───────┘  └───────┘
+  Write to W nodes; Read from R nodes; N total
+  Quorum: W + R > N → consistent reads
+  e.g., N=3, W=2, R=2: sloppy quorum
+\end{verbatim}
+
+\subsection{Sharding / Partitioning}\label{sharding--partitioning}
+
+\setcodelang{}
+
+\begin{verbatim}
+RANGE PARTITIONING:
+  Shard 1: user_id 1–1M        ┌──────────┐
+  Shard 2: user_id 1M–2M       │ Router / │
+  Shard 3: user_id 2M–3M  ←───│ Proxy    │◄── Client writes
+                                └──────────┘
+  Problem: Hot partitions if writes concentrate in range
+
+HASH PARTITIONING:
+  hash(user_id) % 3 = shard number
+  Shard 0: hash % 3 == 0
+  Shard 1: hash % 3 == 1
+  Shard 2: hash % 3 == 2
+  Advantage: Even distribution
+  Disadvantage: Range queries hit all shards; resharding is expensive
+
+CONSISTENT HASHING:
+  Hash ring: 0 ────────────── 360
+  Nodes placed at points on ring
+  Key routes to nearest node clockwise
+  Adding/removing node: only adjacent keys move → minimal resharding
+  
+  ┌──────────────── Ring ─────────────────┐
+  │           Node A (90°)                │
+  │          /                            │
+  │   Node D            Node B (180°)     │
+  │  (270°)                               │
+  │          \          /                 │
+  │           Node C (0°)                 │
+  └───────────────────────────────────────┘
+\end{verbatim}
+
+\section{NoSQL Deep Dive}\label{nosql-deep-dive}
+
+\subsection{When to Pick Which Database}\label{when-to-pick-which-database}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3502}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2432}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4066}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pick
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+User sessions, caching, leaderboards & \textbf{Redis (KV)} & Sub-ms latency, TTL, sorted sets \\
+\rowcolor{zebra}
+Product catalog, user profiles & \textbf{MongoDB (Document)} & Flexible schema, nested documents \\
+Time-series IoT, metrics & \textbf{Cassandra (Column-Family)} & Write-optimized, time-ordered partition keys \\
+\rowcolor{zebra}
+Social graph traversal & \textbf{Neo4j (Graph)} & Relationship traversal is O(1) per hop \\
+E-commerce orders & \textbf{PostgreSQL (SQL)} & ACID, complex queries, FK integrity \\
+\rowcolor{zebra}
+Analytics/reporting & \textbf{Redshift/BigQuery (OLAP)} & Columnar storage, massive parallel scan \\
+Global low-latency KV & \textbf{DynamoDB} & Managed, auto-scale, single-digit ms \\
+\end{longtable}
+
+\subsection{NoSQL Families Comparison}\label{nosql-families-comparison}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0818}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1824}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2390}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1635}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1509}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1824}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Family
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Query pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Scaling
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Consistency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Key-Value} & hash map & point lookups only & horizontal, trivial & eventual usually & Redis, DynamoDB, Memcached \\
+\rowcolor{zebra}
+\textbf{Document} & JSON tree & field-level queries, secondary indexes & horizontal & configurable & MongoDB, Couchbase, Firestore \\
+\textbf{Column-Family} & sparse table, columns grouped & partition key + sort key & horizontal, excellent & tunable (ONE/QUORUM/ALL) & Cassandra, HBase, Bigtable \\
+\rowcolor{zebra}
+\textbf{Graph} & nodes + edges & traversal, path finding & vertical (harder to shard) & ACID usually & Neo4j, Neptune, JanusGraph \\
+\end{longtable}
+
+\subsection{Cassandra Architecture}\label{cassandra-architecture}
+
+\setcodelang{}
+
+\begin{verbatim}
+Data model: Table → Partition Key → Clustering Keys → Columns
+
+  Partition Key: determines which node(s) hold the data
+  Clustering Key: determines ordering within a partition
+
+CREATE TABLE events (
+    user_id   UUID,        ← partition key → all user events on same node
+    event_time TIMESTAMP,  ← clustering key → sorted within partition
+    event_type TEXT,
+    PRIMARY KEY (user_id, event_time)
+) WITH CLUSTERING ORDER BY (event_time DESC);
+\end{verbatim}
+
+\textbf{Consistency levels:} ONE, QUORUM, ALL, LOCAL\_QUORUM
+
+\begin{itemize}
+\tightlist
+\item
+  QUORUM write + QUORUM read = strong consistency (W+R \textgreater{} N)
+\item
+  ONE write + ONE read = fastest, but may read stale data
+\end{itemize}
+
+\textbf{Tunable consistency:} Application chooses per-operation. \textbf{Interview takeaway:} This is Cassandra\textquotesingle s biggest feature --- tune for your SLA.
+
+\subsection{DynamoDB}\label{dynamodb}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Primary key:} Partition key (required) + optional sort key
+\item
+  \textbf{Access patterns drive design} --- no ad-hoc queries; plan your indexes upfront
+\item
+  \textbf{GSI (Global Secondary Index):} Different partition + sort key; async replication
+\item
+  \textbf{LSI (Local Secondary Index):} Same partition key, different sort key; strongly consistent
+\item
+  \textbf{Single-table design:} Multiple entity types in one table (over-loaded keys pattern)
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PK               }\OperatorTok{|}\NormalTok{ SK               }\OperatorTok{|}\NormalTok{ data}
+\NormalTok{USER}\CommentTok{\#alice       | PROFILE          | \{name, email\}}
+\NormalTok{USER}\CommentTok{\#alice       | ORDER\#2024{-}01{-}01 | \{items, total\}}
+\NormalTok{PRODUCT}\CommentTok{\#widget   | META             | \{price, desc\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{MongoDB}\label{mongodb}
+
+\begin{itemize}
+\tightlist
+\item
+  Documents are BSON (binary JSON), up to 16MB
+\item
+  \textbf{Sharding:} shard key determines distribution; avoid monotonically increasing keys
+\item
+  \textbf{Replica sets:} Primary + N secondaries; automatic failover
+\item
+  \textbf{Aggregation pipeline:} \texttt{\$match\ →\ \$group\ →\ \$project\ →\ \$sort\ →\ \$limit}
+\item
+  \textbf{No joins} (use \texttt{\$lookup} but it\textquotesingle s expensive); denormalize or use references
+\end{itemize}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Twitter timeline:} Fanout-on-write (pre-compute timelines) vs fanout-on-read. Redis sorted sets for timeline storage. Cassandra for tweet storage partitioned by user\_id.
+\item
+  \textbf{Uber\textquotesingle s trip matching:} PostgreSQL (PostGIS) for geospatial queries to find nearby drivers. Redis for real-time driver location updates.
+\item
+  \textbf{Amazon orders:} DynamoDB for order lookups by order\_id (partition key). Aurora for complex reporting. Elasticache (Redis) for cart/session data.
+\item
+  \textbf{Netflix recommendations:} Cassandra for user watch history (write-heavy, time-ordered). Spark for batch processing. Elasticsearch for search.
+\item
+  \textbf{Banking transactions:} PostgreSQL or Oracle. Serializable isolation. Two-phase commit for distributed transactions. Strict ACID required --- not negotiable.
+\item
+  \textbf{Facebook social graph:} TAO (custom graph KV store on top of MySQL). Read-heavy, eventually consistent, huge scale. Each edge/node cached in Memcached layer.
+\end{enumerate}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One great library --- every concept is a shelf, a catalogue card, or a librarian\textquotesingle s routine.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1283}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8717}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Index} & The card catalogue at the entrance --- find a book without walking every shelf \\
+\rowcolor{zebra}
+\textbf{B+Tree} & The alphabetised catalogue drawers, with each leaf drawer linked to the next so range browsing is a single sweep across adjacent drawers \\
+\textbf{LSM-Tree} & A returns cart that fills during the day (memtable) and is periodically merged and reshelved in strict order (compaction) --- the cart is fast to drop books onto; the shelving run keeps the stacks sorted \\
+\rowcolor{zebra}
+\textbf{Clustered index} & Books shelved in call-number order --- the shelf layout IS the catalogue; finding call number 823.914 means walking straight to that spot, no detour \\
+\textbf{Non-clustered index} & A subject-card in the catalogue that gives you a call number --- you still have to walk the stacks to pull the physical book off the shelf \\
+\rowcolor{zebra}
+\textbf{MVCC} & Keeping the previous edition on the shelf so current readers aren\textquotesingle t interrupted while the librarian quietly swaps in the new edition behind the desk \\
+\textbf{Transaction} & Checking out a whole reading-list all-or-nothing --- either every book is stamped and in your bag, or none leave the desk \\
+\rowcolor{zebra}
+\textbf{ACID} & Library rules: all books or none leave (atomic); the catalogue stays accurate after every checkout (consistent); two patrons can\textquotesingle t grab the same last copy mid-checkout (isolated); the stamp record survives a power cut (durable) \\
+\textbf{Dirty read} & Peeking at a book the librarian pulled but hasn\textquotesingle t yet decided to add to the collection --- it may go straight back to the supplier \\
+\rowcolor{zebra}
+\textbf{Non-repeatable read} & You note a book is on shelf 4, walk to the café, come back, and it\textquotesingle s gone --- another patron checked it out between your two glances \\
+\textbf{Phantom read} & You count seven books on a topic, step away to photocopy one, return, and now there are eight --- a new donation arrived in between \\
+\rowcolor{zebra}
+\textbf{Deadlock} & Patron A holds the atlas and is waiting for the dictionary; Patron B holds the dictionary and is waiting for the atlas --- neither budges until the librarian intervenes and asks one to put their book down \\
+\textbf{Sharding} & Splitting the collection across buildings by subject --- Sciences in the East Wing, Humanities in the West Wing --- so no single building is overwhelmed \\
+\rowcolor{zebra}
+\textbf{Replication} & Branch libraries holding copies of the most-requested titles --- the main branch updates its master copy and the branches mirror it so local readers are never turned away \\
+\textbf{WAL} & The librarian writes every incoming acquisition in the accession register before touching the shelves --- if a shelf collapses mid-task, the register lets her reconstruct exactly where each book belongs \\
+\rowcolor{zebra}
+\textbf{Pessimistic locking} & Clipping a "Being Used --- Do Not Remove" tag on a book the moment a patron sits down with it, so no one else can grab it from under them \\
+\textbf{Optimistic locking} & No tag on the book while reading; at the checkout desk the librarian checks whether the edition number on the stamp card still matches --- if someone else already updated the record, she hands the book back and asks the patron to start over \\
+\rowcolor{zebra}
+\textbf{Normalization} & One master author-card per person in the catalogue --- every book\textquotesingle s record points to it rather than repeating the author\textquotesingle s biography on every card \\
+\textbf{Denormalization} & Photocopying the author biography onto every book\textquotesingle s catalogue card --- faster to read in one place, but when the author changes address every card must be updated individually \\
+\rowcolor{zebra}
+\textbf{Joins} & Cross-referencing the authors\textquotesingle{} catalogue with the books\textquotesingle{} catalogue --- match each author card to every book card that shares the same author code to build the full picture \\
+\textbf{NoSQL} & A flexible scrapbook section where patrons paste in newspaper clippings, maps, and sticky notes --- no rigid card format required, but you cannot run the same catalogue queries you would on a bound volume \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\subsection{ACID}\label{acid}
+
+\textbf{"A Consistent Isolation Delivers"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{A}tomicity --- All or nothing
+\item
+  \textbf{C}onsistency --- Valid state to valid state
+\item
+  \textbf{I}solation --- Concurrent txs don\textquotesingle t interfere
+\item
+  \textbf{D}urability --- Committed = permanent
+\end{itemize}
+
+\subsection{Isolation Levels (weakest to strongest)}\label{isolation-levels-weakest-to-strongest}
+
+\textbf{"Read Uncommitted Criminals Repeatedly Steal"} \(\rightarrow\) RU, RC, RR, S
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{R}ead \textbf{U}ncommitted --- see dirty data
+\item
+  \textbf{R}ead \textbf{C}ommitted --- no dirty reads
+\item
+  \textbf{R}epeatable \textbf{R}ead --- no non-repeatable reads
+\item
+  \textbf{S}erializable --- full isolation
+\end{enumerate}
+
+\textbf{Anomaly prevention by level (cumulative):}
+
+\begin{itemize}
+\tightlist
+\item
+  RC prevents: \textbf{D}irty reads (mnemonic: \textbf{C}ommitted stops \textbf{D}irt)
+\item
+  RR adds: no \textbf{N}on-repeatable reads (mnemonic: \textbf{R}epeatable stops \textbf{N}ot-same)
+\item
+  S adds: no \textbf{P}hantoms (mnemonic: \textbf{S}erial stops \textbf{P}hantoms)
+\end{itemize}
+
+\subsection{Joins Memory Aid}\label{joins-memory-aid}
+
+\textbf{"INNER only matches, LEFT keeps left, RIGHT keeps right, FULL keeps all"}
+
+\begin{itemize}
+\tightlist
+\item
+  Think of Venn diagrams: INNER = intersection, LEFT = left circle, RIGHT = right circle, FULL = union
+\end{itemize}
+
+\subsection{B+Tree vs LSM Choice}\label{btree-vs-lsm-choice}
+
+\textbf{"B+Tree Reads, LSM Writes"}
+
+\begin{itemize}
+\tightlist
+\item
+  B+Tree: \textbf{B}etter for \textbf{R}eads (random lookups, range scans)
+\item
+  LSM: \textbf{L}oves \textbf{S}equential \textbf{M}assive writes
+\end{itemize}
+
+\subsection{Window Function Rank Types}\label{window-function-rank-types}
+
+\textbf{"RANK has Gaps, DENSE doesn\textquotesingle t, ROW always unique"}
+
+\begin{itemize}
+\tightlist
+\item
+  1, 2, 2, \textbf{4} \(\rightarrow\) RANK (gap after tie)
+\item
+  1, 2, 2, \textbf{3} \(\rightarrow\) DENSE\_RANK (no gap)
+\item
+  1, 2, 3, \textbf{4} \(\rightarrow\) ROW\_NUMBER (always distinct)
+\end{itemize}
+
+\subsection{NoSQL Family by Access Pattern}\label{nosql-family-by-access-pattern}
+
+\textbf{"KV=Speed, Doc=Flexible, Column=Scale, Graph=Traverse"}
+
+\subsection{CAP Theorem}\label{cap-theorem}
+
+\textbf{"Consistent systems Pause during partitions; Available systems Accept stale data"}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{SQL Query Questions (Frequently Asked)}\label{sql-query-questions-frequently-asked}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} 1. Second highest salary}
+\KeywordTok{SELECT} \FunctionTok{MAX}\NormalTok{(salary) }\KeywordTok{FROM}\NormalTok{ employees }\KeywordTok{WHERE}\NormalTok{ salary }\OperatorTok{\textless{}}\NormalTok{ (}\KeywordTok{SELECT} \FunctionTok{MAX}\NormalTok{(salary) }\KeywordTok{FROM}\NormalTok{ employees);}
+\CommentTok{{-}{-} Or: SELECT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1;}
+
+\CommentTok{{-}{-} 2. Nth highest salary (general)}
+\KeywordTok{SELECT}\NormalTok{ salary }\KeywordTok{FROM}\NormalTok{ (}
+    \KeywordTok{SELECT}\NormalTok{ salary, }\FunctionTok{DENSE\_RANK}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ salary }\KeywordTok{DESC}\NormalTok{) }\KeywordTok{AS}\NormalTok{ rnk}
+    \KeywordTok{FROM}\NormalTok{ employees}
+\NormalTok{) ranked }\KeywordTok{WHERE}\NormalTok{ rnk }\OperatorTok{=}\NormalTok{ N;}
+
+\CommentTok{{-}{-} 3. Find duplicate emails}
+\KeywordTok{SELECT}\NormalTok{ email, }\FunctionTok{COUNT}\NormalTok{(}\OperatorTok{*}\NormalTok{) }\KeywordTok{FROM}\NormalTok{ users }\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ email }\KeywordTok{HAVING} \FunctionTok{COUNT}\NormalTok{(}\OperatorTok{*}\NormalTok{) }\OperatorTok{\textgreater{}} \DecValTok{1}\NormalTok{;}
+
+\CommentTok{{-}{-} 4. Delete duplicates, keep lowest id}
+\KeywordTok{DELETE} \KeywordTok{FROM}\NormalTok{ users }\KeywordTok{WHERE} \KeywordTok{id} \KeywordTok{NOT} \KeywordTok{IN}\NormalTok{ (}
+    \KeywordTok{SELECT} \FunctionTok{MIN}\NormalTok{(}\KeywordTok{id}\NormalTok{) }\KeywordTok{FROM}\NormalTok{ users }\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ email}
+\NormalTok{);}
+
+\CommentTok{{-}{-} 5. Employees earning more than their manager}
+\KeywordTok{SELECT}\NormalTok{ e.name}
+\KeywordTok{FROM}\NormalTok{ employees e}
+\KeywordTok{JOIN}\NormalTok{ employees m }\KeywordTok{ON}\NormalTok{ e.manager\_id }\OperatorTok{=}\NormalTok{ m.}\KeywordTok{id}
+\KeywordTok{WHERE}\NormalTok{ e.salary }\OperatorTok{\textgreater{}}\NormalTok{ m.salary;}
+
+\CommentTok{{-}{-} 6. Running total of sales}
+\KeywordTok{SELECT} \DataTypeTok{date}\NormalTok{, amount,}
+       \FunctionTok{SUM}\NormalTok{(amount) }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY} \DataTypeTok{date}\NormalTok{) }\KeywordTok{AS}\NormalTok{ running\_total}
+\KeywordTok{FROM}\NormalTok{ sales;}
+
+\CommentTok{{-}{-} 7. Consecutive logins (gaps and islands)}
+\KeywordTok{WITH}\NormalTok{ login\_data }\KeywordTok{AS}\NormalTok{ (}
+    \KeywordTok{SELECT}\NormalTok{ user\_id, login\_date,}
+           \FunctionTok{ROW\_NUMBER}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ user\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ login\_date)}
+           \OperatorTok{{-}} \FunctionTok{DENSE\_RANK}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}\KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ user\_id }\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ login\_date) }\KeywordTok{AS}\NormalTok{ grp}
+    \KeywordTok{FROM}\NormalTok{ logins}
+\NormalTok{)}
+\KeywordTok{SELECT}\NormalTok{ user\_id, }\FunctionTok{MIN}\NormalTok{(login\_date), }\FunctionTok{MAX}\NormalTok{(login\_date), }\FunctionTok{COUNT}\NormalTok{(}\OperatorTok{*}\NormalTok{) }\KeywordTok{AS}\NormalTok{ streak\_len}
+\KeywordTok{FROM}\NormalTok{ login\_data}
+\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ user\_id, grp}
+\KeywordTok{HAVING} \FunctionTok{COUNT}\NormalTok{(}\OperatorTok{*}\NormalTok{) }\OperatorTok{\textgreater{}=} \DecValTok{3}\NormalTok{;}
+
+\CommentTok{{-}{-} 8. Pivot / crosstab (using CASE)}
+\KeywordTok{SELECT}
+\NormalTok{    student\_id,}
+    \FunctionTok{SUM}\NormalTok{(}\ControlFlowTok{CASE} \ControlFlowTok{WHEN}\NormalTok{ subject }\OperatorTok{=} \StringTok{\textquotesingle{}Math\textquotesingle{}} \ControlFlowTok{THEN}\NormalTok{ score }\ControlFlowTok{END}\NormalTok{) }\KeywordTok{AS}\NormalTok{ math,}
+    \FunctionTok{SUM}\NormalTok{(}\ControlFlowTok{CASE} \ControlFlowTok{WHEN}\NormalTok{ subject }\OperatorTok{=} \StringTok{\textquotesingle{}Science\textquotesingle{}} \ControlFlowTok{THEN}\NormalTok{ score }\ControlFlowTok{END}\NormalTok{) }\KeywordTok{AS}\NormalTok{ science}
+\KeywordTok{FROM}\NormalTok{ grades}
+\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ student\_id;}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{System-Level DB Questions}\label{system-level-db-questions}
+
+\textbf{Q: How does PostgreSQL handle a SELECT query internally?}
+
+A:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Parser} --- tokenize SQL \(\rightarrow\) parse tree
+\item
+  \textbf{Rewriter} --- apply view definitions, rules
+\item
+  \textbf{Planner/Optimizer} --- generate query plan (consider indexes, join orders, cost estimates from statistics)
+\item
+  \textbf{Executor} --- execute plan node by node, return rows
+\end{enumerate}
+
+\textbf{Q: Explain how an UPDATE causes more work than it looks.}
+
+\begin{itemize}
+\tightlist
+\item
+  Read original row (may involve index scan)
+\item
+  Acquire X lock
+\item
+  Write new version (MVCC in Postgres: new tuple, old marked deleted)
+\item
+  Update all secondary indexes pointing to this row
+\item
+  Write to WAL
+\item
+  Release lock at commit
+\end{itemize}
+
+\textbf{Q: What happens when two transactions update the same row simultaneously?}
+
+\begin{itemize}
+\tightlist
+\item
+  First writer acquires X lock
+\item
+  Second writer blocks waiting for X lock
+\item
+  When first commits/rolls back \(\rightarrow\) second proceeds
+\item
+  If both started at same time (deadlock scenario) \(\rightarrow\) DB detects and kills one
+\end{itemize}
+
+\textbf{Q: When would you add an index? When would you not?}
+
+Add index when:
+
+\begin{itemize}
+\tightlist
+\item
+  Column appears in WHERE/JOIN/ORDER BY frequently
+\item
+  Column has high selectivity (many distinct values)
+\item
+  Query response time is too slow and plan shows Seq Scan on large table
+\end{itemize}
+
+Don\textquotesingle t add index when:
+
+\begin{itemize}
+\tightlist
+\item
+  Table is small (full scan is fine)
+\item
+  Column has low selectivity (gender, boolean)
+\item
+  Table is write-heavy (indexes slow every INSERT/UPDATE/DELETE)
+\item
+  Column is rarely queried
+\end{itemize}
+
+\textbf{Q: Explain consistency models in distributed databases.}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Strong consistency:} Read always sees latest write (Spanner, ZooKeeper)
+\item
+  \textbf{Eventual consistency:} Reads converge to latest write eventually (Cassandra, DynamoDB default)
+\item
+  \textbf{Read-your-own-writes:} You always see your own writes (common requirement)
+\item
+  \textbf{Monotonic reads:} Won\textquotesingle t see older state after seeing newer state
+\item
+  \textbf{Causal consistency:} Operations with causal dependencies are ordered
+\end{itemize}
+
+\subsection{Follow-Up Questions Interviewers Love}\label{follow-up-questions-interviewers-love}
+
+\begin{itemize}
+\tightlist
+\item
+  "Your B+Tree index is on (a, b). Can it speed up \texttt{WHERE\ b\ =\ 5}?" \(\rightarrow\) No --- leftmost prefix rule. Index on b separately needed.
+\item
+  "You have an index but the query planner doesn\textquotesingle t use it. Why?" \(\rightarrow\) Low selectivity, stale stats, small table, OR condition, leading wildcard LIKE \textquotesingle\%foo\textquotesingle.
+\item
+  "MVCC prevents locking for reads. Is there any case readers still block?" \(\rightarrow\) DDL operations (ALTER TABLE), lock table, schema-level changes.
+\item
+  "How does Cassandra handle a write if one replica is down?" \(\rightarrow\) Hinted handoff: write stored at coordinator with hint, replayed when node recovers.
+\end{itemize}
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\subsection{Index Trade-offs}\label{index-trade-offs}
+
+\textbf{Write amplification with indexes:}
+
+\begin{itemize}
+\tightlist
+\item
+  Every secondary index must be updated on every INSERT/UPDATE/DELETE
+\item
+  Table with 5 secondary indexes: 1 logical write \(\rightarrow\) potentially 6 physical writes
+\item
+  \textbf{Mitigation:} Audit indexes, drop unused ones. Use pg\_stat\_user\_indexes to find unused indexes.
+\end{itemize}
+
+\textbf{Index bloat:}
+
+\begin{itemize}
+\tightlist
+\item
+  B+Trees have unused space due to page splits and deletions
+\item
+  PostgreSQL: \texttt{REINDEX} to rebuild, \texttt{VACUUM} to reclaim
+\item
+  Monitor with pgstattuple extension
+\end{itemize}
+
+\textbf{Partial indexes:}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Only index active users — much smaller, faster}
+\KeywordTok{CREATE} \KeywordTok{INDEX}\NormalTok{ idx\_active\_users }\KeywordTok{ON}\NormalTok{ users(email) }\KeywordTok{WHERE}\NormalTok{ active }\OperatorTok{=} \KeywordTok{true}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Expression indexes:}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Enable case{-}insensitive search efficiently}
+\KeywordTok{CREATE} \KeywordTok{INDEX}\NormalTok{ idx\_lower\_email }\KeywordTok{ON}\NormalTok{ users(}\FunctionTok{LOWER}\NormalTok{(email));}
+\CommentTok{{-}{-} Query must use LOWER(email) = \textquotesingle{}...\textquotesingle{} to use this index}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Write vs Read Optimization}\label{write-vs-read-optimization}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1971}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8029}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Optimize For
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Strategies
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Read} & More indexes, denormalization, materialized views, caching, read replicas \\
+\rowcolor{zebra}
+\textbf{Write} & Fewer indexes, normalization, batch writes, async writes, LSM-tree storage \\
+\textbf{Both} & CQRS (Command Query Responsibility Segregation) --- separate write/read models \\
+\end{longtable}
+
+\subsection{Hot Partitions}\label{hot-partitions}
+
+\textbf{Problem:} If partition key is not chosen carefully, one partition gets all traffic.
+
+\setcodelang{}
+
+\begin{verbatim}
+Bad: partition by creation_date (all today's traffic on one node)
+Bad: partition by status (all "active" users on one node)
+Good: partition by user_id hash (even distribution)
+\end{verbatim}
+
+\textbf{Mitigation for hot partitions:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add random suffix to key (write spread): \texttt{user\_id\ +\ "\_"\ +\ random(0,9)}
+\item
+  Read by trying all suffixes and combining results
+\item
+  Use a separate cache layer for hot keys
+\item
+  Adaptive/compound partition keys
+\end{enumerate}
+
+\subsection{Replication Lag}\label{replication-lag}
+
+\textbf{Problem:} Leader accepts write; follower replication is async; brief window of stale data on follower.
+
+\textbf{Strategies:}
+
+\begin{itemize}
+\tightlist
+\item
+  Read from leader after a write (read-your-own-writes consistency)
+\item
+  Monotonic reads: user always routed to same replica
+\item
+  Track replication position; application waits if read replica is too far behind
+\item
+  Semi-synchronous replication: at least 1 replica must ack before commit
+\end{itemize}
+
+\subsection{Query Optimization Workflow}\label{query-optimization-workflow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Identify slow queries} --- \texttt{pg\_stat\_statements}, slow query log
+\item
+  \textbf{EXPLAIN ANALYZE} --- look for Seq Scan on large tables, high row estimates
+\item
+  \textbf{Check statistics} --- \texttt{ANALYZE\ table} to update planner stats
+\item
+  \textbf{Add missing index} --- check if selectivity warrants it
+\item
+  \textbf{Rewrite query} --- avoid OR (use UNION), avoid SELECT *, avoid functions on indexed columns in WHERE
+\item
+  \textbf{Consider schema changes} --- normalization, adding denormalized fields, partitioning
+\item
+  \textbf{Hardware} --- more RAM for buffer cache, faster disk, read replicas
+\end{enumerate}
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Confusing isolation levels with lock types} --- isolation levels are \emph{behaviors}; locks are the \emph{mechanism}. MVCC achieves isolation without most locks.
+\item
+  \textbf{Saying "just add an index"} --- without explaining the selectivity check, the write overhead cost, or that the planner might not use it.
+\item
+  \textbf{Claiming Cassandra is strongly consistent} --- it\textquotesingle s AP by default; tunable but defaults to eventual. Know the default.
+\item
+  \textbf{Forgetting phantom reads in Repeatable Read} --- standard SQL allows phantoms at RR; only Serializable prevents them. (Note: InnoDB extends RR with gap locks.)
+\item
+  \textbf{Misunderstanding MVCC} --- "No locking" is oversimplified. MVCC eliminates reader-writer blocking, not writer-writer conflicts. Writers still need locks.
+\item
+  \textbf{Using UUIDs as clustered index in InnoDB} --- causes random page splits, fragmentation, terrible write performance. Use auto-increment or time-ordered UUIDs (UUIDv7).
+\item
+  \textbf{Confusing horizontal partitioning (sharding) with vertical partitioning} --- sharding = split rows across nodes; vertical = split columns across tables/nodes.
+\item
+  \textbf{Ignoring the "N+1 query problem"} --- SELECT 10 users, then SELECT orders for each user = 11 queries. Use JOINs or eager loading.
+\item
+  \textbf{Assuming CAP means "pick two of three always"} --- you always need partition tolerance in distributed systems. Real choice is C vs A during partition.
+\item
+  \textbf{Forgetting VACUUM in PostgreSQL} --- MVCC creates dead tuples; without vacuum, table bloat kills performance.
+\end{enumerate}
+
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2400}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7600}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Connection
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Distributed Systems} & Replication, consensus (Paxos/Raft for leader election), CAP theorem, distributed transactions (2PC/SAGA) \\
+\rowcolor{zebra}
+\textbf{System Design} & Database selection (SQL vs NoSQL), sharding strategy, caching layer (Redis), read replicas, data modeling \\
+\textbf{Operating Systems} & Page cache, fsync, memory-mapped files (mmap), file descriptors, I/O scheduling \\
+\rowcolor{zebra}
+\textbf{Computer Networks} & Client-server protocol (MySQL protocol), connection pooling, TCP for reliability, replication over network \\
+\textbf{Performance Engineering} & Index tuning, query optimization, connection pool sizing, buffer pool tuning, benchmark tools (pgbench, sysbench) \\
+\rowcolor{zebra}
+\textbf{Concurrency} & Locks, MVCC, deadlock detection algorithms, condition variables for lock waits \\
+\textbf{Data Structures} & B+Tree, skip list (Redis sorted sets), hash tables (hash indexes), LSM-tree \\
+\rowcolor{zebra}
+\textbf{Storage} & Sequential vs random I/O, SSD vs HDD impact on LSM vs B+Tree, WAL, page layout \\
+\end{longtable}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Always clarify the access pattern first.} "What queries will this serve?" determines everything --- schema, index, DB choice.
+\item
+  \textbf{Know the trade-off triangle:} Performance vs Consistency vs Availability. State your choice and justify.
+\item
+  \textbf{For SQL questions:} Think about edge cases --- NULLs in JOIN conditions, duplicates, ties in ranking. Mention them proactively.
+\item
+  \textbf{For system design:} Don\textquotesingle t just say "I\textquotesingle ll use DynamoDB." Explain: partition key choice, GSI needs, consistency requirements, estimated RPS, TTL usage.
+\item
+  \textbf{Mention EXPLAIN:} When discussing optimization, always mention "I would run EXPLAIN ANALYZE to see the query plan." Shows you know the workflow.
+\item
+  \textbf{Index questions:} Cover creation, selectivity, covering indexes, composite index column order (leftmost prefix rule).
+\item
+  \textbf{Cassandra questions:} Explain data modeling around access patterns, partition key importance, and consistency level tuning. Amazon/Netflix questions will go deep here.
+\item
+  \textbf{Google-specific:} Know Spanner\textquotesingle s TrueTime (bounded clock uncertainty \(\rightarrow\) external consistency). Know Bigtable\textquotesingle s architecture (column families, SSTable-based).
+\item
+  \textbf{Deadlock questions:} Draw the wait-for graph. Explain victim selection. State that application should retry on deadlock.
+\item
+  \textbf{Always mention trade-offs.} "We can improve read latency by adding an index, but that increases write latency and storage. Given this is read-heavy workload at 95:5 ratio, the trade-off is worth it."
+\end{enumerate}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+\textbf{SQL:} Relational model + ACID + schema-on-write. Joins combine tables. CTEs name subqueries. Window functions compute over rows without collapsing.
+
+\textbf{Indexing:} B+Tree for most databases (all data in leaves, linked list for ranges). LSM-tree for write-heavy (sequential writes, periodic compaction). Clustered = data stored in index order. Secondary = separate structure + pointer to row.
+
+\textbf{ACID \& Isolation:} Atomicity+Durability via WAL. Isolation via MVCC (readers don\textquotesingle t block writers). Four levels: Read Uncommitted \(\rightarrow\) Read Committed \(\rightarrow\) Repeatable Read \(\rightarrow\) Serializable. Each level prevents additional anomalies.
+
+\textbf{Locking:} Pessimistic = lock upfront. Optimistic = check version at commit. Deadlock = circular wait \(\rightarrow\) DB kills one victim.
+
+\textbf{Distributed:} Replication (leader-follower, multi-leader, leaderless). Sharding (range, hash, consistent hashing). CAP theorem: partition tolerance always needed \(\rightarrow\) choose C or A during partition.
+
+\textbf{NoSQL:} KV=speed, Document=flexibility, Column-family=write-scale, Graph=traversal. Choose based on access pattern.
+
+\subsection{Key Numbers to Know}\label{key-numbers-to-know}
+
+\begin{itemize}
+\tightlist
+\item
+  B+Tree height: 3-4 levels for millions of rows (branching factor \textasciitilde200)
+\item
+  Cassandra recommended partition size: \textless{} 100MB, \textless{} 100K rows
+\item
+  DynamoDB item size limit: 400KB
+\item
+  MongoDB document size limit: 16MB
+\item
+  Typical replication lag (async): milliseconds to seconds
+\item
+  Index seek cost: O(log n); full scan: O(n)
+\end{itemize}
+
+\subsection{Most Important Concepts for Interviews}\label{most-important-concepts-for-interviews}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4963}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4467}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Rank
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why Important
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Isolation Level \(\times\) Anomaly Matrix & Asked in almost every DB interview \\
+\rowcolor{zebra}
+2 & B+Tree structure and why it\textquotesingle s used & Fundamental to understanding indexes \\
+3 & MVCC & Explains PostgreSQL/MySQL behavior \\
+\rowcolor{zebra}
+4 & Window functions (RANK, ROW\_NUMBER, LAG) & Common SQL coding questions \\
+5 & Clustered vs secondary index & Critical for performance questions \\
+\rowcolor{zebra}
+6 & LSM-Tree vs B+Tree trade-off & Explains Cassandra/RocksDB choices \\
+7 & Sharding strategies & Core system design component \\
+\rowcolor{zebra}
+8 & EXPLAIN / query plan reading & Shows practical DB experience \\
+9 & CAP applied to specific DBs & System design discussion \\
+\rowcolor{zebra}
+10 & When to use SQL vs which NoSQL & Architecture decision questions \\
+\end{longtable}
+
+\subsection{Cheat-Sheet Summary Table}\label{cheat-sheet-summary-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4236}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5764}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Question Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Quick Answer
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Prevent dirty reads? & Read Committed or above \\
+\rowcolor{zebra}
+Prevent phantom reads? & Serializable (or InnoDB RR with gap locks) \\
+Readers block writers? & No in MVCC (PostgreSQL, MySQL InnoDB) \\
+\rowcolor{zebra}
+Range scan data structure? & B+Tree (leaf linked list) \\
+Write-heavy storage? & LSM-Tree (Cassandra, RocksDB) \\
+\rowcolor{zebra}
+Delete + keep lowest ID? & DELETE WHERE id NOT IN (SELECT MIN(id) ... GROUP BY ...) \\
+Top N per group? & ROW\_NUMBER() OVER (PARTITION BY ... ORDER BY ...) \\
+\rowcolor{zebra}
+Even shard distribution? & Hash partitioning \\
+Resharding with minimal data movement? & Consistent hashing \\
+\rowcolor{zebra}
+Global ACID + distributed? & Google Spanner, CockroachDB \\
+Session/cache store? & Redis \\
+\rowcolor{zebra}
+Time-ordered events at scale? & Cassandra with time-based clustering key \\
+Social graph traversal? & Graph DB (Neo4j, Neptune) \\
+\rowcolor{zebra}
+Deadlock resolution? & DB kills victim; application retries \\
+Index not used by planner? & Check selectivity, stale stats, OR conditions, functions on column \\
+\end{longtable}
+
+\end{document}

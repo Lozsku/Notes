@@ -1,0 +1,2131 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Observability}
+\newcommand{\ThemeKicker}{Platform Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{0891b2}{22d3ee}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} Read top-to-bottom for deep, mechanism-level understanding of how telemetry actually works. Jump to §Common Interview Questions + §Revision Cheat Sheet for last-minute revision. A system design isn\textquotesingle t finished until you can \emph{see} it running --- metrics, logs, traces, and SLOs come up in \textbf{every} senior/staff design round, and "your service is on fire, debug it" is a standard interview prompt. This file teaches you to answer both.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+\textbf{Observability} is the ability to understand a system\textquotesingle s internal state purely from its external outputs --- to ask \emph{new} questions about \emph{why} it\textquotesingle s behaving a certain way \textbf{without shipping new code}. The term comes from control theory: a system is "observable" if you can reconstruct its internal state from its outputs. Applied to software, it means your telemetry is rich enough that when something unexpected breaks, you can investigate it with the data you already emit.
+
+It is built on \textbf{three pillars} --- metrics, logs, and traces --- plus the practices that turn that data into reliable operations: SLOs, alerting, and incident response.
+
+\setcodelang{}
+
+\begin{verbatim}
+Metrics → what is happening   (aggregate numbers, trends, cheap)
+Logs    → what happened       (discrete events, full detail, expensive)
+Traces  → where it happened   (one request's path across services)
+\end{verbatim}
+
+The mental model: \textbf{metrics tell you something is wrong, traces tell you where, logs tell you why.} A good observability practice links all three (by a shared trace id) so you can pivot seamlessly: alert fires on a metric \(\rightarrow\) open the trace for an exemplar slow request \(\rightarrow\) read the structured logs for that exact request.
+
+\textbf{The crucial distinction --- Monitoring vs Observability:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Monitoring} watches \textbf{known} failure modes. You decide in advance what could go wrong ("CPU might spike," "the queue might back up," "error rate might rise") and build dashboards and alerts for each. Monitoring answers \emph{known-knowns} and \emph{known-unknowns}: "Is the thing I anticipated broken?"
+\item
+  \textbf{Observability} is the \emph{property} that lets you debug \textbf{unknown-unknowns} --- failures you never predicted. "Why is p99 latency up only for Android users in the EU region on the \texttt{/checkout} endpoint when they pay with PayPal?" You never built a dashboard for that exact slice --- but if your telemetry is high-cardinality and correlatable, you can discover it on the fly.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+                    Did you predict this failure mode?
+                         YES                 NO
+                  ┌──────────────────┬──────────────────┐
+   Can you query  │                  │                  │
+   it after the   │   MONITORING     │   OBSERVABILITY  │
+   fact?          │  (dashboards,    │  (ad-hoc, high-  │
+                  │   alerts, known  │   cardinality    │
+                  │   queries)       │   exploration)   │
+                  └──────────────────┴──────────────────┘
+   Monitoring is a SUBSET of observability.
+\end{verbatim}
+
+\textbf{Interview takeaway: Monitoring tells you \emph{that} the known thing broke. Observability lets you ask \emph{why} the unknown thing broke --- without deploying. Saying "monitoring is a subset of observability" signals you understand the difference instead of using them as synonyms.}
+
+\section{Why It Exists}\label{why-it-exists}
+
+\subsection{The distributed-systems problem}\label{the-distributed-systems-problem}
+
+In a monolith on one box, debugging was \texttt{ssh} + \texttt{tail\ -f\ app.log} + \texttt{top}. You could see everything because everything was in one place. Distributed systems destroyed that:
+
+\begin{itemize}
+\tightlist
+\item
+  A single user request fans out across \textbf{dozens} of microservices, each on different hosts, in different teams\textquotesingle{} code, written in different languages.
+\item
+  When a request is slow or fails, "\textbf{which hop, for which users, why?}" is unanswerable by staring at one machine.
+\item
+  Failures are \textbf{partial and emergent}: service A is fine, B is fine, but A\(\rightarrow\)B under load with a specific payload times out. No single component is "down."
+\item
+  Hosts are \textbf{ephemeral} (autoscaling, K8s pods come and go), so "ssh into the box" doesn\textquotesingle t work --- the box may already be gone.
+\end{itemize}
+
+Observability exists to reconstruct a coherent picture of the system from telemetry emitted by hundreds of moving parts.
+
+\subsection{What it buys you}\label{what-it-buys-you}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Cuts MTTR (Mean Time To Recovery).} The difference between a 5-minute incident and a 5-hour incident is almost always telemetry. If you can jump from "errors are up" to "this one downstream dependency is timing out" in 30 seconds, you mitigate fast.
+\item
+  \textbf{Surfaces unknown-unknowns.} Emergent failures you never anticipated become discoverable.
+\item
+  \textbf{Closes the reliability loop.} Measure \(\rightarrow\) set SLOs \(\rightarrow\) alert on burn \(\rightarrow\) improve. Without measurement there is no objective notion of "reliable enough."
+\item
+  \textbf{Quantifies the velocity/reliability trade-off.} Error budgets turn "are we reliable enough to ship?" from an argument into arithmetic.
+\end{enumerate}
+
+\begin{quote}
+You cannot operate what you cannot see. At scale, observability is not optional infrastructure --- it is \emph{how you keep the lights on}, and it must be designed in, not bolted on.
+\end{quote}
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1635}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5148}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3217}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evidence / Origin
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lesson
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Google} & Coined \textbf{SRE}, \textbf{SLI/SLO/error budget} in the SRE book. Built \textbf{Borgmon} (Prometheus\textquotesingle{} ancestor), \textbf{Dapper} (the paper that defined distributed tracing --- spans, trace context propagation). & The vocabulary of modern observability is Google\textquotesingle s. Expect deep SLO/error-budget questions. \\
+\rowcolor{zebra}
+\textbf{Amazon} & "Operational excellence" is the \textbf{first pillar} of the AWS Well-Architected Framework. Famous internal rule: \emph{you build it, you run it} --- devs carry the pager. & If you build it you must observe it. Designs are judged on operability. \\
+\textbf{Meta} & Built \textbf{Scuba} (real-time high-cardinality analytics) and a culture of slicing telemetry by arbitrary dimensions at query time. & High-cardinality, ad-hoc querying is the future of debugging. \\
+\rowcolor{zebra}
+\textbf{Netflix} & Pioneered \textbf{chaos engineering} (you must observe the blast radius), \textbf{Atlas} (in-house metrics), per-second streaming SLIs. & You can\textquotesingle t do chaos engineering without observability to measure the damage. \\
+\textbf{Honeycomb} (ex-Facebook founders) & Popularized "\textbf{observability}" as distinct from monitoring; built around high-cardinality events and \texttt{BubbleUp} exploratory analysis. & The industry\textquotesingle s modern definition of observability comes from here. \\
+\end{longtable}
+
+\textbf{FAANG interview reality:} Two guaranteed touchpoints. (1) In \emph{every} system design, the interviewer will ask "\textbf{how would you monitor and debug this in production?}" --- a vague answer signals a junior. (2) A debugging round: "\textbf{p99 latency tripled, walk me through how you\textquotesingle d find the cause.}" They want a disciplined metrics\(\rightarrow\)traces\(\rightarrow\)logs workflow, not guessing.
+
+\textbf{Interview takeaway: End every system design with an explicit observability section --- key SLIs, an SLO with an error budget, the three pillars linked by a trace id, and symptom-based alerts. This is the single highest-leverage thing you can add to a design answer.}
+
+\section{Core Concepts}\label{core-concepts}
+
+Before diving into each pillar, lock down the vocabulary. These terms recur everywhere and interviewers use them as shibboleths.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1452}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4657}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3890}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why it matters
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Telemetry} & The data a system emits about itself (metrics, logs, traces, profiles). & The raw material of observability. \\
+\rowcolor{zebra}
+\textbf{Cardinality} & The number of \emph{unique} values a dimension/label can take, and by extension the number of unique time-series produced. & The \#1 cost and scalability driver. High cardinality (per-user labels) explodes storage. \\
+\textbf{Dimension / Label / Tag} & A key-value attribute attached to telemetry (\texttt{region="eu"}, \texttt{endpoint="/checkout"}). & More dimensions = more ways to slice = more cardinality. \\
+\rowcolor{zebra}
+\textbf{Aggregation} & Rolling many raw data points into a summary (sum, rate, percentile) over a time window. & Metrics are pre-aggregated and cheap; logs are raw and expensive. \\
+\textbf{Sampling} & Keeping only a fraction of traces/logs to control cost. & The lever for affordable tracing at scale. \\
+\rowcolor{zebra}
+\textbf{Time-series} & A stream of \texttt{(timestamp,\ value)} pairs identified by a metric name + label set. & The fundamental unit of metrics storage. \\
+\textbf{Exemplar} & A pointer from an aggregated metric bucket to a specific trace that landed in it. & The bridge that links a metrics spike directly to a trace. \\
+\rowcolor{zebra}
+\textbf{OpenTelemetry (OTel)} & The vendor-neutral CNCF standard: APIs, SDKs, and the Collector for emitting all three pillars. & Instrument once, export anywhere. The default answer to "how do you instrument?" \\
+\textbf{MTTD / MTTR / MTBF} & Mean Time To Detect / Recover / Between Failures. & The headline numbers observability and incident response improve. \\
+\end{longtable}
+
+\subsection{High-cardinality querying --- the heart of observability}\label{high-cardinality-querying--the-heart-of-observability}
+
+The thing that separates "monitoring" from "observability" is the ability to slice telemetry by \textbf{high-cardinality dimensions at query time}. Consider:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{user\_id} --- millions of distinct values
+\item
+  \texttt{request\_id} --- unbounded
+\item
+  \texttt{build\_id}, \texttt{feature\_flag}, \texttt{device\_model}, \texttt{app\_version} --- hundreds to thousands each
+\end{itemize}
+
+A traditional metrics system \emph{cannot} store a separate time-series per \texttt{user\_id} (more on the explosion math below). But an \textbf{event-based} store (Honeycomb, Scuba, or a wide structured log/trace store) keeps the raw high-cardinality events and lets you \texttt{GROUP\ BY\ user\_id} after the fact. That\textquotesingle s how you discover "it\textquotesingle s only failing for these 3 enterprise customers on app version 4.2.1" --- a query nobody anticipated.
+
+\textbf{Interview takeaway: The power of observability is asking questions you didn\textquotesingle t pre-plan. That requires high-cardinality, raw, correlatable data --- which is fundamentally in tension with the cheap, pre-aggregated, low-cardinality nature of metrics. Knowing that tension (and that you solve it with traces/structured-events plus sampling) is a senior signal.}
+
+\section{Metrics}\label{metrics}
+
+A \textbf{metric} is a numeric measurement aggregated over time --- a time-series identified by a name plus a set of labels. Metrics are \textbf{cheap} (pre-aggregated), \textbf{fast to query}, and ideal for \textbf{dashboards and alerting}. Their weakness is \textbf{cardinality}: you cannot attach unbounded labels.
+
+\subsection{Metric types --- the four kinds and what each is for}\label{metric-types--the-four-kinds-and-what-each-is-for}
+
+Prometheus (the de-facto open standard) defines four metric types. Understanding \emph{what each is for} and \emph{how percentiles emerge from histograms} is a classic interview probe.
+
+\subsubsection{Counter}\label{counter}
+
+A value that only ever \textbf{goes up} (monotonically increasing), resetting to 0 only on process restart. You never read a counter\textquotesingle s raw value directly --- you read its \textbf{rate}.
+
+\begin{itemize}
+\tightlist
+\item
+  Examples: \texttt{http\_requests\_total}, \texttt{errors\_total}, \texttt{bytes\_sent\_total}.
+\item
+  Why monotonic? So that if a scrape is missed, the cumulative value is self-healing --- \texttt{rate()} reconstructs the per-second increase across any two scrapes and automatically handles counter resets.
+\end{itemize}
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Requests per second over the last 5 minutes (per series)}
+\NormalTok{rate(http\_requests\_total[5m])}
+
+\NormalTok{\# Total request rate across all instances of a service}
+\NormalTok{sum(rate(http\_requests\_total\{service="checkout"\}[5m]))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Gauge}\label{gauge}
+
+A value that can go \textbf{up or down} --- a snapshot of "right now."
+
+\begin{itemize}
+\tightlist
+\item
+  Examples: \texttt{memory\_usage\_bytes}, \texttt{queue\_depth}, \texttt{active\_connections}, \texttt{temperature\_celsius}, \texttt{goroutines}.
+\item
+  You read gauges directly (current value), or use functions like \texttt{max\_over\_time}, \texttt{delta}, \texttt{deriv}.
+\end{itemize}
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Current queue depth, max over the last hour}
+\NormalTok{max\_over\_time(queue\_depth[1h])}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Histogram}\label{histogram}
+
+Samples observations (e.g., request durations) into \textbf{predefined buckets}, and exposes a counter per bucket. This is how you compute percentiles \textbf{server-side} in a way that aggregates correctly across instances.
+
+A histogram for \texttt{http\_request\_duration\_seconds} with buckets \texttt{{[}0.1,\ 0.3,\ 1,\ 2.5,\ +Inf{]}} emits cumulative bucket counters (\texttt{\_bucket\{le="..."\}}), a \texttt{\_sum}, and a \texttt{\_count}:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{http\_request\_duration\_seconds\_bucket\{le}\OperatorTok{=}\StringTok{"0.1"}\NormalTok{\}   }\DecValTok{24054}   \CommentTok{\# ≤100ms}
+\NormalTok{http\_request\_duration\_seconds\_bucket\{le}\OperatorTok{=}\StringTok{"0.3"}\NormalTok{\}   }\DecValTok{33444}   \CommentTok{\# ≤300ms}
+\NormalTok{http\_request\_duration\_seconds\_bucket\{le}\OperatorTok{=}\StringTok{"1"}\NormalTok{\}     }\DecValTok{34522}   \CommentTok{\# ≤1s}
+\NormalTok{http\_request\_duration\_seconds\_bucket\{le}\OperatorTok{=}\StringTok{"2.5"}\NormalTok{\}   }\DecValTok{34588}   \CommentTok{\# ≤2.5s}
+\NormalTok{http\_request\_duration\_seconds\_bucket\{le}\OperatorTok{=}\StringTok{"+Inf"}\NormalTok{\}  }\DecValTok{34601}   \CommentTok{\# all requests}
+\NormalTok{http\_request\_duration\_seconds\_sum                 }\FloatTok{8953.3}  \CommentTok{\# total seconds}
+\NormalTok{http\_request\_duration\_seconds\_count               }\DecValTok{34601}   \CommentTok{\# total requests}
+\end{Highlighting}
+\end{Shaded}
+
+Note the buckets are \textbf{cumulative} (\texttt{le} = "less than or equal"): the \texttt{le="0.3"} bucket includes everything in \texttt{le="0.1"}. This is what makes them aggregatable --- you can \texttt{sum()} bucket counters across all instances \emph{before} computing the quantile, which is mathematically correct (unlike averaging pre-computed percentiles, which is meaningless).
+
+\textbf{How a percentile is computed from buckets} --- \texttt{histogram\_quantile()} finds which bucket the target rank falls into and \textbf{linearly interpolates} within it:
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# p99 latency over 5m, aggregated across all instances}
+\NormalTok{histogram\_quantile(}
+\NormalTok{  0.99,}
+\NormalTok{  sum by (le) (rate(http\_request\_duration\_seconds\_bucket[5m]))}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Walk-through for p99 with the numbers above: total count = 34601, so the 99th percentile rank is at observation \texttt{0.99\ ×\ 34601\ ≈\ 34255}. That rank lands between the \texttt{le="0.3"} bucket (33444) and \texttt{le="1"} bucket (34522). Linear interpolation within \texttt{{[}0.3s,\ 1s{]}}: \texttt{0.3\ +\ (34255\ −\ 33444)/(34522\ −\ 33444)\ ×\ (1\ −\ 0.3)\ =\ 0.3\ +\ (811/1078)\ ×\ 0.7\ ≈\ 0.83s}. So \textbf{p99 \(\approx\) 830ms}.
+
+\textbf{The accuracy caveat:} histogram percentiles are only as good as your bucket boundaries. If 99\% of traffic is between 0.3s and 1s, that\textquotesingle s a \emph{wide} interpolation gap --- your p99 estimate could be off by hundreds of ms. \textbf{Choose buckets around your SLO thresholds} (e.g., if SLO is 200ms, have buckets at 0.1, 0.15, 0.2, 0.25, 0.3) so the percentile near your target is precise.
+
+\subsubsection{Summary}\label{summary}
+
+Like a histogram, but quantiles are \textbf{pre-computed client-side} at scrape time (e.g., the app calculates its own p50/p99 over a sliding window).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{http\_request\_duration\_seconds\{quantile}\OperatorTok{=}\StringTok{"0.5"}\NormalTok{\}   }\FloatTok{0.052}
+\NormalTok{http\_request\_duration\_seconds\{quantile}\OperatorTok{=}\StringTok{"0.99"}\NormalTok{\}  }\FloatTok{0.84}
+\NormalTok{http\_request\_duration\_seconds\_sum                }\FloatTok{8953.3}
+\NormalTok{http\_request\_duration\_seconds\_count              }\DecValTok{34601}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pro:} exact quantiles (no bucket interpolation error), cheap to query.
+\item
+  \textbf{Con (fatal at scale):} you \textbf{cannot aggregate quantiles across instances}. The p99 of instance A and p99 of instance B cannot be combined into a fleet p99 --- there is no mathematical operation to do so. With histograms you \texttt{sum} the buckets first, then compute; with summaries you\textquotesingle re stuck.
+\end{itemize}
+
+\textbf{Interview takeaway: Prefer histograms over summaries for anything that runs on more than one instance, because histogram buckets are aggregatable across instances and summary quantiles are not. The only knob histograms require is choosing bucket boundaries near your SLO. "You can\textquotesingle t average percentiles" is a line that signals you understand the math.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0896}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1145}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3436}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4522}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Goes down?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Aggregatable across instances?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Counter & No & Yes (\texttt{sum}) & rates: requests, errors, bytes \\
+\rowcolor{zebra}
+Gauge & Yes & Yes (\texttt{sum}/\texttt{avg}/\texttt{max}) & levels: memory, queue depth, connections \\
+Histogram & n/a & \textbf{Yes} (sum buckets, then quantile) & latency / size distributions \(\rightarrow\) percentiles \\
+\rowcolor{zebra}
+Summary & n/a & \textbf{No} (quantiles can\textquotesingle t be merged) & single-instance percentiles only \\
+\end{longtable}
+
+\subsection{Prometheus: the pull model, exporters, and service discovery}\label{prometheus-the-pull-model-exporters-and-service-discovery}
+
+Prometheus \textbf{pulls} (scrapes) metrics from targets over HTTP at a fixed \texttt{scrape\_interval} (default 15s). Each target exposes a \texttt{/metrics} endpoint in a simple text format.
+
+\setcodelang{}
+
+\begin{verbatim}
+            ┌──────────────────┐
+            │   Alertmanager   │  routes/dedupes/silences alerts
+            └────────▲─────────┘  → PagerDuty, Slack, email
+                     │ fires alerts (evaluated against rules)
+            ┌────────┴─────────┐
+  scrape    │   Prometheus     │  PromQL ──▶ ┌──────────┐
+  (HTTP GET │   Server + TSDB  │             │ Grafana  │ dashboards
+   /metrics)│   (local disk)   │             └──────────┘
+     ◄──────│                  │
+            └──────┬───────────┘
+                   │ service discovery (who do I scrape?)
+   ┌───────────────┼────────────────┬─────────────────┐
+   ▼               ▼                ▼                  ▼
+ app:8080      node_exporter   kube-state-metrics  blackbox_exporter
+ /metrics      (host CPU/mem)  (K8s object state)  (probes URLs)
+\end{verbatim}
+
+\textbf{Exporters} translate something that \emph{doesn\textquotesingle t} speak Prometheus into the \texttt{/metrics} format:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{node\_exporter} --- host-level CPU, memory, disk, network (the USE method\textquotesingle s raw material).
+\item
+  \texttt{kube-state-metrics} --- Kubernetes object state (pod restarts, deployment replicas).
+\item
+  \texttt{blackbox\_exporter} --- probes endpoints from outside (HTTP 200? TLS cert expiry? DNS resolves?).
+\item
+  \texttt{mysqld\_exporter}, \texttt{redis\_exporter}, etc. --- pull stats out of off-the-shelf systems.
+\end{itemize}
+
+\textbf{Service discovery} answers "what should I scrape?" dynamically --- critical because targets (pods) are ephemeral. Prometheus integrates with Kubernetes SD, EC2 SD, Consul, etc. It watches the K8s API and automatically scrapes pods that carry a \texttt{prometheus.io/scrape:\ "true"} annotation, so you never hand-maintain a target list.
+
+\setcodelang{YAML}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{scrape\_configs}\KeywordTok{:}
+\AttributeTok{  }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{job\_name}\KeywordTok{:}\AttributeTok{ }\StringTok{\textquotesingle{}kubernetes{-}pods\textquotesingle{}}
+\AttributeTok{    }\FunctionTok{kubernetes\_sd\_configs}\KeywordTok{:}
+\AttributeTok{      }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{role}\KeywordTok{:}\AttributeTok{ pod}
+\AttributeTok{    }\FunctionTok{relabel\_configs}\KeywordTok{:}
+\CommentTok{      \# only scrape pods annotated prometheus.io/scrape=true}
+\AttributeTok{      }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{source\_labels}\KeywordTok{:}\AttributeTok{ }\KeywordTok{[}\AttributeTok{\_\_meta\_kubernetes\_pod\_annotation\_prometheus\_io\_scrape}\KeywordTok{]}
+\AttributeTok{        }\FunctionTok{action}\KeywordTok{:}\AttributeTok{ keep}
+\AttributeTok{        }\FunctionTok{regex}\KeywordTok{:}\AttributeTok{ }\CharTok{true}
+\CommentTok{      \# use the annotated port}
+\AttributeTok{      }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{source\_labels}\KeywordTok{:}\AttributeTok{ }\KeywordTok{[}\AttributeTok{\_\_meta\_kubernetes\_pod\_annotation\_prometheus\_io\_port}\KeywordTok{,}
+\AttributeTok{                        \_\_address\_\_}\KeywordTok{]}
+\AttributeTok{        }\FunctionTok{action}\KeywordTok{:}\AttributeTok{ replace}
+\AttributeTok{        }\FunctionTok{regex}\KeywordTok{:}\AttributeTok{ (\textbackslash{}d+);(.+):\textbackslash{}d+}
+\AttributeTok{        }\FunctionTok{replacement}\KeywordTok{:}\AttributeTok{ $2:$1}
+\AttributeTok{        }\FunctionTok{target\_label}\KeywordTok{:}\AttributeTok{ \_\_address\_\_}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Pull vs Push:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1438}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4443}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4119}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pull (Prometheus)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Push (StatsD, Graphite, OTLP-push)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Liveness & Scrape failure \emph{is} a down signal --- you know the target is gone & Absence of pushes is ambiguous (down? or just quiet?) \\
+\rowcolor{zebra}
+Config & Centralized in Prometheus (SD) & Each app must know where to push \\
+Short-lived jobs & Hard (job ends before scrape) \(\rightarrow\) use \textbf{Pushgateway} & Natural fit (batch job pushes on completion) \\
+\rowcolor{zebra}
+Network & Prometheus must reach targets (firewall/NAT friction) & Targets reach collector (easier through NAT) \\
+Scale & Sharding/federation needed for huge fleets & Collector can be a bottleneck/SPOF \\
+\end{longtable}
+
+The \textbf{Pushgateway} is the escape hatch for the pull model\textquotesingle s weakness: a short-lived batch/cron job that finishes before any scrape pushes its final metrics to the gateway, which Prometheus then scrapes. Caveat: don\textquotesingle t use it for long-running services (it breaks the liveness signal and metrics go stale).
+
+\textbf{Interview takeaway: Pull\textquotesingle s killer feature is that a failed scrape is itself a health signal --- you instantly know a target is unreachable. The classic pull weakness is short-lived jobs, solved by the Pushgateway. OpenTelemetry\textquotesingle s OTLP is push-based, so modern stacks often mix both.}
+
+\subsection{The three monitoring methodologies --- RED, USE, Four Golden Signals}\label{the-three-monitoring-methodologies--red-use-four-golden-signals}
+
+These tell you \emph{which} metrics to collect. Interviewers love "what would you monitor?" --- name the framework.
+
+\textbf{RED (Tom Wilkie / Weaveworks) --- per \emph{service} (request-driven):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{R}ate --- requests per second.
+\item
+  \textbf{E}rrors --- failed requests per second (and as a ratio).
+\item
+  \textbf{D}uration --- latency distribution (p50/p99 via histograms).
+\end{itemize}
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# RED for the checkout service}
+\NormalTok{\# Rate}
+\NormalTok{sum(rate(http\_requests\_total\{service="checkout"\}[5m]))}
+\NormalTok{\# Errors (ratio)}
+\NormalTok{sum(rate(http\_requests\_total\{service="checkout",status=\textasciitilde{}"5.."\}[5m]))}
+\NormalTok{  / sum(rate(http\_requests\_total\{service="checkout"\}[5m]))}
+\NormalTok{\# Duration (p99)}
+\NormalTok{histogram\_quantile(0.99,}
+\NormalTok{  sum by (le) (rate(http\_request\_duration\_seconds\_bucket\{service="checkout"\}[5m])))}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{USE (Brendan Gregg) --- per \emph{resource} (infrastructure-driven):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{U}tilization --- \% busy (CPU at 80\%).
+\item
+  \textbf{S}aturation --- extra queued work the resource can\textquotesingle t service yet (run-queue length, disk I/O queue depth).
+\item
+  \textbf{E}rrors --- error events (packet drops, ECC errors, disk errors).
+\end{itemize}
+
+\textbf{Four Golden Signals (Google SRE book):} Latency, Traffic, Errors, Saturation.
+
+\setcodelang{}
+
+\begin{verbatim}
+RED  ≈ Latency(Duration) + Traffic(Rate) + Errors   → great for stateless services
+USE  ≈ Saturation + Errors + Utilization             → great for resources/queues
+Golden Signals = Latency + Traffic + Errors + Saturation = RED ∪ USE
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1386}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2871}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3168}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2574}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Scope
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Misses
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{RED} & request-driven services & microservices, APIs & saturation/resource limits \\
+\rowcolor{zebra}
+\textbf{USE} & resources (CPU, disk, queues) & hosts, databases, message queues & user-facing experience \\
+\textbf{Golden Signals} & services holistically & the union; the default & (the complete set) \\
+\end{longtable}
+
+\textbf{A subtle point --- latency of errors:} when computing Duration, measure successful and failed requests \textbf{separately}. A flood of fast 500s (failing instantly) can \emph{lower} your average latency and hide a problem. Always split error latency from success latency.
+
+\subsection{Cardinality explosion --- why per-user labels destroy you}\label{cardinality-explosion--why-per-user-labels-destroy-you}
+
+This is \emph{the} most important operational fact about metrics, and a guaranteed senior question. \textbf{Every unique combination of label values creates a separate time-series}, and each time-series consumes memory and storage.
+
+Suppose \texttt{http\_requests\_total} has labels:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{method} (5 values: GET/POST/PUT/DELETE/PATCH)
+\item
+  \texttt{endpoint} (20 routes)
+\item
+  \texttt{status} (\textasciitilde15 codes)
+\item
+  \texttt{instance} (10 pods)
+\end{itemize}
+
+Series count = 5 \(\times\) 20 \(\times\) 15 \(\times\) 10 = \textbf{15,000 time-series}. Totally fine.
+
+Now a well-meaning engineer adds \texttt{user\_id} (1,000,000 users):
+
+Series count = 15,000 \(\times\) 1,000,000 = \textbf{15 billion time-series}.
+
+Each series costs roughly a few KB of RAM in the head block plus ongoing disk. Multiply by billions \(\rightarrow\) Prometheus OOMs, queries time out, the cluster falls over. This is \textbf{cardinality explosion}, and it is the single most common way teams take down their own monitoring.
+
+\setcodelang{}
+
+\begin{verbatim}
+Series = ∏ (cardinality of each label)
+
+  method(5) × endpoint(20) × status(15) × instance(10)        = 15,000      ✅
+  ...      × user_id(1,000,000)                                = 15,000,000,000  💥
+\end{verbatim}
+
+\textbf{Rules of thumb:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Never} put unbounded/high-cardinality values (\texttt{user\_id}, \texttt{request\_id}, \texttt{email}, \texttt{session\_id}, raw URLs with IDs, full error messages) in metric labels.
+\item
+  Bound the cardinality: bucket the URL (\texttt{/users/:id} not \texttt{/users/12345}), cap status to families, keep instance count sane.
+\item
+  If you \emph{need} per-user investigation, that\textquotesingle s a job for \textbf{traces/structured logs} (high-cardinality stores), \textbf{not metrics}.
+\end{itemize}
+
+\textbf{Interview takeaway: "I\textquotesingle d add a user\_id label to the metric" is a trap answer that gets you cut. Metrics are for low-cardinality aggregates; high-cardinality per-entity questions belong in traces or wide structured events. Mentioning cardinality explosion unprompted signals real production experience.}
+
+\subsection{Exemplars --- the bridge from metrics to traces}\label{exemplars--the-bridge-from-metrics-to-traces}
+
+A histogram bucket tells you "13 requests took 2--2.5s" but not \emph{which} requests. An \textbf{exemplar} attaches a sample trace id (and its value) to a bucket, so a single slow observation carries a pointer to the trace that produced it.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{http\_request\_duration\_seconds\_bucket\{le}\OperatorTok{=}\StringTok{"2.5"}\NormalTok{\} }\DecValTok{13} \CommentTok{\# \{trace\_id="abc123"\} 2.31}
+\end{Highlighting}
+\end{Shaded}
+
+In Grafana, you click the spike on the p99 latency graph and it offers "view exemplar trace" \(\rightarrow\) you jump straight to a Jaeger waterfall of an \emph{actual} slow request. This collapses the metrics\(\rightarrow\)traces pivot from minutes of guessing to one click. Exemplars are the glue that makes the "metrics tell you \emph{that}, traces tell you \emph{where}" workflow seamless.
+
+\section{Logs}\label{logs}
+
+A \textbf{log} is a timestamped, discrete record of an event. Logs carry the most \textbf{detail} of any pillar ("payment failed: insufficient funds, balance=\(12.40, requested=\)99.99") but are the most \textbf{expensive} (volume \(\times\) retention = cost) and the hardest to aggregate.
+
+\subsection{Structured logging --- JSON, not free text}\label{structured-logging--json-not-free-text}
+
+The single biggest upgrade to logging is going from human-readable strings to \textbf{structured (JSON) logs} with explicit fields. Free text like \texttt{2026-06-15\ ERROR\ payment\ failed\ for\ user\ 789\ amount\ 99.99} requires fragile regex to query. Structured logs are machine-queryable.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# BAD — unstructured, requires regex archaeology to query}
+\NormalTok{logging.error(}\SpecialStringTok{f"payment failed for user }\SpecialCharTok{\{}\NormalTok{user\_id}\SpecialCharTok{\}}\SpecialStringTok{ amount }\SpecialCharTok{\{}\NormalTok{amount}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+\CommentTok{\# GOOD — structured JSON, every field is independently queryable}
+\ImportTok{import}\NormalTok{ structlog}
+\NormalTok{log }\OperatorTok{=}\NormalTok{ structlog.get\_logger()}
+
+\NormalTok{log.error(}
+    \StringTok{"payment\_failed"}\NormalTok{,}
+\NormalTok{    reason}\OperatorTok{=}\StringTok{"insufficient\_funds"}\NormalTok{,}
+\NormalTok{    user\_id}\OperatorTok{=}\NormalTok{user\_id,}
+\NormalTok{    amount}\OperatorTok{=}\NormalTok{amount,}
+\NormalTok{    currency}\OperatorTok{=}\StringTok{"USD"}\NormalTok{,}
+\NormalTok{    trace\_id}\OperatorTok{=}\NormalTok{current\_trace\_id(),   }\CommentTok{\# ← links this log to the trace}
+\NormalTok{    span\_id}\OperatorTok{=}\NormalTok{current\_span\_id(),}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Emitted:
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"timestamp"}\FunctionTok{:} \StringTok{"2026{-}06{-}15T10:30:00.123Z"}\FunctionTok{,}
+  \DataTypeTok{"level"}\FunctionTok{:} \StringTok{"error"}\FunctionTok{,}
+  \DataTypeTok{"event"}\FunctionTok{:} \StringTok{"payment\_failed"}\FunctionTok{,}
+  \DataTypeTok{"service"}\FunctionTok{:} \StringTok{"payment{-}service"}\FunctionTok{,}
+  \DataTypeTok{"reason"}\FunctionTok{:} \StringTok{"insufficient\_funds"}\FunctionTok{,}
+  \DataTypeTok{"user\_id"}\FunctionTok{:} \StringTok{"u{-}789"}\FunctionTok{,}
+  \DataTypeTok{"amount"}\FunctionTok{:} \FloatTok{99.99}\FunctionTok{,}
+  \DataTypeTok{"currency"}\FunctionTok{:} \StringTok{"USD"}\FunctionTok{,}
+  \DataTypeTok{"trace\_id"}\FunctionTok{:} \StringTok{"abc123"}\FunctionTok{,}
+  \DataTypeTok{"span\_id"}\FunctionTok{:} \StringTok{"def456"}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Now you can run \texttt{level:error\ AND\ reason:insufficient\_funds\ AND\ amount\ \textgreater{}\ 50} in Kibana/Loki, group by \texttt{reason}, and join to the trace via \texttt{trace\_id}. The \texttt{event} field is a \textbf{stable identifier} (not a templated string with the amount baked in), so it groups cleanly.
+
+\subsection{Log levels --- and when to actually use each}\label{log-levels--and-when-to-actually-use-each}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1198}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.7005}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1797}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+When to use
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pages someone?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{TRACE/DEBUG} & Fine-grained dev diagnostics; verbose. Usually disabled in prod (or sampled). & Never \\
+\rowcolor{zebra}
+\textbf{INFO} & Normal significant events: "order placed," "user logged in." Audit-worthy facts. & Never \\
+\textbf{WARN} & Something unexpected but handled/recovered: retry succeeded, fell back to cache, deprecated API used. Worth watching, not yet broken. & Maybe (trend) \\
+\rowcolor{zebra}
+\textbf{ERROR} & A request/operation failed; needs attention but the service is up. & Possibly (rate-based) \\
+\textbf{FATAL/CRITICAL} & The process cannot continue / is crashing. & Yes \\
+\end{longtable}
+
+\textbf{Common mistakes:} logging at ERROR for things you handle gracefully (creates noise and false alarms), or at INFO for things that should page (so nobody sees them). Calibrate so that a spike in ERROR logs genuinely correlates with user pain. Don\textquotesingle t log-and-rethrow the same exception at three layers --- you get one error logged three times.
+
+\subsection{Sampling logs}\label{sampling-logs}
+
+At high volume, logging \emph{every} request is unaffordable (and overwhelms the pipeline). \textbf{Sample}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Keep all errors}, sample successes (e.g., 1\% of 2xx, 100\% of 5xx). Errors are rare and valuable; successes are abundant and cheap to lose.
+\item
+  \textbf{Dynamic sampling}: log more during incidents, less when healthy.
+\item
+  \textbf{Per-key sampling}: keep at least N logs per (endpoint, status) so rare combinations aren\textquotesingle t entirely dropped.
+\end{itemize}
+
+\subsection{Log aggregation pipeline (ELK / Loki)}\label{log-aggregation-pipeline-elk--loki}
+
+You don\textquotesingle t grep individual hosts. Logs flow through a pipeline into a central, indexed store.
+
+\setcodelang{}
+
+\begin{verbatim}
+┌────────┐   ┌─────────────────┐   ┌─────────┐   ┌──────────────┐   ┌──────────┐
+│  App   │──▶│ Agent / shipper │──▶│  Buffer │──▶│   Storage    │──▶│   UI     │
+│(stdout │   │ Fluentd/Fluent  │   │  Kafka  │   │ Elasticsearch│   │ Kibana   │
+│ JSON)  │   │ Bit/Vector/     │   │ (absorbs│   │  (full index)│   │ /Grafana │
+│        │   │ Filebeat        │   │  spikes)│   │  OR Loki     │   │          │
+└────────┘   └─────────────────┘   └─────────┘   │ (index labels│   └──────────┘
+                                                 │  only, cheap)│
+                                                 └──────────────┘
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ELK (Elasticsearch + Logstash + Kibana):} full-text inverted index on every field. Powerful arbitrary search, but \textbf{storage-heavy and expensive} --- you pay to index everything.
+\item
+  \textbf{Loki (Grafana):} indexes only a small set of \textbf{labels} (service, level, host) and stores the log body compressed and unindexed. Much cheaper; you grep within a label-narrowed stream rather than full-text-searching everything. Trade-off: less powerful arbitrary search, far lower cost.
+\item
+  \textbf{Kafka as a buffer} decouples producers from the store and absorbs traffic spikes so a log flood doesn\textquotesingle t drop data or take down Elasticsearch.
+\end{itemize}
+
+\subsection{\texorpdfstring{Correlation IDs --- joining logs \(\leftrightarrow\) traces \(\leftrightarrow\) metrics}{Correlation IDs --- joining logs \textbackslash leftrightarrow traces \textbackslash leftrightarrow metrics}}\label{correlation-ids--joining-logs-leftrightarrow-traces-leftrightarrow-metrics}
+
+The thread that stitches the pillars together is a \textbf{trace id} (a.k.a. correlation/request id) generated at the edge and propagated everywhere. Put it in \textbf{every log line} and \textbf{every span}. Then:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Alert fires (metric) \(\rightarrow\) grab an exemplar \texttt{trace\_id}.
+\item
+  Open the trace (\texttt{trace\_id=abc123}) \(\rightarrow\) see the slow span is \texttt{payment-service}.
+\item
+  Query logs \texttt{trace\_id:abc123\ AND\ service:payment-service} \(\rightarrow\) read the exact error: \texttt{insufficient\_funds}.
+\end{enumerate}
+
+Without this id you\textquotesingle re correlating by timestamp and guessing. With it, all three pillars are one click apart.
+
+\subsection{Retention \& cost}\label{retention--cost}
+
+Logs are the most expensive pillar because cost = \textbf{volume \(\times\) retention \(\times\) indexing}. Strategies:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Tiered retention:} hot (7 days, fast SSD, fully indexed) \(\rightarrow\) warm (30 days, cheaper) \(\rightarrow\) cold (S3/Glacier, 1 year, for compliance, slow to query).
+\item
+  \textbf{Aggressive sampling} of high-volume low-value logs.
+\item
+  \textbf{Drop noisy fields} before indexing.
+\item
+  Treat verbose DEBUG as \textbf{on-demand} (enable per-service during an incident), not always-on.
+\end{itemize}
+
+\subsection{What NOT to log --- PII and secrets}\label{what-not-to-log--pii-and-secrets}
+
+Logs are frequently the source of catastrophic data breaches and compliance violations. \textbf{Never log:}
+
+\begin{itemize}
+\tightlist
+\item
+  Passwords, API keys, tokens, session cookies, private keys.
+\item
+  PII beyond what\textquotesingle s necessary: full credit-card numbers (PCI violation), SSNs, full email/address if avoidable. Mask/tokenize (\texttt{card\_last4="4242"}, not the full PAN).
+\item
+  Full request/response bodies that may contain any of the above.
+\end{itemize}
+
+\textbf{Mechanisms:} redaction filters in the logging library, allow-lists of safe fields, and automated scanners that fail CI if a log statement references a known-sensitive field. GDPR/CCPA also mean logged PII is subject to deletion requests --- another reason to minimize it.
+
+\textbf{Interview takeaway: "Structured JSON logs, sampled (keep all errors), shipped to a central indexed store, carrying a trace id, with PII redacted and tiered retention" is the complete senior answer to \textquotesingle how do you do logging.\textquotesingle{} Mentioning PII/secrets redaction unprompted shows production maturity.}
+
+\section{Traces}\label{traces}
+
+A \textbf{distributed trace} records the end-to-end journey of a single request as it fans out across services. It is the pillar that makes microservice latency debuggable --- answering "\textbf{which hop ate the time?}"
+
+\subsection{Spans and span context}\label{spans-and-span-context}
+
+The unit of a trace is a \textbf{span}: a single named operation with a start time, duration, and metadata. A trace is a \textbf{tree of spans}.
+
+Each span carries:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{trace\_id} --- identifies the whole request (same across all spans in the trace).
+\item
+  \texttt{span\_id} --- identifies this span.
+\item
+  \texttt{parent\_span\_id} --- the span that caused this one (null for the root). This is what builds the tree.
+\item
+  \texttt{name} --- operation (e.g., \texttt{GET\ /checkout}, \texttt{SELECT\ orders}).
+\item
+  \texttt{start\_time}, \texttt{duration}.
+\item
+  \textbf{Attributes} (key-value tags): \texttt{http.method}, \texttt{db.statement}, \texttt{user.tier}, \texttt{region}. High-cardinality is fine here (unlike metric labels) --- this is where per-user debugging lives.
+\item
+  \textbf{Events} (timestamped logs within a span): \texttt{"cache\ miss"}, \texttt{"retry\ attempt\ 2"}, an exception with stack trace.
+\item
+  \textbf{Status:} OK / Error.
+\end{itemize}
+
+\subsection{A trace as a waterfall (tree)}\label{a-trace-as-a-waterfall-tree}
+
+The classic visualization is a \textbf{waterfall}: indentation = parent/child depth, horizontal position = start time, bar width = duration.
+
+\setcodelang{}
+
+\begin{verbatim}
+trace_id=abc123                                              total = 240ms
+│
+├─ gateway: POST /checkout         [■■■■■■■■■■■■■■■■■■■■■■■■]  0──────240ms
+│  ├─ auth: validate_token         [■■]                       2──20ms
+│  ├─ orders: create_order              [■■■■■■■■■■]           30──130ms
+│  │  ├─ db: INSERT orders               [■■]                 35──55ms
+│  │  └─ db: SELECT inventory                 [■■■■■■■]       60──130ms ← SLOW SPAN (70ms)
+│  └─ payment: charge_card                          [■■■■■■■] 135──225ms
+│     └─ http: POST stripe.com/charge                 [■■■■■] 150──215ms (65ms, external)
+│
+Reading it:
+ • Width = time spent. The widest bar that ISN'T just waiting on a child is the culprit.
+ • "SELECT inventory" (70ms self-time) and the external Stripe call (65ms) dominate.
+ • Gaps between a parent's start and its first child = the parent's own (serial) work.
+\end{verbatim}
+
+\textbf{Finding the slow span:} look for the span with the largest \textbf{self-time} (its own duration minus time waiting on children). A parent that\textquotesingle s wide only because its child is wide isn\textquotesingle t the problem --- the child is. Here, \texttt{SELECT\ inventory} (a missing index?) and the Stripe call are the two real costs; \texttt{gateway} is wide simply because it waits for them.
+
+\subsection{W3C Trace Context propagation --- the actual header}\label{w3c-trace-context-propagation--the-actual-header}
+
+For the trace to span services, each service must \textbf{propagate} the trace context to the next via HTTP headers. The W3C standard is the \texttt{traceparent} header:
+
+\setcodelang{}
+
+\begin{verbatim}
+traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+             │  │                                │                │
+             │  └─ trace-id (16 bytes, 32 hex)   │                └─ trace-flags
+             │     same for the whole request    │                   (01 = sampled)
+             └─ version                           └─ parent-id / span-id
+                                                     (8 bytes, this span)
+
+tracestate: vendor1=value1,vendor2=value2   # vendor-specific extra context
+\end{verbatim}
+
+The propagation contract: when service A calls service B, A injects \texttt{traceparent} into the outgoing request with A\textquotesingle s current span as the \texttt{parent-id}. B extracts it, creates a child span referencing A\textquotesingle s span, and on its own outbound calls injects \emph{its} span id. The \texttt{trace-id} never changes; the \texttt{parent-id} does at each hop. The \texttt{sampled} flag rides along so the whole trace is consistently kept or dropped.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# OpenTelemetry handles inject/extract automatically, but conceptually:}
+\CommentTok{\# Service A (caller):}
+\NormalTok{headers }\OperatorTok{=}\NormalTok{ \{\}}
+\NormalTok{inject(headers)  }\CommentTok{\# writes traceparent with A\textquotesingle{}s span as parent{-}id}
+\NormalTok{requests.post(}\StringTok{"http://service{-}b/work"}\NormalTok{, headers}\OperatorTok{=}\NormalTok{headers)}
+
+\CommentTok{\# Service B (callee):}
+\NormalTok{ctx }\OperatorTok{=}\NormalTok{ extract(request.headers)  }\CommentTok{\# reads traceparent}
+\ControlFlowTok{with}\NormalTok{ tracer.start\_as\_current\_span(}\StringTok{"work"}\NormalTok{, context}\OperatorTok{=}\NormalTok{ctx):  }\CommentTok{\# child of A\textquotesingle{}s span}
+\NormalTok{    ...}
+\end{Highlighting}
+\end{Shaded}
+
+If any service in the chain \emph{drops} the header (e.g., a proxy that strips it, or an un-instrumented service), the trace \textbf{breaks} into two disconnected trees --- a common real-world gap.
+
+\subsection{Head vs tail sampling}\label{head-vs-tail-sampling}
+
+Storing every span at scale is unaffordable, so you \textbf{sample}. The decision is \emph{when} you decide to keep a trace.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1586}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4029}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4385}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Head-based sampling
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tail-based sampling
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{When} & At trace \emph{start} (the root decides, e.g., keep 1\%) & At trace \emph{end}, after all spans collected \\
+\rowcolor{zebra}
+\textbf{Cost} & Cheap --- only sampled traces are ever emitted & Expensive --- collector must buffer ALL spans until the trace completes \\
+\textbf{Catches rare errors?} & \textbf{No} --- a slow/failed trace not chosen at the start is lost forever & \textbf{Yes} --- can keep 100\% of traces that errored or exceeded a latency threshold \\
+\rowcolor{zebra}
+\textbf{Decision propagation} & Sampled flag in \texttt{traceparent} keeps the whole trace consistent & Collector reassembles, then decides \\
+\textbf{Typical policy} & "keep 1\% of everything" & "keep 100\% of errors + slow traces + 1\% of the rest" \\
+\end{longtable}
+
+\textbf{The sweet spot at scale:} tail sampling with rules like "keep every trace that errored or had p99-exceeding latency, plus 0.1\% of healthy traces." This guarantees you capture the \emph{interesting} traces (the whole point of tracing is debugging the bad ones) while keeping cost bounded. The cost is the collector must buffer spans in memory until the root span finishes --- non-trivial infrastructure.
+
+\subsection{\texorpdfstring{OpenTelemetry --- SDK \(\rightarrow\) Collector \(\rightarrow\) backend}{OpenTelemetry --- SDK \textbackslash rightarrow Collector \textbackslash rightarrow backend}}\label{opentelemetry--sdk-rightarrow-collector-rightarrow-backend}
+
+\textbf{OpenTelemetry (OTel)} is the vendor-neutral CNCF standard that unifies instrumentation. You instrument once with the OTel SDK and can export to \emph{any} backend, avoiding vendor lock-in.
+
+\setcodelang{}
+
+\begin{verbatim}
+┌─────────────┐   OTLP    ┌──────────────────────┐   ┌──────────────────┐
+│ App + OTel  │──────────▶│  OTel Collector      │──▶│  Jaeger / Tempo  │ traces
+│ SDK         │ (gRPC/    │  receive→process→    │──▶│  Prometheus      │ metrics
+│ (auto +     │  HTTP)    │  export              │──▶│  Loki / ELK      │ logs
+│  manual     │           │  • batching          │   └──────────────────┘
+│  spans)     │           │  • tail sampling     │
+└─────────────┘           │  • PII redaction     │
+                          │  • re-routing        │
+                          └──────────────────────┘
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SDK} --- auto-instruments common libraries (HTTP servers, DB drivers, gRPC) so you get spans for free, plus manual spans for business logic.
+\item
+  \textbf{Collector} --- a separate process/agent that receives telemetry (OTLP), processes it (batch, sample, drop PII, add resource labels), and exports to backends. Decoupling here means you can switch backends or add tail sampling without touching app code.
+\item
+  \textbf{Backend} --- Jaeger/Tempo (traces), Prometheus (metrics), Loki (logs), or a commercial all-in-one (Datadog/Honeycomb).
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Manual span with attributes and an event}
+\ImportTok{from}\NormalTok{ opentelemetry }\ImportTok{import}\NormalTok{ trace}
+\NormalTok{tracer }\OperatorTok{=}\NormalTok{ trace.get\_tracer(}\VariableTok{\_\_name\_\_}\NormalTok{)}
+
+\ControlFlowTok{with}\NormalTok{ tracer.start\_as\_current\_span(}\StringTok{"charge\_card"}\NormalTok{) }\ImportTok{as}\NormalTok{ span:}
+\NormalTok{    span.set\_attribute(}\StringTok{"user.tier"}\NormalTok{, }\StringTok{"enterprise"}\NormalTok{)   }\CommentTok{\# high{-}cardinality OK here}
+\NormalTok{    span.set\_attribute(}\StringTok{"amount"}\NormalTok{, }\FloatTok{99.99}\NormalTok{)}
+    \ControlFlowTok{try}\NormalTok{:}
+\NormalTok{        result }\OperatorTok{=}\NormalTok{ stripe.charge(...)}
+    \ControlFlowTok{except}\NormalTok{ StripeError }\ImportTok{as}\NormalTok{ e:}
+\NormalTok{        span.add\_event(}\StringTok{"stripe\_error"}\NormalTok{, \{}\StringTok{"code"}\NormalTok{: e.code\})  }\CommentTok{\# timestamped event}
+\NormalTok{        span.set\_status(trace.Status(trace.StatusCode.ERROR))}
+        \ControlFlowTok{raise}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway: "Instrument with OpenTelemetry, export via the Collector, tail-sample to keep all errors and slow traces plus a baseline of healthy ones, and propagate W3C traceparent across every hop" is the modern, vendor-neutral, senior-correct answer to \textquotesingle how do you do tracing.\textquotesingle{} Naming the traceparent header and tail-vs-head trade-off is a strong differentiator.}
+
+\section{SLI, SLO, SLA \& Error Budgets}\label{sli-slo-sla--error-budgets}
+
+This section is where SRE rigor lives, and it\textquotesingle s the highest-signal topic in senior interviews. Get the definitions and the math exactly right.
+
+\subsection{Precise definitions and how they nest}\label{precise-definitions-and-how-they-nest}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1177}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5047}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3776}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Term
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SLI} (Indicator) & A \emph{measured} number describing service behavior, usually a ratio of good events to total events. & \texttt{good\ =\ requests\ \textless{}\ 200ms;\ SLI\ =\ good/total} \\
+\rowcolor{zebra}
+\textbf{SLO} (Objective) & The \emph{internal target} you hold yourself to on an SLI, over a window. & "99.9\% of requests \textless{} 200ms, measured over rolling 28 days" \\
+\textbf{SLA} (Agreement) & The \emph{external, contractual} promise to customers, with \textbf{penalties} (refunds/credits) if missed. & "99.9\% monthly uptime or 10\% bill credit" \\
+\rowcolor{zebra}
+\textbf{Error budget} & \texttt{1\ −\ SLO} --- the \emph{allowed} amount of unreliability. The currency of risk. & \texttt{1\ −\ 0.999\ =\ 0.1\%} of requests/time may fail \\
+\end{longtable}
+
+\textbf{How they nest:} \texttt{SLI\ ⊂\ SLO\ ⊂\ SLA}.
+
+\begin{itemize}
+\tightlist
+\item
+  The SLI is the raw measurement.
+\item
+  The SLO is a target \emph{on} that SLI.
+\item
+  The SLA is set \emph{looser} than the SLO so you have \textbf{headroom} --- you breach your internal SLO (and react) well before you ever breach the customer contract. If your SLA is 99.9\%, your SLO might be 99.95\%: by the time you\textquotesingle re paying penalties, you\textquotesingle ve already had alerts firing for a while.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+   Strictest ──────────────────────────────▶ Loosest
+   SLO (99.95%)         SLA (99.9%)
+   "we alert here"      "we owe money here"
+   internal target      external contract + penalties
+        │                    │
+        └─ headroom between them = your safety margin
+\end{verbatim}
+
+\subsection{Choosing good SLIs}\label{choosing-good-slis}
+
+A good SLI is a \textbf{ratio of good events to valid events}, measured \emph{as close to the user as possible} (at the load balancer / edge, not deep in the backend where you miss failures that never reached it). Common categories:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Availability:} \texttt{successful\ requests\ /\ total\ valid\ requests}. (Define "success" carefully --- a 200 with a broken body isn\textquotesingle t success; a 404 for a genuinely missing resource isn\textquotesingle t \emph{your} failure.)
+\item
+  \textbf{Latency:} \texttt{requests\ faster\ than\ threshold\ /\ total\ requests}. (A \emph{threshold-based} ratio, not "average latency" --- it composes into an error budget.)
+\item
+  \textbf{Quality / correctness:} \texttt{requests\ served\ at\ full\ fidelity\ /\ total} (e.g., served from primary vs degraded fallback; freshness of data).
+\item
+  \textbf{Freshness/durability} for data systems: \texttt{\%\ of\ data\ younger\ than\ X}, \texttt{\%\ of\ records\ not\ lost}.
+\end{itemize}
+
+\textbf{Don\textquotesingle t} make an SLI out of something users don\textquotesingle t feel (CPU\%, internal queue depth). SLIs are about \textbf{user-perceived} reliability.
+
+\subsection{The nines table --- downtime per year/month/week}\label{the-nines-table--downtime-per-yearmonthweek}
+
+\texttt{1\ −\ SLO} translated into wall-clock downtime. Memorize the headline rows.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Availability ("nines")
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Error budget
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Down / year
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Down / 30-day month
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Down / week
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+90\% (one nine) & 10\% & 36.5 days & 72 hours & 16.8 hours \\
+\rowcolor{zebra}
+99\% (two nines) & 1\% & 3.65 days & 7.2 hours & 1.68 hours \\
+99.9\% (three nines) & 0.1\% & 8.77 hours & \textbf{43.2 minutes} & 10.1 minutes \\
+\rowcolor{zebra}
+99.95\% & 0.05\% & 4.38 hours & 21.6 minutes & 5 minutes \\
+99.99\% (four nines) & 0.01\% & 52.6 minutes & \textbf{4.32 minutes} & 1 minute \\
+\rowcolor{zebra}
+99.999\% (five nines) & 0.001\% & 5.26 minutes & \textbf{26 seconds} & 6 seconds \\
+\end{longtable}
+
+\textbf{Error-budget math (the derivation interviewers ask):} budget = \texttt{(1\ −\ SLO)\ ×\ window}.
+
+\begin{itemize}
+\tightlist
+\item
+  99.9\% over a 30-day month: \texttt{0.001\ ×\ 30\ days\ =\ 0.001\ ×\ 43,200\ min\ =\ 43.2\ min} of allowed downtime/badness.
+\item
+  99.99\% over a month: \texttt{0.0001\ ×\ 43,200\ =\ 4.32\ min}. Notice each extra nine cuts the budget by 10\(\times\) --- and five nines (26s/month) means you can\textquotesingle t even do a manual response; it must be fully automated, which is why five nines is extraordinarily expensive.
+\end{itemize}
+
+\subsection{Error-budget policy --- what you DO when it\textquotesingle s burned}\label{error-budget-policy--what-you-do-when-its-burned}
+
+The error budget is only useful if it drives \textbf{action}. The \textbf{error-budget policy} is the pre-agreed rule:
+
+\setcodelang{}
+
+\begin{verbatim}
+Is there error budget remaining this window?
+   ├── YES (within budget) ──▶ ship features, take risks, do experiments,
+   │                            run chaos tests, deploy faster
+   └── NO  (budget exhausted)─▶ FEATURE FREEZE: stop risky deploys,
+                                redirect engineering to reliability work,
+                                postmortems, hardening — until the
+                                window rolls over and budget recovers
+\end{verbatim}
+
+This is the genius of error budgets: it converts the eternal \textbf{dev-vs-SRE argument} ("ship faster!" vs "stop breaking prod!") into \textbf{arithmetic}. Reliability becomes a shared currency. If you\textquotesingle re under budget, even SRE can\textquotesingle t block a launch on reliability grounds. If you\textquotesingle ve blown it, even the PM can\textquotesingle t push a risky launch. It aligns incentives instead of pitting teams against each other. The policy must be \textbf{agreed and signed off in advance} (by eng + product leadership) so it isn\textquotesingle t relitigated mid-incident.
+
+\subsection{Multi-window, multi-burn-rate alerting}\label{multi-window-multi-burn-rate-alerting}
+
+The hard part is alerting on budget consumption \emph{correctly}. A naive "alert if any error budget burned" pages constantly. The SRE-canonical solution is \textbf{multi-window multi-burn-rate} alerting.
+
+\textbf{Burn rate} = how fast you\textquotesingle re consuming the error budget relative to "even" consumption. Burn rate 1 = you\textquotesingle ll exactly exhaust the budget by the end of the window. Burn rate 14.4 = you\textquotesingle re burning 14.4\(\times\) too fast \(\rightarrow\) at this rate the \emph{entire monthly budget} is gone in \texttt{30\ days\ /\ 14.4\ ≈\ 2\ days}.
+
+The trick: pair a \textbf{fast (short) window} to react quickly with a \textbf{slow (long) window} to confirm it\textquotesingle s sustained --- so a brief blip doesn\textquotesingle t page, but a real sustained burn does, fast.
+
+\setcodelang{}
+
+\begin{verbatim}
+For a 99.9% SLO over 30 days (budget = 0.1%):
+
+┌──────────────┬────────────┬──────────────┬─────────────────────────┐
+│ Severity     │ Burn rate  │ Windows      │ Budget consumed if held │
+│              │ threshold  │ (long+short) │ → action                │
+├──────────────┼────────────┼──────────────┼─────────────────────────┤
+│ FAST burn    │ 14.4×      │ 1h AND 5m    │ ~2% in 1h → PAGE now     │
+│ (page)       │            │              │ (budget gone in ~2 days) │
+├──────────────┼────────────┼──────────────┼─────────────────────────┤
+│ SLOW burn    │ 1×         │ 6h AND 30m   │ ~10% in 6h → TICKET      │
+│ (ticket)     │ (≈1)       │              │ (not urgent, but real)   │
+└──────────────┴────────────┴──────────────┴─────────────────────────┘
+
+The AND of two windows: the long window proves it's a real sustained burn;
+the short window proves it's STILL happening right now (so you don't page on
+something that already self-resolved). Both must be over threshold to fire.
+\end{verbatim}
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Fast{-}burn page: 14.4x burn over the last 1h AND still over the last 5m}
+\NormalTok{(}
+\NormalTok{  slo:error\_ratio:rate1h  \textgreater{} (14.4 * 0.001)}
+\NormalTok{  and}
+\NormalTok{  slo:error\_ratio:rate5m  \textgreater{} (14.4 * 0.001)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Fast burn (14.4\(\times\), 1h+5m) \(\rightarrow\) page} someone immediately: at this rate you\textquotesingle ll exhaust a month\textquotesingle s budget in \textasciitilde2 days; it\textquotesingle s urgent.
+\item
+  \textbf{Slow burn (1\(\times\), 6h+30m) \(\rightarrow\) ticket}: a steady low-grade burn that will eventually exhaust the budget but doesn\textquotesingle t need a 3am wakeup.
+\end{itemize}
+
+This is dramatically better than threshold alerts because it pages \textbf{proportionally to user impact and urgency}, with low false-positive rate, and it ties directly to the SLO rather than to arbitrary resource thresholds.
+
+\textbf{Interview takeaway: SLI is a measured ratio, SLO is the internal target (stricter than the SLA so you have headroom), SLA is the contract with penalties, error budget is 1\(-\)SLO. The budget drives an error-budget \emph{policy} (freeze risky deploys when burned), and you alert with multi-window multi-burn-rate (fast burn \(\rightarrow\) page, slow burn \(\rightarrow\) ticket). Reciting the nines (99.9\% \(\approx\) 43 min/month) and the burn-rate concept is a top-tier senior signal.}
+
+\section{Alerting \& On-Call}\label{alerting--on-call}
+
+Alerting converts telemetry into human action. The art is paging \textbf{only} when a human must act \emph{now}, and never otherwise.
+
+\subsection{Symptom-based vs cause-based alerting}\label{symptom-based-vs-cause-based-alerting}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Cause-based (bad default):} alert on internal causes --- "CPU \textgreater{} 80\%," "memory \textgreater{} 90\%," "disk queue high." Problem: these are often \emph{fine} (a batch job legitimately maxes CPU; high cache memory is healthy), so they generate \textbf{false pages}, and they don\textquotesingle t necessarily mean users are hurting.
+\item
+  \textbf{Symptom-based (preferred):} alert on \textbf{user-facing symptoms} --- "error rate \textgreater{} X," "p99 latency \textgreater{} SLO," "SLO budget burning fast." If users aren\textquotesingle t affected, you don\textquotesingle t page, \emph{even if a resource looks scary}. This is the core SRE principle.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Page on:  "checkout error rate is 5% and SLO budget burning at 14x"   ✅ users hurting
+NOT on:   "app-server-7 CPU is at 85%"                                ❌ maybe totally fine
+\end{verbatim}
+
+Cause-based metrics are still \textbf{collected} (you need them to \emph{diagnose} once a symptom alert fires) --- they just shouldn\textquotesingle t \emph{page} you. Symptoms page; causes inform the investigation.
+
+\subsection{Actionable + urgent --- the two-question test}\label{actionable--urgent--the-two-question-test}
+
+Before any alert is allowed to page, it must pass:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Is it actionable?} Is there something a human can \emph{do right now} in response? If not, it\textquotesingle s a dashboard metric, not a page.
+\item
+  \textbf{Is it urgent?} Does it need attention \emph{this minute}, or can it wait for business hours? If it can wait \(\rightarrow\) ticket, not page.
+\end{enumerate}
+
+Only \textbf{actionable AND urgent} \(\rightarrow\) page (PagerDuty/Opsgenie). Actionable but not urgent \(\rightarrow\) \textbf{ticket}. Neither \(\rightarrow\) \textbf{dashboard/log}. This triage is how you kill alert fatigue.
+
+\subsection{Reducing alert fatigue}\label{reducing-alert-fatigue}
+
+\textbf{Alert fatigue} is when so many alerts fire (especially false ones) that on-call engineers start ignoring or auto-acking them --- so the \emph{real} alert gets missed (the "smoke alarm that beeps for toast" \(\rightarrow\) people remove the battery). It\textquotesingle s a top cause of bad incidents. Countermeasures:
+
+\begin{itemize}
+\tightlist
+\item
+  Page only on symptoms (above).
+\item
+  Multi-window burn-rate alerts to suppress transient blips.
+\item
+  \textbf{Deduplication \& grouping} (Alertmanager): one root cause that trips 50 services \(\rightarrow\) one page, not 50.
+\item
+  \textbf{Silencing/inhibition:} if the cluster is down, silence the 200 downstream alerts it causes.
+\item
+  Regularly \textbf{review and delete} noisy alerts. An alert that fired 40 times last month and was actioned 0 times must be deleted or fixed.
+\end{itemize}
+
+\subsection{Paging vs ticketing}\label{paging-vs-ticketing}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2082}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3407}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4510}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Page
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ticket
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Urgency & Now (wakes a human) & Soon (next business day) \\
+\rowcolor{zebra}
+Channel & PagerDuty/Opsgenie \(\rightarrow\) phone & Jira/issue queue \\
+Trigger & Fast-burn SLO, hard outage & Slow-burn SLO, capacity warning, cert expiring in 30 days \\
+\rowcolor{zebra}
+Cost of false positive & Very high (burnout, ignored alerts) & Low \\
+\end{longtable}
+
+\subsection{Runbooks}\label{runbooks}
+
+Every page must link to a \textbf{runbook}: "what this alert means, how to confirm it\textquotesingle s real, the first diagnostic steps, known mitigations, and who to escalate to." A 3am page with no runbook means the on-call rediscovers the system from scratch under stress. Mature teams keep runbooks next to the alert definition.
+
+\subsection{Alert as code}\label{alert-as-code}
+
+Alerts and SLOs are \textbf{version-controlled config}, reviewed in PRs, not clicked into a UI. This gives auditability, review, rollback, and reuse.
+
+\setcodelang{YAML}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Prometheus alerting rule (as code, in git)}
+\FunctionTok{groups}\KeywordTok{:}
+\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{name}\KeywordTok{:}\AttributeTok{ checkout{-}slo}
+\AttributeTok{  }\FunctionTok{rules}\KeywordTok{:}
+\AttributeTok{  }\KeywordTok{{-}}\AttributeTok{ }\FunctionTok{alert}\KeywordTok{:}\AttributeTok{ CheckoutFastBurn}
+\FunctionTok{    expr}\KeywordTok{: }\CharTok{|}
+\NormalTok{      slo:checkout:error\_ratio:rate1h \textgreater{} (14.4 * 0.001)}
+\NormalTok{      and}
+\NormalTok{      slo:checkout:error\_ratio:rate5m \textgreater{} (14.4 * 0.001)}
+\AttributeTok{    }\FunctionTok{for}\KeywordTok{:}\AttributeTok{ 2m}
+\AttributeTok{    }\FunctionTok{labels}\KeywordTok{:}
+\AttributeTok{      }\FunctionTok{severity}\KeywordTok{:}\AttributeTok{ page}
+\AttributeTok{    }\FunctionTok{annotations}\KeywordTok{:}
+\AttributeTok{      }\FunctionTok{summary}\KeywordTok{:}\AttributeTok{ }\StringTok{"Checkout burning error budget 14.4x (fast)"}
+\AttributeTok{      }\FunctionTok{runbook}\KeywordTok{:}\AttributeTok{ }\StringTok{"https://runbooks.internal/checkout{-}fast{-}burn"}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway: Page only on actionable + urgent symptoms (SLO burn / user-facing errors), route everything else to tickets, attach a runbook to every alert, and manage alerts as code. "Alert on symptoms, not causes" and "every page must be actionable and urgent" are the two phrases that signal you\textquotesingle ve actually been on-call.}
+
+\section{Incident Response}\label{incident-response}
+
+When an alert fires and something\textquotesingle s broken, observability feeds a disciplined \textbf{incident response} process.
+
+\subsection{Severity levels}\label{severity-levels}
+
+Most orgs use SEV1--SEV4 (lower number = worse):
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3673}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2724}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3309}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sev
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Response
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{SEV1} & Critical: major outage, revenue/data loss, most users affected & Checkout fully down; data corruption & All-hands, incident commander, exec comms, war room \\
+\rowcolor{zebra}
+\textbf{SEV2} & Major: significant degradation, key feature broken & One region down; p99 5\(\times\) over SLO & On-call + secondary paged, active mitigation \\
+\textbf{SEV3} & Minor: limited impact, workaround exists & Non-critical feature degraded & Handle in business hours \\
+\rowcolor{zebra}
+\textbf{SEV4} & Cosmetic / low & Typo in UI, minor metric gap & Backlog ticket \\
+\end{longtable}
+
+\subsection{The reliability metrics --- MTTD, MTTR, MTBF}\label{the-reliability-metrics--mttd-mttr-mtbf}
+
+\setcodelang{}
+
+\begin{verbatim}
+        Failure A                                    Failure B
+           │                                            │
+  ─────────●───────────────────────────────────────────●──────▶ time
+           │                                            │
+           ├─MTTD─┤                                     │
+           detect ├──────────────MTTR────────────────┤ │
+                  triage   mitigate   resolve          │
+           ├──────────────── MTBF ──────────────────────┤
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{MTTD (Mean Time To Detect):} failure happens \(\rightarrow\) you \emph{notice} (alert fires). Good observability shrinks this toward zero.
+\item
+  \textbf{MTTR (Mean Time To Recover/Repair):} detect \(\rightarrow\) service restored. The number observability most directly improves --- fast triage via metrics\(\rightarrow\)traces\(\rightarrow\)logs.
+\item
+  \textbf{MTBF (Mean Time Between Failures):} how often failures occur. Improved by reliability work (the error-budget freeze redirects effort here).
+\end{itemize}
+
+The goal: \textbf{low MTTD + low MTTR + high MTBF.} Note you can have high reliability either by rarely failing (high MTBF) or by recovering instantly (low MTTR) --- both count, and at scale fast recovery is often more achievable than never failing.
+
+\subsection{The incident lifecycle}\label{the-incident-lifecycle}
+
+\setcodelang{}
+
+\begin{verbatim}
+DETECT ──▶ TRIAGE ──▶ MITIGATE ──▶ RESOLVE ──▶ POSTMORTEM
+  │          │           │            │            │
+alert     assess      stop the     fix root     learn &
+fires     severity,   bleeding     cause,       prevent
+          assign IC   (rollback,   restore      (blameless)
+                      failover,    full
+                      shed load)   service
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Detect} --- alert fires (or a human reports it). MTTD clock stops.
+\item
+  \textbf{Triage} --- assess severity, declare the incident, assign an \textbf{Incident Commander (IC)} who coordinates (and is \emph{not} the one typing fixes --- they run the response). Open a comms channel.
+\item
+  \textbf{Mitigate --- stop the bleeding FIRST.} \emph{Mitigation \(\neq\) root cause.} Roll back the bad deploy, fail over to another region, shed load, flip a feature flag. Restore the user experience \emph{before} you fully understand why. This is the most-missed point: don\textquotesingle t debug a SEV1 to root cause while users suffer --- mitigate, then investigate.
+\item
+  \textbf{Resolve} --- service fully restored; incident closed. MTTR clock stops.
+\item
+  \textbf{Postmortem} --- write up what happened and prevent recurrence.
+\end{enumerate}
+
+\subsection{Blameless postmortems}\label{blameless-postmortems}
+
+A \textbf{blameless postmortem} focuses on \emph{systemic and process} causes, never on punishing individuals. The premise: people act reasonably given the information and tools they had; if a single person\textquotesingle s mistake could take down prod, the \emph{system} is at fault (missing guardrail, missing test, missing canary, confusing UI). Blame culture makes people \textbf{hide} incidents \(\rightarrow\) you lose the learning \(\rightarrow\) reliability degrades. A good postmortem documents: timeline, impact, root cause(s), what went well, what went poorly, and \textbf{action items with owners} (the most important part --- a postmortem with no follow-through is theater). The Five Whys is a common root-cause technique. Track whether action items actually get done.
+
+\subsection{On-call rotations}\label{on-call-rotations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Rotation:} engineers take turns being primary on-call (e.g., one week each), with a \textbf{secondary} as backup/escalation.
+\item
+  \textbf{Follow-the-sun:} distribute on-call across geographies so nobody is paged at 3am --- APAC covers their day, then EMEA, then Americas.
+\item
+  \textbf{Sustainability:} the SRE book recommends capping pages per shift (e.g., \(\leq\)2 actionable incidents per 12h shift) --- beyond that, the team is too stretched and must invest in reliability/automation. \textbf{Toil budget}: cap operational toil at \textasciitilde50\% so engineers have time to \emph{automate it away}.
+\item
+  \textbf{Compensation \& humane practices:} on-call should be compensated, handoffs documented, and a quiet shift should be the norm --- a constantly-paging rotation is a bug in the system, not a fact of life.
+\end{itemize}
+
+\textbf{Interview takeaway: Severity drives response intensity; the lifecycle is detect\(\rightarrow\)triage\(\rightarrow\)mitigate\(\rightarrow\)resolve\(\rightarrow\)postmortem; \emph{mitigate before you root-cause} (rollback/failover stops user pain fastest, minimizing MTTR); and postmortems are blameless with owned action items. Saying "mitigate first, root-cause later" and "blameless postmortem" shows real incident experience.}
+
+\section{Debugging with Telemetry (Worked Scenarios)}\label{debugging-with-telemetry-worked-scenarios}
+
+This is the interview\textquotesingle s favorite debugging round. The meta-pattern is always \textbf{metrics (that/where in aggregate) \(\rightarrow\) traces (which hop) \(\rightarrow\) logs (why)}, narrowing by dimension at each step. Below are three fully worked walkthroughs.
+
+\subsection{\texorpdfstring{Scenario 1 --- "p99 latency spiked 3\(\times\) at 14:23"}{Scenario 1 --- "p99 latency spiked 3\textbackslash times at 14:23"}}\label{scenario-1--p99-latency-spiked-3times-at-1423}
+
+\textbf{Symptom:} Dashboard shows \texttt{/checkout} p99 jumped from 200ms to 650ms starting 14:23 UTC. Error rate is \emph{flat} (requests succeed, just slow).
+
+\textbf{Step 1 --- Scope it with metrics (slice by dimension).} Before touching traces, narrow \emph{who/what} is affected to avoid boiling the ocean:
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Is it all endpoints or just one? Slice the p99 by endpoint.}
+\NormalTok{histogram\_quantile(0.99,}
+\NormalTok{  sum by (le, endpoint) (rate(http\_request\_duration\_seconds\_bucket[5m])))}
+
+\NormalTok{\# Is it all regions / all instances / one bad pod?}
+\NormalTok{histogram\_quantile(0.99,}
+\NormalTok{  sum by (le, region) (rate(http\_request\_duration\_seconds\_bucket[5m])))}
+\end{Highlighting}
+\end{Shaded}
+
+Finding: only \texttt{/checkout}, all regions, all pods. So it\textquotesingle s \textbf{endpoint-specific}, not a host or region problem. Cross-check: did \texttt{rate()} (traffic) change at 14:23? No traffic spike \(\rightarrow\) not a load problem. Did a \textbf{deploy} happen at 14:23? Check the deploy annotations on the dashboard --- \emph{yes, checkout-service v412 deployed at 14:22}. Strong suspect.
+
+\textbf{Step 2 --- Find the slow hop with a trace.} Click the p99 spike\textquotesingle s \textbf{exemplar} to jump to an actual slow \texttt{/checkout} trace (or query the trace store for \texttt{service=checkout\ duration\textgreater{}600ms}). The waterfall:
+
+\setcodelang{}
+
+\begin{verbatim}
+gateway: POST /checkout              [■■■■■■■■■■■■■■■■■■] 640ms
+├─ auth                              [■]                  15ms
+├─ orders.create                     [■■■■■■■■■■■■■■■]    520ms ← the new cost
+│  └─ db: SELECT inventory             [■■■■■■■■■■■■■]     480ms ← self-time here
+└─ payment                           [■■]                 80ms
+\end{verbatim}
+
+The \texttt{SELECT\ inventory} span now takes 480ms (was \textasciitilde40ms). The latency lives in \textbf{one database query} in \texttt{orders.create}.
+
+\textbf{Step 3 --- Find \emph{why} with logs / the span attributes.} Read the span\textquotesingle s \texttt{db.statement} attribute or query logs \texttt{trace\_id:\textless{}that\ trace\textgreater{}}:
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}\DataTypeTok{"event"}\FunctionTok{:}\StringTok{"slow\_query"}\FunctionTok{,}\DataTypeTok{"trace\_id"}\FunctionTok{:}\StringTok{"..."}\FunctionTok{,}\DataTypeTok{"db.statement"}\FunctionTok{:}\StringTok{"SELECT * FROM inventory WHERE sku = ? AND warehouse\_id = ?"}\FunctionTok{,}\DataTypeTok{"rows\_scanned"}\FunctionTok{:}\DecValTok{2400000}\FunctionTok{,}\DataTypeTok{"index\_used"}\FunctionTok{:}\KeywordTok{null}\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{index\_used:\ null}, \texttt{rows\_scanned:\ 2.4M} \(\rightarrow\) a \textbf{full table scan}. The v412 deploy added a \texttt{warehouse\_id} filter to the inventory query, but there\textquotesingle s no composite index on \texttt{(sku,\ warehouse\_id)} \(\rightarrow\) the query degraded from index seek to full scan.
+
+\textbf{Root cause:} new query path missing an index. \textbf{Mitigation:} roll back v412 (fastest --- restores p99 immediately). \textbf{Fix:} add the composite index, then re-deploy. \textbf{Verify:} p99 back to 200ms; the slow-query log gone.
+
+\begin{quote}
+The discipline: \emph{narrow by dimension in metrics first} (endpoint? region? deploy?), \emph{then} one trace pinpoints the hop, \emph{then} logs/attributes give the why. You did not guess once.
+\end{quote}
+
+\subsection{Scenario 2 --- "Error rate climbing" (drill down by dimension)}\label{scenario-2--error-rate-climbing-drill-down-by-dimension}
+
+\textbf{Symptom:} Overall 5xx rate climbing from 0.1\% to 4\% over 20 minutes. SLO fast-burn alert paged.
+
+\textbf{Step 1 --- Decompose the error rate by every dimension} to find the concentrated slice:
+
+\setcodelang{PromQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# By status code — what KIND of error?}
+\NormalTok{sum by (status) (rate(http\_requests\_total\{status=\textasciitilde{}"5.."\}[5m]))}
+\NormalTok{\#   → 503s dominate (not 500s) → upstream unavailable, not a code bug}
+
+\NormalTok{\# By endpoint — is it everywhere or one route?}
+\NormalTok{sum by (endpoint) (rate(http\_requests\_total\{status=\textasciitilde{}"5.."\}[5m]))}
+\NormalTok{\#   → concentrated on endpoints that call payment{-}service}
+
+\NormalTok{\# By downstream dependency / region / version}
+\NormalTok{sum by (downstream) (rate(http\_requests\_total\{status="503"\}[5m]))}
+\NormalTok{\#   → all 503s are from calls to payment{-}service}
+\end{Highlighting}
+\end{Shaded}
+
+The errors are \textbf{503s, on payment-dependent endpoints, all pointing at payment-service.} The blast radius is now precise: payment-service is the culprit.
+
+\textbf{Step 2 --- Trace a failing request} (\texttt{status=503}, tail-sampled so errors are kept):
+
+\setcodelang{}
+
+\begin{verbatim}
+gateway: POST /checkout            [■■■■■■]  status=ERROR
+├─ orders                          [■■]      OK
+└─ payment.charge                  [■■■■]    status=ERROR  ← fails here
+   └─ http POST payment-svc        [✗]       connection refused / timeout
+\end{verbatim}
+
+The error originates at the call into payment-service: connection refused / timeouts.
+
+\textbf{Step 3 --- Logs + RED on payment-service itself.} Pivot to payment-service\textquotesingle s own dashboards and logs:
+
+\begin{itemize}
+\tightlist
+\item
+  payment-service \texttt{rate()} of requests is normal, but its \textbf{own} error logs show \texttt{OutOfMemoryError} / pod restarts; \texttt{kube-state-metrics} shows \texttt{container\_restarts} climbing for payment-service at the same timestamp.
+\item
+  Logs \texttt{service:payment-service\ level:error} \(\rightarrow\) \texttt{OOMKilled} events. A memory leak (or a too-low memory limit after a config change) \(\rightarrow\) pods OOM, restart, drop connections \(\rightarrow\) upstream sees 503s.
+\end{itemize}
+
+\textbf{Root cause:} payment-service pods OOMKilled in a crash-loop. \textbf{Mitigation:} bump the memory limit / roll back the change that raised memory use / scale out to spread load while restarting. \textbf{Then} fix the leak. \textbf{Defense:} a \textbf{circuit breaker} in the gateway would have failed fast and shed load instead of piling connections onto the dying service --- note this in the postmortem.
+
+\begin{quote}
+Pattern: when error rate climbs, \textbf{decompose by dimension} (status \(\times\) endpoint \(\times\) downstream \(\times\) region \(\times\) version) until the errors \emph{concentrate} in one slice --- that slice \emph{is} the lead. Then trace one failure to confirm the hop, then logs/restart-metrics for the why.
+\end{quote}
+
+\subsection{Scenario 3 --- Profiling a CPU hotspot (continuous profiling, flame graphs, eBPF)}\label{scenario-3--profiling-a-cpu-hotspot-continuous-profiling-flame-graphs-ebpf}
+
+\textbf{Symptom:} A service\textquotesingle s CPU is at 90\% and p99 is creeping up, but traces show no slow \emph{downstream} span --- the time is spent \emph{inside the service\textquotesingle s own code} (high self-time on the root span, no child explains it). Traces tell you \emph{which service}; they don\textquotesingle t tell you \emph{which function}. For that you need \textbf{profiling}.
+
+\textbf{Continuous profiling} runs a low-overhead sampling profiler \emph{in production all the time} (Parca, Pyroscope, Google-Wide Profiling, \texttt{pprof}). It samples each thread\textquotesingle s call stack \textasciitilde100\(\times\)/sec; the aggregate over thousands of samples shows where CPU time actually goes --- as a \textbf{flame graph}.
+
+\setcodelang{}
+
+\begin{verbatim}
+Flame graph (CPU; wider = more CPU time; bottom = root)
+
+main ─────────────────────────────────────────────────────────────
+serve_request ───────────────────────────────────────────────
+parse_request ──── render_response ──────────────────  log_event ──
+              json.Marshal ─────────────────────────
+                            reflect.Value.* ████████████████  ← HOT
+                            (reflection in JSON encoding = 60% of CPU)
+\end{verbatim}
+
+The widest plateau at the top is the hottest code. Here \texttt{reflect.*} under \texttt{json.Marshal} is eating 60\% of CPU --- the service is serializing a huge response via reflection-based JSON on every request. Fix: switch to a codegen\textquotesingle d/streaming serializer, or cache the serialized payload. CPU drops, p99 recovers.
+
+\textbf{Reading flame graphs:} widest bars at the top = hottest; a flat plateau means \emph{that} function itself is the bottleneck (time not attributed to its callees). Profiles \textbf{differential} beautifully --- diff "before deploy" vs "after deploy" flame graphs to see exactly which function got more expensive.
+
+\textbf{eBPF (brief):} eBPF lets you run sandboxed programs \textbf{in the Linux kernel} to capture system-wide telemetry with near-zero overhead and \textbf{zero application instrumentation} --- CPU profiles, off-CPU time (where threads \emph{block}, e.g., on locks or I/O --- invisible to a CPU profiler), syscall latency, network flows. Tools: \texttt{bcc}, \texttt{bpftrace}, Pixie, Parca-agent, Cilium (eBPF networking). It\textquotesingle s how you profile and trace \emph{without} touching the app --- increasingly the foundation of modern observability agents.
+
+\textbf{Interview takeaway: When the trace shows the time is \emph{inside} a service (high self-time, no slow child), reach for a continuous profiler and read the flame graph --- widest top bar is the hotspot. eBPF gives whole-system, zero-instrumentation profiling (including off-CPU/blocking time). This is the fourth pillar ("profiles") and naming it differentiates you.}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{The unified telemetry pipeline (three pillars, one trace id)}\label{the-unified-telemetry-pipeline-three-pillars-one-trace-id}
+
+\setcodelang{}
+
+\begin{verbatim}
+┌──────────────────────────────────────────────────────────────────────┐
+│  Application (instrumented with OpenTelemetry SDK)                    │
+│  emits all three, every record stamped with the same trace_id        │
+└───────┬──────────────────┬────────────────────┬─────────────────────┘
+        │ metrics          │ logs               │ traces
+        ▼                  ▼                    ▼
+   ┌─────────┐        ┌──────────┐         ┌──────────┐
+   │ scrape  │        │ ship     │         │ OTLP push│
+   │(Prom)   │        │(Fluentd) │         │          │
+   ▼                  ▼                    ▼
+   ┌────────────────────────────────────────────────────┐
+   │            OTel Collector (optional hub)            │
+   │   batch · tail-sample · redact PII · add labels     │
+   └────┬───────────────┬───────────────────┬───────────┘
+        ▼               ▼                    ▼
+   ┌──────────┐   ┌────────────┐       ┌──────────┐
+   │Prometheus│   │ Loki / ELK │       │ Jaeger/  │
+   │  (TSDB)  │   │  (logs)    │       │ Tempo    │
+   └────┬─────┘   └─────┬──────┘       └────┬─────┘
+        └───────────────┴───────────────────┘
+                        ▼
+              ┌──────────────────┐        ┌──────────────────┐
+              │     Grafana      │        │  Alertmanager    │
+              │  dashboards +    │───────▶│  dedupe/route ───┼──▶ PagerDuty
+              │  exemplars link  │ alerts │  silence/group   │   Slack
+              │  metric→trace→log│        └──────────────────┘   ticket
+              └──────────────────┘
+\end{verbatim}
+
+\subsection{The investigation funnel (how the pillars compose)}\label{the-investigation-funnel-how-the-pillars-compose}
+
+\setcodelang{}
+
+\begin{verbatim}
+        WIDE  ┌──────────────── METRICS ────────────────┐   cheap, aggregate
+              │ "p99 up 3x, errors 4%, on /checkout"     │   → THAT + WHERE(coarse)
+              └─────────────────────┬────────────────────┘
+                                    │ slice by dimension, click exemplar
+        NARROW┌──────────────── TRACES ─────────────────┐   sampled, per-request
+              │ "the SELECT inventory span is the 480ms" │   → WHICH HOP
+              └─────────────────────┬────────────────────┘
+                                    │ trace_id pivots to logs
+      PINPOINT┌──────────────── LOGS ───────────────────┐   detailed, expensive
+              │ "full table scan, index_used: null"      │   → WHY
+              └─────────────────────┬────────────────────┘
+                                    │ time inside one service?
+       INSIDE ┌────────────── PROFILES (eBPF/pprof) ────┐   continuous, in-process
+              │ "reflect.* in json.Marshal = 60% CPU"    │   → WHICH FUNCTION
+              └──────────────────────────────────────────┘
+\end{verbatim}
+
+\subsection{Error-budget burn (how multi-burn-rate alerts fire)}\label{error-budget-burn-how-multi-burn-rate-alerts-fire}
+
+\setcodelang{}
+
+\begin{verbatim}
+budget
+remaining
+100% ●────╲
+          ╲           slow burn (1x): steady drift → TICKET
+ 75%       ╲___
+              ╲_____
+ 50%                ╲___
+                       ╲        fast burn (14.4x): cliff → PAGE NOW
+ 25%                    ╲▼▼▼▼▼  (would exhaust monthly budget in ~2 days)
+  0% ───────────────────────────────────▶ time (30-day window)
+
+ Fast-burn (short+long window both over 14.4x) → page immediately.
+ Slow-burn (1x over 6h)                         → open a ticket.
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3618}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2033}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4350}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Tool / System
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pillar
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Prometheus + Grafana} & metrics + dashboards & The de-facto open-source standard. Pull model, PromQL, TSDB. \\
+\rowcolor{zebra}
+\textbf{Thanos / Cortex / Mimir} & metrics (long-term, HA) & Make Prometheus globally queryable and durable at scale. \\
+\textbf{ELK (Elasticsearch/Logstash/Kibana)} & logs & Full-text index; powerful but storage-heavy. \\
+\rowcolor{zebra}
+\textbf{Grafana Loki} & logs & Indexes labels only; cheap; "Prometheus for logs." \\
+\textbf{Jaeger / Zipkin / Grafana Tempo} & traces & Distributed tracing backends; Tempo is cheap object-storage-backed. \\
+\rowcolor{zebra}
+\textbf{OpenTelemetry} & all three & Vendor-neutral instrumentation standard + Collector. The CNCF default. \\
+\textbf{Datadog / New Relic / Dynatrace} & all-in-one (commercial) & Single pane of glass; pay for convenience and scale. \\
+\rowcolor{zebra}
+\textbf{Honeycomb} & events / high-cardinality & Popularized "observability"; \texttt{BubbleUp} slices by arbitrary dimensions. \\
+\textbf{Pyroscope / Parca / Polar Signals} & profiles & Continuous profiling, flame graphs, eBPF-based. \\
+\rowcolor{zebra}
+\textbf{PagerDuty / Opsgenie} & alerting/on-call & Routing, escalation, schedules. \\
+\textbf{Google SRE} & the model & Origin of SLI/SLO/error budget, blameless postmortems, toil. \\
+\rowcolor{zebra}
+\textbf{AWS CloudWatch / X-Ray, GCP Cloud Monitoring/Trace} & cloud-native & Managed equivalents on the big clouds. \\
+\end{longtable}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One theme --- running a hospital ER --- every observability concept maps to a piece of patient care.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1852}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8148}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Metrics} & The bedside vitals monitor: heart rate, blood pressure, O\(_2\) --- continuous numbers that tell you \emph{something is wrong} at a glance, but not why. \\
+\rowcolor{zebra}
+\textbf{Logs} & The patient\textquotesingle s detailed chart: every event, timestamped --- "10:03 administered 5mg, 10:07 reported nausea." Full detail, but you read it after the monitor alarms. \\
+\textbf{Traces} & Following one patient\textquotesingle s entire journey through the hospital --- ER \(\rightarrow\) X-ray \(\rightarrow\) lab \(\rightarrow\) surgery \(\rightarrow\) recovery --- and timing each stop to find where they got stuck waiting. \\
+\rowcolor{zebra}
+\textbf{Profiling} & A surgeon\textquotesingle s intra-operative imaging: zooming \emph{inside} one organ (one service) to see exactly which tissue (function) is the problem. \\
+\textbf{Monitoring vs observability} & Monitoring = the alarms you pre-set for known dangers (low O\(_2\)). Observability = a senior doctor who can diagnose a \emph{novel} illness from the same instruments by asking new questions. \\
+\rowcolor{zebra}
+\textbf{Cardinality explosion} & Trying to keep a separate live monitor for every individual patient who ever visited --- the room fills with screens until the whole system collapses. Keep aggregate vitals; pull the individual chart only when needed. \\
+\textbf{SLO / error budget} & The ER\textquotesingle s target: "95\% of patients seen within 30 min." The 5\% slack is your budget --- spend it on training drills when you\textquotesingle re under it; when you\textquotesingle ve blown it, all hands stop side-projects and focus on throughput. \\
+\rowcolor{zebra}
+\textbf{SLA} & The contract with the insurer: miss the target and you pay penalties --- set looser than your internal target so you react before it costs money. \\
+\textbf{Burn-rate alerting} & If patients are backing up 14\(\times\) faster than normal, page the on-call attending \emph{now}; a slow steady backlog just goes on tomorrow\textquotesingle s planning list. \\
+\rowcolor{zebra}
+\textbf{Alert fatigue} & A monitor that beeps for every tiny movement --- nurses stop reacting, so the real cardiac arrest gets missed. \\
+\textbf{Symptom vs cause alerting} & Page when the \emph{patient} is in distress (symptom), not merely because a machine\textquotesingle s fan is loud (cause that may be harmless). \\
+\rowcolor{zebra}
+\textbf{Mitigate before root-cause} & Stabilize the patient (stop the bleeding) \emph{first}; figure out the underlying disease \emph{after} they\textquotesingle re out of danger. \\
+\textbf{Blameless postmortem} & The M\&M (morbidity \& mortality) conference: examine what the \emph{system} allowed, not which nurse to blame --- so people report mistakes instead of hiding them. \\
+\rowcolor{zebra}
+\textbf{Trace id linking pillars} & The patient\textquotesingle s wristband ID --- scan it and instantly pull their vitals, chart, and journey together. \\
+\textbf{Tail sampling} & You can\textquotesingle t film every patient\textquotesingle s whole visit, but you \emph{do} keep full footage of everyone who coded or waited too long --- the interesting cases. \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Three pillars --- "MLT"} (like a sandwich): \textbf{M}etrics (what), \textbf{L}ogs (detail), \textbf{T}races (where). Add \textbf{P}rofiles for inside-a-service \(\rightarrow\) "MLTP."
+\item
+  \textbf{The investigation order --- "Metrics say THAT, Traces say WHERE, Logs say WHY, Profiles say WHICH FUNCTION."}
+\item
+  \textbf{RED} (services): \textbf{R}ate, \textbf{E}rrors, \textbf{D}uration \(\rightarrow\) "RED light = stop and check the service."
+\item
+  \textbf{USE} (resources): \textbf{U}tilization, \textbf{S}aturation, \textbf{E}rrors \(\rightarrow\) "Uncle Sam\textquotesingle s Equipment."
+\item
+  \textbf{Four Golden Signals --- "LTES"}: Latency, Traffic, Errors, Saturation (= RED \(\cup\) USE).
+\item
+  \textbf{SLI \(\subset\) SLO \(\subset\) SLA} --- \textbf{I}ndicator (measured), \textbf{O}bjective (internal target), \textbf{A}greement (external contract). "Indicator, Objective, Agreement --- small to big."
+\item
+  \textbf{Error budget = 1 \(-\) SLO.} "Spend it on speed; freeze when it\textquotesingle s gone."
+\item
+  \textbf{The nines --- "three-nines is 43 minutes a month."} Each extra nine \(\div\)10: 99.9\% \(\rightarrow\) 43 min, 99.99\% \(\rightarrow\) 4.3 min, 99.999\% \(\rightarrow\) 26 s.
+\item
+  \textbf{Alerting --- "actionable AND urgent \(\rightarrow\) page; else ticket; else dashboard."}
+\item
+  \textbf{Alert on symptoms, not causes} --- "page on the patient, not the machine."
+\item
+  \textbf{Cardinality --- "never label a metric with anything unbounded"} (user\_id, request\_id, email).
+\item
+  \textbf{Histograms aggregate, summaries don\textquotesingle t} --- "you can\textquotesingle t average percentiles."
+\item
+  \textbf{Incident lifecycle --- "DTMRP": Detect \(\rightarrow\) Triage \(\rightarrow\) Mitigate \(\rightarrow\) Resolve \(\rightarrow\) Postmortem; mitigate before root-cause.}
+\item
+  \textbf{traceparent header --- "version-trace-parent-flags"} (\texttt{00-\textless{}traceid\textgreater{}-\textless{}spanid\textgreater{}-01}).
+\end{itemize}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: What are the three pillars of observability, and when do you use each?}\label{q1-what-are-the-three-pillars-of-observability-and-when-do-you-use-each}
+
+\textbf{Model answer:} \textbf{Metrics} are cheap, pre-aggregated time-series (rate/errors/latency via counters, gauges, histograms) --- ideal for dashboards, SLOs, and alerting; their weakness is cardinality, so they answer "what/how much" in aggregate. \textbf{Logs} are detailed, timestamped, discrete events for "what exactly happened" --- prefer structured JSON so they\textquotesingle re queryable; they\textquotesingle re the most expensive pillar so you sample (keep all errors). \textbf{Traces} record one request\textquotesingle s path across services as a tree of spans for "where did the time/error occur" --- essential in microservices. The workflow ties them together: a metric alert tells you \emph{something\textquotesingle s wrong}, a trace shows you \emph{which hop}, logs tell you \emph{why} --- all linked by a shared trace id.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Add a fourth pillar?} \(\rightarrow\) Continuous \textbf{profiles} (flame graphs / eBPF) for "which function" when the time is inside a single service.
+\item
+  \emph{Which is most expensive and why?} \(\rightarrow\) Logs (volume \(\times\) retention \(\times\) indexing); control with sampling + tiered retention.
+\end{itemize}
+
+\subsection{Q2: Monitoring vs observability --- what\textquotesingle s the difference?}\label{q2-monitoring-vs-observability--whats-the-difference}
+
+\textbf{Model answer:} \textbf{Monitoring} watches \textbf{known} failure modes via pre-defined metrics/dashboards/alerts --- it answers "is the thing I anticipated broken?" (known-knowns and known-unknowns). \textbf{Observability} is the \emph{property} of a system that lets you ask \textbf{new} questions and debug \textbf{unknown-unknowns} from the telemetry you already emit, \emph{without shipping new code} --- "why is p99 up only for EU Android users on /checkout paying with PayPal?" Monitoring is a subset of observability; observability requires richer, high-cardinality, correlatable data (the pillars linked by a trace id).
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why can\textquotesingle t classic metrics give observability?} \(\rightarrow\) Cardinality --- you can\textquotesingle t store a series per user; high-cardinality slicing needs traces/structured events.
+\item
+  \emph{Give a concrete unknown-unknown.} \(\rightarrow\) A bug only triggered by a specific feature-flag + device + region combination nobody dashboarded.
+\end{itemize}
+
+\subsection{Q3: Counter vs gauge vs histogram vs summary --- and how do you get p99 from a histogram?}\label{q3-counter-vs-gauge-vs-histogram-vs-summary--and-how-do-you-get-p99-from-a-histogram}
+
+\textbf{Model answer:} A \textbf{counter} only increases (requests\_total) --- you read its \texttt{rate()}. A \textbf{gauge} goes up and down (queue depth, memory). A \textbf{histogram} buckets observations into cumulative \texttt{le} buckets so you compute percentiles server-side with \texttt{histogram\_quantile()}, which finds the bucket containing the target rank and linearly interpolates within it. A \textbf{summary} pre-computes quantiles client-side. The crucial difference: \textbf{histogram buckets aggregate across instances} (sum the buckets, then compute the quantile), whereas \textbf{summary quantiles cannot be merged} --- you can\textquotesingle t average percentiles --- so for multi-instance services you must use histograms. Accuracy depends on bucket placement, so put buckets near your SLO threshold.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Your p99 looks wrong --- why?} \(\rightarrow\) Wide bucket around the percentile \(\rightarrow\) coarse interpolation; add buckets near that latency.
+\item
+  \emph{Cost of many buckets?} \(\rightarrow\) Each bucket is a series \(\rightarrow\) cardinality; balance precision vs cost.
+\end{itemize}
+
+\subsection{Q4: Explain SLI, SLO, SLA, and error budget. How do they relate?}\label{q4-explain-sli-slo-sla-and-error-budget-how-do-they-relate}
+
+\textbf{Model answer:} An \textbf{SLI} is a measured indicator, usually good-events/valid-events (e.g., \% of requests \textless{} 200ms). An \textbf{SLO} is the internal target on that SLI (99.9\% over 28 days). An \textbf{SLA} is the external, contractual promise with penalties (refunds), set \emph{looser} than the SLO so you have headroom and react before you owe money. The \textbf{error budget} is \texttt{1\ −\ SLO} --- the allowed unreliability (0.1\% \(\approx\) 43 min/month). They nest SLI \(\subset\) SLO \(\subset\) SLA. The budget is a currency: within it you ship fast and take risks; once burned, an \textbf{error-budget policy} freezes risky deploys and redirects effort to reliability --- turning the dev-vs-SRE tension into arithmetic.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why is the SLO stricter than the SLA?} \(\rightarrow\) Headroom: alert and fix before breaching the contract.
+\item
+  \emph{Who sets the error-budget policy?} \(\rightarrow\) Eng + product leadership, in advance, so it isn\textquotesingle t relitigated mid-incident.
+\end{itemize}
+
+\subsection{Q5: How do you alert on an SLO without paging constantly?}\label{q5-how-do-you-alert-on-an-slo-without-paging-constantly}
+
+\textbf{Model answer:} Use \textbf{multi-window, multi-burn-rate} alerting. Burn rate is how fast you\textquotesingle re consuming the budget relative to even consumption; burn rate 1 exactly exhausts the budget over the window. Pair a short and a long window with an \texttt{AND}: the long window confirms it\textquotesingle s a sustained real burn, the short window confirms it\textquotesingle s \emph{still happening now}. A \textbf{fast burn} (e.g., 14.4\(\times\) over 1h AND 5m \(\rightarrow\) \textasciitilde2\% of monthly budget in an hour) \textbf{pages} immediately; a \textbf{slow burn} (1\(\times\) over 6h AND 30m) opens a \textbf{ticket}. This pages proportionally to user impact and urgency with low false positives, tied to the SLO rather than arbitrary resource thresholds.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why two windows?} \(\rightarrow\) Long = real/sustained; short = currently active (don\textquotesingle t page on something already resolved).
+\item
+  \emph{Where does 14.4 come from?} \(\rightarrow\) It\textquotesingle s the burn rate that consumes \textasciitilde2\% of a 30-day budget in 1 hour (a common page threshold from the SRE workbook).
+\end{itemize}
+
+\subsection{\texorpdfstring{Q6: Walk me through debugging a 3\(\times\) p99 latency spike.}{Q6: Walk me through debugging a 3\textbackslash times p99 latency spike.}}\label{q6-walk-me-through-debugging-a-3times-p99-latency-spike}
+
+\textbf{Model answer:} First, \textbf{scope with metrics}: slice p99 by endpoint, region, instance, and version to find the affected slice; check if traffic spiked (load problem) and whether a deploy coincided (correlate with deploy annotations). Suppose it\textquotesingle s one endpoint, all hosts, right after a deploy. Second, \textbf{find the slow hop with a trace} --- click the latency exemplar or query traces by \texttt{duration\ \textgreater{}\ threshold}; the waterfall shows which span has the high \emph{self-time} (say, a DB query). Third, \textbf{find why with logs / span attributes} --- the \texttt{db.statement} and \texttt{rows\_scanned}/\texttt{index\_used} reveal a full table scan from a new query missing an index. \textbf{Mitigate by rolling back} (fastest), then add the index and re-deploy, then verify p99 recovered. The discipline: narrow by dimension first, one trace pinpoints the hop, logs give the cause --- never guess.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Error rate is flat but latency is up --- what does that tell you?} \(\rightarrow\) Requests succeed slowly \(\rightarrow\) not a crash; suspect a slow dependency/query/GC, not a logic bug.
+\item
+  \emph{No deploy happened --- now what?} \(\rightarrow\) Look at traffic (load/saturation), downstream latencies, GC pauses, noisy-neighbor, or data growth (a query that scales with table size).
+\end{itemize}
+
+\subsection{Q7: How does distributed tracing propagate context across services?}\label{q7-how-does-distributed-tracing-propagate-context-across-services}
+
+\textbf{Model answer:} At the edge, a \textbf{trace id} and root \textbf{span id} are generated. Each service, on an outbound call, \textbf{injects} the W3C \texttt{traceparent} header --- \texttt{00-\textless{}32-hex\ trace-id\textgreater{}-\textless{}16-hex\ parent-span-id\textgreater{}-\textless{}flags\textgreater{}} --- where the parent-span-id is its current span and the flags carry the sampled bit. The callee \textbf{extracts} it, creates a child span referencing the parent, and on \emph{its} outbound calls injects its own span id. The trace-id is constant across the whole request; the parent-span-id changes per hop; the sampled flag keeps the whole trace consistently kept or dropped. The backend reassembles spans by trace-id/parent-id into a waterfall. OpenTelemetry\textquotesingle s SDKs handle inject/extract automatically; if any hop strips the header, the trace breaks into disconnected trees.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Head vs tail sampling?} \(\rightarrow\) Head decides at start (cheap, misses rare errors); tail decides at end after buffering all spans (expensive, keeps all errors/slow traces). At scale: tail-sample errors + slow + a baseline.
+\item
+  \emph{How do logs join the trace?} \(\rightarrow\) Stamp every log with the trace id; pivot \texttt{trace\_id:abc} across both stores.
+\end{itemize}
+
+\subsection{Q8: Why percentiles, not averages, for latency?}\label{q8-why-percentiles-not-averages-for-latency}
+
+\textbf{Model answer:} Averages hide the tail --- a handful of very slow requests barely move the mean but dominate the worst user experiences. \textbf{p95/p99/p99.9} show what your slowest users actually feel, and at scale a "1\%" tail is millions of requests. Worse, in fan-out architectures the tail \emph{amplifies}: a request hitting 100 backends will likely hit at least one slow one (\texttt{1\ −\ 0.99¹⁰⁰\ ≈\ 63\%}), so a backend\textquotesingle s p99 becomes the system\textquotesingle s p50. You therefore define SLOs and alerts on percentiles and design tail-tolerant patterns (hedged requests, timeouts). Also: never \emph{average percentiles} across instances --- aggregate the histogram buckets first.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Which percentile for an SLO?} \(\rightarrow\) Usually p99 (sometimes p99.9) for user-facing; depends on how much tail users feel.
+\item
+  \emph{Average can even be misleading downward --- how?} \(\rightarrow\) A flood of fast-failing 500s lowers average latency; split success vs error latency.
+\end{itemize}
+
+\subsection{Q9: What should and shouldn\textquotesingle t go into a log line?}\label{q9-what-should-and-shouldnt-go-into-a-log-line}
+
+\textbf{Model answer:} \textbf{Should:} structured JSON with a stable \texttt{event} name, a \texttt{level}, the \texttt{service}, a \texttt{trace\_id}/\texttt{span\_id} for correlation, and the specific fields you\textquotesingle d query on (\texttt{reason}, \texttt{user\_id}, \texttt{amount}). \textbf{Shouldn\textquotesingle t:} secrets (passwords, tokens, keys, cookies) and PII beyond necessity (full card numbers \(\rightarrow\) PCI violation, SSNs, raw bodies that may contain them) --- redact/mask (\texttt{card\_last4}). Calibrate \textbf{levels} (don\textquotesingle t log handled cases at ERROR), \textbf{sample} (keep all errors, sample successes), and use \textbf{tiered retention} to control cost. Logged PII is also subject to GDPR deletion --- another reason to minimize it.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{How do you enforce no-PII?} \(\rightarrow\) Redaction filters in the logging lib, field allow-lists, and CI scanners that fail builds referencing sensitive fields.
+\item
+  \emph{ELK vs Loki?} \(\rightarrow\) ELK full-text-indexes everything (powerful, costly); Loki indexes labels only and greps the body (cheap, less arbitrary search).
+\end{itemize}
+
+\subsection{Q10: Your metric storage is exploding. What happened and how do you fix it?}\label{q10-your-metric-storage-is-exploding-what-happened-and-how-do-you-fix-it}
+
+\textbf{Model answer:} Almost certainly \textbf{cardinality explosion} --- someone added a high-cardinality label (user\_id, request\_id, email, raw URL with IDs, full error message). Series count is the \emph{product} of every label\textquotesingle s cardinality, so adding a 1M-value label multiplies series by a million and OOMs the TSDB. Fix: drop/relabel the offending label, bound dimensions (template the URL to \texttt{/users/:id}, collapse status to families), and move per-entity investigation to \textbf{traces/structured events} (high-cardinality stores) rather than metrics. Prevent recurrence with cardinality limits/linting in the metrics pipeline.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{But I need per-user debugging.} \(\rightarrow\) That\textquotesingle s a trace/event query (\texttt{group\ by\ user\_id} on raw events), not a metric label.
+\item
+  \emph{How to detect which label is the culprit?} \(\rightarrow\) Prometheus \texttt{topk} on series count by label; \texttt{count\ by\ (\_\_name\_\_)} and per-label cardinality reports.
+\end{itemize}
+
+\subsection{Q11: Describe the incident lifecycle. What\textquotesingle s the most common mistake?}\label{q11-describe-the-incident-lifecycle-whats-the-most-common-mistake}
+
+\textbf{Model answer:} \textbf{Detect} (alert fires --- MTTD) \(\rightarrow\) \textbf{Triage} (assess severity, declare the incident, assign an Incident Commander, open comms) \(\rightarrow\) \textbf{Mitigate} (stop the bleeding --- rollback, failover, shed load, flip a flag) \(\rightarrow\) \textbf{Resolve} (full service restored --- MTTR) \(\rightarrow\) \textbf{Postmortem} (blameless, with owned action items). The most common mistake is \textbf{trying to root-cause before mitigating} --- you should restore the user experience \emph{first} (rollback/failover) and investigate \emph{after}, because every minute spent debugging a live SEV1 is MTTR users feel. Also: postmortems must be blameless (focus on systemic gaps) and produce tracked action items, or you don\textquotesingle t actually improve.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{What does the Incident Commander do?} \(\rightarrow\) Coordinates the response and comms; does \emph{not} type the fix --- keeps the response organized.
+\item
+  \emph{MTTD vs MTTR vs MTBF?} \(\rightarrow\) Time to detect, to recover, between failures; observability shrinks MTTD/MTTR, reliability work raises MTBF.
+\end{itemize}
+
+\subsection{Q12: How would you add observability to a system you just designed?}\label{q12-how-would-you-add-observability-to-a-system-you-just-designed}
+
+\textbf{Model answer:} I\textquotesingle d define the \textbf{SLIs} that matter to users (availability and p99 latency on the critical path, plus quality/freshness if relevant), set an \textbf{SLO} with an \textbf{error budget} and a freeze \textbf{policy}. For the three pillars: \textbf{RED metrics} per service (and USE on resources/queues) via Prometheus, \textbf{structured JSON logs} with trace ids shipped to Loki/ELK with PII redaction and tiered retention, and \textbf{OpenTelemetry traces} propagating \texttt{traceparent} across hops, tail-sampled to keep all errors and slow traces. I\textquotesingle d alert \textbf{symptom-based} with \textbf{multi-window burn-rate} (fast \(\rightarrow\) page, slow \(\rightarrow\) ticket), attach \textbf{runbooks}, manage alerts as code, and link the pillars by trace id (exemplars from metrics \(\rightarrow\) traces \(\rightarrow\) logs). Continuous profiling for in-service hotspots.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Cost concerns?} \(\rightarrow\) Sample logs/traces (keep all errors), bound metric cardinality, tier retention.
+\item
+  \emph{How do you know your SLIs are right?} \(\rightarrow\) They must correlate with real user pain; validate against support tickets / user-reported issues.
+\end{itemize}
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Observability is a design-time requirement, not an afterthought.} You can\textquotesingle t retrofit a trace id; instrument at the boundaries from day one and treat telemetry schema (metric names, label sets, span attributes) as an API you version.
+\item
+  \textbf{The cardinality/observability tension is the central engineering trade-off.} Debugging unknowns needs high-cardinality dimensions, but metrics can\textquotesingle t afford them. The resolution is a \emph{tiered} strategy: low-cardinality metrics for alerting/SLOs, high-cardinality traces/events for exploration, with sampling and cost controls. Knowing \emph{why} you can\textquotesingle t just "label everything" is the senior signal.
+\item
+  \textbf{Error budgets are an organizational tool, not just a number.} Their value is resolving the dev-vs-SRE conflict by making reliability a shared, quantified currency. The policy (signed off in advance) is what gives it teeth.
+\item
+  \textbf{Symptom-based alerting + SLO burn rate scales; per-resource threshold alerting does not.} As services multiply, cause-based alerts produce unmanageable noise. Tie pages to user-facing SLO burn.
+\item
+  \textbf{Telemetry has real cost and the bill grows super-linearly with scale.} Logs especially. Senior engineers treat observability cost as a budget to optimize (sampling, retention tiers, dropping unused metrics, Loki-vs-ELK) --- at FAANG scale observability can rival the cost of the service it observes.
+\item
+  \textbf{Mitigation decoupled from diagnosis.} Build for fast rollback/failover/feature-flags so MTTR is low \emph{independent} of how long root-causing takes. Resilience patterns (circuit breakers, load shedding, bulkheads) reduce blast radius before observability even gets involved.
+\item
+  \textbf{Tail sampling and exemplars are what make tracing useful at scale} --- keep the \emph{interesting} traces (errors, slow) not a blind 1\%, and wire exemplars so metrics spikes link straight to a representative trace.
+\item
+  \textbf{eBPF and continuous profiling are the frontier} --- whole-system, zero-instrumentation telemetry (including off-CPU/blocking time) is increasingly the foundation of agents (Pixie, Parca, Cilium).
+\item
+  \textbf{Cross-team trace continuity is an org problem.} One un-instrumented or header-stripping service breaks every trace through it; observability requires platform-level standards (OTel everywhere, propagation contracts) that span team boundaries.
+\end{itemize}
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Finishing a system design with no observability story.} "How do you know it\textquotesingle s healthy / how do you debug it?" must be answered proactively. This is the \#1 omission that signals junior.
+\item
+  \textbf{Using averages instead of percentiles} for latency (and not knowing you can\textquotesingle t average percentiles across instances).
+\item
+  \textbf{Alerting on causes (CPU/memory) instead of symptoms (SLO burn / user errors)} \(\rightarrow\) noisy, non-actionable pages and alert fatigue.
+\item
+  \textbf{Proposing per-user (or per-request) metric labels} --- cardinality explosion that takes down the monitoring stack. High-cardinality belongs in traces/events.
+\item
+  \textbf{Unstructured logs} (free text needing regex) and logging too much (cost/PII) or too little (blind).
+\item
+  \textbf{No trace id linking the pillars} --- can\textquotesingle t pivot from a metric to the trace to the logs for one request.
+\item
+  \textbf{Confusing SLA and SLO} (or setting them equal --- no headroom), or having an SLO with no error-budget \emph{policy}.
+\item
+  \textbf{Root-causing before mitigating} during an incident --- debugging a live SEV1 while users suffer instead of rolling back first.
+\item
+  \textbf{Conflating monitoring and observability} as synonyms --- missing the known vs unknown-unknown distinction.
+\item
+  \textbf{Choosing a summary when a histogram is needed} (multi-instance services) and being unable to compute a fleet-wide percentile.
+\item
+  \textbf{No runbooks} on alerts, so a 3am page means rediscovering the system under stress.
+\item
+  \textbf{Ignoring telemetry cost} --- proposing "log everything, trace everything at 100\%" with no sampling or retention strategy.
+\end{enumerate}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2307}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7693}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Connection
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Performance Engineering (\hyperlink{section.09}{\textcolor{acc}{§09}})} & Percentiles, tail latency, fan-out amplification, flame graphs, USE/RED --- observability is how you \emph{measure} the performance you optimize. Profiling is the shared tool. \\
+\rowcolor{zebra}
+\textbf{Distributed Systems (\hyperlink{section.07}{\textcolor{acc}{§07}})} & Tracing exists \emph{because} of distributed systems; context propagation, partial failures, and fan-out are the problems observability solves. \\
+\textbf{Cloud \& Infrastructure (\hyperlink{section.04}{\textcolor{acc}{§04}})} & Prometheus/Grafana/OTel/Loki/Jaeger run on your K8s platform; kube-state-metrics, node\_exporter, service-mesh tracing (Envoy) all feed telemetry. \\
+\rowcolor{zebra}
+\textbf{System Design (\hyperlink{section.05}{\textcolor{acc}{§05}})} & Every design needs an SLI/SLO + three-pillars + alerting section; capacity planning uses the same metrics. \\
+\textbf{Reliability / SRE} & SLOs, error budgets, blameless postmortems, on-call, toil budgets --- observability is SRE\textquotesingle s instrument panel. \\
+\rowcolor{zebra}
+\textbf{Networking} & Blackbox probing, trace spans for RPC hops, packet-drop USE-errors, TLS-cert-expiry alerts. \\
+\textbf{Security} & Audit logs, anomaly detection, PII/secret redaction in logs, access logs for forensics. \\
+\rowcolor{zebra}
+\textbf{Testing (\hyperlink{section.17}{\textcolor{acc}{§17}})} & Monitoring catches in production what tests miss; canary analysis uses SLIs; synthetic monitoring is testing in prod. \\
+\textbf{Databases} & Slow-query logs, query plans (\texttt{EXPLAIN}), connection-pool saturation metrics, replication-lag SLIs --- observability surfaces DB bottlenecks. \\
+\end{longtable}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{End every system design with "here\textquotesingle s how I\textquotesingle d observe it":} name the key SLIs, set an SLO with an error budget, the three pillars linked by a trace id, and symptom-based alerts. This single move dramatically raises your level signal.
+\item
+  \textbf{Say "p99, not average"} and \textbf{"alert on symptoms / SLO burn rate, not on CPU."} These two phrases instantly read as senior.
+\item
+  \textbf{Mention an error-budget policy} ("freeze risky deploys when the budget\textquotesingle s burned") to show you understand the velocity-vs-reliability trade-off.
+\item
+  \textbf{Name the cardinality trap unprompted} --- "I wouldn\textquotesingle t put user\_id in a metric label; that\textquotesingle s a cardinality explosion --- per-user lives in traces." Strong production signal.
+\item
+  \textbf{Use the metrics\(\rightarrow\)traces\(\rightarrow\)logs (\(\rightarrow\)profiles) funnel} when asked to debug. Narrow by dimension first; never guess.
+\item
+  \textbf{Know the nines} cold: 99.9\% \(\approx\) 43 min/month, each extra nine \(\div\)10.
+\item
+  \textbf{Mitigate before root-cause} during incident questions --- rollback/failover first, investigate after.
+\item
+  \textbf{Histograms aggregate, summaries don\textquotesingle t} --- drop this when metric types come up.
+\item
+  \textbf{Name OpenTelemetry and the traceparent header} for tracing questions; mention head vs tail sampling.
+\item
+  \textbf{Connect to business impact} --- "good observability cuts MTTR, and at Amazon-scale every minute of downtime is real revenue." Tie telemetry to money.
+\end{enumerate}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+Observability = understand a system\textquotesingle s internals from its outputs, so you can debug \textbf{unknown} failures without shipping code. \textbf{Monitoring} (known failure modes) is a subset. Built on three pillars: \textbf{Metrics} (cheap aggregates \(\rightarrow\) \emph{that} something\textquotesingle s wrong), \textbf{Traces} (one request across services \(\rightarrow\) \emph{where}), \textbf{Logs} (detailed events \(\rightarrow\) \emph{why}) --- plus \textbf{Profiles} (\(\rightarrow\) \emph{which function}). Link them all by a \textbf{trace id}.
+
+\textbf{Metrics:} counter (only up, read \texttt{rate()}), gauge (up/down), \textbf{histogram} (buckets \(\rightarrow\) \texttt{histogram\_quantile()}, \emph{aggregatable} across instances), summary (client-side quantiles, \emph{not} aggregatable --- never average percentiles). Prometheus \textbf{pulls} from \texttt{/metrics} (failed scrape = down signal); Pushgateway for short jobs. \textbf{RED} per service, \textbf{USE} per resource, \textbf{Four Golden Signals} = union. \textbf{Cardinality explosion}: series = product of label cardinalities --- never label with user\_id/request\_id.
+
+\textbf{Logs:} structured JSON, stable event name, trace id, leveled (calibrated), sampled (keep all errors), shipped to ELK (full index, costly) or Loki (label index, cheap), PII/secrets redacted, tiered retention.
+
+\textbf{Traces:} spans form a tree; find the span with high \textbf{self-time}. Propagate \textbf{W3C \texttt{traceparent}} (\texttt{00-\textless{}traceid\textgreater{}-\textless{}spanid\textgreater{}-\textless{}flags\textgreater{}}) across hops. \textbf{Head sampling} (cheap, misses errors) vs \textbf{tail sampling} (keep all errors/slow, expensive). \textbf{OpenTelemetry}: SDK \(\rightarrow\) Collector \(\rightarrow\) backend.
+
+\textbf{SLI \(\subset\) SLO \(\subset\) SLA.} SLI = measured ratio; SLO = internal target (stricter than SLA for headroom); SLA = contract + penalties. \textbf{Error budget = 1 \(-\) SLO} (99.9\% \(\approx\) 43 min/month). \textbf{Policy}: freeze risky deploys when burned. \textbf{Multi-window multi-burn-rate} alerts: fast burn (14.4\(\times\), 1h+5m) \(\rightarrow\) page; slow burn (1\(\times\), 6h+30m) \(\rightarrow\) ticket.
+
+\textbf{Alerting:} symptoms not causes; actionable AND urgent \(\rightarrow\) page, else ticket; runbooks; alerts as code; kill fatigue. \textbf{Incidents:} detect\(\rightarrow\)triage\(\rightarrow\)mitigate\(\rightarrow\)resolve\(\rightarrow\)postmortem; \textbf{mitigate before root-cause}; blameless postmortems with owned actions; MTTD/MTTR/MTBF.
+
+\subsection{Key Numbers}\label{key-numbers}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2686}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7314}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Thing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+99\% & 7.2 h/month down \\
+\rowcolor{zebra}
+99.9\% & \textbf{43.2 min/month} \\
+99.95\% & 21.6 min/month \\
+\rowcolor{zebra}
+99.99\% & \textbf{4.32 min/month} \\
+99.999\% & 26 s/month \\
+\rowcolor{zebra}
+Fast-burn page & 14.4\(\times\) over 1h AND 5m \\
+Slow-burn ticket & 1\(\times\) over 6h AND 30m \\
+\rowcolor{zebra}
+Prometheus scrape & default 15s \\
+Fan-out p99 & 100 backends @ 1\% slow \(\rightarrow\) \textasciitilde63\% hit a slow one \\
+\end{longtable}
+
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2766}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7234}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-liner
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Three pillars} & Metrics (what/that) \(\cdot\) Traces (where) \(\cdot\) Logs (why) \(\cdot\) +Profiles (which fn) \\
+\rowcolor{zebra}
+\textbf{Monitoring vs observability} & known failures vs debugging unknown-unknowns; monitoring \(\subset\) observability \\
+\textbf{Metric types} & counter\(\uparrow\) \(\cdot\) gauge↕ \(\cdot\) histogram(buckets, aggregatable) \(\cdot\) summary(quantiles, not) \\
+\rowcolor{zebra}
+\textbf{Pull model} & Prometheus scrapes /metrics; failed scrape = down; Pushgateway for short jobs \\
+\textbf{RED / USE / Golden} & Rate-Errors-Duration \(\cdot\) Util-Sat-Errors \(\cdot\) Latency-Traffic-Errors-Saturation \\
+\rowcolor{zebra}
+\textbf{Cardinality} & series = \(\prod\) label cardinalities; never user\_id in a metric label \\
+\textbf{Exemplar} & metric bucket \(\rightarrow\) pointer to a real trace \\
+\rowcolor{zebra}
+\textbf{Structured logs} & JSON + trace\_id; keep all errors, sample successes; redact PII \\
+\textbf{ELK vs Loki} & full-text index (costly) vs label index + grep (cheap) \\
+\rowcolor{zebra}
+\textbf{Trace} & tree of spans; find high self-time span \\
+\textbf{traceparent} & \texttt{00-\textless{}traceid\textgreater{}-\textless{}spanid\textgreater{}-\textless{}flags\textgreater{}}; propagate across hops \\
+\rowcolor{zebra}
+\textbf{Head vs tail sampling} & start/cheap/miss-errors vs end/expensive/keep-errors \\
+\textbf{OpenTelemetry} & SDK \(\rightarrow\) Collector \(\rightarrow\) backend; vendor-neutral \\
+\rowcolor{zebra}
+\textbf{SLI \(\subset\) SLO \(\subset\) SLA} & measured ratio \(\cdot\) internal target \(\cdot\) external contract+penalties \\
+\textbf{Error budget} & 1 \(-\) SLO; spend on velocity, freeze when gone \\
+\rowcolor{zebra}
+\textbf{Burn-rate alerts} & fast(14.4\(\times\),1h+5m)\(\rightarrow\)page \(\cdot\) slow(1\(\times\),6h+30m)\(\rightarrow\)ticket \\
+\textbf{Symptom alerting} & page on user impact, not CPU; actionable + urgent \\
+\rowcolor{zebra}
+\textbf{Incident} & detect\(\rightarrow\)triage\(\rightarrow\)mitigate\(\rightarrow\)resolve\(\rightarrow\)postmortem; mitigate first; blameless \\
+\textbf{MTTD/MTTR/MTBF} & detect \(\cdot\) recover \(\cdot\) between failures \\
+\end{longtable}
+
+\subsection{Most Important Concepts}\label{most-important-concepts}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Metrics say \emph{that}, traces say \emph{where}, logs say \emph{why}} --- linked by a trace id; the universal debugging funnel.
+\item
+  \textbf{Monitoring = known failures; observability = unknown-unknowns} (monitoring is a subset).
+\item
+  \textbf{Histograms aggregate, summaries don\textquotesingle t} --- you can\textquotesingle t average percentiles.
+\item
+  \textbf{Cardinality explosion} --- never put unbounded labels on metrics.
+\item
+  \textbf{SLI \(\subset\) SLO \(\subset\) SLA; error budget = 1 \(-\) SLO} with a freeze policy.
+\item
+  \textbf{Multi-window multi-burn-rate alerting} --- fast burn pages, slow burn tickets.
+\item
+  \textbf{Alert on symptoms, not causes; actionable + urgent only.}
+\item
+  \textbf{Mitigate before root-cause; blameless postmortems with owned actions.}
+\item
+  \textbf{Propagate \texttt{traceparent}; tail-sample to keep errors + slow traces.}
+\item
+  \textbf{Instrument at design time} --- observability is a first-class requirement, not an afterthought.
+\end{enumerate}
+
+\textbf{Golden rule:} instrument with metrics + logs + traces (+ profiles) linked by a trace id, define SLOs with error budgets and a freeze policy, track percentiles (never averages), bound cardinality, and alert on user-facing symptoms via burn rate --- then debug top-down metrics \(\rightarrow\) traces \(\rightarrow\) logs.
+
+\emph{Last updated: 2026-06-15 \textbar{} Topic: Observability \textbar{} Level: FAANG Senior}
+
+\end{document}

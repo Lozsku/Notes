@@ -1,0 +1,2924 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{MLOps \& ML System Design}
+\newcommand{\ThemeKicker}{AI/ML Track}
+\newcommand{\ThemeNumber}{06}
+
+\usepackage{interviewstyle}
+\setthemecolor{7c3aed}{a78bfa}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+MLOps is the engineering discipline that closes the loop between ML research and production impact --- the difference between a model that scores well in a notebook and one that earns billions of dollars reliably at scale.
+\end{quote}
+
+\section{Overview --- What it is}\label{overview--what-it-is}
+
+MLOps (Machine Learning Operations) is the set of practices, tools, and cultural norms that make it possible to deploy, monitor, and continuously improve ML systems in production. ML System Design is the interview skill of architecting those systems end-to-end given business and technical constraints.
+
+\textbf{MLOps spans five lifecycle phases:}
+
+\visualfigure{../../figures/aiml-06-mlops/01-mlops-lifecycle.pdf}{Production ML is a loop: monitoring detects data/concept drift and triggers retraining, closing the gap between a one-off model and a living system.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Data} --- ingestion, validation, versioning, labeling
+\item
+  \textbf{Features} --- engineering, storing, serving (online + offline)
+\item
+  \textbf{Training} --- distributed computation, experiment tracking, hyperparameter search
+\item
+  \textbf{Deployment} --- packaging, serving, traffic management
+\item
+  \textbf{Monitoring \& Feedback} --- drift detection, alerting, triggering retraining
+\end{enumerate}
+
+\textbf{ML System Design adds the business layer:}
+
+\begin{itemize}
+\tightlist
+\item
+  Translate a vague product goal ("make users engage more") into a precise ML objective
+\item
+  Choose the right model architecture, feature set, and serving strategy
+\item
+  Reason about latency, cost, fairness, and iteration speed from the start
+\end{itemize}
+
+\section{Why It Exists}\label{why-it-exists}
+
+Classical software engineering has a clean input-output contract: given the same code and inputs, outputs are deterministic and bugs are reproducible. ML systems break every assumption:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3463}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6537}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Classical Software
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ML Systems
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Logic is explicit in code & Logic is latent in model weights \\
+\rowcolor{zebra}
+Bug = wrong code & Bug = wrong data, wrong objective, or distribution shift \\
+Version = git commit & Version = code + data + hyperparameters + environment \\
+\rowcolor{zebra}
+Testing = unit tests & Testing = statistical evaluation on held-out sets \\
+Deployment is one-time & Deployment requires continuous retraining \\
+\rowcolor{zebra}
+Failure is deterministic & Failure is gradual (silent model decay) \\
+\end{longtable}
+
+MLOps exists because the ML development lifecycle is fundamentally different from software development. Without it, teams experience:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Training-serving skew}: model trained on offline data that doesn\textquotesingle t match production
+\item
+  \textbf{Silent degradation}: model accuracy drifts without triggering any alert
+\item
+  \textbf{Unreproducible experiments}: "which run produced the model we shipped?"
+\item
+  \textbf{Deployment bottlenecks}: data scientists can\textquotesingle t deploy; engineers can\textquotesingle t understand models
+\end{itemize}
+
+\section{Why FAANG Cares (be specific --- recsys/ranking/ads are the revenue engines)}\label{why-faang-cares-be-specific--recsysrankingads-are-the-revenue-engines}
+
+At FAANG scale, ML systems are not infrastructure --- they ARE the product.
+
+\textbf{The numbers that matter:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6143}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ML System
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Revenue / Business Impact
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Google & Ad CTR prediction & \(220B+/yr ad revenue; 1% CTR improvement = ~
+\)2B \\
+\rowcolor{zebra}
+Meta & News Feed ranking & Core DAU driver; feed determines time-on-site \\
+Amazon & Product recommendations & 35\% of Amazon\textquotesingle s revenue attributed to recommendations \\
+\rowcolor{zebra}
+Netflix & Content recommendations & Saves \textasciitilde\$1B/yr in churn; 80\% of watched content is recommended \\
+TikTok & For You page ranking & Primary retention mechanism for 1B+ MAU \\
+\end{longtable}
+
+\textbf{Why FAANG interviews specifically test this:}
+
+\begin{itemize}
+\tightlist
+\item
+  Senior engineers at FAANG own systems generating millions of predictions per second
+\item
+  Model quality improvements translate directly to revenue (each 0.1\% AUC lift in ads = \$100M+)
+\item
+  MLOps failures are catastrophic: a bad model pushed to 100\% traffic can crash a product in hours
+\item
+  System design interviews test whether you can reason about scale before writing a single line of code
+\end{itemize}
+
+\textbf{The FAANG-specific challenges:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Scale}: billions of users, trillions of features, millions of QPS
+\item
+  \textbf{Freshness}: news feed needs features from the last 30 seconds
+\item
+  \textbf{Fairness \& Safety}: models making consequential decisions (loans, content moderation)
+\item
+  \textbf{Multi-objective optimization}: engagement vs. revenue vs. diversity vs. user wellbeing
+\end{itemize}
+
+\section{The ML System Design Framework (Step-by-Step Playbook)}\label{the-ml-system-design-framework-step-by-step-playbook}
+
+Use this framework in every ML system design interview. Walk through each step explicitly --- interviewers reward structured thinking.
+
+\setcodelang{}
+
+\begin{verbatim}
+FRAMEWORK: C-O-D-F-M-T-E-S-M-I
+Clarify → Objective → Data → Features → Model → Train → Evaluate → Serve → Monitor → Iterate
+\end{verbatim}
+
+\subsection{Step 1: Clarify Requirements (5 min)}\label{step-1-clarify-requirements-5-min}
+
+Always start here. Never design before clarifying.
+
+\textbf{Questions to ask:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Scale}: How many users? How many items/candidates? QPS at serving time?
+\item
+  \textbf{Latency}: Real-time (\textless{} 100ms)? Near-real-time (\textless{} 1s)? Batch (hours)?
+\item
+  \textbf{Freshness}: How stale can features/model be? (seconds? hours? days?)
+\item
+  \textbf{Constraints}: Budget? Existing infrastructure? Privacy (GDPR, CCPA)?
+\item
+  \textbf{Cold start}: What happens with new users or new items?
+\item
+  \textbf{Feedback}: Explicit (ratings) or implicit (clicks, dwell time)?
+\end{itemize}
+
+\textbf{Interview tip}: Say "Before I design, let me ask a few clarifying questions to make sure I\textquotesingle m solving the right problem."
+
+\subsection{Step 2: Define ML Objective \& Metrics}\label{step-2-define-ml-objective--metrics}
+
+Translate the business goal into a precise ML problem.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2159}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3864}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1932}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2045}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Business Goal
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ML Objective
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primary Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Business Metric
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Increase engagement & Maximize click probability & AUC-ROC, log-loss & CTR, DAU \\
+\rowcolor{zebra}
+Increase revenue & Maximize conversion \(\times\) revenue & NDCG, MAP & Revenue/query \\
+Reduce churn & Predict 30-day churn & F1, Recall & Retention rate \\
+\rowcolor{zebra}
+Improve search & Rank relevant docs higher & NDCG@10, MRR & Click-through-rank \\
+\end{longtable}
+
+\textbf{Key insight}: The ML metric and the business metric must be causally linked. Optimizing CTR can hurt revenue if it promotes cheap-but-clickable content.
+
+\textbf{Always define}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Offline metric}: what you optimize during training (log-loss, NDCG)
+\item
+  \textbf{Online metric}: what you measure in A/B tests (CTR, session length)
+\item
+  \textbf{Guardrail metrics}: what must NOT degrade (latency P99, flagged content rate)
+\end{itemize}
+
+\subsection{Step 3: Data Strategy}\label{step-3-data-strategy}
+
+\textbf{Questions to answer:}
+
+\begin{itemize}
+\tightlist
+\item
+  Where does training data come from? (logs, human labels, synthetic)
+\item
+  How is it collected and at what volume?
+\item
+  What are the label definitions? (positive = click? purchase? 30-second watch?)
+\item
+  How is it versioned and partitioned?
+\item
+  What biases exist? (position bias, selection bias, feedback loops)
+\end{itemize}
+
+\textbf{Data challenges at scale:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Positive label scarcity}: 1 purchase per 1000 impressions \(\rightarrow\) class imbalance
+\item
+  \textbf{Label delay}: purchase attribution can lag by 30 days
+\item
+  \textbf{Data leakage}: features computed after the prediction time leak future info
+\item
+  \textbf{Position bias}: items shown in position 1 get clicked more regardless of quality
+\end{itemize}
+
+\subsection{Step 4: Feature Engineering}\label{step-4-feature-engineering}
+
+\textbf{Categorize features:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{User features}: demographics, historical behavior, embeddings
+\item
+  \textbf{Item features}: content features, popularity statistics, embeddings
+\item
+  \textbf{Context features}: device, time, location, session context
+\item
+  \textbf{Cross features}: user-item interaction history, co-occurrence statistics
+\end{itemize}
+
+\textbf{Online vs. Offline features:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2448}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1584}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1836}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4132}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Feature Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Freshness
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Latency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Offline/batch & Hours-days & Low & User\textquotesingle s 30-day watch history \\
+\rowcolor{zebra}
+Near-real-time & Minutes & Medium & User\textquotesingle s last 1-hour behavior \\
+Real-time/online & Seconds & Must be fast & Current session activity \\
+\end{longtable}
+
+\textbf{Training-serving skew}: The \#1 production issue. Occurs when features computed at serving time differ from features used during training. Fix: use the same feature pipeline for both.
+
+\subsection{Step 5: Model Selection}\label{step-5-model-selection}
+
+\textbf{Choose model complexity based on:}
+
+\begin{itemize}
+\tightlist
+\item
+  Latency requirements (simpler = faster)
+\item
+  Data volume (deep models need \textgreater1M examples)
+\item
+  Feature types (dense = neural; sparse categorical = GBDT or embeddings)
+\item
+  Explainability needs (regulatory, debugging)
+\end{itemize}
+
+\textbf{Model progression:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Heuristics → Logistic Regression → GBDT → Two-Tower Neural → Full Deep Learning
+(baseline)    (fast, interpretable)  (best for tabular)  (embeddings)    (most expressive)
+\end{verbatim}
+
+\subsection{Step 6: Training Infrastructure}\label{step-6-training-infrastructure}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Distributed training}: data parallelism for large data, model parallelism for large models
+\item
+  \textbf{Experiment tracking}: log every run (params, metrics, artifacts)
+\item
+  \textbf{Hyperparameter optimization}: Bayesian search \textgreater{} grid search at scale
+\item
+  \textbf{Retraining frequency}: daily? hourly? triggered by drift?
+\end{itemize}
+
+\subsection{Step 7: Evaluation}\label{step-7-evaluation}
+
+\textbf{Offline evaluation:}
+
+\begin{itemize}
+\tightlist
+\item
+  Hold-out test set (temporally stratified --- never shuffle time-series data)
+\item
+  Cross-validation
+\item
+  Slice-based analysis (performance per user segment, item category)
+\end{itemize}
+
+\textbf{Online evaluation:}
+
+\begin{itemize}
+\tightlist
+\item
+  A/B test: 90\%/10\% traffic split, measure business metrics
+\item
+  Interleaving: merge ranked lists, measure user preferences (faster than A/B)
+\item
+  Shadow mode: run new model in parallel without affecting users
+\end{itemize}
+
+\subsection{Step 8: Serving Architecture}\label{step-8-serving-architecture}
+
+\textbf{Key decisions:}
+
+\begin{itemize}
+\tightlist
+\item
+  Batch vs. real-time vs. streaming
+\item
+  Model hosting: own servers, managed endpoints, edge
+\item
+  Latency budget: how much time per component?
+\item
+  Cascading: multiple models at different cost-accuracy tradeoffs
+\end{itemize}
+
+\subsection{Step 9: Monitoring \& Observability}\label{step-9-monitoring--observability}
+
+\textbf{What to monitor:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Data health}: input distribution shifts, missing features, schema violations
+\item
+  \textbf{Model health}: prediction distribution, confidence scores
+\item
+  \textbf{Business health}: CTR, revenue, latency P99, error rate
+\item
+  \textbf{Fairness}: performance across demographic slices
+\end{itemize}
+
+\subsection{Step 10: Iterate}\label{step-10-iterate}
+
+\begin{itemize}
+\tightlist
+\item
+  Close the feedback loop: production predictions \(\rightarrow\) new training data
+\item
+  Prioritize: data quality improvements often beat model architecture changes
+\item
+  A/B test every change before full rollout
+\end{itemize}
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Data Pipelines \& Data Versioning}\label{data-pipelines--data-versioning}
+
+\textbf{Data pipeline components:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Raw Sources → Ingestion → Validation → Transformation → Storage → Feature Computation
+(DBs, events)  (Kafka,      (Great        (Spark,          (S3,       (feature store)
+               Flink)       Expectations) dbt)             Hive)
+\end{verbatim}
+
+\textbf{Data versioning tools:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DVC (Data Version Control)}: Git-like versioning for datasets and models. Stores pointers in git, actual data in S3/GCS
+\item
+  \textbf{Delta Lake / Iceberg}: versioned data lakes with ACID transactions, time-travel queries
+\item
+  \textbf{Pachyderm}: data-centric version control with lineage tracking
+\item
+  \textbf{LakeFS}: Git-like branching for data lakes
+\end{itemize}
+
+\textbf{Why version data?}
+
+\begin{itemize}
+\tightlist
+\item
+  Reproduce any past experiment exactly
+\item
+  Roll back to previous data if quality degrades
+\item
+  Audit model decisions (regulatory compliance)
+\item
+  Track data lineage end-to-end
+\end{itemize}
+
+\textbf{Data validation:}
+
+\begin{itemize}
+\tightlist
+\item
+  Schema validation: expected columns, types, ranges
+\item
+  Statistical validation: mean, variance, null rates within expected bounds
+\item
+  Distribution shift: compare current batch against historical baseline
+\item
+  Tools: \textbf{Great Expectations}, \textbf{TFX Data Validation}, \textbf{Deequ}
+\end{itemize}
+
+\subsection{Feature Engineering at Scale \& Feature Stores}\label{feature-engineering-at-scale--feature-stores}
+
+\textbf{The feature store problem:}
+Without a feature store, the same feature (e.g., "user\textquotesingle s 7-day click rate") is computed independently by:
+
+\begin{itemize}
+\tightlist
+\item
+  The training pipeline (offline batch job)
+\item
+  The serving system (online real-time computation)
+\end{itemize}
+
+This causes training-serving skew and duplicated engineering work.
+
+\textbf{Feature store architecture:}
+
+\setcodelang{}
+
+\begin{verbatim}
+                     FEATURE STORE
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│  Offline Store (historical features)                     │
+│  ┌──────────────────────────────────┐                   │
+│  │ Point-in-time correct features   │ ← Training jobs   │
+│  │ (Hive, Parquet, Delta Lake)      │                   │
+│  └──────────────────────────────────┘                   │
+│                    ↑ batch write                         │
+│  Feature Pipelines (Spark, dbt, Flink)                  │
+│                    ↓ stream write                        │
+│  Online Store (low-latency lookup)                       │
+│  ┌──────────────────────────────────┐                   │
+│  │ Latest feature values only       │ ← Serving requests│
+│  │ (Redis, DynamoDB, Cassandra)     │   < 10ms lookup   │
+│  └──────────────────────────────────┘                   │
+│                                                          │
+│  Feature Registry (metadata, lineage, discoverability)   │
+└──────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\textbf{Offline store}: Historical features for training. Must support \textbf{point-in-time correct} joins --- when training, we must use only features that would have been available at prediction time (no future leakage).
+
+\textbf{Online store}: Latest feature values for low-latency serving. Redis/DynamoDB for \textless10ms lookups. Only stores the current value, not history.
+
+\textbf{Training-serving skew prevention:}
+
+\begin{itemize}
+\tightlist
+\item
+  Single feature computation logic used for both offline (batch) and online (stream)
+\item
+  Log-and-wait: log features used at serving time, join with labels later for training
+\item
+  Feature validation: statistical tests before training to detect skew
+\end{itemize}
+
+\textbf{Feature store products:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Feast} (open source): original feature store, widely used
+\item
+  \textbf{Tecton}: managed Feast, Uber/Twitter lineage
+\item
+  \textbf{Databricks Feature Store}: integrated with MLflow
+\item
+  \textbf{Vertex AI Feature Store} (GCP): managed, supports streaming
+\item
+  \textbf{SageMaker Feature Store} (AWS): managed, online + offline
+\end{itemize}
+
+\textbf{Feature freshness vs. cost tradeoff:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1763}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2317}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1889}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0756}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3275}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Freshness
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Update Frequency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Latency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Batch & Daily/hourly & Low & Low & Long-term user preferences \\
+\rowcolor{zebra}
+Near-real-time & Minutes & Medium & Medium & Recent session behavior \\
+Real-time & Seconds & \textless{} 10ms required & High & Current context features \\
+\end{longtable}
+
+\subsection{Experiment Tracking \& Model Registry}\label{experiment-tracking--model-registry}
+
+\textbf{Experiment tracking captures:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Parameters}: hyperparameters, model architecture config
+\item
+  \textbf{Metrics}: training/validation loss, AUC, NDCG at each epoch
+\item
+  \textbf{Artifacts}: model weights, feature importance plots, confusion matrices
+\item
+  \textbf{Environment}: Docker image, library versions, hardware specs
+\item
+  \textbf{Code}: git commit hash
+\end{itemize}
+
+\textbf{Tools:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{MLflow}: open-source, widely adopted; tracking + registry + projects + models
+\item
+  \textbf{Weights \& Biases (W\&B)}: rich visualization, popular in deep learning
+\item
+  \textbf{Neptune.ai}: collaborative experiment tracking
+\item
+  \textbf{Vertex AI Experiments} / \textbf{SageMaker Experiments}: managed cloud options
+\end{itemize}
+
+\textbf{MLflow workflow:}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{with}\NormalTok{ mlflow.start\_run():}
+\NormalTok{    mlflow.log\_param(}\StringTok{"learning\_rate"}\NormalTok{, }\FloatTok{0.001}\NormalTok{)}
+\NormalTok{    mlflow.log\_param(}\StringTok{"n\_estimators"}\NormalTok{, }\DecValTok{100}\NormalTok{)}
+    
+    \CommentTok{\# Train model...}
+    
+\NormalTok{    mlflow.log\_metric(}\StringTok{"val\_auc"}\NormalTok{, }\FloatTok{0.87}\NormalTok{)}
+\NormalTok{    mlflow.sklearn.log\_model(model, }\StringTok{"model"}\NormalTok{)}
+    
+\CommentTok{\# Register best model}
+\NormalTok{mlflow.register\_model(}\StringTok{"runs:/abc123/model"}\NormalTok{, }\StringTok{"CTR\_Predictor"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Model Registry} manages the model lifecycle:
+
+\setcodelang{}
+
+\begin{verbatim}
+┌──────────────────────────────────────────────────────────┐
+│              MODEL REGISTRY                              │
+│                                                          │
+│  Stages: Staging → Validation → Production → Archived    │
+│                                                          │
+│  For each model version:                                 │
+│  - Model artifact (weights, preprocessing pipeline)      │
+│  - Training metadata (data version, parameters)          │
+│  - Evaluation metrics (offline + online)                 │
+│  - Deployment history                                     │
+│  - Approval workflow (human sign-off for production)     │
+└──────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\textbf{Key registry capabilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Lineage}: which data + code produced this model?
+\item
+  \textbf{Versioning}: compare model versions side by side
+\item
+  \textbf{Governance}: approval gates before production promotion
+\item
+  \textbf{Rollback}: one-click revert to previous version
+\end{itemize}
+
+\subsection{Distributed Training}\label{distributed-training}
+
+\textbf{Why distributed?}
+
+\begin{itemize}
+\tightlist
+\item
+  Model too large for one GPU (GPT-3: 175B params, 350GB in fp32)
+\item
+  Data too large to train on one machine in reasonable time
+\item
+  Need faster experimentation turnaround
+\end{itemize}
+
+\textbf{Three parallelism paradigms:}
+
+\subsubsection{Data Parallelism}\label{data-parallelism}
+
+\setcodelang{}
+
+\begin{verbatim}
+         Master (gradient aggregation)
+              /         |         \
+        Worker 1    Worker 2    Worker 3
+        [Shard 1]  [Shard 2]  [Shard 3]
+        full model  full model  full model
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Each worker holds a \textbf{full copy of the model}
+\item
+  Data is split across workers (each sees different mini-batches)
+\item
+  Workers compute gradients independently
+\item
+  Gradients aggregated (sum/average) and model weights updated
+\item
+  \textbf{Works for}: models that fit in one GPU\textquotesingle s memory
+\end{itemize}
+
+\textbf{All-Reduce vs. Parameter Server:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2288}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4553}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3159}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Architecture
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+All-Reduce
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Parameter Server
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gradient aggregation & Ring all-reduce (each worker sends/receives) & Central PS node aggregates \\
+\rowcolor{zebra}
+Communication pattern & Peer-to-peer & Hub-and-spoke \\
+Bottleneck & Network bandwidth & PS becomes bottleneck \\
+\rowcolor{zebra}
+Fault tolerance & Worker failure affects ring & PS can be replicated \\
+Best for & Homogeneous GPU clusters & Heterogeneous, sparse models \\
+\rowcolor{zebra}
+Example & Horovod, PyTorch DDP & TensorFlow PS, Uber Petastorm \\
+\end{longtable}
+
+\textbf{Ring All-Reduce} (NCCL):
+
+\setcodelang{}
+
+\begin{verbatim}
+W1 → W2 → W3 → W4
+↑               ↓
+W4 ← W3 ← W2 ← W1
+\end{verbatim}
+
+Each worker sends a chunk to the next, receives a chunk from the previous. After N-1 steps, each worker has the full gradient sum. Bandwidth-optimal: each worker sends/receives exactly one full gradient tensor total.
+
+\subsubsection{Model Parallelism}\label{model-parallelism}
+
+\setcodelang{}
+
+\begin{verbatim}
+Worker 1        Worker 2        Worker 3
+[Layers 1-4]   [Layers 5-8]   [Layers 9-12]
+    ↓ activations ↓ activations ↓
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Model is \textbf{split across workers} by layer or module
+\item
+  Each worker holds only a portion of the model
+\item
+  Forward pass: activations flow from worker to worker
+\item
+  \textbf{Works for}: models too large for a single GPU (LLMs)
+\item
+  \textbf{Challenge}: pipeline bubbles --- workers idle while waiting for previous stage
+\end{itemize}
+
+\textbf{Pipeline Parallelism} (GPipe, PipeDream):
+
+\setcodelang{}
+
+\begin{verbatim}
+Micro-batch 1: [W1 compute] → [W2 compute] → [W3 compute]
+Micro-batch 2:               [W1 compute] → [W2 compute] → [W3 compute]
+Micro-batch 3:                              [W1 compute] → [W2 compute] → ...
+\end{verbatim}
+
+Split model into stages + split mini-batch into micro-batches to fill the pipeline.
+
+\subsubsection{Tensor Parallelism}\label{tensor-parallelism}
+
+\begin{itemize}
+\tightlist
+\item
+  Split individual \textbf{weight matrices} across GPUs
+\item
+  Each GPU computes part of a matrix multiply in parallel
+\item
+  Used by Megatron-LM for extremely large transformers
+\item
+  Requires high-bandwidth GPU interconnects (NVLink)
+\end{itemize}
+
+\textbf{Combined: 3D Parallelism (Megatron + DeepSpeed)}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Data Parallel × Pipeline Parallel × Tensor Parallel}
+\OperatorTok{=}\NormalTok{ can train }\DecValTok{1}\NormalTok{ trillion parameter models}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{DeepSpeed ZeRO} (Zero Redundancy Optimizer):
+Partitions optimizer states, gradients, and parameters across data-parallel workers, dramatically reducing per-GPU memory.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1635}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5750}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2615}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+ZeRO Stage
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What\textquotesingle s Partitioned
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Memory Reduction
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Stage 1 & Optimizer states & 4x \\
+\rowcolor{zebra}
+Stage 2 & Optimizer states + gradients & 8x \\
+Stage 3 & Optimizer states + gradients + parameters & 64x \\
+\end{longtable}
+
+\subsection{Model Serving}\label{model-serving}
+
+\textbf{Three serving paradigms:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1516}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0763}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1090}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3695}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2937}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Paradigm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Latency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Throughput
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Batch inference} & Hours & Very high & Precomputed embeddings, offline scoring & Weekly product recs \\
+\rowcolor{zebra}
+\textbf{Online/real-time} & \textless{} 100ms & Medium & Interactive queries, search ranking & Search results \\
+\textbf{Streaming} & Seconds & High & Continuous event processing & Fraud detection on transactions \\
+\end{longtable}
+
+\textbf{Batch vs. Online serving deep dive:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2361}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4306}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aspect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Batch
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Online
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Trigger & Schedule (cron) & User request \\
+\rowcolor{zebra}
+Latency SLA & None (hours) & Strict (\textless{} 100ms) \\
+Compute cost & Cheaper (spot instances) & Higher (always-on) \\
+\rowcolor{zebra}
+Feature freshness & Stale (hours-days) & Fresh (milliseconds) \\
+Model complexity & Any & Limited by latency budget \\
+\rowcolor{zebra}
+Infrastructure & Spark, Beam & FastAPI, TorchServe, TF Serving \\
+Failure handling & Retry easily & Circuit breakers, fallbacks \\
+\end{longtable}
+
+\textbf{Serving stack components:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Client Request
+      ↓
+Load Balancer
+      ↓
+API Gateway (auth, rate limiting)
+      ↓
+Feature Service → Online Feature Store (Redis)
+      ↓
+Model Server (TF Serving / TorchServe / Triton)
+      ↓           ↑
+   GPU/CPU     Model Registry (pulls model artifacts)
+      ↓
+Post-processing (business rules, safety filters)
+      ↓
+Response
+\end{verbatim}
+
+\textbf{GPU serving optimizations:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Batching}: group multiple requests into one GPU forward pass (increases throughput, adds latency)
+\item
+  \textbf{Model quantization}: FP32 \(\rightarrow\) INT8 (4x speedup, \textasciitilde1\% accuracy drop)
+\item
+  \textbf{TensorRT}: NVIDIA\textquotesingle s inference optimizer --- fuses layers, optimizes compute graphs
+\item
+  \textbf{ONNX}: model exchange format --- train in PyTorch, serve with any runtime
+\item
+  \textbf{Dynamic batching}: TorchServe, Triton aggregate requests within a time window
+\item
+  \textbf{KV-cache} (LLMs): cache attention key-value pairs for auto-regressive generation
+\end{itemize}
+
+\textbf{Latency vs. throughput tradeoff:}
+
+\begin{itemize}
+\tightlist
+\item
+  Small batch size \(\rightarrow\) low latency, low throughput
+\item
+  Large batch size \(\rightarrow\) high throughput, high latency
+\item
+  \textbf{Batching timeout}: "wait up to 5ms for more requests, then process whatever we have"
+\end{itemize}
+
+\textbf{Model serving frameworks:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2222}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4444}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Framework
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best For
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Feature
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+TensorFlow Serving & TF models, production-grade & gRPC, REST, versioning \\
+\rowcolor{zebra}
+TorchServe & PyTorch models & Custom handlers, dynamic batching \\
+NVIDIA Triton & Any framework, GPU-first & Ensemble pipelines, GPU optimization \\
+\rowcolor{zebra}
+BentoML & ML-framework agnostic & Python-native, easy packaging \\
+Ray Serve & Python-native, distributed & Actor-based, online learning \\
+\rowcolor{zebra}
+vLLM & LLM inference & PagedAttention, continuous batching \\
+\end{longtable}
+
+\textbf{Model-as-a-Service patterns:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Shadow deployment}: new model receives traffic copies but responses are discarded. Validates model works without risk
+\item
+  \textbf{Canary deployment}: send 1-5\% of traffic to new model, gradually increase
+\item
+  \textbf{Blue-green}: maintain two identical environments, switch traffic instantly
+\item
+  \textbf{Multi-armed bandit}: dynamically allocate traffic to better-performing variants
+\end{itemize}
+
+\subsection{A/B Testing \& Online Experimentation}\label{ab-testing--online-experimentation}
+
+\textbf{Why A/B test?} Offline metrics (AUC, NDCG) don\textquotesingle t always translate to business metrics (revenue, engagement). Online experiments close this gap.
+
+\textbf{A/B test anatomy:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Traffic → [Experiment Assignment] → Control (A) or Treatment (B)
+                                         ↓               ↓
+                                   Log responses   Log responses
+                                         ↓
+                                   Statistical analysis
+                                   (t-test, Mann-Whitney, bootstrap)
+                                         ↓
+                                   Ship if: p < 0.05 AND effect size meaningful
+\end{verbatim}
+
+\textbf{Statistical considerations:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sample size}: determined by minimum detectable effect (MDE), alpha (Type I error), beta (Type II error / power)
+\item
+  \textbf{Multiple testing problem}: testing 20 metrics at p=0.05 expects 1 false positive. Use Bonferroni correction or FDR control
+\item
+  \textbf{Network effects (interference)}: user A\textquotesingle s experience affects user B\textquotesingle s (social networks). Solution: cluster randomization
+\item
+  \textbf{Novelty effect}: users engage more with anything new. Run experiments for 2+ weeks
+\end{itemize}
+
+\textbf{Experiment designs for ML:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1748}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3495}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1165}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3592}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Speed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use Case
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A/B test & Split users into control/treatment & Slow (weeks) & Standard \\
+\rowcolor{zebra}
+Interleaving & Merge ranked lists from A and B & 100x faster & Ranking systems \\
+Multi-armed bandit & Dynamic traffic allocation & Adaptive & When exploration-exploitation matters \\
+\rowcolor{zebra}
+Switchback & Alternate between A/B by time period & Fast & Marketplace, supply-side effects \\
+\end{longtable}
+
+\textbf{Interleaving} (for recommendation/search):
+
+\begin{itemize}
+\tightlist
+\item
+  Merge recommendation lists from model A and model B, randomly shuffling ties
+\item
+  Measure which model\textquotesingle s items users click more
+\item
+  Much more sensitive than A/B (each user is their own control)
+\item
+  Used by Netflix, Spotify, LinkedIn
+\end{itemize}
+
+\textbf{Guardrail metrics} --- metrics that must not degrade even if primary metrics improve:
+
+\begin{itemize}
+\tightlist
+\item
+  Page load time
+\item
+  Error rate
+\item
+  Revenue per user
+\item
+  Content flagging rate
+\end{itemize}
+
+\subsection{Monitoring \& Observability}\label{monitoring--observability}
+
+\textbf{Four types of drift:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1225}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2374}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3097}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3304}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Drift Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What Changes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Detection Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Data drift} & Input feature distribution P(X) & KL divergence, PSI, Kolmogorov-Smirnov & User demographics shift after product expansion \\
+\rowcolor{zebra}
+\textbf{Concept drift} & Relationship P(Y\textbar X) & Monitor prediction accuracy on new labels & COVID changed search intent for "mask" \\
+\textbf{Label drift} & Label distribution P(Y) & Monitor label statistics & Fraud patterns shift seasonally \\
+\rowcolor{zebra}
+\textbf{Prediction drift} & Model output distribution P(Ŷ) & Monitor prediction distribution & Sudden spike in high-confidence predictions \\
+\end{longtable}
+
+\textbf{Population Stability Index (PSI):}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PSI }\OperatorTok{=}\NormalTok{ Σ (Actual}\OperatorTok{\%} \OperatorTok{{-}}\NormalTok{ Expected}\OperatorTok{\%}\NormalTok{) × ln(Actual}\OperatorTok{\%} \OperatorTok{/}\NormalTok{ Expected}\OperatorTok{\%}\NormalTok{)}
+
+\NormalTok{PSI }\OperatorTok{\textless{}} \FloatTok{0.1}\NormalTok{: No significant change}
+\NormalTok{PSI }\FloatTok{0.1}\OperatorTok{{-}}\FloatTok{0.2}\NormalTok{: Moderate change, monitor}
+\NormalTok{PSI }\OperatorTok{\textgreater{}} \FloatTok{0.2}\NormalTok{: Major shift, investigate}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Monitoring stack:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Production Traffic
+      ↓
+Feature Logging → Data Store (Kafka → S3)
+      ↓
+Monitoring Pipeline (Spark Streaming / Flink)
+      │
+      ├── Data Quality Checks (nulls, schema, range violations)
+      ├── Statistical Drift Detection (PSI, KS-test, chi-squared)
+      ├── Prediction Distribution Monitoring
+      └── Business Metric Dashboards (CTR, revenue, latency)
+           ↓
+      Alert System (PagerDuty, Slack)
+           ↓
+      [Automatic retraining trigger] OR [Human investigation]
+\end{verbatim}
+
+\textbf{Model decay causes:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Covariate shift}: P(X) changes, P(Y\textbar X) unchanged (feature distribution changes)
+\item
+  \textbf{Concept drift}: P(Y\textbar X) changes (the underlying relationship changes)
+\item
+  \textbf{Feedback loops}: model predictions influence future training data
+\item
+  \textbf{Upstream data changes}: schema changes, pipeline failures, new null patterns
+\end{itemize}
+
+\textbf{Observability pillars for ML:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Logs}: every prediction logged with features and context
+\item
+  \textbf{Metrics}: aggregated statistics (mean prediction, P95 latency, error rate)
+\item
+  \textbf{Traces}: end-to-end request tracing from API call to model response
+\item
+  \textbf{Alerts}: threshold-based and anomaly-detection-based
+\end{itemize}
+
+\textbf{Tools:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Evidently AI}: open-source data/model monitoring, drift reports
+\item
+  \textbf{Arize AI}: commercial ML observability
+\item
+  \textbf{WhyLabs}: statistical profiling and monitoring
+\item
+  \textbf{Fiddler AI}: explainability + monitoring
+\item
+  \textbf{Prometheus + Grafana}: metrics and dashboards (infrastructure layer)
+\end{itemize}
+
+\subsection{CI/CD for ML (Continuous Training)}\label{cicd-for-ml-continuous-training}
+
+\textbf{Standard CI/CD vs. ML CI/CD:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1009}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3659}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5331}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Stage
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Software CI/CD
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ML CI/CD
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Trigger & Code push & Code push OR new data OR drift alert \\
+\rowcolor{zebra}
+Build & Compile, lint & Data validation, feature pipeline \\
+Test & Unit tests, integration tests & Model evaluation, slice analysis, bias checks \\
+\rowcolor{zebra}
+Artifact & Docker image & Model weights + preprocessing pipeline \\
+Deploy & Container rollout & Canary model rollout \\
+\rowcolor{zebra}
+Monitor & Uptime, error rate & Prediction quality, data drift \\
+\end{longtable}
+
+\textbf{Continuous Training (CT):}
+
+\begin{itemize}
+\tightlist
+\item
+  Automatically retrain when triggered by: schedule, data threshold, or drift detection
+\item
+  Requires: automated data validation, automated evaluation gates, automated deployment
+\item
+  \textbf{Full CT pipeline}:
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Trigger → Data Pipeline → Validation → Training → Evaluation
+                                                        ↓
+           [Fail: alert humans]  ←  [Pass threshold?]  ←
+                                              ↓ Yes
+                              Model Registry (staging)
+                                              ↓
+                              Automated integration tests
+                                              ↓
+                              Shadow deployment
+                                              ↓
+                              Canary deployment (5%)
+                                              ↓
+                              Full rollout (if metrics OK)
+\end{verbatim}
+
+\textbf{Reproducibility requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Code}: git commit hash
+\item
+  \textbf{Data}: data version (DVC tag, Delta Lake version)
+\item
+  \textbf{Environment}: Docker image with pinned dependencies
+\item
+  \textbf{Hyperparameters}: logged in experiment tracker
+\item
+  \textbf{Random seeds}: fixed for reproducibility
+\end{itemize}
+
+\textbf{ML pipeline orchestration tools:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Apache Airflow}: general DAG orchestration, widely used
+\item
+  \textbf{Kubeflow Pipelines}: Kubernetes-native ML pipelines
+\item
+  \textbf{MLflow Projects}: package code with conda/docker environments
+\item
+  \textbf{Metaflow} (Netflix): Python-native, scales from laptop to AWS
+\item
+  \textbf{Prefect / Dagster}: modern Python-native orchestration
+\item
+  \textbf{Vertex AI Pipelines}: GCP managed, Kubeflow-compatible
+\end{itemize}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{End-to-End MLOps Pipeline}\label{end-to-end-mlops-pipeline}
+
+\setcodelang{}
+
+\begin{verbatim}
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        END-TO-END MLOPS PIPELINE                            │
+│                                                                              │
+│  DATA LAYER                                                                  │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────────────────────┐ │
+│  │  Raw     │   │ Ingest   │   │ Validate │   │  Feature Engineering     │ │
+│  │  Sources │──▶│ (Kafka/  │──▶│ (Great   │──▶│  (Spark / dbt / Flink)  │ │
+│  │  (DB,    │   │  Flink)  │   │ Expect.) │   │                         │ │
+│  │  Events) │   └──────────┘   └──────────┘   └─────────────┬───────────┘ │
+│  └──────────┘                                               │               │
+│                                                             │               │
+│  FEATURE STORE                                              ▼               │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │  Offline Store (S3/Hive) ←──────────────────── Batch features       │   │
+│  │  Online Store (Redis/DynamoDB) ←────────────── Stream features      │   │
+│  └──────────────────────────────────┬─────────────────────────────────┘    │
+│                                     │                                        │
+│  TRAINING LAYER                     ▼                                        │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────────────────────┐ │
+│  │ Training │   │ Exp.     │   │ Model    │   │  Model Registry          │ │
+│  │ Jobs     │──▶│ Tracking │──▶│ Eval     │──▶│  (staging → prod)       │ │
+│  │ (GPU     │   │ (MLflow/ │   │ (offline │   │                         │ │
+│  │ cluster) │   │  W&B)    │   │  metrics)│   └─────────────┬───────────┘ │
+│  └──────────┘   └──────────┘   └──────────┘                │               │
+│                                                             │               │
+│  SERVING LAYER                                              ▼               │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────────────────────┐ │
+│  │ Feature  │   │ Model    │   │ Post-    │   │  A/B Testing /           │ │
+│  │ Retrieval│──▶│ Server   │──▶│ Process  │──▶│  Traffic Routing        │ │
+│  │ (online  │   │ (Triton/ │   │ (rules,  │   │  (canary, shadow)       │ │
+│  │  store)  │   │ TorchSrv)│   │ safety)  │   └──────────────────────────┘ │
+│  └──────────┘   └──────────┘   └──────────┘                                │
+│                                                                              │
+│  MONITORING LAYER                                                            │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────────────────────┐ │
+│  │ Log      │   │ Drift    │   │ Alert    │   │  Retrain Trigger         │ │
+│  │ Collector│──▶│ Detection│──▶│ System   │──▶│  (CT pipeline)          │ │
+│  │ (Kafka)  │   │ (PSI,KS) │   │ (PagerD) │   │                         │ │
+│  └──────────┘   └──────────┘   └──────────┘   └─────────────┬───────────┘ │
+│                                                               │               │
+│                          ◄───────────────────────────────────┘  (feedback) │
+└─────────────────────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\subsection{Feature Store Architecture (Online/Offline)}\label{feature-store-architecture-onlineoffline}
+
+\setcodelang{}
+
+\begin{verbatim}
+                         FEATURE STORE DEEP DIVE
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                          │
+│   DATA SOURCES                  PIPELINES               STORES          │
+│   ┌──────────┐                                                          │
+│   │ MySQL/   │   Batch (Spark)  ───────────────▶  Offline Store        │
+│   │ Postgres │──▶               (hourly/daily)    (S3 + Parquet)       │
+│   │ Data     │                                    Point-in-time joins   │
+│   │ Warehouse│                                    for training          │
+│   └──────────┘                                          │               │
+│   ┌──────────┐                                          │               │
+│   │ Kafka    │   Streaming      ─────────────────┐      │               │
+│   │ Event    │──▶ (Flink)       (seconds-minutes) │      │               │
+│   │ Stream   │                                    ▼      ▼               │
+│   └──────────┘                              Online Store               │
+│   ┌──────────┐                              (Redis/DynamoDB)           │
+│   │ Real-    │   Request-time  ─────────────▶ Key: entity_id           │
+│   │ time     │──▶ Computation  (milliseconds) Value: feature vector    │
+│   │ context  │                                < 10ms lookup            │
+│   └──────────┘                                    │                    │
+│                                                   │                    │
+│   CONSUMERS                                       │                    │
+│   ┌──────────────────┐                            │                    │
+│   │ Training Job     │◀── Offline Store ──────────┘                   │
+│   │ (batch features) │                                                  │
+│   └──────────────────┘                                                  │
+│   ┌──────────────────┐                                                  │
+│   │ Serving System   │◀── Online Store                                 │
+│   │ (real-time feat) │    (same feature code → no skew)                │
+│   └──────────────────┘                                                  │
+└─────────────────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\subsection{Two-Tower Recommendation Architecture}\label{two-tower-recommendation-architecture}
+
+\setcodelang{}
+
+\begin{verbatim}
+                    TWO-TOWER MODEL ARCHITECTURE
+┌───────────────────────────────────────────────────────────────────────┐
+│                                                                        │
+│         USER TOWER                        ITEM TOWER                  │
+│   ┌──────────────────┐             ┌──────────────────┐               │
+│   │ User Features:   │             │ Item Features:   │               │
+│   │ - user_id embed  │             │ - item_id embed  │               │
+│   │ - age, gender    │             │ - category       │               │
+│   │ - watch history  │             │ - duration       │               │
+│   │ - search history │             │ - content embed  │               │
+│   │ - device type    │             │ - popularity     │               │
+│   └────────┬─────────┘             └────────┬─────────┘               │
+│            ▼                                ▼                          │
+│   ┌──────────────────┐             ┌──────────────────┐               │
+│   │  MLP (3-4 layers)│             │  MLP (3-4 layers)│               │
+│   └────────┬─────────┘             └────────┬─────────┘               │
+│            ▼                                ▼                          │
+│   ┌──────────────────┐             ┌──────────────────┐               │
+│   │ User Embedding   │             │ Item Embedding   │               │
+│   │ (128-512 dims)   │             │ (128-512 dims)   │               │
+│   └────────┬─────────┘             └────────┬─────────┘               │
+│            └──────────────┬─────────────────┘                         │
+│                           ▼                                            │
+│              ┌─────────────────────────┐                              │
+│              │  Dot Product / Cosine   │                              │
+│              │  Similarity Score       │                              │
+│              └────────────┬────────────┘                              │
+│                           ▼                                            │
+│              ┌─────────────────────────┐                              │
+│              │  Training: In-batch     │                              │
+│              │  Negative Sampling or   │                              │
+│              │  Sampled Softmax        │                              │
+│              └─────────────────────────┘                              │
+│                                                                        │
+│   AT SERVING TIME:                                                     │
+│   1. Compute user embedding (online, per-request)                      │
+│   2. Pre-index item embeddings in vector DB (FAISS, ScaNN, Annoy)     │
+│   3. ANN search: retrieve top-K candidates in < 10ms                  │
+└───────────────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\subsection{\texorpdfstring{Candidate Generation \(\rightarrow\) Ranking Funnel}{Candidate Generation \textbackslash rightarrow Ranking Funnel}}\label{candidate-generation-rightarrow-ranking-funnel}
+
+\setcodelang{}
+
+\begin{verbatim}
+                RECOMMENDATION FUNNEL (NETFLIX/YOUTUBE SCALE)
+
+All Items (millions)
+        │
+        ▼  [CANDIDATE GENERATION - Sub-100ms]
+   ┌──────────────────────────────────────────────┐
+   │ Multiple retrieval sources:                  │
+   │ • Two-tower ANN (collaborative filtering)    │
+   │ • Content-based similarity                   │
+   │ • Trending/popularity-based                  │
+   │ • User history (continued watching)          │
+   │ • Rule-based (new releases by subscribed     │
+   │   creator)                                   │
+   └────────────────┬─────────────────────────────┘
+                    │
+                    ▼
+              Top ~500 candidates
+                    │
+                    ▼  [RANKING - 100-200ms]
+   ┌──────────────────────────────────────────────┐
+   │ Deep neural ranking model:                   │
+   │ • Merges user + item + cross features        │
+   │ • Wide & Deep or DCN (Deep & Cross Network)  │
+   │ • Predicts P(click), P(watch > 30s),         │
+   │   P(like), P(share)                          │
+   │ • Multi-task learning head per objective     │
+   └────────────────┬─────────────────────────────┘
+                    │
+                    ▼
+               Top ~50 items
+                    │
+                    ▼  [RE-RANKING - 50ms]
+   ┌──────────────────────────────────────────────┐
+   │ Business rules & diversity:                  │
+   │ • Dedup (no 3 consecutive items same creator)│
+   │ • Diversity injection (different categories) │
+   │ • Freshness boost                            │
+   │ • Safety/policy filters                      │
+   │ • Sponsored content insertion                │
+   │ • MMR (Maximal Marginal Relevance)           │
+   └────────────────┬─────────────────────────────┘
+                    │
+                    ▼
+           Final ranked list (20-30 items)
+                    │
+                    ▼
+               User sees feed
+\end{verbatim}
+
+\subsection{Data vs. Model Parallelism}\label{data-vs-model-parallelism}
+
+\setcodelang{}
+
+\begin{verbatim}
+DATA PARALLELISM
+─────────────────
+GPU 1: [Model copy] ← [Shard 1 of data]  →  gradients ─┐
+GPU 2: [Model copy] ← [Shard 2 of data]  →  gradients  ├─ All-Reduce → Updated model
+GPU 3: [Model copy] ← [Shard 3 of data]  →  gradients ─┘
+GPU 4: [Model copy] ← [Shard 4 of data]  →  gradients ─┘
+
+Constraint: Entire model must fit on one GPU
+
+
+MODEL PARALLELISM (Pipeline)
+────────────────────────────
+Micro-batch flows through pipeline stages:
+
+GPU 1: [Layers 1-3]  →  activations
+                              ↓
+GPU 2:             [Layers 4-6]  →  activations
+                                          ↓
+GPU 3:                       [Layers 7-9]  →  activations
+                                                    ↓
+GPU 4:                               [Layers 10-12] → loss
+
+Allows training models that don't fit on one GPU
+
+
+TENSOR PARALLELISM
+──────────────────
+Matrix multiply W × X split across GPUs:
+
+GPU 1: W[rows 0:N/2, :] × X = partial result 1 ─┐
+GPU 2: W[rows N/2:N, :] × X = partial result 2  ─┴─ AllGather → full result
+\end{verbatim}
+
+\subsection{Drift Monitoring Loop}\label{drift-monitoring-loop}
+
+\setcodelang{}
+
+\begin{verbatim}
+DRIFT MONITORING & RESPONSE LOOP
+
+Production ──▶ Feature Logging ──▶ Data Store (S3)
+   │                                      │
+   │                                      ▼
+   │                         Statistical Tests
+   │                         ┌──────────────────────┐
+   │                         │ PSI per feature      │
+   │                         │ KS-test distributions│
+   │                         │ Chi-squared (categ.) │
+   │                         │ Prediction dist.     │
+   │                         └──────────┬───────────┘
+   │                                    │
+   │                             Drift detected?
+   │                            /              \
+   │                          NO               YES
+   │                          │                │
+   │                   Continue           Severity?
+   │                 monitoring          /        \
+   │                                  LOW        HIGH
+   │                                  │            │
+   │                           Log & notify   Auto-retrain
+   │                           team (Slack)   pipeline OR
+   │                                          page on-call
+   │                                          │
+   └──────────────────────────────────────────┘
+         (retrained model pushed back to prod)
+\end{verbatim}
+
+\section{Worked Examples}\label{worked-examples}
+
+\subsection{Design a Recommendation System (e.g., YouTube / Netflix)}\label{design-a-recommendation-system-eg-youtube--netflix}
+
+\textbf{Clarify requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  1B+ users, 100M+ videos, 5M QPS at peak
+\item
+  Latency: \textless{} 200ms end-to-end
+\item
+  Goal: maximize long-term user satisfaction (not just next click)
+\item
+  Cold start: handle new users, new videos
+\end{itemize}
+
+\textbf{ML Objective:}
+
+\begin{itemize}
+\tightlist
+\item
+  Multi-task: predict P(click), P(watch \textgreater{} 50\%), P(like), P(share)
+\item
+  Weighted combination as ranking score
+\item
+  Metric: user satisfaction proxy (watch time, explicit rating), not just CTR
+\end{itemize}
+
+\textbf{Data:}
+
+\begin{itemize}
+\tightlist
+\item
+  Implicit feedback: watch events, clicks, skips, shares (billions/day)
+\item
+  Explicit feedback: ratings, thumbs up/down (sparse)
+\item
+  Item metadata: transcripts, thumbnails, category, creator
+\item
+  Labels: positive = watched \textgreater{} 50\% of video, negative = skipped \textless{} 30s
+\end{itemize}
+
+\textbf{Features:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2204}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7796}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Category
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Features
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+User & user\_id embedding, age, country, subscription tier \\
+\rowcolor{zebra}
+User behavior & watched\_video\_ids (last 50), search\_queries (last 10), avg\_watch\_time \\
+Item & video\_id embedding, category, duration, language, upload\_date \\
+\rowcolor{zebra}
+Item popularity & view\_count\_24h, like\_rate, comment\_rate \\
+Context & time\_of\_day, device\_type, session\_number \\
+\rowcolor{zebra}
+Cross & user\textquotesingle s historical engagement with this creator/category \\
+\end{longtable}
+
+\textbf{Model:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Candidate Generation (Two-Tower)}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    User tower: embed user\_id + process user features \(\rightarrow\) 256-dim user embedding
+  \item
+    Item tower: embed video\_id + process item features \(\rightarrow\) 256-dim item embedding
+  \item
+    Training: sampled softmax over all items in batch
+  \item
+    Serving: pre-compute item embeddings, index in FAISS/ScaNN for ANN retrieval
+  \item
+    Retrieve top 500 candidates \textless{} 10ms
+  \end{itemize}
+\item
+  \textbf{Ranking (Wide \& Deep or DCN-v2)}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Inputs: 500 candidates \(\times\) user features \(\times\) cross features
+  \item
+    Multi-task output heads: P(click), P(watch50\%), P(like)
+  \item
+    Final score: weighted sum of task predictions + calibration
+  \item
+    Latency: \textless{} 100ms for 500 candidates
+  \end{itemize}
+\item
+  \textbf{Re-ranking}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Diversity: MMR to avoid consecutive same-creator videos
+  \item
+    Freshness: boost videos \textless{} 24h old
+  \item
+    Safety: filter policy-violating content
+  \item
+    Promoted content: insert ads with guaranteed placements
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Training:}
+
+\begin{itemize}
+\tightlist
+\item
+  Training data: last 7 days of user interaction logs
+\item
+  Retrain: daily (with freshness signals updated hourly via streaming)
+\item
+  Distributed: data parallel training on 64 A100 GPUs
+\end{itemize}
+
+\textbf{Evaluation:}
+
+\begin{itemize}
+\tightlist
+\item
+  Offline: AUC for each prediction task, NDCG@10, calibration (expected vs. actual CTR)
+\item
+  Online: A/B test measuring total watch time, session length, 7-day retention
+\item
+  Guardrails: creator fairness (no single creator dominates), content diversity
+\end{itemize}
+
+\textbf{Monitoring:}
+
+\begin{itemize}
+\tightlist
+\item
+  Feature drift: PSI on user and item feature distributions daily
+\item
+  Prediction drift: monitor mean/variance of CTR predictions
+\item
+  Retraining trigger: if offline AUC drops \textgreater{} 0.5\% OR drift PSI \textgreater{} 0.2 on key features
+\end{itemize}
+
+\subsection{Design CTR (Click-Through Rate) Prediction for Ads}\label{design-ctr-click-through-rate-prediction-for-ads}
+
+\textbf{Context:} This is the core revenue model at Google, Meta, Amazon ads.
+
+\textbf{Clarify requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  Scale: 10M ads, 3B users, 5M QPS
+\item
+  Latency: \textless{} 50ms (ads integrated into search/feed, strict latency SLA)
+\item
+  Objective: accurately predict probability a user will click an ad
+\item
+  Revenue: auction price = bid \(\times\) predicted CTR (Vickrey auction)
+\end{itemize}
+
+\textbf{ML Objective:}
+
+\begin{itemize}
+\tightlist
+\item
+  Binary classification: P(click \textbar{} user, ad, context)
+\item
+  Key metric: \textbf{calibration} (critical --- mispredicted CTR distorts auction prices)
+\item
+  Also track AUC-ROC (discrimination ability)
+\end{itemize}
+
+\textbf{Data:}
+
+\begin{itemize}
+\tightlist
+\item
+  Billions of (impression, user, ad) tuples per day
+\item
+  Label: click (positive) / no-click (negative)
+\item
+  Extreme class imbalance: 1 click per 200-1000 impressions
+\item
+  Label strategy: downsample negatives to 1:50 or use weighted loss
+\end{itemize}
+
+\textbf{Features:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1939}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6537}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1524}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Category
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Features
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Freshness
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+User & age, gender, interest categories, past ad click history & Daily batch \\
+\rowcolor{zebra}
+User real-time & Last 5 ads clicked this session, last search query & Real-time \\
+Ad & ad\_id, advertiser, category, creative type, bid price & Ad metadata \\
+\rowcolor{zebra}
+Query/context & search query embeddings, page topic, device, time & Per-request \\
+Cross features & user-ad category match, query-ad relevance & Per-request \\
+\rowcolor{zebra}
+Historical & user CTR for this ad, CTR for advertiser, position stats & Daily batch \\
+\end{longtable}
+
+\textbf{Model:}
+
+\textbf{DLRM (Deep Learning Recommendation Model)} or \textbf{Wide \& Deep}:
+
+\setcodelang{}
+
+\begin{verbatim}
+Sparse Features              Dense Features
+(user_id, ad_id,        (age, bid, position,
+ category embeddings)    historical rates)
+        │                        │
+        ▼                        ▼
+  Embedding Layer          Dense Layer
+  (dim 32-128 each)
+        │                        │
+        └──────────┬─────────────┘
+                   ▼
+         Interaction Layer
+         (dot products between
+          embedding pairs)
+                   │
+                   ▼
+              MLP (3-5 layers)
+                   │
+                   ▼
+            Sigmoid output
+            P(click) ∈ [0,1]
+\end{verbatim}
+
+\textbf{Calibration} is critical: if model predicts CTR = 5\% but actual is 2.5\%, ads are underpriced by 2x.
+
+\begin{itemize}
+\tightlist
+\item
+  Platt scaling, isotonic regression post-hoc calibration
+\item
+  Regular recalibration as audience/ad inventory changes
+\end{itemize}
+
+\textbf{Serving:}
+
+\begin{itemize}
+\tightlist
+\item
+  Retrieval: ad candidates selected by bid \(\times\) predicted CTR (simplified GSP auction)
+\item
+  Latency breakdown: feature retrieval (10ms) + model inference (20ms) + auction logic (10ms) = 40ms
+\item
+  Hardware: dedicated GPU inference cluster; INT8 quantized models
+\item
+  Caching: precompute user embeddings hourly, cache in Redis
+\end{itemize}
+
+\textbf{Training:}
+
+\begin{itemize}
+\tightlist
+\item
+  Frequency: retrain daily with last 24h of fresh data; fine-tune every hour on last 1h
+\item
+  Distributed: data parallel, 32-128 GPUs
+\item
+  Exploration: \(\varepsilon\)-greedy or Thompson sampling for ad exploration
+\end{itemize}
+
+\textbf{Monitoring:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Online calibration}: compare predicted CTR vs. actual CTR in rolling 1-hour windows
+\item
+  \textbf{Revenue per query}: primary business metric
+\item
+  \textbf{Prediction drift}: sudden shift in CTR predictions can indicate data pipeline issue
+\item
+  \textbf{Latency P99}: ads must not delay page load
+\end{itemize}
+
+\subsection{Design News Feed Ranking (Facebook / Twitter / LinkedIn)}\label{design-news-feed-ranking-facebook--twitter--linkedin}
+
+\textbf{Context:} Orders millions of posts per user per day into a feed that maximizes engagement and wellbeing.
+
+\textbf{Clarify:}
+
+\begin{itemize}
+\tightlist
+\item
+  3B users, 100B posts/day created, user sees \textasciitilde100 posts per session
+\item
+  Latency: \textless{} 500ms (user opens app, sees feed)
+\item
+  Multi-objective: engagement AND user wellbeing AND advertiser revenue AND creator success
+\end{itemize}
+
+\textbf{ML Objective:}
+
+\begin{itemize}
+\tightlist
+\item
+  Multi-task prediction per candidate post: P(like), P(comment), P(share), P(hide/report), P(reading time)
+\item
+  Combined score: weighted sum with business weight tuning
+\item
+  Negative signals (hide, report) heavily penalized
+\end{itemize}
+
+\textbf{Data:}
+
+\begin{itemize}
+\tightlist
+\item
+  Social graph: who follows whom, friendship strength
+\item
+  Engagement logs: all interactions per post per user (100B events/day)
+\item
+  Content: text, images, video, links with metadata
+\item
+  Temporal: recency matters --- 1-hour old post vs. 1-day old post
+\end{itemize}
+
+\textbf{Architecture:}
+
+\setcodelang{}
+
+\begin{verbatim}
+FEED RANKING PIPELINE
+
+Social Graph + All Candidate Posts (last 7 days from network)
+                    │
+                    ▼ [HEURISTIC FILTERING - <10ms]
+          Reduce to top 2000 posts
+          (recency filter, basic relevance)
+                    │
+                    ▼ [LIGHT RANKER - <50ms]
+          Simple model (logistic regression or small DNN)
+          Reduces to top 500 candidates
+                    │
+                    ▼ [HEAVY RANKER - <300ms]
+          Large multi-task neural network
+          Predicts: P(like), P(comment), P(share),
+                    P(hide), P(30s read), P(click link)
+          Features: user + post + social context + cross
+                    │
+                    ▼ [CONTEXTUAL ADJUSTMENT - <50ms]
+          Diversity rules (max 3 consecutive from same user)
+          Ads insertion (every 5th item)
+          Promoted content
+          Safety filters
+                    │
+                    ▼
+          Final feed (100 posts, paginated 20/load)
+\end{verbatim}
+
+\textbf{Key Features:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3318}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6682}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example Features
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Post content & text length, image/video, sentiment, entity mentions \\
+\rowcolor{zebra}
+Post freshness & time since posting (exponential decay weighting) \\
+Creator & creator\_id embed, follower count, past post engagement rate \\
+\rowcolor{zebra}
+User-creator relationship & interaction frequency last 30 days, recency of last interaction \\
+Social signals & how many of user\textquotesingle s friends engaged with this post \\
+\rowcolor{zebra}
+User session & time of day, session length, last 10 posts interacted with \\
+\end{longtable}
+
+\textbf{Multi-objective balancing:}
+
+\begin{itemize}
+\tightlist
+\item
+  Naively maximizing engagement drives clickbait and outrage
+\item
+  Meta\textquotesingle s approach: add "meaningful social interactions" signal (comments \textgreater{} reactions \textgreater{} likes)
+\item
+  LinkedIn: weight toward professional content, career-relevant posts
+\item
+  Explicit tuning: product managers adjust weights between objectives
+\end{itemize}
+
+\textbf{Training:}
+
+\begin{itemize}
+\tightlist
+\item
+  Labels: delayed engagement (collect for 24h post-impression, not just immediate)
+\item
+  Negative labels: explicitly marked as "hide post" or "see fewer like this"
+\item
+  Training frequency: daily full retrain + hourly fine-tuning
+\item
+  Evaluation: offline NDCG + online A/B test of session length, DAU, weekly active engagement
+\end{itemize}
+
+\textbf{Monitoring:}
+
+\begin{itemize}
+\tightlist
+\item
+  Content diversity index (are users seeing a filter bubble?)
+\item
+  Misinformation spread rate (flagged content in top positions)
+\item
+  Creator fairness (small creators vs. large creators reach)
+\item
+  Engagement health vs. wellbeing indicators
+\end{itemize}
+
+\subsection{Design Search/Ranking System (Google Search / Bing / Amazon Product Search)}\label{design-searchranking-system-google-search--bing--amazon-product-search}
+
+\textbf{Key differences from recommendations:}
+
+\begin{itemize}
+\tightlist
+\item
+  User provides explicit query --- query understanding is critical
+\item
+  Relevance is primary, personalization is secondary
+\item
+  Both precision (first result correct) and recall (don\textquotesingle t miss relevant docs) matter
+\end{itemize}
+
+\textbf{Pipeline:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Query → Query Understanding → Retrieval → Ranking → Results
+        (spell correct,        (BM25,     (neural    (snippets,
+        intent, NER)           dense      ranker)     ads)
+                               retrieval)
+\end{verbatim}
+
+\textbf{Query understanding:}
+
+\begin{itemize}
+\tightlist
+\item
+  Spell correction (Levenshtein, BERT-based)
+\item
+  Query classification: informational, navigational, transactional
+\item
+  Named entity recognition: "Nike shoes" \(\rightarrow\) brand + product type
+\item
+  Query expansion: synonyms, related terms
+\end{itemize}
+
+\textbf{Retrieval (first-stage):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{BM25}: lexical matching, fast, interpretable
+\item
+  \textbf{Dense retrieval}: bi-encoder (query and document into same embedding space), ANN search
+\item
+  \textbf{Hybrid}: combine BM25 + dense scores
+\end{itemize}
+
+\textbf{Neural reranking (second-stage):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Cross-encoder}: concatenate query + document, run through BERT \(\rightarrow\) relevance score
+\item
+  Much more accurate than bi-encoder (sees full interaction)
+\item
+  Too slow for full corpus \(\rightarrow\) apply only to top-100 from first stage
+\end{itemize}
+
+\textbf{Learning to Rank:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pointwise}: predict relevance score for each document independently
+\item
+  \textbf{Pairwise}: learn which of doc A / doc B is more relevant (RankNet, LambdaRank)
+\item
+  \textbf{Listwise}: optimize a list-level metric directly (LambdaMART, AdaRank)
+\end{itemize}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\textbf{Netflix:}
+
+\begin{itemize}
+\tightlist
+\item
+  Candidate generation: two-tower model retrieves \textasciitilde1000 candidates per user
+\item
+  Ranking: uses estimated "take rate" (will user choose to watch the item if they see the row)
+\item
+  Evaluation: primarily causal inference --- A/B tests measuring streaming hours
+\item
+  Feature store: Hollow (internal) --- manages billions of features across user and item spaces
+\item
+  Monitoring: model staleness tracked daily; immediate alert if prediction distributions shift \textgreater{} 2\(\sigma\)
+\end{itemize}
+
+\textbf{Google:}
+
+\begin{itemize}
+\tightlist
+\item
+  Ad CTR model: billions of training examples daily; retrained multiple times per day
+\item
+  Feature engineering: Cross features (user \(\times\) ad) via feature crosses in Wide \& Deep
+\item
+  Calibration: click models include position bias correction
+\item
+  Serving: custom ASIC hardware (TPUs) for inference at scale
+\end{itemize}
+
+\textbf{Uber:}
+
+\begin{itemize}
+\tightlist
+\item
+  Michelangelo platform: end-to-end ML platform --- feature store, training, serving, monitoring
+\item
+  Feature store: Hive (offline) + Cassandra (online) with shared feature computation
+\item
+  Use case: ETA prediction, surge pricing, matching driver to rider
+\end{itemize}
+
+\textbf{Meta:}
+
+\begin{itemize}
+\tightlist
+\item
+  News feed: multi-task model with 12+ prediction heads
+\item
+  Feature store: every user feature updated in real-time as users interact
+\item
+  Interleaving experiments: run thousands of simultaneous experiments
+\item
+  DLRM (open sourced): their production recommendation model architecture
+\end{itemize}
+
+\textbf{LinkedIn:}
+
+\begin{itemize}
+\tightlist
+\item
+  Feed ranking: uses "expected dwell time" as primary signal, not clicks
+\item
+  Feature: Economic Graph embeddings (job title, company, skill entity embeddings)
+\item
+  Experiment: Every feature, model change goes through strict A/B framework
+\end{itemize}
+
+\textbf{DoorDash:}
+
+\begin{itemize}
+\tightlist
+\item
+  ETA model: predicts restaurant prep time + courier travel time
+\item
+  Key MLOps challenge: models degrade on holidays/events --- specialized retraining triggers
+\item
+  Training-serving skew: courier GPS features differ between training logs and real-time serving
+\end{itemize}
+
+\section{Real-Life Analogies --- An Airport Operations Center Running Flights at Scale}\label{real-life-analogies--an-airport-operations-center-running-flights-at-scale}
+
+\emph{Every piece of MLOps maps to the controlled chaos of keeping thousands of flights departing on time from a major hub like Chicago O\textquotesingle Hare.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1461}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2540}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5999}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+MLOps Component
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Airport Analog
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why The Parallel Works
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Data pipeline} & Baggage conveyor system & Raw bags (events) ingested, sorted, routed to the right destination (data store) --- constantly moving, with error handling for mislabeled bags (schema violations) \\
+\rowcolor{zebra}
+\textbf{Feature store (offline)} & Pre-prepped airline meal depot & Meals prepared hours ahead in batches, stored by route type; training uses these historical meal logs to know what passengers on Route X typically ate \\
+\textbf{Feature store (online)} & Fuel depot at the gate & Real-time fuel requested per specific flight, delivered in seconds before departure; must be fresh and correct or the flight is grounded \\
+\rowcolor{zebra}
+\textbf{Model registry} & Certified aircraft archive & Every aircraft model has a certification record --- airworthiness tests passed, maintenance history, approved for which routes. You only fly certified aircraft \\
+\textbf{Training} & Pilot training in flight simulators & Pilots train on simulated scenarios (historical data); new conditions require recertification (retraining) \\
+\rowcolor{zebra}
+\textbf{Serving (real-time)} & Live flights departing on schedule & Gate assignments, departure sequences --- decisions made in seconds, must be correct, must scale to 1000 daily flights \\
+\textbf{Batch serving} & Pre-printed passenger manifests & Generated hours before the flight for all passengers; fine to be slightly stale \\
+\rowcolor{zebra}
+\textbf{A/B testing} & Testing two runway configurations & North runway vs. south runway: measure average taxi time, fuel burn, delays. Switch all traffic to winner \\
+\textbf{Monitoring/drift} & Control tower watching weather change & Tower continuously monitors conditions; if wind pattern shifts (drift), immediately reroutes aircraft or triggers holds \\
+\rowcolor{zebra}
+\textbf{Model decay} & Flight routes becoming outdated & Routes planned for old demand patterns; if a city grows (distribution shift), the old route plan serves it poorly \\
+\textbf{Retraining} & Recertifying crews after new regulations & FAA changes rules (concept drift); all crews must be retrained and recertified before flying under new conditions \\
+\rowcolor{zebra}
+\textbf{CI/CD pipeline} & Pre-flight safety checklist** & Before any flight departs (model deploys), the same rigorous checklist is run every time --- no shortcuts \\
+\textbf{Latency (P99)} & On-time departure rate & P99 latency = the flight that takes longest even on a bad day; 99th percentile delays cascade through the hub \\
+\rowcolor{zebra}
+\textbf{Data versioning} & Black box flight recorder & Every flight records exactly what happened; if a crash occurs (model failure), you replay the recording to find the root cause \\
+\textbf{Shadow deployment} & Test flight with no passengers & New aircraft configuration runs a full route but carries no revenue passengers --- validates before trusting with real load \\
+\rowcolor{zebra}
+\textbf{Canary release} & Single gate uses new boarding process & Try new boarding procedure on 2 flights/day; if it works, roll out to all 500 gates \\
+\end{longtable}
+
+\emph{The throughput goal: every flight on time, safe, efficient. The ML goal: every prediction timely, accurate, at scale.}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\textbf{The Framework: "CODFMTESMI"}
+Say: "\textbf{C}hef \textbf{O}rders \textbf{D}ishes \textbf{F}resh \textbf{M}ornings --- \textbf{T}aste, \textbf{E}at, \textbf{S}erve, \textbf{M}onitor, \textbf{I}terate"
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{C}larify, \textbf{O}bjective, \textbf{D}ata, \textbf{F}eatures, \textbf{M}odel, \textbf{T}rain, \textbf{E}val, \textbf{S}erve, \textbf{M}onitor, \textbf{I}terate
+\end{itemize}
+
+\textbf{Drift Types: "DCPL"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{D}ata drift (X changes)
+\item
+  \textbf{C}oncept drift (Y\textbar X changes)
+\item
+  \textbf{P}rediction drift (Ŷ changes)
+\item
+  \textbf{L}abel drift (Y distribution changes)
+\end{itemize}
+
+\textbf{Parallelism: "DMP = Different Model Parts"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{D}ata parallelism: same model, different data
+\item
+  \textbf{M}odel parallelism: different model layers, same data
+\item
+  \textbf{P}ipeline parallelism: model stages pipelined like factory assembly line
+\end{itemize}
+
+\textbf{Feature Store: "ROPE"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{R}eal-time (online store, Redis)
+\item
+  \textbf{O}ffline (batch features, S3/Hive)
+\item
+  \textbf{P}oint-in-time correct (no future leakage in training)
+\item
+  \textbf{E}liminate skew (same code for train and serve)
+\end{itemize}
+
+\textbf{Serving modes: "BOS" = Batch, Online, Streaming}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{B}atch: precomputed (hours old is fine)
+\item
+  \textbf{O}nline: request-triggered (\textless{} 100ms)
+\item
+  \textbf{S}treaming: event-driven (seconds latency)
+\end{itemize}
+
+\textbf{Recommendation funnel: "CRRR"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{C}andidate generation (millions \(\rightarrow\) hundreds)
+\item
+  \textbf{R}anking (hundreds \(\rightarrow\) top 50)
+\item
+  \textbf{R}e-ranking (business rules, diversity)
+\item
+  \textbf{R}esults served to user
+\end{itemize}
+
+\textbf{A/B test validity: "SMPN"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{S}ample size (pre-calculated, don\textquotesingle t peek early)
+\item
+  \textbf{M}ultiple testing correction (Bonferroni)
+\item
+  \textbf{P}ower (80\%+ power)
+\item
+  \textbf{N}ovelty effect (run 2+ weeks)
+\end{itemize}
+
+\textbf{PSI Thresholds: "10-20-Go"}
+
+\begin{itemize}
+\item
+  \textless{} 0.10 = stable
+\item
+  0.10-0.20 = monitor
+\item
+  \begin{quote}
+  0.20 = action required
+  \end{quote}
+\end{itemize}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: "Design a recommendation system for Netflix."}\label{q1-design-a-recommendation-system-for-netflix}
+
+\textbf{Model answer framework:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Clarify: 200M users, 20K titles, personalized home page, \textless{} 200ms, maximize watch time
+\item
+  ML objective: predict P(user watches title \textgreater{} 50\%), optimize ranked list for total watch time
+\item
+  Data: watch history (positive), skips \textless{} 30s (negative), explicit ratings
+\item
+  Features: user watch history embeddings, title content embeddings, temporal features
+\item
+  Model: Two-tower candidate retrieval \(\rightarrow\) Deep ranking model \(\rightarrow\) Re-ranking
+\item
+  Training: Daily retrain, data parallel on GPU cluster
+\item
+  Evaluation: Offline NDCG + Online A/B (watch hours, retention)
+\item
+  Monitoring: PSI on feature distributions, weekly model accuracy evaluation
+\item
+  Handling cold start: new user \(\rightarrow\) use demographics + context; new item \(\rightarrow\) use content features only
+\end{enumerate}
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  "How do you handle cold start?" \(\rightarrow\) Content-based features for new items; exploration strategies (\(\varepsilon\)-greedy, UCB) for new users
+\item
+  "How do you prevent filter bubbles?" \(\rightarrow\) Diversity in re-ranking (MMR), inject exploration items, monitor content diversity index
+\item
+  "How would you handle feedback loops?" \(\rightarrow\) Off-policy correction, causal inference, debiasing weights
+\end{itemize}
+
+\subsection{Q2: "How do you detect and handle model degradation in production?"}\label{q2-how-do-you-detect-and-handle-model-degradation-in-production}
+
+\textbf{Model answer:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Detect}: Monitor three layers --- data (input feature distributions via PSI), model (prediction distributions, confidence), business (CTR, revenue, latency)
+\item
+  \textbf{Alert thresholds}: PSI \textgreater{} 0.2 on key features; prediction mean shift \textgreater{} 2\(\sigma\); business metric drops \textgreater{} X\%
+\item
+  \textbf{Distinguish causes}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Data pipeline issue \(\rightarrow\) features are null/wrong \(\rightarrow\) check upstream
+  \item
+    Concept drift \(\rightarrow\) retrain on recent data
+  \item
+    Covariate shift \(\rightarrow\) weighted retraining or domain adaptation
+  \end{itemize}
+\item
+  \textbf{Response playbook}: (a) alert on-call, (b) rollback to last stable model if severe, (c) investigate root cause, (d) retrain with corrected data, (e) validate before re-deployment
+\item
+  \textbf{Prevent future}: daily drift reports, automated retraining triggers, test data sets from multiple time windows
+\end{enumerate}
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  "Difference between data drift and concept drift?" \(\rightarrow\) Data drift: P(X) changes, model may still be right if P(Y\textbar X) unchanged; concept drift: P(Y\textbar X) changes, requires retraining
+\item
+  "How do you get ground truth labels quickly?" \(\rightarrow\) For ads: clicks are near-instant; for purchase predictions: 30-day delay; workaround: proxy labels (add-to-cart)
+\end{itemize}
+
+\subsection{Q3: "Explain training-serving skew and how you prevent it."}\label{q3-explain-training-serving-skew-and-how-you-prevent-it}
+
+\textbf{Model answer:}
+Training-serving skew occurs when the features computed at training time differ from features computed at serving time. This is the \#1 production issue in ML systems.
+
+Causes:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Different code paths for batch training vs. online serving
+\item
+  Using stale features at training time (e.g., features from 1 week before the event)
+\item
+  Data leakage: using future information in training features
+\item
+  Different preprocessing logic (normalize differently)
+\end{enumerate}
+
+Prevention:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Feature store}: single feature computation logic consumed by both training (via offline store) and serving (via online store)
+\item
+  \textbf{Log-and-join}: log features at serving time, join with labels later; training uses these exact served features
+\item
+  \textbf{Point-in-time correct joins}: in training data preparation, only use features that were available at prediction time
+\item
+  \textbf{Test for skew}: statistical comparison of feature distributions between training set and serving logs
+\end{enumerate}
+
+\subsection{Q4: "What\textquotesingle s the difference between data parallelism and model parallelism?"}\label{q4-whats-the-difference-between-data-parallelism-and-model-parallelism}
+
+\textbf{Model answer:}
+\textbf{Data parallelism}: Every worker holds a full copy of the model. Data is split --- each worker processes a different mini-batch. Workers compute gradients independently, then gradients are averaged (via all-reduce). Works when model fits on one GPU. Most common approach (PyTorch DDP, Horovod).
+
+\textbf{Model parallelism}: Model is too large for one GPU. Model is split across workers --- different layers on different GPUs. Forward pass flows activations from GPU to GPU through the pipeline. Backward pass flows gradients in reverse. Used for LLMs (GPT-4, Llama 70B).
+
+\textbf{Pipeline parallelism} is a subset of model parallelism that addresses GPU idling: split mini-batches into micro-batches, pipeline them through stages so no GPU is idle waiting.
+
+\textbf{In practice}: Use data parallelism first. Only use model parallelism when model \textgreater{} GPU memory.
+
+\subsection{Q5: "How do you run A/B tests for ranking systems?"}\label{q5-how-do-you-run-ab-tests-for-ranking-systems}
+
+\textbf{Model answer:}
+Standard A/B tests are suboptimal for ranking because: they need large sample sizes (weeks), high variance, and network effects corrupt randomization.
+
+Better approaches:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Interleaving}: For each user, merge ranked lists from model A and model B (random tiebreak for equal positions). Observe which model\textquotesingle s items get clicked more. 100x more sensitive than A/B, runs in days instead of weeks. Used by Netflix, Spotify.
+\item
+  \textbf{Quasi-experimental}: Use geographic or temporal holdouts if randomization is impossible (marketplace dynamics, social graphs).
+\item
+  \textbf{Multi-armed bandit}: For when you want to explore multiple variants while exploiting the current best (Thompson sampling, UCB).
+\end{enumerate}
+
+For any experiment:
+
+\begin{itemize}
+\tightlist
+\item
+  Pre-register hypothesis and metric
+\item
+  Calculate required sample size before starting (avoid peeking)
+\item
+  Run for 2+ weeks to average over weekly cycles and overcome novelty effect
+\item
+  Analyze primary metric + guardrail metrics + segment breakdowns
+\end{itemize}
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\textbf{1. Feedback loops and their dangers:}
+When a model influences the data used to train its successor, feedback loops emerge. Example: recommendation model recommends popular items \(\rightarrow\) popular items get more clicks \(\rightarrow\) model trains on these skewed clicks \(\rightarrow\) recommends even more popular content \(\rightarrow\) "rich get richer." Solution: mix exploration (\(\varepsilon\)-greedy, Thompson sampling) with exploitation; off-policy evaluation; counterfactual logging.
+
+\textbf{2. Causal inference vs. correlation in ML systems:}
+Standard ML learns correlation. For ads, correlation isn\textquotesingle t enough --- we need to know if showing ad X CAUSED a purchase, not just that purchases co-occurred with ad views. Approaches: randomized experiments (gold standard), instrumental variables, doubly-robust estimators, counterfactual reasoning.
+
+\textbf{3. Multi-objective optimization is a product decision, not a model decision:}
+The choice of how to weight P(engagement) vs. P(wellbeing) vs. P(revenue) is a values-laden business decision, not a technical one. Senior engineers push back on framing it as a modeling problem and involve policy, legal, and product stakeholders.
+
+\textbf{4. MLOps maturity model:}
+
+\begin{itemize}
+\tightlist
+\item
+  Level 0: Manual, ad-hoc training and deployment (notebook to production)
+\item
+  Level 1: Automated training pipeline, manual deployment trigger
+\item
+  Level 2: Automated training + automated evaluation + automated deployment (CT/CD)
+\item
+  Level 3: Full experimentation platform with multi-arm bandits, online learning
+\end{itemize}
+
+\textbf{5. The hidden technical debt in ML systems (D. Sculley et al., "Machine Learning: The High-Interest Credit Card of Technical Debt"):}
+
+\begin{itemize}
+\tightlist
+\item
+  Boundary erosion: ML models interact with everything but are tested in isolation
+\item
+  Entanglement: changing one feature changes all features (CACE principle --- Change Anything, Change Everything)
+\item
+  Undeclared consumers: model outputs consumed by downstream systems without documentation
+\item
+  Data dependencies: harder to track and eliminate than code dependencies
+\end{itemize}
+
+\textbf{6. LLMOps --- how LLMs change MLOps:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Prompt versioning}: prompts are code, must be version-controlled and tested
+\item
+  \textbf{Eval harness}: automated evaluation against golden datasets before deployment
+\item
+  \textbf{Guardrails}: output filtering for safety, hallucination detection
+\item
+  \textbf{Observability}: token usage, latency, refusal rates, harmful output rates
+\item
+  \textbf{Fine-tuning vs. RAG vs. prompt engineering}: build-vs-buy decision for each use case
+\item
+  \textbf{Cost management}: LLM inference is expensive; caching, routing to smaller models for simple queries
+\item
+  \textbf{Context management}: token limits require smart chunking, retrieval, and context compression
+\end{itemize}
+
+\textbf{7. Fairness, accountability, and transparency:}
+
+\begin{itemize}
+\tightlist
+\item
+  Slice-based evaluation: ensure model performs equally across demographic groups
+\item
+  Disparate impact analysis: measure if model outcomes disproportionately affect protected groups
+\item
+  Model cards: documentation of model capabilities, limitations, evaluation conditions
+\item
+  Counterfactual fairness: if a protected attribute changed, would the prediction change?
+\end{itemize}
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\textbf{Mistake 1: Jumping to model architecture too quickly.}
+\emph{Problem}: Candidates start designing neural network architectures before clarifying requirements, defining metrics, or discussing data.
+\emph{Fix}: Always spend the first 5 minutes on Step 1 (clarify) and Step 2 (objective/metrics). Say "before I discuss models, let me make sure I understand the problem."
+
+\textbf{Mistake 2: Ignoring training-serving skew.}
+\emph{Problem}: Describing a training pipeline and a serving pipeline independently without addressing how features will be consistent.
+\emph{Fix}: Explicitly mention feature stores and point-in-time correct joins. Say "to prevent training-serving skew, I\textquotesingle d use a feature store where the same feature computation logic is used for both."
+
+\textbf{Mistake 3: Forgetting monitoring and the feedback loop.}
+\emph{Problem}: The design ends at serving. No mention of how the system detects degradation or improves over time.
+\emph{Fix}: Always complete the loop. End with monitoring (data drift, prediction drift, business metrics), alerting, and retraining triggers.
+
+\textbf{Mistake 4: Using wrong evaluation strategy.}
+\emph{Problem}: Using random train/test split on time-series interaction data.
+\emph{Fix}: Always use temporal split for ML systems (train on past, evaluate on future). Mention this explicitly.
+
+\textbf{Mistake 5: Only discussing offline metrics.}
+\emph{Problem}: "We\textquotesingle d optimize for AUC of 0.85." No mention of online A/B tests.
+\emph{Fix}: Distinguish offline evaluation (AUC, NDCG --- fast iteration signal) from online evaluation (A/B test of business metric --- ground truth). Both are required before shipping.
+
+\textbf{Mistake 6: Not handling cold start.}
+\emph{Problem}: Design assumes every user has rich history. Ignores new users and new items.
+\emph{Fix}: Explicit cold start strategy: content-based features for new items; population-level statistics for new users; exploration vs. exploitation policies.
+
+\textbf{Mistake 7: Over-engineering the model.}
+\emph{Problem}: Proposing a transformer-based model when logistic regression on 5 features would solve the problem.
+\emph{Fix}: Start with the simplest model that could work. Justify complexity with scale, data volume, and business requirement.
+
+\textbf{Mistake 8: Ignoring position bias and feedback bias.}
+\emph{Problem}: Using click data as-is without noting that items shown at position 1 always get more clicks.
+\emph{Fix}: Mention position bias correction: "I\textquotesingle d use inverse propensity scoring or train a position-aware model to debias click labels."
+
+\textbf{Mistake 9: Not discussing latency budget.}
+\emph{Problem}: Describing a complex multi-stage pipeline without accounting for how each step affects total latency.
+\emph{Fix}: For each stage, explicitly state: "candidate retrieval \textless{} 20ms, feature serving \textless{} 10ms, ranking \textless{} 50ms, total \textless{} 100ms."
+
+\textbf{Mistake 10: Conflating data drift and concept drift.}
+\emph{Problem}: Using both terms interchangeably.
+\emph{Fix}: Data drift = input distribution P(X) changed. Concept drift = the relationship P(Y\textbar X) changed. Both require different responses.
+
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+
+\textbf{ML Fundamentals:}
+
+\begin{itemize}
+\tightlist
+\item
+  Bias-variance tradeoff determines whether you need more data (high bias) or regularization (high variance)
+\item
+  Feature selection directly impacts both online store size and serving latency
+\item
+  Calibration (from probability theory) is critical for ad auction pricing
+\end{itemize}
+
+\textbf{Deep Learning:}
+
+\begin{itemize}
+\tightlist
+\item
+  Two-tower models use the same building blocks as standard neural networks
+\item
+  Distributed training (all-reduce, model parallelism) is required for large deep learning models
+\item
+  Embedding layers are the core of how categorical features are handled in production
+\end{itemize}
+
+\textbf{System Design:}
+
+\begin{itemize}
+\tightlist
+\item
+  Feature stores are databases with specific consistency and latency requirements
+\item
+  Serving systems are distributed services with load balancing, caching, and fault tolerance
+\item
+  Monitoring pipelines are stream processing systems (Kafka, Flink)
+\end{itemize}
+
+\textbf{Distributed Systems:}
+
+\begin{itemize}
+\tightlist
+\item
+  All-reduce algorithms for gradient aggregation borrow from consensus protocols
+\item
+  Parameter servers are distributed key-value stores
+\item
+  Feature stores require distributed storage (Redis cluster, Cassandra)
+\end{itemize}
+
+\textbf{Cloud Infrastructure:}
+
+\begin{itemize}
+\tightlist
+\item
+  Managed ML platforms (Vertex AI, SageMaker, Azure ML) implement much of the MLOps stack
+\item
+  Spot instances / preemptible VMs dramatically reduce training costs for data parallel jobs
+\item
+  Object storage (S3, GCS) is the foundation of offline feature stores and model registries
+\end{itemize}
+
+\textbf{Statistics:}
+
+\begin{itemize}
+\tightlist
+\item
+  A/B testing validity depends on correct hypothesis testing, p-values, power analysis
+\item
+  Drift detection uses KL divergence, Kolmogorov-Smirnov test, chi-squared tests
+\item
+  Causal inference methods (IV, DiD) are required for unbiased effect estimation
+\end{itemize}
+
+\textbf{Data Engineering:}
+
+\begin{itemize}
+\tightlist
+\item
+  Feature pipelines run on Spark/Flink/dbt --- all standard data engineering tools
+\item
+  Data quality tools (Great Expectations, Deequ) originate in data engineering
+\item
+  Schema evolution and data versioning (Delta Lake) are data engineering concerns
+\end{itemize}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\textbf{For Google / YouTube:}
+
+\begin{itemize}
+\tightlist
+\item
+  Emphasize scale (billions of users, millions of QPS)
+\item
+  Know TF Serving, TFX, Vertex AI well
+\item
+  Be ready to discuss ad auction mechanics and CTR model calibration
+\item
+  System design: expect Ads, YouTube recommendation, Search ranking
+\end{itemize}
+
+\textbf{For Meta / Facebook:}
+
+\begin{itemize}
+\tightlist
+\item
+  Know DLRM architecture (they open-sourced it)
+\item
+  Be familiar with feed ranking, ads, Reels recommendation
+\item
+  Discuss multi-objective optimization trade-offs between engagement and wellbeing
+\item
+  Strong emphasis on A/B testing rigor --- Meta runs thousands of experiments simultaneously
+\end{itemize}
+
+\textbf{For Amazon:}
+
+\begin{itemize}
+\tightlist
+\item
+  Product recommendation = core business driver
+\item
+  E-commerce-specific challenges: price as a feature, inventory constraints, session length
+\item
+  Know SageMaker ecosystem
+\item
+  Discuss cold start for long-tail products (millions of products with few interactions)
+\end{itemize}
+
+\textbf{For Netflix:}
+
+\begin{itemize}
+\tightlist
+\item
+  Watch "A/B Testing on Netflix" talks --- interleaving is their secret weapon
+\item
+  Two-tower model for candidate generation is well-documented in their tech blog
+\item
+  Causal inference and counterfactual evaluation is a strong emphasis
+\item
+  Know heterogeneous treatment effects (different users respond differently to recommendations)
+\end{itemize}
+
+\textbf{For LinkedIn:}
+
+\begin{itemize}
+\tightlist
+\item
+  Economic Graph embeddings --- professional entity representations
+\item
+  Feed ranking with "dwell time" as primary positive signal
+\item
+  Recommendation in professional context: be aware of fairness to recruiters, job seekers, applicants
+\item
+  AI governance and fairness teams are prominent at LinkedIn
+\end{itemize}
+
+\textbf{General FAANG tips:}
+
+\begin{itemize}
+\tightlist
+\item
+  Draw the complete pipeline, not just the model
+\item
+  Mention specific tools by name (don\textquotesingle t just say "a database" --- say Redis for online store)
+\item
+  Quantify: mention sample sizes, latency budgets, model complexity (number of params)
+\item
+  Explicitly address the full lifecycle: train \(\rightarrow\) deploy \(\rightarrow\) monitor \(\rightarrow\) retrain
+\item
+  When asked "how would you improve this?", propose A/B testable hypotheses, not theoretical improvements
+\item
+  Demonstrate that you\textquotesingle ve shipped production ML, not just trained notebooks
+\end{itemize}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+MLOps solves the gap between model training and reliable production impact. The core loop is: \textbf{data \(\rightarrow\) features \(\rightarrow\) train \(\rightarrow\) evaluate \(\rightarrow\) serve \(\rightarrow\) monitor \(\rightarrow\) retrain}. Feature stores eliminate training-serving skew by providing a single feature computation layer for both offline training and online serving. Distributed training uses data parallelism (copy model, split data) for large datasets and model parallelism (split model across GPUs) for giant models. All-reduce (ring-based) is more bandwidth-efficient than parameter servers for homogeneous clusters. Serving choices are batch (hours, cheap), online (\textless{} 100ms, expensive), or streaming (seconds). A/B tests validate offline improvements translate to online business metrics; interleaving is 100x faster for ranking systems. Monitor for four drift types: data, concept, prediction, label. Detect with PSI (\textgreater{} 0.2 = act). The recommendation funnel is: candidate generation (millions \(\rightarrow\) hundreds via ANN) \(\rightarrow\) ranking (deep model) \(\rightarrow\) re-ranking (diversity, business rules). CTR prediction requires calibrated probabilities (not just discrimination) because auction prices depend on exact predicted values.
+
+\subsection{Key Points}\label{key-points}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Framework}: Clarify \(\rightarrow\) Objective \(\rightarrow\) Data \(\rightarrow\) Features \(\rightarrow\) Model \(\rightarrow\) Train \(\rightarrow\) Evaluate \(\rightarrow\) Serve \(\rightarrow\) Monitor \(\rightarrow\) Iterate
+\item
+  \textbf{Training-serving skew prevention}: single feature computation logic, feature store, log-and-join
+\item
+  \textbf{Feature store}: offline (S3, point-in-time correct) + online (Redis, \textless{} 10ms) + shared computation logic
+\item
+  \textbf{Distributed training}: data parallel (same model, split data, all-reduce gradients) vs. model parallel (split model, flow activations)
+\item
+  \textbf{All-reduce}: ring topology, each GPU sends/receives exactly one full gradient, bandwidth-optimal
+\item
+  \textbf{Serving}: batch (offline, cheap) vs. online (\textless{} 100ms, GPU cluster) vs. streaming (Flink, seconds)
+\item
+  \textbf{Recommendation funnel}: Two-tower retrieval (ANN, \textless{} 10ms) \(\rightarrow\) Neural ranking (Deep \& Cross, \textless{} 100ms) \(\rightarrow\) Re-ranking (diversity + business rules, \textless{} 50ms)
+\item
+  \textbf{Drift types}: data (P(X) changes), concept (P(Y\textbar X) changes), prediction (Ŷ distribution), label (P(Y))
+\item
+  \textbf{PSI thresholds}: \textless{} 0.1 stable, 0.1-0.2 monitor, \textgreater{} 0.2 act
+\item
+  \textbf{A/B testing}: interleaving 100x faster for ranking; run 2+ weeks for novelty effect; correct for multiple testing
+\item
+  \textbf{CTR model}: must be calibrated (exact probabilities matter for auction); DLRM/Wide \& Deep; extreme class imbalance
+\item
+  \textbf{LLMOps additions}: prompt versioning, eval harness, guardrails, cost management, RAG vs. fine-tune decision
+\end{enumerate}
+
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3529}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3826}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2645}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Detail
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Interview Trigger
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Feature store & Offline (S3) + Online (Redis) + shared code & "training-serving skew" question \\
+\rowcolor{zebra}
+Data parallelism & Full model per GPU, split data, all-reduce & "distributed training" question \\
+Model parallelism & Split model, flow activations & "large model / LLM" question \\
+\rowcolor{zebra}
+Ring all-reduce & Each GPU sends receives one full tensor total & "why not parameter server?" \\
+Two-tower model & User tower + item tower + dot product + ANN & "recommendation system" \\
+\rowcolor{zebra}
+Candidate \(\rightarrow\) Rank \(\rightarrow\) Re-rank & Millions \(\rightarrow\) 500 \(\rightarrow\) 50 \(\rightarrow\) 20 & "recommendation funnel" \\
+Wide \& Deep / DCN & Dense + sparse + cross features & "CTR prediction model" \\
+\rowcolor{zebra}
+PSI \textgreater{} 0.2 & Major distribution shift, take action & "drift detection" \\
+Concept drift & P(Y\textbar X) changed, not just P(X) & "monitoring" question \\
+\rowcolor{zebra}
+Interleaving & 100x faster than A/B for ranking & "online evaluation" question \\
+Point-in-time join & No future leakage in training features & "training-serving skew" \\
+\rowcolor{zebra}
+Continuous training & Retrain triggered by drift or schedule & "retraining strategy" \\
+Batch serving & Pre-compute, hours old OK, cheap & "latency not critical" \\
+\rowcolor{zebra}
+Online serving & Request-triggered, \textless{} 100ms, GPU cluster & "real-time scoring" \\
+Calibration & P(click) exact value must be correct & "ad auction" question \\
+\end{longtable}
+
+\subsection{Most Important Concepts}\label{most-important-concepts}
+
+\textbf{For the interview, these 5 concepts matter most:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{The full lifecycle} (data \(\rightarrow\) features \(\rightarrow\) train \(\rightarrow\) serve \(\rightarrow\) monitor \(\rightarrow\) retrain) --- draw this diagram, walk through it explicitly
+\item
+  \textbf{Feature store solving training-serving skew} --- understand offline vs. online stores, point-in-time correctness, and why same feature code eliminates skew
+\item
+  \textbf{Recommendation funnel} (two-tower candidate generation \(\rightarrow\) deep ranking \(\rightarrow\) re-ranking) --- know why each stage exists and what it trades off
+\item
+  \textbf{Drift detection and response} --- four drift types, PSI metric, monitoring loop, automated retraining triggers
+\item
+  \textbf{A/B testing for ML systems} --- offline vs. online evaluation gap, interleaving for ranking, statistical rigor requirements (sample size, multiple testing, novelty effect)
+\end{enumerate}
+
+\emph{Word count: approximately 12,500 words \textbar{} Section count: 16 sections}
+
+\end{document}

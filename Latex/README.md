@@ -14,16 +14,23 @@ Latex/
 ├── build.py                 # resumable driver: markdown → .tex → PDF
 ├── make_index.py            # builds the collection index + merged "Complete-Collection.pdf"
 ├── manifest.json            # build state (content hashes) — enables resume
-├── tex/                     # generated LaTeX sources (one per topic)
-├── pdf/                     # compiled PDFs (one per topic) + the two collection PDFs
-└── figures/                 # generated diagrams (matplotlib/TikZ), if any
+├── tex/<concept>/           # generated LaTeX sources, grouped by concept folder
+├── pdf/<concept>/           # compiled PDFs, grouped by concept folder
+├── make_anki.py             # flashcard decks (anki/*.tsv)
+├── make_flashcards_ui.py    # flashcards.html study app
+├── flashcards.html          # self-contained flashcard web app
+└── figures/                 # generated diagrams (matplotlib/TikZ)
 ```
 
+`tex/` and `pdf/` are organised into **concept folders** (the `FOLDER` map in `build.py`):
+`foundations` (oop, design-patterns), `systems`, `infrastructure`, `system-design`, `data`,
+`dev-practices`, `dsa`, `ai-ml`, `behavioral`, and `_collection` (index + merged book).
+
 Key outputs in `pdf/`:
-- One PDF per topic (e.g. `01-concurrency.pdf`, `12-oop.pdf`, `aiml-04-tf.pdf`, …) — **28 editions**.
-- `00-Collection-Index.pdf` — cover + catalogue of all editions.
-- `Complete-Collection.pdf` — every edition merged into one ~790-page book, with a full
-  **PDF bookmark tree** (per-edition entries + nested sections) for navigation.
+- One PDF per topic, e.g. `pdf/foundations/design-patterns.pdf`, `pdf/system-design/caching.pdf` — **38 editions**.
+- `_collection/00-Collection-Index.pdf` — cover + catalogue of all editions.
+- `_collection/Complete-Collection.pdf` — every edition merged into one ~880-page book, with a
+  full **PDF bookmark tree** (per-edition entries + nested sections) for navigation.
 
 And `anki/` holds **flashcards** auto-generated from the Q&A sections — `ALL-flashcards.tsv`
 plus one `.tsv` per topic, importable straight into Anki (see `anki/README.md`).
@@ -50,7 +57,12 @@ python3 build.py --only 04  # only docs whose key contains "04"
 python3 build.py --status   # progress table
 python3 make_index.py       # rebuild the index + bookmarked merged collection
 python3 make_anki.py        # regenerate the Anki flashcard decks
+python3 make_flashcards_ui.py   # regenerate flashcards.html (browser study app)
 ```
+
+**Flashcards UI:** `flashcards.html` is a self-contained study app (open in any browser, no
+server) — deck picker, click/Space to reveal, ←/→ to navigate, shuffle, and "mastered"
+progress saved in the browser. Built from the same Q&A as the Anki decks.
 
 The build is **resumable**: `manifest.json` records each source's content hash and
 whether its PDF compiled. Re-running rebuilds only what changed (source edits, or any

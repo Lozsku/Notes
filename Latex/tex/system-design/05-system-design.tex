@@ -1,0 +1,2530 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{System Design}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{05}
+
+\usepackage{interviewstyle}
+\setthemecolor{db2777}{f472b6}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{Highest-signal topic for senior loops.} Every FAANG design round tests the same core skills:
+decompose ambiguity, reason about scale, articulate trade-offs, defend decisions under pressure.
+This guide builds that capability from first principles.
+\end{quote}
+
+\section{Overview --- What it is}\label{overview--what-it-is}
+
+System design is the discipline of defining the \textbf{architecture, components, interfaces, and data flows} of a large-scale distributed software system to satisfy functional and non-functional requirements.
+
+Unlike coding interviews (which have a single correct answer), design interviews are \textbf{open-ended}: the interviewer evaluates \emph{how you think}, not just what you propose.
+
+\textbf{Key properties of a well-designed system:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Scalability} --- handles growth in load/data without redesign
+\item
+  \textbf{Reliability} --- stays correct under failures
+\item
+  \textbf{Availability} --- serves requests despite partial failures
+\item
+  \textbf{Maintainability} --- easy to change and operate over time
+\item
+  \textbf{Performance} --- low latency, high throughput
+\item
+  \textbf{Cost-efficiency} --- doesn\textquotesingle t over-engineer
+\end{itemize}
+
+\textbf{First-principles mental model:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Requirements → Constraints → Trade-offs → Architecture
+\end{verbatim}
+
+Every design decision is a trade-off. There is no "best" architecture --- only architectures that are best \emph{for a given set of constraints}.
+
+\section{Why It Exists}\label{why-it-exists}
+
+The internet changed everything. In the 1970s--90s, software ran on a single machine. As usage grew:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Single server} hits CPU/memory limits \(\rightarrow\) need to scale
+\item
+  \textbf{Single database} becomes the bottleneck \(\rightarrow\) need replication, sharding
+\item
+  \textbf{Single data center} risks outage \(\rightarrow\) need geographic distribution
+\item
+  \textbf{Single deployment unit} makes change risky \(\rightarrow\) need microservices
+\item
+  \textbf{Synchronous calls} create cascading failures \(\rightarrow\) need async messaging
+\end{enumerate}
+
+Each real-world pain point birthed a design pattern. Understanding \emph{why} each pattern exists helps you apply it correctly and explain it convincingly.
+
+\section{Why FAANG Cares (be specific per company)}\label{why-faang-cares-be-specific-per-company}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0672}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4093}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5235}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What they\textquotesingle re really testing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key signals they look for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Google} & Can you design at planetary scale? (Maps, Search, YouTube) & Bigtable/Spanner-style thinking, eventual consistency comfort, data locality, Borg-like resource scheduling \\
+\rowcolor{zebra}
+\textbf{Meta} & Social graph scale (3B+ users), read-heavy feeds, real-time notifications & EdgeRank-style ranking, TAO graph DB, async fanout, infrastructure cost awareness \\
+\textbf{Amazon} & Service-oriented culture, failure isolation, "two-pizza team" ownership & Six-pager thinking, blast radius minimization, DynamoDB/SQS/SNS, operational excellence \\
+\rowcolor{zebra}
+\textbf{Apple} & Privacy, device--cloud sync, iCloud-scale storage & End-to-end encryption architecture, conflict resolution (CRDT), offline-first design \\
+\textbf{Netflix} & Chaos engineering mindset, streaming at scale, global CDN & Hystrix/resilience patterns, Open Connect CDN, A/B experimentation infrastructure \\
+\rowcolor{zebra}
+\textbf{Microsoft} & Azure integration, enterprise reliability SLAs, Azure-native patterns & Multi-tenant isolation, RBAC, hybrid cloud, Teams-scale real-time messaging \\
+\end{longtable}
+
+\textbf{Universal FAANG signal:} Can you identify bottlenecks \emph{before} being asked? Can you quantify trade-offs numerically? Do you think about failure modes proactively?
+
+\section{The System Design Interview Framework}\label{the-system-design-interview-framework}
+
+\begin{quote}
+\textbf{Use this exact playbook in every design round. Stick to the sequence.}
+\end{quote}
+
+\subsection{Step 1: Clarify Requirements (3--5 min)}\label{step-1-clarify-requirements-35-min}
+
+Never assume. Ask:
+
+\textbf{Functional requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  What are the core features? (e.g., "Can users like posts? Comment? Follow?")
+\item
+  What is out of scope? ("Do we need DMs? Stories?")
+\item
+  Who are the users? (consumers, businesses, developers?)
+\end{itemize}
+
+\textbf{Non-functional requirements:}
+
+\begin{itemize}
+\tightlist
+\item
+  Scale: DAU, QPS, storage growth per year
+\item
+  Latency: p99 read latency? write latency?
+\item
+  Consistency: is eventual consistency acceptable? (news feed: yes; bank transfer: no)
+\item
+  Availability: 99.9\%? 99.99\%? (8.7 hrs vs 52 min downtime/year)
+\item
+  Durability: can we lose data? (never for payments)
+\end{itemize}
+
+\textbf{Constraints:}
+
+\begin{itemize}
+\tightlist
+\item
+  Budget, team size, timeline (rarely asked but good to mention you\textquotesingle re aware)
+\end{itemize}
+
+\textbf{Candidate phrase:} \emph{"Before I dive in, let me make sure I understand the requirements. I\textquotesingle ll ask a few questions --- stop me if I\textquotesingle m going too deep."}
+
+\subsection{Step 2: Capacity Estimation (3--5 min)}\label{step-2-capacity-estimation-35-min}
+
+Back-of-envelope. Show your work. Round aggressively.
+
+\setcodelang{}
+
+\begin{verbatim}
+Example: Twitter
+- DAU: 300M users
+- Each reads 100 tweets/day → 300M × 100 / 86400 ≈ 350K reads/sec
+- Each posts 1 tweet/10 days → 300M × 0.1 / 86400 ≈ 350 writes/sec
+- Tweet size: 140 chars + metadata ≈ 300 bytes
+- Storage: 350 writes/sec × 300 bytes × 86400 × 365 ≈ 3.3 TB/year
+- Media (10% have images, 200KB avg): 350 × 0.1 × 200KB × 86400 × 365 ≈ 220 TB/year
+\end{verbatim}
+
+\textbf{Always estimate:} QPS (read + write), storage/year, bandwidth, memory for cache.
+
+\subsection{Step 3: Define the API (2--3 min)}\label{step-3-define-the-api-23-min}
+
+Sketch the core REST/RPC endpoints:
+
+\setcodelang{}
+
+\begin{verbatim}
+POST   /tweets            → create tweet
+GET    /timeline/{userId} → get home timeline
+POST   /follow            → follow user
+GET    /user/{userId}     → get user profile
+\end{verbatim}
+
+This forces you to crystallize exactly what the system does and surfaces data model decisions early.
+
+\subsection{Step 4: Data Model (3--5 min)}\label{step-4-data-model-35-min}
+
+Choose SQL vs NoSQL. Define key entities and relationships.
+
+\setcodelang{}
+
+\begin{verbatim}
+User:    user_id (PK), username, email, created_at
+Tweet:   tweet_id (PK), user_id (FK), content, media_url, created_at
+Follow:  follower_id, followee_id, created_at (composite PK)
+Feed:    user_id, tweet_id, score, created_at  ← for pre-computed feeds
+\end{verbatim}
+
+Explain \emph{why} each field exists and what queries drive the schema.
+
+\subsection{Step 5: High-Level Architecture (5--8 min)}\label{step-5-high-level-architecture-58-min}
+
+Draw the major components and data flows. Always include:
+
+\setcodelang{}
+
+\begin{verbatim}
+Client → CDN → API Gateway → Load Balancer → App Servers → Cache → DB
+                                                        ↓
+                                              Message Queue → Workers
+\end{verbatim}
+
+Name each component and explain its role. Don\textquotesingle t over-engineer at this stage.
+
+\subsection{Step 6: Deep Dive (10--15 min)}\label{step-6-deep-dive-1015-min}
+
+Pick 2--3 of the hardest sub-problems and go deep. Let the interviewer guide you, but have opinions:
+
+\begin{itemize}
+\tightlist
+\item
+  "The hardest part of this system is X. Let me explain why and how I\textquotesingle d solve it."
+\item
+  Common deep-dives: fan-out on write vs read, cache invalidation, sharding strategy, consistency guarantees.
+\end{itemize}
+
+\subsection{Step 7: Identify Bottlenecks \& Scale (3--5 min)}\label{step-7-identify-bottlenecks--scale-35-min}
+
+Proactively find your own system\textquotesingle s weaknesses:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Single points of failure:} Where does the system go down if one component fails?
+\item
+  \textbf{Hot spots:} Which users/keys get disproportionate traffic? (Celebrity problem)
+\item
+  \textbf{Write amplification:} Fan-out writes cost more than fan-out reads at some scales.
+\item
+  \textbf{Consistency vs latency:} Where are you making that trade-off explicitly?
+\end{itemize}
+
+\textbf{Candidate phrase:} \emph{"Now let me stress-test my own design. Here are the three places I\textquotesingle d worry about at scale..."}
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Scalability}\label{scalability}
+
+\textbf{Definition:} Ability to handle increased load by adding resources.
+
+\textbf{Vertical scaling (scale up):} Add more CPU/RAM/disk to existing machine.
+
+\begin{itemize}
+\tightlist
+\item
+  Pros: Simple, no code changes, strong consistency
+\item
+  Cons: Hardware limits, expensive, single point of failure, requires downtime
+\end{itemize}
+
+\textbf{Horizontal scaling (scale out):} Add more machines.
+
+\begin{itemize}
+\tightlist
+\item
+  Pros: Theoretically unlimited, commodity hardware, fault tolerant
+\item
+  Cons: Requires stateless application tier, data distribution complexity
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Vertical:                    Horizontal:
+┌─────────────┐              ┌──────┐  ┌──────┐  ┌──────┐
+│  Big Server │              │  S1  │  │  S2  │  │  S3  │
+│  32 cores   │              │ 4CPU │  │ 4CPU │  │ 4CPU │
+│  512 GB RAM │    vs.       │  8GB │  │  8GB │  │  8GB │
+└─────────────┘              └──────┘  └──────┘  └──────┘
+     ↑                             ↑ Load Balancer ↑
+ Add bigger                    Add more machines
+\end{verbatim}
+
+\textbf{Interview takeaway:} \textbf{Start with vertical, switch to horizontal when you hit limits or need HA.} Nearly all large-scale systems are horizontally scaled.
+
+\textbf{Stateless vs Stateful:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1498}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4293}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4209}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stateless
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stateful
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Definition & Each request contains all needed context & Server stores session state between requests \\
+\rowcolor{zebra}
+Scaling & Trivially horizontal (any server handles any request) & Hard (sticky sessions, session replication) \\
+Failure recovery & Easy (just route elsewhere) & Hard (state is lost) \\
+\rowcolor{zebra}
+Examples & REST APIs, CDN edge nodes & WebSocket connections, game servers, DB connections \\
+\end{longtable}
+
+\textbf{Key insight:} Make your application tier \textbf{stateless} by moving state to an external store (cache, DB). This is what makes horizontal scaling work.
+
+\subsection{Load Balancing}\label{load-balancing}
+
+\textbf{Definition:} Distribute incoming traffic across multiple servers to avoid overloading any single one.
+
+\textbf{Algorithms:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1906}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4154}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3940}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How it works
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Round Robin & Each server gets requests in rotation & Uniform server capacity, stateless requests \\
+\rowcolor{zebra}
+Weighted Round Robin & Servers get proportional share based on capacity & Mixed server hardware \\
+Least Connections & Route to server with fewest active connections & Long-lived connections (WebSockets) \\
+\rowcolor{zebra}
+IP Hash & Hash client IP \(\rightarrow\) sticky routing & Session persistence without external store \\
+Random & Pick random server & Simple, uniform load \\
+\rowcolor{zebra}
+Least Response Time & Route to fastest responding server & Latency-sensitive workloads \\
+\end{longtable}
+
+\textbf{Layer 4 vs Layer 7:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1618}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4118}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4265}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+L4 (Transport)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+L7 (Application)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Operates at & TCP/UDP level & HTTP/HTTPS level \\
+\rowcolor{zebra}
+Sees & IP, port, protocol & URLs, headers, cookies, body \\
+Speed & Faster (less processing) & Slower (more processing) \\
+\rowcolor{zebra}
+Flexibility & Less (can\textquotesingle t inspect content) & More (route by URL, A/B test) \\
+Examples & AWS NLB, HAProxy TCP & AWS ALB, Nginx, Envoy \\
+\end{longtable}
+
+\textbf{Health checks:} LBs continuously probe backend servers. Remove unhealthy instances automatically.
+
+\textbf{Interview takeaway:} \textbf{Use L7 LB for HTTP microservices (route by path/header). L4 for raw TCP (databases, game servers). Always have \(\geq\)2 LB instances for HA.}
+
+\subsection{Caching}\label{caching}
+
+\textbf{Definition:} Store frequently accessed data in fast storage (memory) to reduce latency and backend load.
+
+\textbf{Why cache?} Memory access: \textasciitilde100ns. Disk: \textasciitilde10ms. Network DB query: \textasciitilde1-10ms. Cache hit: \textasciitilde0.5ms local, \textasciitilde1ms Redis.
+
+\subsubsection{Caching Strategies}\label{caching-strategies}
+
+\textbf{1. Cache-Aside (Lazy Loading)}
+
+\setcodelang{}
+
+\begin{verbatim}
+Read:                              Write:
+App checks cache                   App writes to DB
+  ↓ miss                           App invalidates cache
+App reads from DB                  (next read repopulates)
+App writes to cache
+App returns data
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Pros: Only cache what\textquotesingle s needed, cache failures don\textquotesingle t break reads
+\item
+  Cons: Cache miss is expensive (3 trips), stale data possible, thundering herd on cold start
+\item
+  \textbf{Use when:} Read-heavy, data not always needed
+\end{itemize}
+
+\textbf{2. Write-Through}
+
+\setcodelang{}
+
+\begin{verbatim}
+Write:                             Read:
+App writes to cache                Check cache → hit → return
+Cache synchronously writes to DB   (always fresh)
+Return success
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Pros: Cache always consistent with DB, no stale reads
+\item
+  Cons: Write latency higher (2 writes), cache may hold rarely-read data
+\item
+  \textbf{Use when:} Write + read same data frequently, consistency critical
+\end{itemize}
+
+\textbf{3. Write-Back (Write-Behind)}
+
+\setcodelang{}
+
+\begin{verbatim}
+Write:                             Background:
+App writes to cache                Cache async flushes to DB
+Return success immediately         (batched writes)
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Pros: Lowest write latency, batch DB writes (fewer I/O ops)
+\item
+  Cons: Risk of data loss if cache fails before flush, complex recovery
+\item
+  \textbf{Use when:} High write throughput, can tolerate small data loss window (analytics, logging)
+\end{itemize}
+
+\textbf{4. Write-Around}
+
+\setcodelang{}
+
+\begin{verbatim}
+Write: App writes directly to DB (bypasses cache)
+Read:  Cache miss → read from DB → populate cache
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Pros: Cache not polluted with write-once data
+\item
+  Cons: First read always misses
+\item
+  \textbf{Use when:} Data written once, rarely read back soon (file uploads, logs)
+\end{itemize}
+
+\subsubsection{Cache Eviction Policies}\label{cache-eviction-policies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2755}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3265}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3980}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rule
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{LRU} (Least Recently Used) & Evict item not accessed longest & General purpose, temporal locality \\
+\rowcolor{zebra}
+\textbf{LFU} (Least Frequently Used) & Evict item accessed least times & Stable "hot" data (popular items stay) \\
+\textbf{MRU} (Most Recently Used) & Evict most recently used item & Scans (last item won\textquotesingle t be needed again) \\
+\rowcolor{zebra}
+\textbf{FIFO} & Evict oldest inserted item & Simple, predictable \\
+\textbf{Random} & Evict random item & Simple approximation of LRU \\
+\rowcolor{zebra}
+\textbf{TTL} & Evict after time-to-live expires & Time-sensitive data \\
+\end{longtable}
+
+\textbf{LRU Implementation:} Doubly-linked list + HashMap. O(1) get and put. Classic interview question.
+
+\subsubsection{Cache Invalidation}\label{cache-invalidation}
+
+The hardest problem in caching. Three strategies:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{TTL-based:} Set expiry time. Simple but stale until TTL expires.
+\item
+  \textbf{Event-driven:} When DB changes, publish invalidation event to cache. Complex but fresh.
+\item
+  \textbf{Write-through invalidation:} On write, update cache atomically. Consistent but slower writes.
+\end{enumerate}
+
+\textbf{Cache stampede / Thundering Herd:} When a popular cached item expires, thousands of requests simultaneously hit the DB. Solutions:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Probabilistic early expiration:} Refresh cache slightly before TTL with some probability
+\item
+  \textbf{Mutex/lock:} First request acquires lock, others wait, lock-holder populates cache
+\item
+  \textbf{Background refresh:} Async refresh before TTL, serve stale during refresh
+\end{itemize}
+
+\textbf{Interview takeaway:} \textbf{Cache-aside is the most common pattern. Always discuss TTL strategy and cache invalidation --- interviewers love this. Know LRU vs LFU trade-offs.}
+
+\subsection{CDNs (Content Delivery Networks)}\label{cdns-content-delivery-networks}
+
+\textbf{Definition:} Geographically distributed network of servers (edge nodes/PoPs) that cache and serve content close to end users.
+
+\setcodelang{}
+
+\begin{verbatim}
+Without CDN:                    With CDN:
+User (Tokyo) ─────────────────→ Origin Server (Virginia)
+                ~150ms RTT
+
+User (Tokyo) ──→ Edge Node (Tokyo) ──→ Origin (if miss)
+                    ~5ms RTT              (only on cache miss)
+\end{verbatim}
+
+\textbf{What CDNs serve:} Static assets (images, CSS, JS, videos), but also dynamic content (API responses at edge), WebSocket connections at edge.
+
+\textbf{Push vs Pull CDN:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2240}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4027}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3733}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Push CDN
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pull CDN
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+How content gets to edge & You upload/push to CDN & CDN fetches from origin on first request \\
+\rowcolor{zebra}
+Control & Full control, pre-populate & Automatic, reactive \\
+Storage cost & Higher (must store all content at all edges) & Lower (only popular content cached) \\
+\rowcolor{zebra}
+Staleness & Manual invalidation needed & TTL-based, auto-expire \\
+Best for & Large files known in advance (videos, software) & Unpredictable access patterns, websites \\
+\end{longtable}
+
+\textbf{Key CDN features:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{TLS termination at edge} \(\rightarrow\) reduces SSL handshake cost for users
+\item
+  \textbf{DDoS protection} \(\rightarrow\) absorb attacks at edge before reaching origin
+\item
+  \textbf{Edge compute} \(\rightarrow\) run code at edge nodes (Cloudflare Workers, Lambda@Edge)
+\item
+  \textbf{Geo-blocking} \(\rightarrow\) restrict by country at network level
+\end{itemize}
+
+\textbf{Interview takeaway:} \textbf{CDN = first line of defense for scale. Serve all static assets via CDN. For dynamic content, push DB-query results to CDN with short TTLs. Always mention CDN early in a design.}
+
+\subsection{Sharding (Horizontal Partitioning)}\label{sharding-horizontal-partitioning}
+
+\textbf{Definition:} Split a large dataset across multiple database nodes, each holding a subset of the data.
+
+\setcodelang{}
+
+\begin{verbatim}
+Without sharding:              With sharding:
+┌────────────────┐             ┌──────────┐  ┌──────────┐  ┌──────────┐
+│   All data     │             │ Shard 0  │  │ Shard 1  │  │ Shard 2  │
+│  (single DB)   │             │ user 0-M │  │ user M-N │  │ user N-Z │
+└────────────────┘             └──────────┘  └──────────┘  └──────────┘
+\end{verbatim}
+
+\textbf{Sharding strategies:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1191}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3096}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2144}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3569}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Range-based} & Shard by key range (A-F, G-M, N-Z) & Simple, range queries easy & Hot spots if data not uniformly distributed \\
+\rowcolor{zebra}
+\textbf{Hash-based} & shard = hash(key) \% N & Uniform distribution & Range queries hit all shards, resharding is painful \\
+\textbf{Directory-based} & Lookup table maps key \(\rightarrow\) shard & Flexible, easy to move data & Lookup table becomes bottleneck/SPOF \\
+\rowcolor{zebra}
+\textbf{Geographic} & Shard by user location & Latency, compliance (GDPR) & Cross-geo queries expensive \\
+\end{longtable}
+
+\textbf{Consistent Hashing:} Solves the resharding problem of hash-based sharding.
+
+\setcodelang{}
+
+\begin{verbatim}
+Normal hashing: shard = hash(key) % N
+  → If N changes: almost ALL keys reassigned (massive rebalancing)
+
+Consistent hashing:
+  → Keys and servers mapped to a ring (0 to 2^32)
+  → Each key assigned to the nearest server clockwise
+  → When a server is added/removed: only (K/N) keys move
+\end{verbatim}
+
+\setcodelang{}
+
+\begin{verbatim}
+            Ring (0 → 2^32)
+                   0
+            S1 ●───────────● S2
+           /                    \
+          /                      \
+    S4 ●                          ● S3
+          \                      /
+           \                    /
+            ──────────────────
+            
+Key k → go clockwise → lands on nearest server
+\end{verbatim}
+
+\textbf{Virtual nodes (vnodes):} Assign each physical server multiple positions on the ring \(\rightarrow\) better load balancing, smoother failover.
+
+\textbf{Sharding pitfalls:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Cross-shard joins:} Joins across shards are expensive \(\rightarrow\) denormalize or avoid
+\item
+  \textbf{Cross-shard transactions:} Distributed transactions (2PC) are slow and complex
+\item
+  \textbf{Hot shards:} Celebrity users, trending content \(\rightarrow\) route to overloaded shard
+\item
+  \textbf{Resharding:} Painful with hash-based, plan for it with consistent hashing
+\end{itemize}
+
+\textbf{Interview takeaway:} \textbf{Sharding is the last resort after read replicas, caching, and indexing. Use consistent hashing to avoid resharding pain. Know the hot-spot problem and mitigation (add shard for celebrity, use virtual nodes).}
+
+\subsection{Replication}\label{replication}
+
+\textbf{Definition:} Maintain copies of the same data on multiple machines for redundancy and read scaling.
+
+\subsubsection{Leader-Follower (Primary-Replica)}\label{leader-follower-primary-replica}
+
+\setcodelang{}
+
+\begin{verbatim}
+         Writes                      Reads (can be sent to followers)
+           ↓                              ↓           ↓
+    ┌─────────────┐            ┌──────────────┐  ┌──────────────┐
+    │   Leader    │────sync───→│  Follower 1  │  │  Follower 2  │
+    │  (Primary)  │────async──→│  Follower 2  │  │  Follower 3  │
+    └─────────────┘            └──────────────┘  └──────────────┘
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  All writes go to leader
+\item
+  Followers replicate asynchronously (usually) or synchronously
+\item
+  Reads can be distributed across followers \(\rightarrow\) read scaling
+\item
+  Automatic failover: a follower promoted to leader on primary failure
+\end{itemize}
+
+\textbf{Sync vs Async replication:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1647}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4471}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3882}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Synchronous
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Asynchronous
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Write latency & Higher (wait for replica ACK) & Lower (return after leader write) \\
+\rowcolor{zebra}
+Data loss risk & Zero (if replica fails, write fails) & Non-zero (unflushed writes lost) \\
+Availability & Lower (writes blocked if replica down) & Higher \\
+\rowcolor{zebra}
+Typical use & Financial transactions, critical data & Social feeds, analytics \\
+\end{longtable}
+
+\subsubsection{Leader-Leader (Multi-Primary / Active-Active)}\label{leader-leader-multi-primary--active-active}
+
+\setcodelang{}
+
+\begin{verbatim}
+    ┌──────────┐ ←── sync ──→ ┌──────────┐
+    │ Leader 1 │               │ Leader 2 │
+    │(Region A)│               │(Region B)│
+    └──────────┘               └──────────┘
+    Accepts writes              Accepts writes
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Both leaders accept writes
+\item
+  Conflict resolution needed (last-write-wins, vector clocks, CRDTs)
+\item
+  Best for geo-distributed systems where each region serves local writes
+\item
+  Conflict resolution is the hard part
+\end{itemize}
+
+\textbf{Replication lag:} Followers may lag behind leader. Read-your-own-writes problem: write to leader, immediately read from follower \(\rightarrow\) stale data.
+
+\textbf{Solutions to replication lag:}
+
+\begin{itemize}
+\tightlist
+\item
+  Read own writes from leader
+\item
+  Track replication position, route reads to followers that are caught up
+\item
+  Accept eventual consistency
+\end{itemize}
+
+\subsection{Consistency Models}\label{consistency-models}
+
+\textbf{Definition:} Rules that define what values are valid to return for reads after writes.
+
+\setcodelang{}
+
+\begin{verbatim}
+Strong ────────────────────────────────────────────────► Eventual
+(Linearizable)                                        (BASE)
+
+Every read reflects    Reads may be slightly    Reads eventually
+the latest write.      stale but bounded.       reflect writes.
+Slowest.               (bounded staleness)      Fastest.
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2266}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4712}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3022}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Guarantee
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Linearizability} (Strong) & All ops appear to execute atomically at a single point in time & Single-node DB, Zookeeper \\
+\rowcolor{zebra}
+\textbf{Sequential Consistency} & All ops appear in some sequential order consistent per-process & Older CPUs, some distributed DBs \\
+\textbf{Causal Consistency} & Causally related ops seen in order; concurrent ops may differ & Amazon Dynamo-style \\
+\rowcolor{zebra}
+\textbf{Eventual Consistency} & Given no new writes, all replicas converge eventually & DNS, Cassandra, DynamoDB default \\
+\textbf{Read-your-writes} & You always see your own writes & Session-level guarantee \\
+\rowcolor{zebra}
+\textbf{Monotonic reads} & Once you read a value, you never read an older one & Prevents time-traveling reads \\
+\end{longtable}
+
+\textbf{ACID vs BASE:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1193}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4202}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4605}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ACID (SQL)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+BASE (NoSQL)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Stands for & Atomicity, Consistency, Isolation, Durability & Basically Available, Soft-state, Eventually consistent \\
+\rowcolor{zebra}
+Consistency & Strong (serializable) & Eventual \\
+Availability & Sacrificed during partition & Maintained \\
+\rowcolor{zebra}
+Performance & Lower throughput & Higher throughput \\
+Use case & Banking, inventory, orders & Social feeds, caches, analytics \\
+\end{longtable}
+
+\subsection{CAP Theorem}\label{cap-theorem}
+
+\textbf{Statement:} A distributed system can guarantee at most \textbf{two} of these three properties simultaneously:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{C}onsistency --- Every read sees the most recent write (all nodes agree on the same data)
+\item
+  \textbf{A}vailability --- Every request gets a non-error response (system is always up)
+\item
+  \textbf{P}artition tolerance --- System continues to operate despite network partition (lost messages)
+\end{itemize}
+
+\textbf{Key insight:} Network partitions \emph{will} happen in any real distributed system. Therefore, you \emph{must} tolerate partitions. The real choice is \textbf{CP vs AP}:
+
+\setcodelang{}
+
+\begin{verbatim}
+         Consistency
+              ▲
+         CP   │   CA
+              │   (not possible
+   ───────────┼───in distributed
+              │    systems)
+         AP   │
+              ▼
+Availability
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2597}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3135}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4268}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Choice
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Behavior during partition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CP} (Consistency + Partition) & Return error rather than stale data & HBase, Zookeeper, MongoDB (default config), Redis Cluster \\
+\rowcolor{zebra}
+\textbf{AP} (Availability + Partition) & Return stale data rather than error & Cassandra, DynamoDB, CouchDB, DNS \\
+\end{longtable}
+
+\textbf{Real-world nuance:} CAP is a spectrum, not binary. Modern systems use tunable consistency (Cassandra\textquotesingle s \texttt{QUORUM}, \texttt{ONE}, \texttt{ALL} read/write levels).
+
+\textbf{PACELC Extension:} Even when no partition:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PAC:} During Partition \(\rightarrow\) choose Availability or Consistency
+\item
+  \textbf{ELC:} Else \(\rightarrow\) Latency vs Consistency trade-off
+\end{itemize}
+
+\textbf{Interview takeaway:} \textbf{"P is always required. The real choice is CP vs AP. Pick based on business need: banking = CP, social feed = AP. Always mention PACELC for senior roles."}
+
+\subsection{Message Queues}\label{message-queues}
+
+\textbf{Definition:} Middleware that decouples producers (senders) and consumers (receivers) via an async buffer.
+
+\setcodelang{}
+
+\begin{verbatim}
+Producer ──→ ┌───────────────────┐ ──→ Consumer 1
+             │   Message Queue   │ ──→ Consumer 2
+Producer ──→ │  (persistent buf) │ ──→ Consumer 3
+             └───────────────────┘
+\end{verbatim}
+
+\textbf{Why use message queues?}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Decoupling:} Producer doesn\textquotesingle t need to know about consumers
+\item
+  \textbf{Load leveling:} Queue absorbs burst traffic, consumers process at their pace
+\item
+  \textbf{Resilience:} If consumer is down, messages wait in queue (not lost)
+\item
+  \textbf{Async processing:} Return response to user immediately; process in background
+\item
+  \textbf{Fan-out:} One message delivered to multiple consumers
+\end{enumerate}
+
+\textbf{Core concepts:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Producer:} Publishes messages
+\item
+  \textbf{Queue/Topic:} Buffer that holds messages
+\item
+  \textbf{Consumer/Subscriber:} Reads and processes messages
+\item
+  \textbf{ACK:} Consumer acknowledges message after processing; queue deletes it
+\item
+  \textbf{Dead Letter Queue (DLQ):} Messages that fail repeatedly go here for inspection
+\item
+  \textbf{At-least-once delivery:} Message may be delivered multiple times \(\rightarrow\) consumers must be \textbf{idempotent}
+\item
+  \textbf{At-most-once:} Message delivered 0 or 1 times \(\rightarrow\) no retries, possible loss
+\item
+  \textbf{Exactly-once:} Delivered exactly once \(\rightarrow\) hardest, expensive, often approximated
+\end{itemize}
+
+\subsubsection{Kafka vs RabbitMQ vs SQS}\label{kafka-vs-rabbitmq-vs-sqs}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1030}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3240}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3008}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2722}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Feature
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Apache Kafka}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{RabbitMQ}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{AWS SQS}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Type & Distributed log (pub/sub) & Message broker (queue) & Managed queue \\
+\rowcolor{zebra}
+Ordering & Partition-level ordering & FIFO queue variant & FIFO queue variant \\
+Retention & Configurable (days/weeks) & Until consumed & Up to 14 days \\
+\rowcolor{zebra}
+Replay & Yes (seek to offset) & No & No \\
+Throughput & Very high (millions/sec) & High (tens of thousands/sec) & High (managed) \\
+\rowcolor{zebra}
+Consumer model & Pull (consumer controls offset) & Push (broker pushes) & Pull \\
+Routing & Topics + partitions & Flexible routing (exchanges) & Simple queue \\
+\rowcolor{zebra}
+Durability & Persistent (disk) & Persistent or transient & Persistent \\
+Best for & Event streaming, log aggregation, high throughput & Complex routing, RPC patterns, task queues & Serverless, AWS-native, simple queues \\
+\rowcolor{zebra}
+Operations & Complex (Zookeeper, brokers) & Moderate & None (managed) \\
+\end{longtable}
+
+\textbf{Kafka deep dive:}
+\visualfigure{../../figures/05-system-design/04-kafka-partitions.pdf}{A topic is split into partitions for parallelism. Within a consumer group each partition is read by exactly one consumer; different groups read the same data independently.}
+
+\textbf{Kafka use cases:} Event sourcing, change data capture (CDC), log aggregation, stream processing, activity tracking.
+
+\subsection{Event-Driven Architecture}\label{event-driven-architecture}
+
+\textbf{Definition:} System where components communicate by emitting and reacting to events rather than direct calls.
+
+\setcodelang{}
+
+\begin{verbatim}
+Traditional (Request/Response):           Event-Driven:
+┌──────────┐   sync call   ┌──────────┐  ┌──────────┐  event  ┌───────────┐
+│ Service A│──────────────→│ Service B│  │ Service A│────────→│Event Bus  │
+└──────────┘←──────────────└──────────┘  └──────────┘         │(Kafka/SQS)│
+           response                                            └─────┬─────┘
+                                                                     │ event
+                                                              ┌──────┴──────┐
+                                                              ↓             ↓
+                                                         ┌────────┐  ┌────────┐
+                                                         │Svc B   │  │Svc C   │
+                                                         └────────┘  └────────┘
+\end{verbatim}
+
+\textbf{Patterns:}
+
+\textbf{Event Sourcing:} Store state changes as a sequence of events (not the current state).
+
+\begin{itemize}
+\tightlist
+\item
+  Audit log built in, can replay events to rebuild state
+\item
+  Example: Bank account balance = sum of all transactions
+\item
+  Cons: Querying current state requires replay, complex
+\end{itemize}
+
+\textbf{CQRS (Command Query Responsibility Segregation):} Separate read and write models.
+
+\setcodelang{}
+
+\begin{verbatim}
+Write Path:                          Read Path:
+Command → Write Service → DB         Query → Read Service → Read-optimized Store
+                        ↓ event                                    ↑ populated by
+                   Event Bus ──────────────────────────────────────┘
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Write DB optimized for writes (normalized)
+\item
+  Read DB optimized for reads (denormalized, cached)
+\item
+  Eventual consistency between write and read sides
+\end{itemize}
+
+\textbf{Saga Pattern:} Manage distributed transactions across microservices via events.
+
+\setcodelang{}
+
+\begin{verbatim}
+Choreography Saga:
+OrderService ─[OrderCreated]→ PaymentService ─[PaymentCompleted]→ ShippingService
+                              ─[PaymentFailed]→ OrderService (compensate)
+
+Orchestration Saga:
+Orchestrator → PaymentService → Orchestrator → ShippingService → ...
+\end{verbatim}
+
+\subsection{Microservices}\label{microservices}
+
+\textbf{Definition:} Architectural style where an application is built as a suite of small, independently deployable services, each owning its data and communicating via APIs.
+
+\subsubsection{Monolith vs Microservices}\label{monolith-vs-microservices}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1969}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3243}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4789}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Monolith
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Microservices
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Deployment & Single unit & Independent per service \\
+\rowcolor{zebra}
+Scaling & Scale whole app & Scale individual services \\
+Tech stack & Uniform & Polyglot (each service chooses) \\
+\rowcolor{zebra}
+Development & Simpler (one codebase) & Complex (distributed system) \\
+Testing & Easier (unit + integration) & Hard (contract tests, integration) \\
+\rowcolor{zebra}
+Failure isolation & Poor (one bug can crash all) & Good (blast radius contained) \\
+Data management & Shared DB (simpler) & DB per service (complex) \\
+\rowcolor{zebra}
+Latency & No network hops & Network calls between services \\
+Team org & Coupled, coordination needed & Autonomous teams (Conway\textquotesingle s Law) \\
+\rowcolor{zebra}
+When to use & Early stage, small team & Scale, large teams, clear domain boundaries \\
+\end{longtable}
+
+\textbf{Conway\textquotesingle s Law:} \emph{"Organizations design systems that mirror their communication structure."} Microservices enable team autonomy.
+
+\textbf{Microservices anti-patterns:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nano-services:} Too fine-grained \(\rightarrow\) too many network calls
+\item
+  \textbf{Distributed monolith:} Services tightly coupled, deployed together \(\rightarrow\) worst of both worlds
+\item
+  \textbf{Shared database:} Multiple services share same DB \(\rightarrow\) coupling through data
+\end{itemize}
+
+\subsubsection{Service Communication}\label{service-communication}
+
+\textbf{Synchronous:}
+
+\begin{itemize}
+\tightlist
+\item
+  REST (HTTP/JSON) --- simple, universal, stateless
+\item
+  gRPC (HTTP/2 + Protobuf) --- fast, typed, streaming, better for internal services
+\item
+  GraphQL --- flexible queries, avoid over/under-fetching
+\end{itemize}
+
+\textbf{Asynchronous:}
+
+\begin{itemize}
+\tightlist
+\item
+  Message queue (Kafka, SQS) --- decoupled, resilient
+\item
+  Event bus --- fan-out, event-driven
+\item
+  Webhooks --- callback when event occurs
+\end{itemize}
+
+\textbf{Sync vs Async:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4333}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Synchronous
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Asynchronous
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Coupling & Tight (caller waits) & Loose (fire and forget) \\
+\rowcolor{zebra}
+Latency & Direct (low if service is fast) & Added queue latency \\
+Availability & Caller fails if callee fails & Resilient (queue absorbs failure) \\
+\rowcolor{zebra}
+Complexity & Simple & Complex (eventual consistency, DLQ) \\
+Use case & Query for data, need immediate response & Long-running tasks, fan-out, decoupling \\
+\end{longtable}
+
+\textbf{Service Mesh (Istio, Linkerd):} Infrastructure layer handling service-to-service communication: mTLS, observability, load balancing, circuit breaking --- without changing application code.
+
+\textbf{Circuit Breaker Pattern:} Prevent cascading failures.
+
+\setcodelang{}
+
+\begin{verbatim}
+CLOSED (normal) → fails exceed threshold → OPEN (reject requests) →
+                                          timeout expires →
+HALF-OPEN (probe) → success → CLOSED  /  failure → OPEN
+\end{verbatim}
+
+\subsection{Rate Limiting}\label{rate-limiting}
+
+\textbf{Definition:} Control the rate of requests to prevent abuse, ensure fair use, and protect system resources.
+
+\textbf{Algorithms:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1413}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3319}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2440}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2828}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Token Bucket} & Tokens added at rate r, bucket capacity c. Request consumes token. & Allows bursts up to c. Smooth average. & Complex state \\
+\rowcolor{zebra}
+\textbf{Leaky Bucket} & Requests enter bucket, drain at fixed rate. Overflow dropped. & Smooth, constant output rate & Strict, no burst allowed \\
+\textbf{Fixed Window Counter} & Count requests in fixed time window (e.g., per minute). & Simple & Edge problem: 2x rate possible at window boundary \\
+\rowcolor{zebra}
+\textbf{Sliding Window Log} & Log timestamps of all requests, count in last N seconds. & Accurate, no edge problem & Memory: O(requests) \\
+\textbf{Sliding Window Counter} & Approximate using current + previous window counts, weighted. & Memory efficient, accurate & Approximation \\
+\end{longtable}
+
+\textbf{Where to implement:}
+
+\begin{itemize}
+\tightlist
+\item
+  Client-side (throttle outgoing requests)
+\item
+  API Gateway level (before hitting any service)
+\item
+  Per-service (business logic limits)
+\item
+  Per-user, per-IP, per-API-key, per-endpoint
+\end{itemize}
+
+\textbf{Redis implementation:} \texttt{INCR\ key} + \texttt{EXPIRE\ key\ 60} \(\rightarrow\) atomic counter per user per minute.
+
+\subsection{API Gateway}\label{api-gateway}
+
+\textbf{Definition:} Single entry point for all client requests. Handles cross-cutting concerns.
+
+\setcodelang{}
+
+\begin{verbatim}
+Mobile ─────────────────────────────────────────────────────┐
+Web ──────────────────────────────────────────────────────→ │
+Partner API ──────────────────────────────────────────────→ │ API Gateway
+                                                            │
+                                                 ┌──────────┴──────────┐
+                                                 │  Auth  │ Rate Limit │
+                                                 │  SSL   │ Routing    │
+                                                 │  Logs  │ Transform  │
+                                                 └────────────────────┘
+                                                          ↓
+                                              ┌───────────────────────┐
+                                              │ User Svc │ Order Svc  │
+                                              │ Search   │ Payment    │
+                                              └───────────────────────┘
+\end{verbatim}
+
+\textbf{API Gateway responsibilities:}
+
+\begin{itemize}
+\tightlist
+\item
+  Authentication/Authorization (JWT validation, OAuth)
+\item
+  Rate limiting and throttling
+\item
+  SSL/TLS termination
+\item
+  Request routing (to correct microservice)
+\item
+  Load balancing
+\item
+  Request/response transformation
+\item
+  Logging, metrics, tracing
+\item
+  Caching (edge caching)
+\item
+  API versioning
+\end{itemize}
+
+\textbf{Examples:} AWS API Gateway, Kong, Nginx, Envoy, Traefik
+
+\subsection{Database Choice: SQL vs NoSQL}\label{database-choice-sql-vs-nosql}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1591}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3977}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4432}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{SQL (Relational)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{NoSQL}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Data model & Tables, rows, columns & Document, key-value, wide-column, graph \\
+\rowcolor{zebra}
+Schema & Fixed, defined upfront & Flexible, schema-less \\
+Transactions & ACID, multi-row & BASE, limited (improving) \\
+\rowcolor{zebra}
+Joins & Yes, powerful & No (denormalize or application-level) \\
+Scaling & Vertical (primarily), read replicas & Horizontal (built-in) \\
+\rowcolor{zebra}
+Query language & SQL (standardized) & Proprietary APIs \\
+Consistency & Strong & Eventual (usually) \\
+\rowcolor{zebra}
+Use cases & E-commerce, banking, ERP & Social feeds, real-time analytics, IoT \\
+Examples & PostgreSQL, MySQL, Oracle & Cassandra, MongoDB, DynamoDB, Redis \\
+\end{longtable}
+
+\textbf{NoSQL subtypes:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0894}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2844}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3580}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2682}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Data model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Key-Value} & key \(\rightarrow\) value & Caching, sessions, leaderboards & Redis, DynamoDB, Memcached \\
+\rowcolor{zebra}
+\textbf{Document} & key \(\rightarrow\) JSON doc & User profiles, catalogs, CMS & MongoDB, CouchDB, Firestore \\
+\textbf{Wide-Column} & row key \(\rightarrow\) dynamic columns & Time series, IoT, event logs & Cassandra, HBase, BigTable \\
+\rowcolor{zebra}
+\textbf{Graph} & Nodes + edges & Social networks, recommendations, fraud detection & Neo4j, Amazon Neptune \\
+\textbf{Time Series} & Timestamp + metrics & Monitoring, metrics, IoT & InfluxDB, TimescaleDB, Prometheus \\
+\end{longtable}
+
+\textbf{Interview takeaway:} \textbf{Start with SQL. Use NoSQL when you need: horizontal scale, flexible schema, specific access patterns SQL handles poorly (graph traversal, time series). Don\textquotesingle t use NoSQL "because it\textquotesingle s faster" --- profile first.}
+
+\subsection{Idempotency}\label{idempotency}
+
+\textbf{Definition:} An operation is idempotent if applying it multiple times has the same effect as applying it once.
+
+\setcodelang{}
+
+\begin{verbatim}
+Idempotent:      PUT /users/123  { name: "Alice" }  → same result each time
+Not idempotent:  POST /orders    (creates new order each time)
+Not idempotent:  counter++       (increments each call)
+\end{verbatim}
+
+\textbf{Why it matters:} Networks are unreliable. Requests may be retried. If your operation isn\textquotesingle t idempotent, retries cause duplicate side effects (double charges, duplicate records).
+
+\textbf{Implementation patterns:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Idempotency key:} Client sends unique key with request. Server stores key \(\rightarrow\) result mapping. On retry, return stored result.
+\item
+  \textbf{Natural idempotency:} Use PUT instead of POST for upserts. Use idempotent math (set value, not increment).
+\item
+  \textbf{Deduplication window:} Store recently processed message IDs in Redis with TTL. Reject duplicates.
+\end{itemize}
+
+\textbf{HTTP method idempotency:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1579}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2632}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5789}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Idempotent
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Safe (no side effects)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GET & Yes & Yes \\
+\rowcolor{zebra}
+HEAD & Yes & Yes \\
+PUT & Yes & No \\
+\rowcolor{zebra}
+DELETE & Yes & No \\
+POST & No & No \\
+\rowcolor{zebra}
+PATCH & No & No \\
+\end{longtable}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{Typical Scalable Web Architecture}\label{typical-scalable-web-architecture}
+
+\visualfigure{../../figures/05-system-design/01-web-architecture.pdf}{The canonical pattern: stateless app servers behind a load balancer, a CDN for static edge content, a cache to absorb reads, and a primary DB with read replicas.}
+
+\setcodelang{}
+
+\begin{verbatim}
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         INTERNET                                            │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                              ┌────────▼────────┐
+                              │      DNS         │
+                              └────────┬────────┘
+                                       │
+                 ┌─────────────────────▼──────────────────────┐
+                 │              CDN (CloudFront/Akamai)        │
+                 │     Static: images, JS, CSS, videos         │
+                 └─────────────────────┬──────────────────────┘
+                                       │ (cache miss → origin)
+                              ┌────────▼────────┐
+                              │   API Gateway    │
+                              │ Auth, Rate Limit │
+                              │ SSL Termination  │
+                              └────────┬────────┘
+                                       │
+                     ┌─────────────────▼─────────────────┐
+                     │         Load Balancer (L7)         │
+                     │      (Nginx / AWS ALB / HAProxy)   │
+                     └───────────┬──────────┬────────────┘
+                                 │          │
+                    ┌────────────▼──┐  ┌────▼─────────────┐
+                    │  App Server 1 │  │  App Server 2     │
+                    │  (stateless)  │  │  (stateless)      │
+                    └──────┬────────┘  └────────┬──────────┘
+                           │                    │
+          ┌────────────────▼────────────────────▼────────────────────┐
+          │                    Cache Layer                            │
+          │              (Redis Cluster / Memcached)                  │
+          │          Sessions, hot data, computed results             │
+          └────────────────────────┬──────────────────────────────────┘
+                                   │ (cache miss)
+          ┌────────────────────────▼──────────────────────────────────┐
+          │                 Database Layer                            │
+          │   Primary (writes)        Replicas (reads, 2+)           │
+          │   ┌──────────────┐        ┌──────────┐  ┌──────────┐    │
+          │   │  Primary DB  │──────→ │ Replica 1│  │ Replica 2│    │
+          │   │ (PostgreSQL) │        └──────────┘  └──────────┘    │
+          │   └──────────────┘                                       │
+          └───────────────────────────────────────────────────────────┘
+                           │
+          ┌────────────────▼──────────────────────────────────────────┐
+          │                Message Queue (Kafka / SQS)                │
+          │   OrderCreated | UserSignedUp | PaymentProcessed          │
+          └────────────────────────┬──────────────────────────────────┘
+                                   │
+               ┌───────────────────▼───────────────────┐
+               │              Workers                  │
+               │  Email   │  Analytics │  Notifications │
+               └────────────────────────────────────────┘
+\end{verbatim}
+
+\subsection{Sharding Architecture}\label{sharding-architecture}
+
+\setcodelang{}
+
+\begin{verbatim}
+Application Layer
+       │
+       ├── hash(user_id) % 3 = 0 ──→ ┌──────────┐
+       │                              │ Shard 0  │ users 0, 3, 6, 9...
+       │                              └──────────┘
+       ├── hash(user_id) % 3 = 1 ──→ ┌──────────┐
+       │                              │ Shard 1  │ users 1, 4, 7, 10...
+       │                              └──────────┘
+       └── hash(user_id) % 3 = 2 ──→ ┌──────────┐
+                                      │ Shard 2  │ users 2, 5, 8, 11...
+                                      └──────────┘
+\end{verbatim}
+
+\subsection{Leader-Follower Replication}\label{leader-follower-replication}
+
+\setcodelang{}
+
+\begin{verbatim}
+                WRITES                          READS
+                  │                        ┌──────────┐
+                  ▼                        │          │
+         ┌────────────────┐                ▼          ▼
+         │     Leader     │──replication→ Follower1  Follower2
+         │   (Primary)    │──replication→            Follower3
+         └────────────────┘
+                │
+         Failover: Follower1 elected Leader if Primary fails
+\end{verbatim}
+
+\subsection{Caching Patterns}\label{caching-patterns}
+
+\visualfigure{../../figures/05-system-design/03-caching-patterns.pdf}{The four write/read cache patterns trade freshness, latency and durability. Cache-aside is the default; write-through favours consistency; write-back favours write latency.}
+
+\subsection{Message Queue Flow}\label{message-queue-flow}
+
+\setcodelang{}
+
+\begin{verbatim}
+                                    ┌─────────────────────────────┐
+Order Service                       │       Message Queue          │
+(Producer)                          │                              │
+    │                               │  ┌───┐ ┌───┐ ┌───┐ ┌───┐  │
+    │──[OrderCreated event]────────→│  │ 4 │ │ 3 │ │ 2 │ │ 1 │  │
+    │                               │  └───┘ └───┘ └───┘ └───┘  │
+    │                               │     (messages buffered)     │
+    │                               └──────┬────────┬─────────────┘
+    │                                      │        │
+    │                              ┌───────▼──┐ ┌───▼──────┐
+    │                              │ Email    │ │Analytics │
+    │                              │ Worker   │ │ Worker   │
+    │                              │(Consumer)│ │(Consumer)│
+    │                              └──────────┘ └──────────┘
+    │                              ACK after processing → message deleted
+\end{verbatim}
+
+\section{Back-of-Envelope Estimation Cheatsheet}\label{back-of-envelope-estimation-cheatsheet}
+
+\subsection{Latency Numbers Every Programmer Should Know}\label{latency-numbers-every-programmer-should-know}
+
+\setcodelang{}
+
+\begin{verbatim}
+Operation                              Latency         Notes
+─────────────────────────────────────────────────────────────────────
+L1 cache reference                       0.5 ns
+Branch mispredict                        5   ns
+L2 cache reference                       7   ns        14x L1
+Mutex lock/unlock                       25   ns
+Main memory reference                  100   ns        20x L2, 200x L1
+Compress 1K bytes with Zippy         3,000   ns   (3 μs)
+Send 1K bytes over 1 Gbps network   10,000   ns  (10 μs)
+Read 4K randomly from SSD           150,000   ns (150 μs)  ~1GB/s SSD
+Read 1 MB sequentially from memory  250,000   ns (250 μs)
+Round trip within same datacenter   500,000   ns (0.5 ms)
+Read 1 MB sequentially from SSD   1,000,000   ns   (1 ms)   4x memory
+Disk seek                          10,000,000   ns  (10 ms)
+Read 1 MB sequentially from disk   20,000,000   ns  (20 ms)  80x memory
+Send packet CA → Netherlands → CA 150,000,000   ns (150 ms)
+─────────────────────────────────────────────────────────────────────
+\end{verbatim}
+
+\textbf{Key takeaways from latency numbers:}
+
+\begin{itemize}
+\tightlist
+\item
+  Memory is \textbf{200x faster} than random disk
+\item
+  SSD is \textbf{10-30x faster} than spinning disk
+\item
+  Same-DC call: \textasciitilde0.5ms; Cross-continent: \textasciitilde150ms
+\item
+  \textbf{Cache hit (\textasciitilde0.5ms) vs DB query (\textasciitilde1-10ms) = 2-20x difference}
+\end{itemize}
+
+\subsection{Powers of 2}\label{powers-of-2}
+
+\setcodelang{}
+
+\begin{verbatim}
+Power   Exact Value    Approx    Storage name
+─────────────────────────────────────────────
+10         1,024       1 thousand    1 KB
+20     1,048,576       1 million     1 MB
+30  1,073,741,824      1 billion     1 GB
+32  4,294,967,296      4 billion     (IPv4 space)
+40                     1 trillion    1 TB
+50                     1 quadrillion 1 PB
+\end{verbatim}
+
+\subsection{QPS / Storage Estimation Reference}\label{qps--storage-estimation-reference}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Time conversions (memorize):}
+  \DecValTok{1}\NormalTok{ day    }\OperatorTok{=} \DecValTok{86}\NormalTok{,}\DecValTok{400}\NormalTok{ seconds ≈ }\DecValTok{10}\OperatorTok{\^{}}\DecValTok{5}\NormalTok{ seconds}
+  \DecValTok{1}\NormalTok{ month  }\OperatorTok{=} \FloatTok{2.5}\ErrorTok{M}\NormalTok{ seconds}
+  \DecValTok{1}\NormalTok{ year   }\OperatorTok{=} \DecValTok{32}\ErrorTok{M}\NormalTok{ seconds ≈ }\DecValTok{3}\NormalTok{×}\DecValTok{10}\OperatorTok{\^{}}\DecValTok{7}
+
+\NormalTok{QPS estimation formula:}
+\NormalTok{  QPS }\OperatorTok{=}\NormalTok{ (Users × Actions per User per Day) }\OperatorTok{/} \DecValTok{86}\NormalTok{,}\DecValTok{400}
+
+\NormalTok{Storage estimation formula:}
+\NormalTok{  Storage}\OperatorTok{/}\NormalTok{day }\OperatorTok{=}\NormalTok{ writes}\OperatorTok{/}\NormalTok{sec × }\BuiltInTok{bytes}\OperatorTok{/}\NormalTok{write × }\DecValTok{86}\NormalTok{,}\DecValTok{400}
+\NormalTok{  Storage}\OperatorTok{/}\NormalTok{year }\OperatorTok{=}\NormalTok{ Storage}\OperatorTok{/}\NormalTok{day × }\DecValTok{365}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Common System Scale Reference}\label{common-system-scale-reference}
+
+\setcodelang{}
+
+\begin{verbatim}
+System                DAU      Peak QPS    Storage/day
+──────────────────────────────────────────────────────
+Twitter               200M     ~350K read  ~25GB (tweets)
+Instagram             500M     ~500K read  ~100TB (media)
+YouTube               2B       ~1M read    ~3PB (video)
+WhatsApp              2B       ~10M msg    ~100TB
+Uber (peak)           5M trips ~100K read  ~10GB
+Netflix               200M     ~500K read  ~1PB (content stored)
+\end{verbatim}
+
+\subsection{Bandwidth Math}\label{bandwidth-math}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Network bandwidth:}
+  \DecValTok{1}\NormalTok{ Gbps  }\OperatorTok{=} \DecValTok{125}\NormalTok{ MB}\OperatorTok{/}\NormalTok{s}
+  \DecValTok{10}\NormalTok{ Gbps }\OperatorTok{=} \FloatTok{1.25}\NormalTok{ GB}\OperatorTok{/}\NormalTok{s}
+
+\NormalTok{SSD sequential: }\OperatorTok{\textasciitilde{}}\DecValTok{500}\NormalTok{ MB}\OperatorTok{/}\NormalTok{s – }\DecValTok{3}\NormalTok{ GB}\OperatorTok{/}\NormalTok{s}
+\NormalTok{Memory sequential: }\OperatorTok{\textasciitilde{}}\DecValTok{10}\OperatorTok{{-}}\DecValTok{50}\NormalTok{ GB}\OperatorTok{/}\NormalTok{s}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\subsection{Design TinyURL}\label{design-tinyurl}
+
+\textbf{Core features:} Shorten URLs, redirect on click, optional custom alias, analytics.
+
+\textbf{Estimation:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Write: 100M URLs/day → ~1,200/sec
+Read: 10B redirects/day → ~115,000/sec (100:1 read:write)
+Storage: 100M × 500 bytes = 50 GB/day
+\end{verbatim}
+
+\textbf{API:}
+
+\setcodelang{}
+
+\begin{verbatim}
+POST /shorten  { long_url, custom_alias? } → { short_url }
+GET  /{code}   → 302 redirect to long_url
+\end{verbatim}
+
+\textbf{Data model:}
+
+\setcodelang{}
+
+\begin{verbatim}
+URLs table:
+  code        VARCHAR(7)  PK  (Base62: a-z, A-Z, 0-9 → 62^7 = 3.5T combos)
+  long_url    TEXT
+  user_id     INT
+  created_at  TIMESTAMP
+  expires_at  TIMESTAMP
+\end{verbatim}
+
+\textbf{Code generation approaches:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Hash (MD5/SHA256) + take 7 chars:} Collision risk, need to handle
+\item
+  \textbf{Counter + Base62 encode:} Simple, predictable (guessable), need distributed counter
+\item
+  \textbf{Pre-generated pool:} Worker pre-generates codes into DB, pick one on create. No collision.
+\end{enumerate}
+
+\textbf{Architecture:}
+
+\setcodelang{}
+
+\begin{verbatim}
+User → API Gateway → App Servers → Cache (Redis: code→URL)
+                                 ↓ (miss)
+                              PostgreSQL (with read replicas)
+\end{verbatim}
+
+\textbf{Redirect flow:} GET /\{code\} \(\rightarrow\) check Redis \(\rightarrow\) hit: return URL \(\rightarrow\) miss: DB query \(\rightarrow\) cache, return URL \(\rightarrow\) 302 redirect.
+
+\textbf{Interview deep-dives:} Custom domains, expiry, analytics (click count, geo), abuse prevention (block malicious URLs).
+
+\subsection{Design a News Feed (Instagram/Twitter)}\label{design-a-news-feed-instagramtwitter}
+
+\textbf{Core features:} Post content, follow users, see home feed (posts from followed users, reverse-chron or ranked).
+
+\textbf{The core problem:} Given 500M DAU, user follows 200 people each, each posts 1x/day \(\rightarrow\) 200 posts to potentially insert per user per day \(\rightarrow\) 500M \(\times\) 200 = 100B feed entries/day.
+
+\textbf{Two approaches to feed generation:}
+
+\textbf{Fan-out on Write (Push model):}
+
+\setcodelang{}
+
+\begin{verbatim}
+User posts → App Server → for each follower → write tweet to follower's feed cache
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Reads are O(1) (just read pre-built feed)
+\item
+  Write amplification: celebrity with 50M followers \(\rightarrow\) 50M writes per tweet
+\item
+  \textbf{Good for:} Most users (low follower count)
+\end{itemize}
+
+\textbf{Fan-out on Read (Pull model):}
+
+\setcodelang{}
+
+\begin{verbatim}
+User requests feed → App Server → get following list → merge N timelines → sort → return
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  No write amplification
+\item
+  Read is expensive (must merge N sorted lists)
+\item
+  \textbf{Good for:} Celebrities
+\end{itemize}
+
+\textbf{Hybrid approach (Twitter\textquotesingle s solution):}
+
+\begin{itemize}
+\tightlist
+\item
+  For normal users: push model
+\item
+  For celebrities: pull model (inject celebrity tweets at read time)
+\item
+  Threshold: \textasciitilde10K followers \(\rightarrow\) switch to pull
+\end{itemize}
+
+\textbf{Feed ranking:} Not pure reverse-chron anymore. ML models score posts by:
+
+\begin{itemize}
+\tightlist
+\item
+  Engagement prediction (like/comment/share probability)
+\item
+  Recency
+\item
+  User relationships (close friends rank higher)
+\item
+  Diversity (avoid same-author runs)
+\end{itemize}
+
+\subsection{Design a Rate Limiter}\label{design-a-rate-limiter}
+
+\textbf{Token bucket in Redis:}
+
+\setcodelang{}
+
+\begin{verbatim}
+GET user:123:tokens  → current tokens
+If tokens >= 1:
+  DECR user:123:tokens
+  Allow request
+Else:
+  Rate limit response (429)
+
+Background refill job: every second, INCRBY tokens up to max
+\end{verbatim}
+
+\textbf{Sliding window in Redis:}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{key }\OperatorTok{=} \StringTok{"ratelimit:user:123"}
+\NormalTok{now }\OperatorTok{=}\NormalTok{ current\_timestamp\_ms}
+\NormalTok{window }\OperatorTok{=} \DecValTok{60000}  \CommentTok{\# 1 minute}
+
+\NormalTok{ZREMRANGEBYSCORE key }\DecValTok{0}\NormalTok{ (now }\OperatorTok{{-}}\NormalTok{ window)     }\CommentTok{\# remove old entries}
+\NormalTok{ZADD key now now                           }\CommentTok{\# add current request}
+\NormalTok{count }\OperatorTok{=}\NormalTok{ ZCARD key}
+\NormalTok{EXPIRE key window}\OperatorTok{/}\DecValTok{1000}
+
+\NormalTok{If count }\OperatorTok{\textgreater{}}\NormalTok{ limit: reject}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One growing city --- every concept is a road, a shop, or a depot in the same metropolis.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1294}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8706}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Real-Life Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Load Balancer} & The traffic officer at the city\textquotesingle s main junction, waving each car toward the least-busy road so no single lane grinds to a halt \\
+\rowcolor{zebra}
+\textbf{Cache} & The corner shop two streets from your house that stocks the twenty items locals buy every day --- you skip the forty-minute drive to the distant warehouse (the DB) for a pint of milk \\
+\textbf{CDN} & Neighbourhood mini-marts stocked in every district --- nobody drives downtown for everyday goods; the nearest shelf serves you in seconds \\
+\rowcolor{zebra}
+\textbf{Sharding} & Splitting the city into postal districts (North, East, South, West), each served by its own depot; a parcel for the North never touches the South depot \\
+\textbf{Replication} & Copies of the city\textquotesingle s land records kept in every district town hall --- the central hall (leader) stamps every deed first, then branch halls (followers) update their copies so locals can query without crossing town \\
+\rowcolor{zebra}
+\textbf{CAP Theorem} & When the bridge linking the East and West districts collapses (partition), the district bank either closes its West branch rather than risk stale balances (consistency) or keeps the branch open on yesterday\textquotesingle s ledger (availability) --- it cannot do both \\
+\textbf{Circuit Breaker} & The district substation that trips automatically when the grid is overloaded, cutting power to protect the wiring; after a safe interval it resets and reconnects --- rather than letting the whole city burn \\
+\rowcolor{zebra}
+\textbf{Message Queue} & The city\textquotesingle s pneumatic-tube dispatch system: a business drops a sealed canister (message) into the tube; the central sorting office holds it until the right depot (consumer) is ready to collect --- the sender doesn\textquotesingle t wait at the tube \\
+\textbf{Rate Limiting} & The toll booth on the city highway: each driver gets a book of ten toll tokens per day; once the book is empty the barrier stays down, keeping the road from seizing up \\
+\rowcolor{zebra}
+\textbf{Consistent Hashing} & Addresses along the city ring-road: depots are spaced around the loop, and deliveries go to the nearest clockwise depot. Open a new depot and only the handful of deliveries just past it reroute --- the rest of the city carries on unchanged \\
+\textbf{Leader-Follower} & The central city records office (leader) is the only place allowed to register a new deed; district town halls (followers) replicate every entry so residents can look up records locally without queuing downtown \\
+\rowcolor{zebra}
+\textbf{Event-Driven Arch} & The city\textquotesingle s emergency-broadcast loudspeaker: when a water main bursts (event), the broadcast fires once and every crew --- plumbers, traffic wardens, road-repair gangs --- reacts independently without waiting for a dispatcher to call each one \\
+\textbf{Microservices} & The city\textquotesingle s specialist trade streets --- the electricians\textquotesingle{} quarter, the glaziers\textquotesingle{} row, the plumbers\textquotesingle{} lane --- each guild operates its own yard, hires its own workers, and a fire in one yard doesn\textquotesingle t shut down the others \\
+\rowcolor{zebra}
+\textbf{Write-through Cache} & The corner-shop owner who updates the shelf tag (cache) and the stock ledger at the depot (DB) in the same stroke --- both records stay in sync the moment goods arrive \\
+\textbf{Write-back Cache} & The shop assistant who scribbles each sale on a notepad (cache) and submits a tally to the depot ledger (DB) only at end of day --- faster for customers, but a flooded shop loses the day\textquotesingle s notes before they\textquotesingle re filed \\
+\rowcolor{zebra}
+\textbf{Idempotency} & The pedestrian crossing button at a city intersection --- pressing it ten times is identical to pressing it once; the crossing changes when it\textquotesingle s ready, not once per press \\
+\textbf{Eventual Consistency} & The city\textquotesingle s notice-board network: a planning decision is pinned at the central hall first; within hours every district board carries the same notice --- briefly, a resident in the outer suburbs hasn\textquotesingle t seen it yet, but they will \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\textbf{CAP Theorem:} "\textbf{C}onsistency is \textbf{A}lways \textbf{P}artial in distributed systems" --- you must pick between C and A when P happens.
+
+\textbf{ACID vs BASE:} "\textbf{ACID} is for bankers (strict), \textbf{BASE} is for beaches (relaxed)."
+
+\textbf{Caching strategies (CWWW):} "\textbf{C}ache-aside, \textbf{W}rite-through, \textbf{W}rite-back, \textbf{W}rite-around" --- remember by water volume: Cache-aside fills only on demand; Write-through fills both pools simultaneously; Write-back fills fast pool first, slow pool later; Write-around fills slow pool first.
+
+\textbf{LRU vs LFU:} "\textbf{R}ecently used = \textbf{R}elax (evict old) vs \textbf{F}requently used = \textbf{F}avor (keep popular)."
+
+\textbf{Sharding decision rule: "C-A-P-S"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{C}apacity exceeded? Consider sharding
+\item
+  \textbf{A}ccess patterns known? Choose shard key accordingly
+\item
+  \textbf{P}artition tolerance: now you have it, and all its complexity
+\item
+  \textbf{S}harding is a last resort --- exhaust other options first
+\end{itemize}
+
+\textbf{Load balancing algorithms: "RLWIH"} (Round, Least-conn, Weighted, IP-hash, Hash) --- "Really Large Websites Implement Hash-routing."
+
+\textbf{System design interview steps: "RRADE-BD"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{R}equirements
+\item
+  \textbf{R}ough estimation
+\item
+  \textbf{A}PI design
+\item
+  \textbf{D}ata model
+\item
+  \textbf{E}ntity relationships
+\item
+  \textbf{B}ig-picture architecture
+\item
+  \textbf{D}ive deep + bottlenecks
+\end{itemize}
+
+\textbf{SQL vs NoSQL rule of thumb:} "If you need \textbf{J}oins, \textbf{T}ransactions, or \textbf{S}chema \(\rightarrow\) \textbf{SQL} (\textbf{JTS = SQL}). If you need \textbf{S}cale, \textbf{F}lexibility, or \textbf{S}pecial access patterns \(\rightarrow\) \textbf{NoSQL} (\textbf{SFS = NoSQL})."
+
+\textbf{Replication sync vs async:} "\textbf{S}ync = \textbf{S}afe (no data loss, slower); \textbf{A}sync = \textbf{A}gile (faster, risk data loss)."
+
+\textbf{Message queue choices:} "\textbf{K}afka for \textbf{K}ilo-messages-per-second streaming; \textbf{R}abbitMQ for \textbf{R}outing complexity; \textbf{S}QS for \textbf{S}erverless simplicity."
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{1. Design a URL Shortener (TinyURL / bit.ly)}\label{1-design-a-url-shortener-tinyurl--bitly}
+
+\textbf{Approach:} Hash vs counter, Base62 encoding, DB schema, redirect (301 vs 302), analytics, expiry, custom aliases.
+
+\textbf{Key decisions:}
+
+\begin{itemize}
+\tightlist
+\item
+  301 (permanent) redirect \(\rightarrow\) browser caches, reduces future load but no analytics
+\item
+  302 (temporary) redirect \(\rightarrow\) analytics works but more server load
+\end{itemize}
+
+\textbf{Follow-ups:} Rate limiting per user, analytics dashboard, abuse detection, multi-DC.
+
+\subsection{2. Design Twitter / Social Media Feed}\label{2-design-twitter--social-media-feed}
+
+\textbf{Approach:} Fan-out on write vs read, hybrid model for celebrities, feed ranking, post storage, media CDN.
+
+\textbf{Key decisions:} Push vs pull trade-off at what follower threshold; eventual consistency acceptable for feeds.
+
+\textbf{Follow-ups:} Real-time updates (WebSocket/SSE), trending topics, notification system, search.
+
+\subsection{3. Design a Chat System (WhatsApp / Slack)}\label{3-design-a-chat-system-whatsapp--slack}
+
+\textbf{Approach:} WebSocket for real-time bidirectional; message storage (Cassandra: write-heavy, time-ordered); delivery receipts; online presence; group chat fan-out.
+
+\textbf{Key decisions:} Server-side fan-out vs client-side; push notifications for offline users (APNs/FCM).
+
+\textbf{Follow-ups:} End-to-end encryption, media sharing, message search, read receipts at scale.
+
+\subsection{4. Design YouTube / Video Streaming}\label{4-design-youtube--video-streaming}
+
+\textbf{Approach:} Video upload pipeline (chunked upload \(\rightarrow\) encoding workers \(\rightarrow\) CDN); streaming (HLS/DASH adaptive bitrate); metadata DB; recommendation system.
+
+\textbf{Key decisions:} Encoding at multiple resolutions in parallel; CDN PoPs for low-latency streaming.
+
+\textbf{Follow-ups:} Live streaming, comments, subscription notifications, copyright detection.
+
+\subsection{5. Design Uber / Ride-Sharing}\label{5-design-uber--ride-sharing}
+
+\textbf{Approach:} Real-time driver location (WebSocket, update every 4s); geospatial index (geohash/quadtree); matching algorithm; surge pricing; trip state machine.
+
+\textbf{Key decisions:} How to efficiently query "drivers near user" (geohash range query); update frequency vs battery drain.
+
+\textbf{Follow-ups:} ETA calculation, route optimization, driver-side vs rider-side consistency, payment processing.
+
+\subsection{6. Design a Rate Limiter}\label{6-design-a-rate-limiter}
+
+\textbf{Approach:} Token bucket vs sliding window; Redis atomic operations; per-user / per-IP / per-API-key; distributed rate limiting across multiple API servers.
+
+\textbf{Key decisions:} Sliding window log (accurate, more memory) vs sliding window counter (approximate, less memory).
+
+\textbf{Follow-ups:} Rate limit headers (X-RateLimit-Remaining), different limits per tier, bypass for internal services.
+
+\subsection{7. Design a Distributed Cache (Redis)}\label{7-design-a-distributed-cache-redis}
+
+\textbf{Approach:} Cache cluster (sharding via consistent hashing); eviction policies; replication for HA; persistence options (AOF vs RDB); pub/sub for invalidation.
+
+\textbf{Key decisions:} Cache-aside vs write-through; TTL strategy; cache warming on startup.
+
+\textbf{Follow-ups:} Cache stampede prevention, multi-region cache consistency, Redis Sentinel vs Cluster.
+
+\subsection{8. Design a Search System (type-ahead / full-text)}\label{8-design-a-search-system-type-ahead--full-text}
+
+\textbf{Approach:} Trie for autocomplete (in-memory or stored); Elasticsearch for full-text; inverted index; ranking (TF-IDF, BM25, ML re-ranking); real-time indexing pipeline.
+
+\textbf{Key decisions:} Trie vs DB prefix query for autocomplete; sharding Elasticsearch by index/shard.
+
+\textbf{Follow-ups:} Personalized results, spell correction, synonyms, content freshness.
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\subsection{Trade-offs Senior Engineers Must Articulate}\label{trade-offs-senior-engineers-must-articulate}
+
+\textbf{Consistency vs Availability:}
+
+\begin{quote}
+"In our checkout flow, we use strong consistency for inventory (can\textquotesingle t oversell) but eventual consistency for product recommendations. The choice is driven by business impact of inconsistency."
+\end{quote}
+
+\textbf{Sync vs Async:}
+
+\begin{quote}
+"Payment processing is synchronous because the user needs confirmation. Email notification is async because 100ms delay is acceptable and we can\textquotesingle t block payment on email infrastructure."
+\end{quote}
+
+\textbf{Normalization vs Denormalization:}
+
+\begin{quote}
+"We denormalize the author name into the post object to avoid a JOIN on every feed read. The cost is: on author name change, we must update every post. Since name changes are rare and feed reads are billions/day, this trade-off is worth it."
+\end{quote}
+
+\subsection{Failure Modes}\label{failure-modes}
+
+\textbf{Cascading failures:} Service A calls Service B, which is slow \(\rightarrow\) A\textquotesingle s thread pool fills waiting \(\rightarrow\) A becomes slow \(\rightarrow\) upstream C fills up \(\rightarrow\) full outage.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Solution:} Timeouts + circuit breakers + bulkheads (isolate thread pools per downstream)
+\end{itemize}
+
+\textbf{Hot spots:} User ID 1 = Justin Bieber with 100M followers. All writes fan out to shard holding his followers.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Solution:} Detect hot keys, route to dedicated shard/cache, use virtual nodes in consistent hashing
+\end{itemize}
+
+\textbf{Split-brain:} Network partition \(\rightarrow\) both sides elect a new leader \(\rightarrow\) two leaders accepting writes \(\rightarrow\) data divergence.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Solution:} Quorum (majority must agree), fencing tokens, STONITH
+\end{itemize}
+
+\textbf{Clock skew:} Distributed system timestamps can\textquotesingle t be trusted for ordering.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Solution:} Logical clocks (Lamport clocks), vector clocks, Google TrueTime (atomic + GPS clocks with bounded uncertainty)
+\end{itemize}
+
+\subsection{Back-Pressure}\label{back-pressure}
+
+\textbf{Problem:} Producers emit faster than consumers can process \(\rightarrow\) queue grows unbounded \(\rightarrow\) OOM crash.
+
+\textbf{Solutions:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Push back to producer:} HTTP 503, return RateLimit headers
+\item
+  \textbf{Drop oldest messages:} For non-critical streams (metrics)
+\item
+  \textbf{Prioritize queues:} Critical messages bypass backlogged queues
+\item
+  \textbf{Scale consumers:} Auto-scale consumer group based on queue depth
+\item
+  \textbf{Circuit breaker at producer:} Stop producing if consumer lag exceeds threshold
+\end{enumerate}
+
+\textbf{In Kafka:} Monitor consumer lag. Alert when lag \textgreater{} threshold. Auto-scale consumer group.
+
+\subsection{Write Amplification in Social Systems}\label{write-amplification-in-social-systems}
+
+\textbf{The math:} 100M users follow 200 people. When a celebrity (10M followers) posts:
+
+\begin{itemize}
+\tightlist
+\item
+  Fan-out on write: 10M DB writes
+\item
+  At 1 post/hour: 10M \(\times\) 24 = 240M writes/day from one user
+\end{itemize}
+
+\textbf{Solutions:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Hybrid: fan-out-on-write for normal users, fan-out-on-read for celebrities
+\item
+  Lazy fan-out: pre-populate top N followers\textquotesingle{} caches, rest pull on demand
+\item
+  Tiered storage: hot followers in Redis, cold followers in Cassandra
+\end{enumerate}
+
+\subsection{Observability at Scale}\label{observability-at-scale}
+
+\textbf{Three pillars:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Metrics:} QPS, latency (p50/p95/p99), error rate, saturation \(\rightarrow\) Prometheus + Grafana
+\item
+  \textbf{Logs:} Structured JSON logs \(\rightarrow\) Elasticsearch/Splunk
+\item
+  \textbf{Traces:} Distributed request tracing \(\rightarrow\) Jaeger/Zipkin/AWS X-Ray
+\end{itemize}
+
+\textbf{SLO vs SLA vs SLI:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SLI} (Indicator): Actual measurement (latency p99 = 50ms)
+\item
+  \textbf{SLO} (Objective): Target you set (p99 \textless{} 100ms)
+\item
+  \textbf{SLA} (Agreement): Contract with customer (p99 \textless{} 200ms, else credit)
+\end{itemize}
+
+\textbf{Error budget:} If SLO = 99.9\% availability \(\rightarrow\) 43.8 min/month downtime budget. Spend it on risky deploys.
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\subsection{1. Jumping to solution before requirements}\label{1-jumping-to-solution-before-requirements}
+
+\textbf{Wrong:} "OK so we\textquotesingle ll use Kafka and Cassandra and microservices---"
+\textbf{Right:} "Before I design anything, let me make sure I understand the scale and requirements. Can I ask a few questions?"
+
+\subsection{2. Over-engineering from the start}\label{2-over-engineering-from-the-start}
+
+\textbf{Wrong:} Proposing 15 microservices, multi-region, event sourcing + CQRS for a URL shortener.
+\textbf{Right:} Start simple (monolith + single DB), then scale only the bottlenecks you identify.
+
+\subsection{3. Not doing capacity estimation}\label{3-not-doing-capacity-estimation}
+
+\textbf{Wrong:} "We\textquotesingle ll just add more servers if needed."
+\textbf{Right:} "At 100M DAU with 10 requests each = 1M RPM = \textasciitilde17K QPS. We need \textasciitilde17 servers at 1K QPS each, plus 3x for redundancy and headroom."
+
+\subsection{4. Being vague about trade-offs}\label{4-being-vague-about-trade-offs}
+
+\textbf{Wrong:} "We\textquotesingle ll use caching to make it faster."
+\textbf{Right:} "We\textquotesingle ll use Redis with cache-aside pattern. The trade-off is: writes update DB first, so cache may serve stale data for up to 5 minutes (our TTL). This is acceptable for user profiles but not for inventory."
+
+\subsection{5. Forgetting failure modes}\label{5-forgetting-failure-modes}
+
+\textbf{Wrong:} Designing the happy path only.
+\textbf{Right:} After high-level design: "Now let me stress-test this. What happens if the cache fails? If the primary DB goes down? If the message queue gets backed up?"
+
+\subsection{6. Wrong database choice}\label{6-wrong-database-choice}
+
+\textbf{Wrong:} "Let\textquotesingle s use MongoDB because it\textquotesingle s NoSQL and more scalable." (Cargo-culting)
+\textbf{Right:} "Given we have complex queries with joins, strong consistency requirements for transactions, and our team knows SQL --- PostgreSQL is the right choice. If we hit read scale limits, we\textquotesingle ll add read replicas. Sharding would come much later."
+
+\subsection{7. Not handling the "celebrity problem"}\label{7-not-handling-the-celebrity-problem}
+
+\textbf{Wrong:} Designing fan-out-on-write without acknowledging write amplification for popular users.
+\textbf{Right:} "For the 1\% of users with \textgreater10K followers, we\textquotesingle ll use fan-out-on-read and inject their posts at query time."
+
+\subsection{8. Ignoring network partitions}\label{8-ignoring-network-partitions}
+
+\textbf{Wrong:} Assuming the network is always reliable.
+\textbf{Right:} "Given network partitions will happen, we have to choose CP or AP. For this payment system, we choose CP --- we\textquotesingle d rather return an error than process a payment on stale data."
+
+\subsection{9. Not communicating clearly}\label{9-not-communicating-clearly}
+
+\textbf{Wrong:} Silent thinking for 3 minutes.
+\textbf{Right:} Think out loud continuously: "I\textquotesingle m considering two approaches here: X and Y. X has this trade-off, Y has this trade-off. Given our consistency requirement, I\textquotesingle ll go with Y."
+
+\subsection{10. Forgetting about data at rest}\label{10-forgetting-about-data-at-rest}
+
+\textbf{Wrong:} Only modeling the API and compute.
+\textbf{Right:} "Let me also model the data. What\textquotesingle s the schema? How do we handle indexing? What\textquotesingle s our backup strategy? How do we handle schema migrations?"
+
+\section{How This Connects To Other Topics}\label{how-this-connects-to-other-topics}
+
+\subsection{Distributed Systems}\label{distributed-systems}
+
+System design \emph{is} distributed systems applied. CAP theorem, consensus (Raft/Paxos), vector clocks, CRDTs --- all foundational. A distributed system must handle: network partitions, clock skew, node failures, Byzantine failures (in blockchain-style systems).
+
+\subsection{Databases}\label{databases}
+
+\begin{itemize}
+\tightlist
+\item
+  SQL/NoSQL choice dictates your sharding strategy, consistency model, and query patterns
+\item
+  B-trees (SQL indexes), LSM-trees (Cassandra, RocksDB) --- storage engine choice affects write vs read performance
+\item
+  MVCC (Multi-Version Concurrency Control) --- how PostgreSQL achieves isolation without locking reads
+\item
+  Write-ahead logging (WAL) --- enables crash recovery and replication
+\end{itemize}
+
+\subsection{Computer Networks}\label{computer-networks}
+
+\begin{itemize}
+\tightlist
+\item
+  TCP vs UDP choice matters for real-time systems (games, video: UDP; reliability: TCP)
+\item
+  HTTP/1.1 vs HTTP/2 vs HTTP/3 --- multiplexing, header compression, QUIC protocol
+\item
+  TLS handshake cost \(\rightarrow\) terminate at load balancer, not at each microservice
+\item
+  DNS TTL \(\rightarrow\) how long before a failed-over IP propagates
+\end{itemize}
+
+\subsection{Cloud / Infrastructure}\label{cloud--infrastructure}
+
+\begin{itemize}
+\tightlist
+\item
+  AWS: EC2 (compute), RDS/Aurora (managed SQL), DynamoDB (managed NoSQL), S3 (object storage), ElastiCache (managed Redis/Memcached), SQS/SNS/Kafka-MSK (queuing), CloudFront (CDN), ALB/NLB (load balancers), Lambda (serverless)
+\item
+  Auto-scaling groups: scale out on CPU/QPS metric \(\rightarrow\) handles load spikes
+\item
+  Multi-AZ deployment: replication across availability zones for HA
+\item
+  Multi-region: active-active or active-passive for DR and global latency
+\end{itemize}
+
+\subsection{Performance Engineering}\label{performance-engineering}
+
+\begin{itemize}
+\tightlist
+\item
+  Profiling before optimizing: measure P99 latency, not average
+\item
+  Amdahl\textquotesingle s Law: speedup limited by non-parallelizable fraction
+\item
+  Little\textquotesingle s Law: N = \(\lambda\) \(\times\) W (concurrency = arrival\_rate \(\times\) service\_time) \(\rightarrow\) crucial for capacity planning
+\end{itemize}
+
+\visualfigure{../../figures/05-system-design/02-latency-utilization.pdf}{Latency stays flat until utilization approaches capacity, then rises sharply as queues build. Plan for headroom — running hot (>70-80\%) is a tail-latency trap.}
+
+\begin{itemize}
+\tightlist
+\item
+  Working set size vs available memory \(\rightarrow\) cache hit rate prediction
+\end{itemize}
+
+\subsection{Security}\label{security}
+
+\begin{itemize}
+\tightlist
+\item
+  API Gateway as the security perimeter (auth, WAF, DDoS protection)
+\item
+  Zero-trust networking: even internal services must authenticate
+\item
+  Data encryption at rest (AES-256) and in transit (TLS 1.3)
+\item
+  Secrets management: never hardcode credentials \(\rightarrow\) Vault, AWS Secrets Manager
+\end{itemize}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\subsection{Before the Interview}\label{before-the-interview}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Practice on a whiteboard} (or Excalidraw/miro) --- interviews happen on whiteboards, not IDE
+\item
+  \textbf{Time-box your sections} --- 5 min requirements, 5 min estimation, 10 min high-level, 15 min deep-dive
+\item
+  \textbf{Know 5-8 systems cold:} URL shortener, news feed, chat, search, rate limiter, notification system, distributed cache, ride-sharing
+\item
+  \textbf{Read the system design primer:} github.com/donnemartin/system-design-primer
+\item
+  \textbf{Read actual engineering blogs:} Uber Engineering, Airbnb Tech, Netflix TechBlog, AWS Architecture Blog
+\end{enumerate}
+
+\subsection{During the Interview}\label{during-the-interview}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Clarify before designing} --- Never assume scale or requirements
+\item
+  \textbf{Think out loud always} --- "I\textquotesingle m considering X vs Y because..."
+\item
+  \textbf{Draw first, explain second} --- Sketch the architecture, then explain each component
+\item
+  \textbf{Drive the interview} --- Have opinions, don\textquotesingle t wait to be asked
+\item
+  \textbf{Quantify everything} --- Don\textquotesingle t say "faster," say "reduces latency from 50ms to 2ms"
+\item
+  \textbf{Name the trade-offs explicitly} --- "The downside of this approach is..."
+\item
+  \textbf{Acknowledge what you\textquotesingle d do differently at 10x scale}
+\item
+  \textbf{Ask for feedback} --- "Is there a specific area you\textquotesingle d like me to go deeper on?"
+\end{enumerate}
+
+\subsection{Red flags interviewers look for:}\label{red-flags-interviewers-look-for}
+
+\begin{itemize}
+\tightlist
+\item
+  No requirements gathering
+\item
+  Jumping to buzzwords (Kubernetes, microservices) without justification
+\item
+  Can\textquotesingle t explain why they chose SQL vs NoSQL
+\item
+  No mention of failure cases
+\item
+  Can\textquotesingle t estimate scale
+\item
+  Vague on data model
+\item
+  Passive, not leading the conversation
+\end{itemize}
+
+\subsection{Green flags that signal senior-level thinking:}\label{green-flags-that-signal-senior-level-thinking}
+
+\begin{itemize}
+\tightlist
+\item
+  Proactively identifies bottlenecks before being asked
+\item
+  Knows specific numbers (latency, capacity)
+\item
+  Discusses operational concerns (monitoring, deployment, rollback)
+\item
+  References real systems and what they learned from them
+\item
+  Explicitly states assumptions and asks if they\textquotesingle re correct
+\item
+  Brings up failure scenarios and how to handle them
+\end{itemize}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+\textbf{System design = Requirements + Scale Estimation + API + Data Model + Architecture + Trade-offs}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Always clarify:} DAU, QPS, consistency, latency, availability requirements
+\item
+  \textbf{Estimate first:} QPS, storage, bandwidth --- round aggressively
+\item
+  \textbf{Standard architecture:} Client \(\rightarrow\) CDN \(\rightarrow\) LB \(\rightarrow\) App (stateless) \(\rightarrow\) Cache \(\rightarrow\) DB \(\rightarrow\) Queue \(\rightarrow\) Workers
+\item
+  \textbf{Scaling order:} Vertical \(\rightarrow\) Read replicas \(\rightarrow\) Caching \(\rightarrow\) Sharding \(\rightarrow\) Microservices
+\item
+  \textbf{DB choice:} SQL for ACID + joins; NoSQL for horizontal scale + flexible schema
+\item
+  \textbf{Caching strategies:} Cache-aside (most common), Write-through (consistency), Write-back (performance)
+\item
+  \textbf{CAP theorem:} Must pick CP (consistency, for banking) or AP (availability, for social)
+\item
+  \textbf{Message queues:} Decouple producers/consumers; Kafka for streaming, SQS for simple
+\item
+  \textbf{Microservices:} Independent deployability + DB-per-service = complexity; start with monolith
+\item
+  \textbf{Senior signals:} Failure modes, back-pressure, hot spots, observability, trade-off articulation
+\end{enumerate}
+
+\subsection{Key Points}\label{key-points}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2755}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7245}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-liner
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Horizontal scaling & Stateless app tier + external session store \\
+\rowcolor{zebra}
+Load balancing & L4 for TCP, L7 for HTTP routing + A/B \\
+Cache-aside & App manages cache; misses hit DB \\
+\rowcolor{zebra}
+Write-through & Both cache and DB updated on write \\
+LRU eviction & Evict least recently accessed \\
+\rowcolor{zebra}
+CDN & Cache static content geographically near users \\
+Sharding & Partition data across nodes; consistent hashing minimizes resharding \\
+\rowcolor{zebra}
+Replication & Copy data across nodes; sync=safe, async=fast \\
+CAP & Pick 2 of 3; P is mandatory; choose C or A \\
+\rowcolor{zebra}
+Eventual consistency & Replicas converge given no new writes \\
+Idempotency & Safe to retry; use idempotency keys \\
+\rowcolor{zebra}
+Circuit breaker & Fail fast when downstream is unhealthy \\
+Message queue & Decouple, buffer, fan-out; at-least-once + idempotent consumer \\
+\rowcolor{zebra}
+API Gateway & Auth, rate limit, routing, SSL in one place \\
+Rate limiting & Token bucket (burst-friendly) or sliding window (precise) \\
+\end{longtable}
+
+\subsection{Cheat-Sheet Table: The Most Important Decisions}\label{cheat-sheet-table-the-most-important-decisions}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2865}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7135}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Decision
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rule of Thumb
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SQL vs NoSQL & SQL default; NoSQL when horizontal scale or special access pattern needed \\
+\rowcolor{zebra}
+Cache strategy & Cache-aside default; write-through for high consistency; write-back for high write throughput \\
+Sync vs Async & Sync for user-facing responses; async for background work, fan-out, decoupling \\
+\rowcolor{zebra}
+Fan-out on write vs read & Write for low-follower-count users; read for celebrities; hybrid for both \\
+Sharding key choice & High cardinality, uniform distribution, matches access pattern (avoid cross-shard queries) \\
+\rowcolor{zebra}
+Replication sync vs async & Sync for financial data; async for social/analytics \\
+CAP choice & CP for consistency-critical (banking, inventory); AP for availability-critical (social, search) \\
+\rowcolor{zebra}
+Monolith vs microservices & Monolith to start; microservices when teams/services need independent scaling/deployment \\
+REST vs gRPC & REST for public APIs; gRPC for internal microservice communication \\
+\rowcolor{zebra}
+Push vs Pull notifications & Push (FCM/APNs) for mobile; SSE/WebSocket for web real-time \\
+\end{longtable}
+
+\subsection{Most Important Concepts (Rank-ordered by interview frequency)}\label{most-important-concepts-rank-ordered-by-interview-frequency}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Horizontal scaling + stateless app servers} --- foundation of everything
+\item
+  \textbf{Caching (cache-aside, LRU, TTL, invalidation)} --- most common optimization lever
+\item
+  \textbf{Database choice (SQL vs NoSQL + why)} --- asked in every design
+\item
+  \textbf{Load balancing (L4 vs L7, algorithms)} --- part of every architecture
+\item
+  \textbf{CAP theorem + consistency models} --- senior expectation
+\item
+  \textbf{Message queues + async processing} --- Kafka/SQS in every large system
+\item
+  \textbf{Sharding + consistent hashing} --- needed for any at-scale DB discussion
+\item
+  \textbf{CDN} --- must mention early, serves static content, reduces origin load
+\item
+  \textbf{Rate limiting} --- common standalone design question + mentioned in every API design
+\item
+  \textbf{Replication + leader-follower} --- must know for DB deep-dives
+\item
+  \textbf{Microservices trade-offs} --- monolith vs microservices discussion in every senior loop
+\item
+  \textbf{API Gateway} --- entry point for security, routing, rate limiting
+\item
+  \textbf{Back-of-envelope estimation} --- first thing to do in every design
+\item
+  \textbf{Circuit breaker + failure handling} --- senior green flag
+\item
+  \textbf{Idempotency} --- payment systems, retry safety
+\end{enumerate}
+
+\emph{Study tip: Practice narrating each design out loud for 45 minutes. Silence is your enemy in a system design interview. Build the habit of communicating continuously.}
+
+\end{document}

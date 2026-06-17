@@ -1,0 +1,94 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{AI / ML — Index}
+\newcommand{\ThemeKicker}{AI/ML Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{7c3aed}{a78bfa}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+From classical machine learning to deep learning, Transformers, and building real products with LLMs --- first-principles notes in the same structure as the core topics, with hand-built diagrams and magazine PDFs.
+
+\section{Files}\label{files}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0733}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.5683}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1054}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2530}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Magazine PDF
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Machine Learning Fundamentals & \href{01-ml-fundamentals.md}{md} & \href{ML-Fundamentals-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+2 & Classic ML Algorithms & \href{02-classic-ml-algorithms.md}{md} & \href{Classic-ML-Algorithms-Magazine.pdf}{PDF} \\
+3 & Deep Learning \& Neural Networks & \href{03-deep-learning.md}{md} & \href{Deep-Learning-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+4 & Transformers \& LLMs & \href{04-transformers-and-llms.md}{md} & \href{Transformers-and-LLMs-Magazine.pdf}{PDF} \\
+5 & LLM Applications \& GenAI & \href{05-llm-applications-genai.md}{md} & \href{LLM-Applications-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+6 & MLOps \& ML System Design & \href{06-mlops-and-ml-system-design.md}{md} & \href{MLOps-ML-System-Design-Magazine.pdf}{PDF} \\
+\end{longtable}
+
+= the architecture behind modern AI --- highest-signal for AI/ML interviews.
+
+\section{What each covers}\label{what-each-covers}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{01 Fundamentals} --- learning paradigms, bias--variance, regularization, evaluation metrics, gradient descent.
+\item
+  \textbf{02 Classic Algorithms} --- regression, trees, random forests, gradient boosting (XGBoost/LightGBM), SVM, k-NN, Naive Bayes, k-Means, PCA, ensembles.
+\item
+  \textbf{03 Deep Learning} --- neurons, backprop, activations, optimizers, CNNs, RNNs/LSTMs, batch norm, dropout, embeddings.
+\item
+  \textbf{04 Transformers \& LLMs} --- self-attention (Q/K/V), the Transformer, tokenization, BERT vs GPT, pretraining, RLHF/DPO, LoRA, quantization, MoE, decoding, hallucination.
+\item
+  \textbf{05 LLM Applications} --- prompt engineering, RAG (chunking, embeddings, vector DBs, reranking), agents (tools, function calling, ReAct), evaluation, guardrails, cost/latency.
+\item
+  \textbf{06 MLOps \& ML System Design} --- feature stores, distributed training, serving, drift, the ML-design framework, and worked designs (recommendation, CTR, feed ranking).
+\end{itemize}
+
+\section{Reading order}\label{reading-order}
+
+\texttt{01\ →\ 02\ →\ 03\ →\ 04\ →\ 05}, with \texttt{06} as the systems capstone. For AI-focused roles, prioritize \textbf{04 + 05 + 06}.
+
+\section{\texorpdfstring{Each \texttt{.md} has a coherent analogy world}{Each .md has a coherent analogy world}}\label{each-md-has-a-coherent-analogy-world}
+
+School (fundamentals) \(\cdot\) a panel of doctors (algorithms) \(\cdot\) a learning factory line (deep learning) \(\cdot\) a newsroom of editors (Transformers) \(\cdot\) a research assistant in a library (LLM apps) \(\cdot\) an airport ops center (MLOps).
+
+\begin{quote}
+Preview \& edit any edition live: \texttt{cd\ ../.magazine\ \&\&\ python3\ serve.py} \(\rightarrow\) http://localhost:8000
+\end{quote}
+
+\end{document}

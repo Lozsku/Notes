@@ -1,0 +1,110 @@
+\documentclass[11pt]{article}
+\newcommand{\ThemeName}{The Complete Collection}
+\newcommand{\ThemeKicker}{Interview Mastery Library}
+\newcommand{\ThemeNumber}{}
+\usepackage{interviewstyle}
+\setthemecolor{6366f1}{8b5cf6}
+\providecommand{\tightlist}{}
+
+\newcommand{\catalogsection}[1]{%
+  \par\addvspace{14pt}\needspace{6\baselineskip}%
+  {\headingfont\large\bfseries\color{acc}#1}\par
+  {\color{acc}\rule{\linewidth}{1.4pt}}\par\addvspace{4pt}}
+\newenvironment{catalogtbl}{%
+  \begin{list}{}{\setlength{\leftmargin}{0pt}\setlength{\itemsep}{2pt}}}{\end{list}}
+\newcommand{\catalogrow}[3]{%
+  \item[]\makebox[2.4em][l]{\headingfont\bfseries\color{acc2}#1}%
+  {\headingfont\color{ink}#2}\hfill{\color{ink2}\small#3 pp}%
+  \par\vspace{1pt}{\color{rule}\rule{\linewidth}{0.4pt}}}
+
+\begin{document}
+\makecoverpage
+
+% ---- stats band on its own intro page ----
+\thispagestyle{empty}
+\vspace*{2.2cm}
+\begin{center}
+{\headingfont\Huge\bfseries\color{ink} Interview Mastery Library}\\[6pt]
+{\headingfont\large\color{ink2} A professionally typeset, end-to-end preparation series}\\[26pt]
+\begin{tcolorbox}[enhanced,width=0.82\linewidth,colback=acc!6,colframe=acc,
+  boxrule=0pt,leftrule=4pt,arc=3pt,left=16pt,right=16pt,top=12pt,bottom=12pt]
+{\headingfont\large\color{ink}\bfseries This edition contains}\\[8pt]
+{\Large\color{acc}\bfseries 38}~{\color{ink2}professionally typeset editions}\\[4pt]
+{\Large\color{acc}\bfseries 1207}~{\color{ink2}pages of curated interview material}\\[4pt]
+{\color{ink2} Systems \textbullet\ Design \textbullet\ Data \textbullet\ DSA \textbullet\ AI/ML \textbullet\ Behavioral}
+\end{tcolorbox}
+\end{center}
+\vfill
+\begin{center}{\color{ink2}\small Compiled June 2026 \quad\textbullet\quad Rendered with \LaTeX\ (XeTeX / Tectonic)}\end{center}
+\clearpage
+
+% ---- catalog ----
+\vspace*{2pt}
+{\headingfont\LARGE\bfseries\color{ink}Catalogue of Editions}\par\vspace{4pt}
+{\color{acc}\rule{\linewidth}{2pt}}\par\vspace{12pt}
+\catalogsection{Systems Track}
+\begin{catalogtbl}
+\catalogrow{01}{Concurrency \& Multithreading}{30}
+\catalogrow{02}{Operating Systems}{33}
+\catalogrow{03}{Computer Networks}{31}
+\catalogrow{07}{Distributed Systems}{32}
+\catalogrow{09}{Performance Engineering}{27}
+\end{catalogtbl}
+\catalogsection{Platform Track}
+\begin{catalogtbl}
+\catalogrow{04}{Cloud \& Infrastructure}{41}
+\catalogrow{10}{Security Fundamentals}{32}
+\catalogrow{\textbullet}{Observability}{37}
+\catalogrow{\textbullet}{Linux \& the Command Line}{46}
+\end{catalogtbl}
+\catalogsection{Design Track}
+\begin{catalogtbl}
+\catalogrow{05}{System Design}{35}
+\catalogrow{06}{Low-Level Design}{34}
+\catalogrow{\textbullet}{Object-Oriented Programming}{16}
+\catalogrow{I}{System Design Problems — Foundational}{27}
+\catalogrow{II}{System Design Problems — Advanced}{27}
+\catalogrow{\textbullet}{LLD Problems — Coded Solutions}{36}
+\catalogrow{\textbullet}{Design Patterns}{50}
+\catalogrow{\textbullet}{API Design}{44}
+\catalogrow{\textbullet}{Caching}{34}
+\catalogrow{\textbullet}{Message Queues \& Streaming}{42}
+\end{catalogtbl}
+\catalogsection{Data Track}
+\begin{catalogtbl}
+\catalogrow{08}{Databases}{29}
+\catalogrow{\textbullet}{Vector Databases \& Embeddings}{40}
+\end{catalogtbl}
+\catalogsection{Soft-Skills Track}
+\begin{catalogtbl}
+\catalogrow{11}{Behavioral \& Leadership}{23}
+\end{catalogtbl}
+\catalogsection{Last-Minute Revision}
+\begin{catalogtbl}
+\catalogrow{\textbullet}{The Grand Cheat Sheet}{8}
+\end{catalogtbl}
+\catalogsection{DSA Track}
+\begin{catalogtbl}
+\catalogrow{\textbullet}{DSA — Index}{3}
+\catalogrow{01}{DSA Patterns \& Templates}{35}
+\catalogrow{02}{Data Structures}{35}
+\catalogrow{03}{Algorithms \& Complexity}{40}
+\end{catalogtbl}
+\catalogsection{AI/ML Track}
+\begin{catalogtbl}
+\catalogrow{\textbullet}{AI / ML — Index}{3}
+\catalogrow{01}{ML Fundamentals}{35}
+\catalogrow{02}{Classic ML Algorithms}{39}
+\catalogrow{03}{Deep Learning}{33}
+\catalogrow{04}{Transformers \& LLMs}{36}
+\catalogrow{05}{LLM Applications \& GenAI}{36}
+\catalogrow{06}{MLOps \& ML System Design}{34}
+\catalogrow{07}{AI Agents \& Tool Use}{40}
+\end{catalogtbl}
+\catalogsection{Quality Track}
+\begin{catalogtbl}
+\catalogrow{\textbullet}{Testing \& Code Quality}{43}
+\catalogrow{\textbullet}{Git \& Dev Workflow}{36}
+\end{catalogtbl}
+
+\end{document}

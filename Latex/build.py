@@ -69,7 +69,56 @@ REG = [
   ("sdp-2",         "System-Design-Problems/part2-advanced.md",    "System Design Problems — Advanced",     "Design Track",          "II", "db2777","f472b6"),
   # LLD Problems
   ("lld-coded",     "LLD-Problems/coded-solutions.md",             "LLD Problems — Coded Solutions",        "Design Track",          "",   "ea580c","fb923c"),
+  # ---- new editions ----
+  ("design-patterns","13-design-patterns.md",                      "Design Patterns",                      "Design Track",          "",   "0284c7","38bdf8"),
+  ("api-design",    "14-api-design.md",                            "API Design",                           "Design Track",          "",   "4f46e5","818cf8"),
+  ("caching",       "15-caching.md",                               "Caching",                              "Design Track",          "",   "c2410c","fb923c"),
+  ("message-queues","16-message-queues.md",                        "Message Queues \\& Streaming",         "Design Track",          "",   "7c3aed","a78bfa"),
+  ("testing",       "17-testing.md",                               "Testing \\& Code Quality",             "Quality Track",         "",   "16a34a","4ade80"),
+  ("observability", "18-observability.md",                         "Observability",                        "Platform Track",        "",   "0891b2","22d3ee"),
+  ("git",           "19-git-version-control.md",                   "Git \\& Dev Workflow",                 "Quality Track",         "",   "ea580c","fb923c"),
+  ("linux",         "20-linux-cli.md",                             "Linux \\& the Command Line",           "Platform Track",        "",   "334155","64748b"),
+  ("vector-databases","21-vector-databases.md",                    "Vector Databases \\& Embeddings",      "Data Track",            "",   "0d9488","2dd4bf"),
+  ("ai-agents",     "AI-ML/07-ai-agents.md",                       "AI Agents \\& Tool Use",               "AI/ML Track",           "07", "7c3aed","a78bfa"),
 ]
+
+# ----------------------------------------------------------------------
+# Output folder per edition — keeps tex/ and pdf/ organised by concept.
+# Every folder is exactly ONE level deep (figures referenced as ../../figures/).
+# ----------------------------------------------------------------------
+FOLDER = {
+  "00-index": "_collection", "cheatsheet": "_collection",
+  # foundations
+  "12-oop": "foundations", "design-patterns": "foundations",
+  # systems
+  "01-concurrency": "systems", "02-os": "systems", "03-networks": "systems",
+  "07-distributed": "systems", "09-performance": "systems",
+  # infrastructure / ops
+  "04-cloud": "infrastructure", "10-security": "infrastructure",
+  "observability": "infrastructure", "linux": "infrastructure",
+  # system design
+  "05-system-design": "system-design", "06-lld": "system-design",
+  "api-design": "system-design", "caching": "system-design",
+  "message-queues": "system-design", "sdp-1": "system-design",
+  "sdp-2": "system-design", "lld-coded": "system-design",
+  # data
+  "08-databases": "data", "vector-databases": "data",
+  # dev practices
+  "testing": "dev-practices", "git": "dev-practices",
+  # behavioral
+  "11-behavioral": "behavioral",
+  # dsa
+  "dsa-00-index": "dsa", "dsa-01-patterns": "dsa", "dsa-02-ds": "dsa", "dsa-03-algos": "dsa",
+  # ai / ml
+  "aiml-00-index": "ai-ml", "aiml-01-fund": "ai-ml", "aiml-02-classic": "ai-ml",
+  "aiml-03-dl": "ai-ml", "aiml-04-tf": "ai-ml", "aiml-05-genai": "ai-ml",
+  "aiml-06-mlops": "ai-ml", "ai-agents": "ai-ml",
+}
+def folder_of(key): return FOLDER.get(key, "misc")
+def texdir_for(key):
+    d = TEXDIR / folder_of(key); d.mkdir(parents=True, exist_ok=True); return d
+def pdfdir_for(key):
+    d = PDFDIR / folder_of(key); d.mkdir(parents=True, exist_ok=True); return d
 
 def sha(p: Path) -> str:
     return hashlib.sha1(p.read_bytes()).hexdigest()[:12]
@@ -204,9 +253,9 @@ def build_one(key, srcrel, title, kicker, num, acc, acc2, m, force=False):
     src = SRC / srcrel
     if not src.exists():
         print(f"  !! missing source: {src}"); return False
-    texrel = key + ".tex"
-    tex = TEXDIR / texrel
-    pdf = PDFDIR / (key + ".pdf")
+    texd, pdfd = texdir_for(key), pdfdir_for(key)
+    tex = texd / (key + ".tex")
+    pdf = pdfd / (key + ".pdf")
     cur = sha(src)
     rec = m["docs"].get(key, {})
     up_to_date = (not force and rec.get("src") == cur
@@ -216,12 +265,11 @@ def build_one(key, srcrel, title, kicker, num, acc, acc2, m, force=False):
         print(f"  == {key:18s} up-to-date"); return True
 
     print(f"  ++ {key:18s} building…")
-    TEXDIR.mkdir(exist_ok=True); PDFDIR.mkdir(exist_ok=True)
-    # make the style package discoverable next to the .tex
-    (TEXDIR / "interviewstyle.sty").write_bytes((ASSETS/"interviewstyle.sty").read_bytes())
+    # make the style package discoverable next to the .tex (in this subfolder)
+    (texd / "interviewstyle.sty").write_bytes((ASSETS/"interviewstyle.sty").read_bytes())
     md = preprocess(src.read_text())
     md = place_figures(md, key)          # insert inline figure tokens at anchors
-    tmp_md = TEXDIR / (key + ".pre.md")
+    tmp_md = texd / (key + ".pre.md")
     tmp_md.write_text(md)
 
     # 1) pandoc -> tex
@@ -253,7 +301,7 @@ def build_one(key, srcrel, title, kicker, num, acc, acc2, m, force=False):
     pdf.unlink(missing_ok=True)
     t0 = time.time()
     r = subprocess.run([TECTONIC, "-X", "compile", str(tex),
-                        "--outdir", str(PDFDIR), "--keep-logs"],
+                        "--outdir", str(pdfd), "--keep-logs"],
                        capture_output=True, text=True)
     ok = (pdf.exists() and r.returncode == 0)
     dt = time.time() - t0
@@ -304,7 +352,7 @@ def postprocess_tex(tex: Path, key: str = ""):
         i = int(m.group(1))
         if i < len(figs):
             fn, cap = figs[i][0], figs[i][1]
-            return r"\visualfigure{../figures/%s/%s}{%s}" % (key, fn, latexify(cap))
+            return r"\visualfigure{../../figures/%s/%s}{%s}" % (key, fn, latexify(cap))
         return ""
     s = re.sub(r"@@VFIG(\d+)@@", figrepl, s)
     # clickable in-document section references: "§9" -> jump to section 9

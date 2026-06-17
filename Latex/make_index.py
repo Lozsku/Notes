@@ -9,7 +9,10 @@ Run after build.py has produced the per-topic PDFs.
 import subprocess, time
 from pathlib import Path
 import pypdfium2 as pdfium
-from build import REG, ASSETS, TEXDIR, PDFDIR, TECTONIC
+from build import REG, ASSETS, TEXDIR, PDFDIR, TECTONIC, pdfdir_for
+
+def pdf_of(key):
+    return pdfdir_for(key) / f"{key}.pdf"
 
 CATALOG_KEY = "00-Collection-Index"
 
@@ -30,13 +33,13 @@ def build_catalog():
     for key, srcrel, title, kicker, num, acc, acc2 in REG:
         if key == "00-index":
             continue  # the per-doc roadmap; catalog supersedes it on the cover
-        pdf = PDFDIR / f"{key}.pdf"
+        pdf = pdf_of(key)
         pc = pagecount(pdf) if pdf.exists() else 0
         if kicker not in groups:
             groups[kicker] = []; order.append(kicker)
         groups[kicker].append((num, title, pc, acc))
-    total_pages = sum(pagecount(PDFDIR / f"{k}.pdf") for k, *_ in REG if (PDFDIR / f"{k}.pdf").exists())
-    total_docs = sum(1 for k, *_ in REG if (PDFDIR / f"{k}.pdf").exists())
+    total_pages = sum(pagecount(pdf_of(k)) for k, *_ in REG if pdf_of(k).exists())
+    total_docs = sum(1 for k, *_ in REG if pdf_of(k).exists())
 
     body = []
     for kicker in order:
@@ -48,15 +51,17 @@ def build_catalog():
         body.append(r"\end{catalogtbl}")
     body = "\n".join(body)
 
-    tex = TEXDIR / f"{CATALOG_KEY}.tex"
-    (TEXDIR / "interviewstyle.sty").write_bytes((ASSETS / "interviewstyle.sty").read_bytes())
+    cdir = (PDFDIR/"_collection"); cdir.mkdir(parents=True,exist_ok=True)
+    tdir = (TEXDIR/"_collection"); tdir.mkdir(parents=True,exist_ok=True)
+    tex = tdir / f"{CATALOG_KEY}.tex"
+    (tdir / "interviewstyle.sty").write_bytes((ASSETS / "interviewstyle.sty").read_bytes())
     tex.write_text(TEMPLATE_TEX.replace("<<TOTALDOCS>>", str(total_docs))
                                .replace("<<TOTALPAGES>>", str(total_pages))
                                .replace("<<BODY>>", body)
                                .replace("<<DATE>>", time.strftime("%B %Y")))
-    out = PDFDIR / f"{CATALOG_KEY}.pdf"
+    out = cdir / f"{CATALOG_KEY}.pdf"
     out.unlink(missing_ok=True)
-    r = subprocess.run([TECTONIC, "-X", "compile", str(tex), "--outdir", str(PDFDIR)],
+    r = subprocess.run([TECTONIC, "-X", "compile", str(tex), "--outdir", str(cdir)],
                        capture_output=True, text=True)
     if out.exists():
         print(f"  ok  {CATALOG_KEY}.pdf  ({pagecount(out)} pp, {out.stat().st_size//1024} KB)")
@@ -79,12 +84,12 @@ def merge_all(catalog: Path):
     for key, srcrel, title, kicker, num, acc, acc2 in REG:
         if key == "00-index":
             continue
-        p = PDFDIR / f"{key}.pdf"
+        p = pdf_of(key)
         if not p.exists():
             continue
         w.append(str(p), outline_item=_plain(title))
         n_ed += 1
-    outp = PDFDIR / "Complete-Collection.pdf"
+    outp = (PDFDIR/"_collection"/"Complete-Collection.pdf")
     with open(outp, "wb") as f:
         w.write(f)
     w.close()

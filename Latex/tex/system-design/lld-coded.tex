@@ -1,0 +1,2321 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{LLD Problems — Coded Solutions}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{ea580c}{fb923c}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} Each \texttt{\#\#} section is a self-contained LLD problem. Read Requirements + Class Diagram first, then study the code. Run any block directly with \texttt{python3}. The closing sections distill the cross-cutting patterns for rapid revision.
+\end{quote}
+
+\section{The Machine-Coding Approach}\label{the-machine-coding-approach}
+
+\subsection{Time-box strategy (45--90 min round)}\label{time-box-strategy-4590-min-round}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3929}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1105}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4966}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Phase
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Goal
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Clarify requirements & 5 min & Pin scope; avoid building the wrong thing \\
+\rowcolor{zebra}
+Extract entities \& relationships & 5 min & Noun-verb extraction on whiteboard \\
+Sketch class diagram & 5--10 min & Get agreement before coding \\
+\rowcolor{zebra}
+Code core classes + happy path & 20--30 min & Must compile/run \\
+Add edge cases + extensibility & 10 min & Show you think beyond happy path \\
+\rowcolor{zebra}
+Demo driver & 5 min & Prove it works end-to-end \\
+\end{longtable}
+
+\subsection{What interviewers grade (roughly in priority order)}\label{what-interviewers-grade-roughly-in-priority-order}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Working, runnable code} --- broken code is an automatic downgrade.
+\item
+  \textbf{Clean abstractions} --- classes with single responsibilities; meaningful names.
+\item
+  \textbf{Extensibility} --- adding a new feature should require adding code, not changing existing code (OCP).
+\item
+  \textbf{Edge cases handled} --- not just happy path (full parking lot, divide-by-zero in splits, empty elevator queue).
+\item
+  \textbf{Design patterns named} --- shows vocabulary; don\textquotesingle t force patterns but do name what you use.
+\end{enumerate}
+
+\subsection{What to deprioritize under time pressure}\label{what-to-deprioritize-under-time-pressure}
+
+\begin{itemize}
+\tightlist
+\item
+  Persistence / DB layer (mention it, skip it).
+\item
+  Concurrency / thread-safety (mention locks, skip implementation unless asked).
+\item
+  Perfect error messages (simple exceptions are fine).
+\item
+  Over-engineering: 3-layer factory + abstract-factory combos for a 45-min round are a red flag.
+\end{itemize}
+
+\subsection{The noun-verb extraction recipe}\label{the-noun-verb-extraction-recipe}
+
+From the problem statement: circle \textbf{nouns} \(\rightarrow\) candidate classes; underline \textbf{verbs} \(\rightarrow\) candidate methods. Then prune: nouns that are just attributes (e.g. "name", "price") become fields, not classes.
+
+\section{1. LRU Cache (+ LFU Variant Note)}\label{1-lru-cache--lfu-variant-note}
+
+\subsection{Requirements}\label{requirements}
+
+\textbf{Functional}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{get(key)} --- return value or -1 if not present.
+\item
+  \texttt{put(key,\ value)} --- insert; if capacity exceeded, evict \textbf{least recently used} entry.
+\item
+  Both operations must be \textbf{O(1)}.
+\end{itemize}
+
+\textbf{Clarifying questions to ask}
+
+\begin{itemize}
+\tightlist
+\item
+  Is capacity fixed at construction? (Yes.)
+\item
+  Thread-safe? (Assume single-threaded unless asked; mention \texttt{threading.Lock} for MT.)
+\item
+  Key/value types? (Generics / \texttt{Any} for flexibility.)
+\item
+  On \texttt{put} of existing key, update value and recency? (Yes.)
+\end{itemize}
+
+\subsection{Core entities / classes}\label{core-entities--classes}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1876}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8124}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{DLinkedNode} & Doubly-linked list node (key, value, prev, next pointers) \\
+\rowcolor{zebra}
+\texttt{LRUCache} & HashMap + doubly-linked list; exposes \texttt{get}/\texttt{put} \\
+\end{longtable}
+
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{   DLinkedNode    }\OperatorTok{|}          \OperatorTok{|}\NormalTok{    LRUCache       }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{ key: }\BuiltInTok{int}         \OperatorTok{|}  \DecValTok{1}    \OperatorTok{*}  \OperatorTok{|}\NormalTok{ capacity: }\BuiltInTok{int}     \OperatorTok{|}
+\OperatorTok{|}\NormalTok{ value: }\BuiltInTok{int}       \OperatorTok{|\textless{}{-}{-}{-}{-}{-}{-}{-}{-}\textgreater{}|}\NormalTok{ cache: }\BuiltInTok{dict}       \OperatorTok{|}
+\OperatorTok{|}\NormalTok{ prev: DLinkedNode}\OperatorTok{|}          \OperatorTok{|}\NormalTok{ head: DLinkedNode }\OperatorTok{|}
+\OperatorTok{|} \BuiltInTok{next}\NormalTok{: DLinkedNode}\OperatorTok{|}          \OperatorTok{|}\NormalTok{ tail: DLinkedNode }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                              \OperatorTok{|}\NormalTok{ get(key) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{int}   \OperatorTok{|}
+                              \OperatorTok{|}\NormalTok{ put(key, val)     }\OperatorTok{|}
+                              \OperatorTok{|}\NormalTok{ \_remove(node)     }\OperatorTok{|}
+                              \OperatorTok{|}\NormalTok{ \_add\_to\_front(n)  }\OperatorTok{|}
+                              \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Design patterns used}\label{design-patterns-used}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{No classic GoF pattern} --- this is a pure data-structure problem. The key insight is the \textbf{sentinel head/tail} trick to avoid null checks. Interviewers want to see you know this.
+\item
+  Mention: for thread-safety you\textquotesingle d wrap with a \texttt{threading.Lock} or use \texttt{collections.OrderedDict} (which Python\textquotesingle s stdlib provides for a simpler implementation, but interviewers want the manual version to test understanding).
+\end{itemize}
+
+\subsection{Full code}\label{full-code}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+
+
+\KeywordTok{class}\NormalTok{ DLinkedNode:}
+    \CommentTok{"""Doubly{-}linked list node used as the internal building block."""}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, key: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{0}\NormalTok{, value: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{0}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.key }\OperatorTok{=}\NormalTok{ key}
+        \VariableTok{self}\NormalTok{.value }\OperatorTok{=}\NormalTok{ value}
+        \VariableTok{self}\NormalTok{.prev: Optional[DLinkedNode] }\OperatorTok{=} \VariableTok{None}
+        \VariableTok{self}\NormalTok{.}\BuiltInTok{next}\NormalTok{: Optional[DLinkedNode] }\OperatorTok{=} \VariableTok{None}
+
+
+\KeywordTok{class}\NormalTok{ LRUCache:}
+    \CommentTok{"""}
+\CommentTok{    O(1) get/put LRU Cache implemented with a HashMap + doubly{-}linked list.}
+
+\CommentTok{    Invariant: the list is ordered most{-}recently{-}used (front) to}
+\CommentTok{    least{-}recently{-}used (back). Sentinel head/tail nodes eliminate}
+\CommentTok{    edge{-}case null checks.}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, capacity: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ capacity }\OperatorTok{\textless{}=} \DecValTok{0}\NormalTok{:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"Capacity must be positive"}\NormalTok{)}
+        \VariableTok{self}\NormalTok{.capacity }\OperatorTok{=}\NormalTok{ capacity}
+        \VariableTok{self}\NormalTok{.cache: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{int}\NormalTok{, DLinkedNode] }\OperatorTok{=}\NormalTok{ \{\}}
+
+        \CommentTok{\# Sentinels — never evicted, never returned}
+        \VariableTok{self}\NormalTok{.head }\OperatorTok{=}\NormalTok{ DLinkedNode()  }\CommentTok{\# MRU sentinel}
+        \VariableTok{self}\NormalTok{.tail }\OperatorTok{=}\NormalTok{ DLinkedNode()  }\CommentTok{\# LRU sentinel}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{self}\NormalTok{.tail}
+        \VariableTok{self}\NormalTok{.tail.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.head}
+
+    \CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+    \CommentTok{\# Public API                                                           \#}
+    \CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+    \KeywordTok{def}\NormalTok{ get(}\VariableTok{self}\NormalTok{, key: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{int}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.cache:}
+            \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.cache[key]}
+        \VariableTok{self}\NormalTok{.\_move\_to\_front(node)}
+        \ControlFlowTok{return}\NormalTok{ node.value}
+
+    \KeywordTok{def}\NormalTok{ put(}\VariableTok{self}\NormalTok{, key: }\BuiltInTok{int}\NormalTok{, value: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{in} \VariableTok{self}\NormalTok{.cache:}
+\NormalTok{            node }\OperatorTok{=} \VariableTok{self}\NormalTok{.cache[key]}
+\NormalTok{            node.value }\OperatorTok{=}\NormalTok{ value}
+            \VariableTok{self}\NormalTok{.\_move\_to\_front(node)}
+        \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{            node }\OperatorTok{=}\NormalTok{ DLinkedNode(key, value)}
+            \VariableTok{self}\NormalTok{.cache[key] }\OperatorTok{=}\NormalTok{ node}
+            \VariableTok{self}\NormalTok{.\_add\_to\_front(node)}
+            \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.cache) }\OperatorTok{\textgreater{}} \VariableTok{self}\NormalTok{.capacity:}
+\NormalTok{                lru }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_pop\_from\_back()}
+                \KeywordTok{del} \VariableTok{self}\NormalTok{.cache[lru.key]}
+
+    \CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+    \CommentTok{\# Private helpers                                                      \#}
+    \CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+    \KeywordTok{def}\NormalTok{ \_add\_to\_front(}\VariableTok{self}\NormalTok{, node: DLinkedNode) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{"""Insert node right after head sentinel (= most{-}recently{-}used)."""}
+\NormalTok{        node.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.head}
+\NormalTok{        node.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next}\NormalTok{.prev }\OperatorTok{=}\NormalTok{ node}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node}
+
+    \KeywordTok{def}\NormalTok{ \_remove(}\VariableTok{self}\NormalTok{, node: DLinkedNode) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{"""Unlink node from its current position."""}
+\NormalTok{        node.prev.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node.}\BuiltInTok{next}
+\NormalTok{        node.}\BuiltInTok{next}\NormalTok{.prev }\OperatorTok{=}\NormalTok{ node.prev}
+
+    \KeywordTok{def}\NormalTok{ \_move\_to\_front(}\VariableTok{self}\NormalTok{, node: DLinkedNode) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.\_remove(node)}
+        \VariableTok{self}\NormalTok{.\_add\_to\_front(node)}
+
+    \KeywordTok{def}\NormalTok{ \_pop\_from\_back(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ DLinkedNode:}
+        \CommentTok{"""Remove and return the LRU node (just before tail sentinel)."""}
+\NormalTok{        lru }\OperatorTok{=} \VariableTok{self}\NormalTok{.tail.prev}
+        \VariableTok{self}\NormalTok{.\_remove(lru)}
+        \ControlFlowTok{return}\NormalTok{ lru}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# LFU variant — brief notes (full implementation would add freq map) \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# LFU Cache (Least Frequently Used):}
+\CommentTok{\#   {-} Evict the entry with the LOWEST access frequency;}
+\CommentTok{\#     tie{-}break on LRU order within same frequency.}
+\CommentTok{\# Data structures needed:}
+\CommentTok{\#   {-} key\_to\_val: dict[key {-}\textgreater{} value]}
+\CommentTok{\#   {-} key\_to\_freq: dict[key {-}\textgreater{} frequency]}
+\CommentTok{\#   {-} freq\_to\_keys: dict[freq {-}\textgreater{} OrderedDict[key {-}\textgreater{} None]]  (ordered = LRU within freq)}
+\CommentTok{\#   {-} min\_freq: int  (track current minimum)}
+\CommentTok{\# On get/put: increment freq, move key to freq+1 bucket, update min\_freq.}
+\CommentTok{\# All operations O(1). See Python\textquotesingle{}s collections.OrderedDict for ordered bucket.}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    cache }\OperatorTok{=}\NormalTok{ LRUCache(capacity}\OperatorTok{=}\DecValTok{3}\NormalTok{)}
+\NormalTok{    cache.put(}\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{)}
+\NormalTok{    cache.put(}\DecValTok{2}\NormalTok{, }\DecValTok{20}\NormalTok{)}
+\NormalTok{    cache.put(}\DecValTok{3}\NormalTok{, }\DecValTok{30}\NormalTok{)}
+
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{1}\NormalTok{))   }\CommentTok{\# 10  — 1 is now MRU}
+\NormalTok{    cache.put(}\DecValTok{4}\NormalTok{, }\DecValTok{40}\NormalTok{)      }\CommentTok{\# evicts 2 (LRU)}
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{2}\NormalTok{))   }\CommentTok{\# {-}1  — evicted}
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{3}\NormalTok{))   }\CommentTok{\# 30}
+\NormalTok{    cache.put(}\DecValTok{5}\NormalTok{, }\DecValTok{50}\NormalTok{)      }\CommentTok{\# evicts 4 (LRU after 1 and 3 were accessed)}
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{4}\NormalTok{))   }\CommentTok{\# {-}1}
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{1}\NormalTok{))   }\CommentTok{\# 10}
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{3}\NormalTok{))   }\CommentTok{\# 30}
+    \BuiltInTok{print}\NormalTok{(cache.get(}\DecValTok{5}\NormalTok{))   }\CommentTok{\# 50}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Extensibility discussion}\label{extensibility-discussion}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{TTL / expiry:} Add \texttt{expiry:\ Optional{[}float{]}} to \texttt{DLinkedNode}. On \texttt{get}, check \texttt{time.time()\ \textgreater{}\ expiry} and treat as miss + remove. A background thread or lazy expiry on access both work.
+\item
+  \textbf{Thread-safety:} Wrap \texttt{get}/\texttt{put} with \texttt{threading.Lock}. For higher concurrency, shard the cache into N sub-caches keyed by \texttt{hash(key)\ \%\ N}.
+\item
+  \textbf{Generics:} Replace \texttt{int} with \texttt{TypeVar(\textquotesingle{}K\textquotesingle{})} / \texttt{TypeVar(\textquotesingle{}V\textquotesingle{})} and reuse across types.
+\end{itemize}
+
+\textbf{Interview takeaway: The sentinel head/tail trick is the key insight. Without sentinels you need \texttt{if\ node.prev} null-checks everywhere --- messy and error-prone. Name it explicitly.}
+
+\section{2. Parking Lot}\label{2-parking-lot}
+
+\subsection{Requirements}\label{requirements-1}
+
+\textbf{Functional}
+
+\begin{itemize}
+\tightlist
+\item
+  Support multiple levels, multiple spot types (COMPACT, LARGE, MOTORCYCLE, ELECTRIC).
+\item
+  Vehicles: Motorcycle, Car, Truck --- each fits specific spot types.
+\item
+  \texttt{park(vehicle)} --- find nearest available spot; return ticket.
+\item
+  \texttt{unpark(ticket)} --- free the spot; compute fee.
+\item
+  Pluggable pricing strategy (hourly, flat-rate, etc.).
+\item
+  Display available spots per level.
+\end{itemize}
+
+\textbf{Clarifying questions to ask}
+
+\begin{itemize}
+\tightlist
+\item
+  Can a car park in a large spot if compact is full? (Yes, with preference ordering.)
+\item
+  Is pricing per hour or per entry? (Make it a strategy --- both.)
+\item
+  Multiple entrances? (Assume single for now; mention extension.)
+\item
+  Reservations / pre-booking? (Out of scope.)
+\item
+  Thread-safety for concurrent \texttt{park} calls? (Mention lock per level; skip for now.)
+\end{itemize}
+
+\subsection{Core entities / classes}\label{core-entities--classes-1}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3163}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6837}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{VehicleType} (enum) & MOTORCYCLE, CAR, TRUCK \\
+\rowcolor{zebra}
+\texttt{SpotType} (enum) & MOTORCYCLE, COMPACT, LARGE, ELECTRIC \\
+\texttt{Vehicle} (ABC) & Base vehicle with type + license plate \\
+\rowcolor{zebra}
+\texttt{ParkingSpot} & Individual spot --- type, level, number, occupied flag \\
+\texttt{ParkingLevel} & Collection of spots on one floor; find-spot logic \\
+\rowcolor{zebra}
+\texttt{ParkingLot} & Singleton; owns levels; exposes park/unpark \\
+\texttt{Ticket} & Issued on park; holds spot ref + entry time \\
+\rowcolor{zebra}
+\texttt{PricingStrategy} (ABC) & Strategy interface: \texttt{calculate\_fee(ticket)\ -\textgreater{}\ float} \\
+\texttt{HourlyPricing} & Concrete strategy \\
+\rowcolor{zebra}
+\texttt{FlatRatePricing} & Concrete strategy \\
+\end{longtable}
+
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-1}
+
+\setcodelang{}
+
+\begin{verbatim}
+                        +-------------------+
+                        |   ParkingLot      |  <<Singleton>>
+                        +-------------------+
+                        | levels: List[Level]
+                        | strategy: PricingStrategy
+                        +-------------------+
+                        | park(vehicle)     |
+                        | unpark(ticket)    |
+                        +--------+----------+
+                                 | 1..*
+                        +--------v----------+
+                        |  ParkingLevel     |
+                        +-------------------+
+                        | level_num: int    |
+                        | spots: List[Spot] |
+                        +-------------------+
+                        | find_spot(vehicle)|
+                        +--------+----------+
+                                 | 1..*
+                        +--------v----------+
+  <<ABC>>               |   ParkingSpot     |
++------------------+    +-------------------+
+| PricingStrategy  |    | spot_type: SpotType
++------------------+    | is_available: bool|
+| calculate_fee()  |    | vehicle: Vehicle  |
++--------+---------+    +-------------------+
+         |
+   +-----+------+
+   |             |
++--+---+   +----+------+
+|Hourly|   |FlatRate   |
++------+   +-----------+
+
+<<ABC>>
++------------------+
+|    Vehicle       |
++------------------+
+| license: str     |
+| type: VehicleType|
++------------------+
+      ^
+   +--+--+-------+
+   |      |       |
+Moto    Car    Truck
+\end{verbatim}
+
+\subsection{Design patterns used}\label{design-patterns-used-1}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Strategy} --- \texttt{PricingStrategy} lets you swap hourly/flat-rate/weekend pricing without touching \texttt{ParkingLot}.
+\item
+  \textbf{Singleton} --- \texttt{ParkingLot} represents a single physical lot; use \texttt{\_\_new\_\_} or a module-level instance.
+\item
+  \textbf{Factory Method} --- \texttt{VehicleFactory.create(type,\ plate)} to instantiate vehicles without \texttt{if/else} in client code.
+\item
+  \textbf{Template Method} --- \texttt{Vehicle} defines \texttt{allowed\_spot\_types()} as an abstract method; each subclass overrides it.
+\end{itemize}
+
+\subsection{Full code}\label{full-code-1}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ time}
+\ImportTok{from}\NormalTok{ abc }\ImportTok{import}\NormalTok{ ABC, abstractmethod}
+\ImportTok{from}\NormalTok{ enum }\ImportTok{import}\NormalTok{ Enum, auto}
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+\ImportTok{from}\NormalTok{ dataclasses }\ImportTok{import}\NormalTok{ dataclass, field}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Enums                                                               \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ VehicleType(Enum):}
+\NormalTok{    MOTORCYCLE }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    CAR }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    TRUCK }\OperatorTok{=}\NormalTok{ auto()}
+
+
+\KeywordTok{class}\NormalTok{ SpotType(Enum):}
+\NormalTok{    MOTORCYCLE }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    COMPACT }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    LARGE }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    ELECTRIC }\OperatorTok{=}\NormalTok{ auto()}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Vehicles                                                            \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Vehicle(ABC):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, license\_plate: }\BuiltInTok{str}\NormalTok{, vehicle\_type: VehicleType) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.license\_plate }\OperatorTok{=}\NormalTok{ license\_plate}
+        \VariableTok{self}\NormalTok{.vehicle\_type }\OperatorTok{=}\NormalTok{ vehicle\_type}
+
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ allowed\_spot\_types(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[SpotType]:}
+        \CommentTok{"""Ordered preference: first = most preferred spot type."""}
+\NormalTok{        ...}
+
+    \KeywordTok{def} \FunctionTok{\_\_repr\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+        \ControlFlowTok{return} \SpecialStringTok{f"}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{\_\_class\_\_}\SpecialCharTok{.}\VariableTok{\_\_name\_\_}\SpecialCharTok{\}}\SpecialStringTok{(}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{license\_plate}\SpecialCharTok{\}}\SpecialStringTok{)"}
+
+
+\KeywordTok{class}\NormalTok{ Motorcycle(Vehicle):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, license\_plate: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{(license\_plate, VehicleType.MOTORCYCLE)}
+
+    \KeywordTok{def}\NormalTok{ allowed\_spot\_types(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[SpotType]:}
+        \ControlFlowTok{return}\NormalTok{ [SpotType.MOTORCYCLE, SpotType.COMPACT, SpotType.LARGE]}
+
+
+\KeywordTok{class}\NormalTok{ Car(Vehicle):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, license\_plate: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{(license\_plate, VehicleType.CAR)}
+
+    \KeywordTok{def}\NormalTok{ allowed\_spot\_types(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[SpotType]:}
+        \ControlFlowTok{return}\NormalTok{ [SpotType.COMPACT, SpotType.LARGE, SpotType.ELECTRIC]}
+
+
+\KeywordTok{class}\NormalTok{ Truck(Vehicle):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, license\_plate: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{(license\_plate, VehicleType.TRUCK)}
+
+    \KeywordTok{def}\NormalTok{ allowed\_spot\_types(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[SpotType]:}
+        \ControlFlowTok{return}\NormalTok{ [SpotType.LARGE]}
+
+
+\KeywordTok{class}\NormalTok{ VehicleFactory:}
+    \CommentTok{"""Factory to decouple client from concrete vehicle classes."""}
+
+\NormalTok{    \_registry: }\BuiltInTok{dict}\NormalTok{[VehicleType, }\BuiltInTok{type}\NormalTok{[Vehicle]] }\OperatorTok{=}\NormalTok{ \{}
+\NormalTok{        VehicleType.MOTORCYCLE: Motorcycle,}
+\NormalTok{        VehicleType.CAR: Car,}
+\NormalTok{        VehicleType.TRUCK: Truck,}
+\NormalTok{    \}}
+
+    \AttributeTok{@classmethod}
+    \KeywordTok{def}\NormalTok{ create(cls, vehicle\_type: VehicleType, license\_plate: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Vehicle:}
+\NormalTok{        klass }\OperatorTok{=}\NormalTok{ cls.\_registry.get(vehicle\_type)}
+        \ControlFlowTok{if}\NormalTok{ klass }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Unknown vehicle type: }\SpecialCharTok{\{}\NormalTok{vehicle\_type}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+        \ControlFlowTok{return}\NormalTok{ klass(license\_plate)}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Parking Spot                                                        \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ ParkingSpot:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, spot\_id: }\BuiltInTok{str}\NormalTok{, spot\_type: SpotType, level: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.spot\_id }\OperatorTok{=}\NormalTok{ spot\_id}
+        \VariableTok{self}\NormalTok{.spot\_type }\OperatorTok{=}\NormalTok{ spot\_type}
+        \VariableTok{self}\NormalTok{.level }\OperatorTok{=}\NormalTok{ level}
+        \VariableTok{self}\NormalTok{.\_vehicle: Optional[Vehicle] }\OperatorTok{=} \VariableTok{None}
+
+    \AttributeTok{@property}
+    \KeywordTok{def}\NormalTok{ is\_available(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_vehicle }\KeywordTok{is} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ park(}\VariableTok{self}\NormalTok{, vehicle: Vehicle) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if} \KeywordTok{not} \VariableTok{self}\NormalTok{.is\_available:}
+            \ControlFlowTok{raise} \PreprocessorTok{RuntimeError}\NormalTok{(}\SpecialStringTok{f"Spot }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{spot\_id}\SpecialCharTok{\}}\SpecialStringTok{ already occupied"}\NormalTok{)}
+        \VariableTok{self}\NormalTok{.\_vehicle }\OperatorTok{=}\NormalTok{ vehicle}
+
+    \KeywordTok{def}\NormalTok{ unpark(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Vehicle:}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.is\_available:}
+            \ControlFlowTok{raise} \PreprocessorTok{RuntimeError}\NormalTok{(}\SpecialStringTok{f"Spot }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{spot\_id}\SpecialCharTok{\}}\SpecialStringTok{ is empty"}\NormalTok{)}
+\NormalTok{        vehicle }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_vehicle}
+        \VariableTok{self}\NormalTok{.\_vehicle }\OperatorTok{=} \VariableTok{None}
+        \ControlFlowTok{return}\NormalTok{ vehicle  }\CommentTok{\# type: ignore[return{-}value]}
+
+    \KeywordTok{def} \FunctionTok{\_\_repr\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+\NormalTok{        status }\OperatorTok{=} \StringTok{"FREE"} \ControlFlowTok{if} \VariableTok{self}\NormalTok{.is\_available }\ControlFlowTok{else} \SpecialStringTok{f"OCC(}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{\_vehicle}\SpecialCharTok{\}}\SpecialStringTok{)"}
+        \ControlFlowTok{return} \SpecialStringTok{f"Spot[}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{spot\_id}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{spot\_type}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\NormalTok{status}\SpecialCharTok{\}}\SpecialStringTok{]"}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Ticket                                                              \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\AttributeTok{@dataclass}
+\KeywordTok{class}\NormalTok{ Ticket:}
+\NormalTok{    ticket\_id: }\BuiltInTok{str}
+\NormalTok{    vehicle: Vehicle}
+\NormalTok{    spot: ParkingSpot}
+\NormalTok{    entry\_time: }\BuiltInTok{float} \OperatorTok{=}\NormalTok{ field(default\_factory}\OperatorTok{=}\NormalTok{time.time)}
+\NormalTok{    exit\_time: Optional[}\BuiltInTok{float}\NormalTok{] }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ duration\_hours(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{:}
+\NormalTok{        end }\OperatorTok{=} \VariableTok{self}\NormalTok{.exit\_time }\KeywordTok{or}\NormalTok{ time.time()}
+        \ControlFlowTok{return}\NormalTok{ (end }\OperatorTok{{-}} \VariableTok{self}\NormalTok{.entry\_time) }\OperatorTok{/} \FloatTok{3600.0}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Pricing Strategy                                                    \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ PricingStrategy(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ calculate\_fee(}\VariableTok{self}\NormalTok{, ticket: Ticket) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{:}
+\NormalTok{        ...}
+
+
+\KeywordTok{class}\NormalTok{ HourlyPricing(PricingStrategy):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, rate\_per\_hour: }\BuiltInTok{float} \OperatorTok{=} \FloatTok{2.0}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.rate\_per\_hour }\OperatorTok{=}\NormalTok{ rate\_per\_hour}
+
+    \KeywordTok{def}\NormalTok{ calculate\_fee(}\VariableTok{self}\NormalTok{, ticket: Ticket) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{:}
+        \ImportTok{import}\NormalTok{ math}
+\NormalTok{        hours }\OperatorTok{=}\NormalTok{ math.ceil(ticket.duration\_hours())  }\CommentTok{\# round up to next hour}
+        \ControlFlowTok{return} \BuiltInTok{max}\NormalTok{(hours, }\DecValTok{1}\NormalTok{) }\OperatorTok{*} \VariableTok{self}\NormalTok{.rate\_per\_hour}
+
+
+\KeywordTok{class}\NormalTok{ FlatRatePricing(PricingStrategy):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, flat\_fee: }\BuiltInTok{float} \OperatorTok{=} \FloatTok{5.0}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.flat\_fee }\OperatorTok{=}\NormalTok{ flat\_fee}
+
+    \KeywordTok{def}\NormalTok{ calculate\_fee(}\VariableTok{self}\NormalTok{, ticket: Ticket) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.flat\_fee}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Parking Level                                                       \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ ParkingLevel:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, level\_num: }\BuiltInTok{int}\NormalTok{, spots: }\BuiltInTok{list}\NormalTok{[ParkingSpot]) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.level\_num }\OperatorTok{=}\NormalTok{ level\_num}
+        \VariableTok{self}\NormalTok{.spots }\OperatorTok{=}\NormalTok{ spots}
+
+    \KeywordTok{def}\NormalTok{ find\_spot(}\VariableTok{self}\NormalTok{, vehicle: Vehicle) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Optional[ParkingSpot]:}
+        \CommentTok{"""Return first available spot matching vehicle preference order."""}
+        \ControlFlowTok{for}\NormalTok{ preferred\_type }\KeywordTok{in}\NormalTok{ vehicle.allowed\_spot\_types():}
+            \ControlFlowTok{for}\NormalTok{ spot }\KeywordTok{in} \VariableTok{self}\NormalTok{.spots:}
+                \ControlFlowTok{if}\NormalTok{ spot.spot\_type }\OperatorTok{==}\NormalTok{ preferred\_type }\KeywordTok{and}\NormalTok{ spot.is\_available:}
+                    \ControlFlowTok{return}\NormalTok{ spot}
+        \ControlFlowTok{return} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ available\_count(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{dict}\NormalTok{[SpotType, }\BuiltInTok{int}\NormalTok{]:}
+\NormalTok{        counts: }\BuiltInTok{dict}\NormalTok{[SpotType, }\BuiltInTok{int}\NormalTok{] }\OperatorTok{=}\NormalTok{ \{\}}
+        \ControlFlowTok{for}\NormalTok{ spot }\KeywordTok{in} \VariableTok{self}\NormalTok{.spots:}
+            \ControlFlowTok{if}\NormalTok{ spot.is\_available:}
+\NormalTok{                counts[spot.spot\_type] }\OperatorTok{=}\NormalTok{ counts.get(spot.spot\_type, }\DecValTok{0}\NormalTok{) }\OperatorTok{+} \DecValTok{1}
+        \ControlFlowTok{return}\NormalTok{ counts}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Parking Lot (Singleton)                                             \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ ParkingLot:}
+\NormalTok{    \_instance: Optional[ParkingLot] }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def} \FunctionTok{\_\_new\_\_}\NormalTok{(cls, }\OperatorTok{*}\NormalTok{args, }\OperatorTok{**}\NormalTok{kwargs) }\OperatorTok{{-}\textgreater{}}\NormalTok{ ParkingLot:}
+        \ControlFlowTok{if}\NormalTok{ cls.\_instance }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+\NormalTok{            cls.\_instance }\OperatorTok{=} \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_new\_\_}\NormalTok{(cls)}
+        \ControlFlowTok{return}\NormalTok{ cls.\_instance}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}
+        \VariableTok{self}\NormalTok{,}
+\NormalTok{        name: }\BuiltInTok{str}\NormalTok{,}
+\NormalTok{        levels: }\BuiltInTok{list}\NormalTok{[ParkingLevel],}
+\NormalTok{        pricing\_strategy: Optional[PricingStrategy] }\OperatorTok{=} \VariableTok{None}\NormalTok{,}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{\# Guard against re{-}init on subsequent \_\_new\_\_ returns}
+        \ControlFlowTok{if} \BuiltInTok{hasattr}\NormalTok{(}\VariableTok{self}\NormalTok{, }\StringTok{"\_initialized"}\NormalTok{):}
+            \ControlFlowTok{return}
+        \VariableTok{self}\NormalTok{.name }\OperatorTok{=}\NormalTok{ name}
+        \VariableTok{self}\NormalTok{.levels }\OperatorTok{=}\NormalTok{ levels}
+        \VariableTok{self}\NormalTok{.pricing\_strategy: PricingStrategy }\OperatorTok{=}\NormalTok{ pricing\_strategy }\KeywordTok{or}\NormalTok{ HourlyPricing()}
+        \VariableTok{self}\NormalTok{.\_tickets: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, Ticket] }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.\_ticket\_counter }\OperatorTok{=} \DecValTok{0}
+        \VariableTok{self}\NormalTok{.\_initialized }\OperatorTok{=} \VariableTok{True}
+
+    \KeywordTok{def}\NormalTok{ park(}\VariableTok{self}\NormalTok{, vehicle: Vehicle) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Ticket:}
+        \ControlFlowTok{for}\NormalTok{ level }\KeywordTok{in} \VariableTok{self}\NormalTok{.levels:}
+\NormalTok{            spot }\OperatorTok{=}\NormalTok{ level.find\_spot(vehicle)}
+            \ControlFlowTok{if}\NormalTok{ spot:}
+\NormalTok{                spot.park(vehicle)}
+                \VariableTok{self}\NormalTok{.\_ticket\_counter }\OperatorTok{+=} \DecValTok{1}
+\NormalTok{                ticket }\OperatorTok{=}\NormalTok{ Ticket(}
+\NormalTok{                    ticket\_id}\OperatorTok{=}\SpecialStringTok{f"T}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{\_ticket\_counter}\SpecialCharTok{:04d\}}\SpecialStringTok{"}\NormalTok{,}
+\NormalTok{                    vehicle}\OperatorTok{=}\NormalTok{vehicle,}
+\NormalTok{                    spot}\OperatorTok{=}\NormalTok{spot,}
+\NormalTok{                )}
+                \VariableTok{self}\NormalTok{.\_tickets[ticket.ticket\_id] }\OperatorTok{=}\NormalTok{ ticket}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Parked }\SpecialCharTok{\{}\NormalTok{vehicle}\SpecialCharTok{\}}\SpecialStringTok{ at }\SpecialCharTok{\{}\NormalTok{spot}\SpecialCharTok{.}\NormalTok{spot\_id}\SpecialCharTok{\}}\SpecialStringTok{ (Level }\SpecialCharTok{\{}\NormalTok{level}\SpecialCharTok{.}\NormalTok{level\_num}\SpecialCharTok{\}}\SpecialStringTok{)"}\NormalTok{)}
+                \ControlFlowTok{return}\NormalTok{ ticket}
+        \ControlFlowTok{raise} \PreprocessorTok{RuntimeError}\NormalTok{(}\StringTok{"No available spot for this vehicle type"}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ unpark(}\VariableTok{self}\NormalTok{, ticket\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{float}\NormalTok{:}
+\NormalTok{        ticket }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_tickets.get(ticket\_id)}
+        \ControlFlowTok{if}\NormalTok{ ticket }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Unknown ticket: }\SpecialCharTok{\{}\NormalTok{ticket\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+\NormalTok{        ticket.exit\_time }\OperatorTok{=}\NormalTok{ time.time()}
+\NormalTok{        ticket.spot.unpark()}
+\NormalTok{        fee }\OperatorTok{=} \VariableTok{self}\NormalTok{.pricing\_strategy.calculate\_fee(ticket)}
+        \KeywordTok{del} \VariableTok{self}\NormalTok{.\_tickets[ticket\_id]}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Unparked }\SpecialCharTok{\{}\NormalTok{ticket}\SpecialCharTok{.}\NormalTok{vehicle}\SpecialCharTok{\}}\SpecialStringTok{ | Fee: $}\SpecialCharTok{\{}\NormalTok{fee}\SpecialCharTok{:.2f\}}\SpecialStringTok{"}\NormalTok{)}
+        \ControlFlowTok{return}\NormalTok{ fee}
+
+    \KeywordTok{def}\NormalTok{ display\_availability(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"}\CharTok{\textbackslash{}n}\SpecialStringTok{{-}{-}{-} }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{ Availability {-}{-}{-}"}\NormalTok{)}
+        \ControlFlowTok{for}\NormalTok{ level }\KeywordTok{in} \VariableTok{self}\NormalTok{.levels:}
+\NormalTok{            counts }\OperatorTok{=}\NormalTok{ level.available\_count()}
+            \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Level }\SpecialCharTok{\{}\NormalTok{level}\SpecialCharTok{.}\NormalTok{level\_num}\SpecialCharTok{\}}\SpecialStringTok{: }\SpecialCharTok{\{}\NormalTok{counts}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Helper: build a lot                                                 \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{def}\NormalTok{ build\_parking\_lot() }\OperatorTok{{-}\textgreater{}}\NormalTok{ ParkingLot:}
+    \CommentTok{\# Reset singleton for demo purposes}
+\NormalTok{    ParkingLot.\_instance }\OperatorTok{=} \VariableTok{None}
+
+    \KeywordTok{def}\NormalTok{ make\_spots(level: }\BuiltInTok{int}\NormalTok{, config: }\BuiltInTok{dict}\NormalTok{[SpotType, }\BuiltInTok{int}\NormalTok{]) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[ParkingSpot]:}
+\NormalTok{        spots }\OperatorTok{=}\NormalTok{ []}
+        \ControlFlowTok{for}\NormalTok{ spot\_type, count }\KeywordTok{in}\NormalTok{ config.items():}
+            \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{1}\NormalTok{, count }\OperatorTok{+} \DecValTok{1}\NormalTok{):}
+\NormalTok{                spot\_id }\OperatorTok{=} \SpecialStringTok{f"L}\SpecialCharTok{\{}\NormalTok{level}\SpecialCharTok{\}}\SpecialStringTok{{-}}\SpecialCharTok{\{}\NormalTok{spot\_type}\SpecialCharTok{.}\NormalTok{name[}\DecValTok{0}\NormalTok{]}\SpecialCharTok{\}\{}\NormalTok{i}\SpecialCharTok{\}}\SpecialStringTok{"}
+\NormalTok{                spots.append(ParkingSpot(spot\_id, spot\_type, level))}
+        \ControlFlowTok{return}\NormalTok{ spots}
+
+\NormalTok{    levels }\OperatorTok{=}\NormalTok{ [}
+\NormalTok{        ParkingLevel(}\DecValTok{1}\NormalTok{, make\_spots(}\DecValTok{1}\NormalTok{, \{}
+\NormalTok{            SpotType.MOTORCYCLE: }\DecValTok{5}\NormalTok{,}
+\NormalTok{            SpotType.COMPACT: }\DecValTok{10}\NormalTok{,}
+\NormalTok{            SpotType.LARGE: }\DecValTok{5}\NormalTok{,}
+\NormalTok{        \})),}
+\NormalTok{        ParkingLevel(}\DecValTok{2}\NormalTok{, make\_spots(}\DecValTok{2}\NormalTok{, \{}
+\NormalTok{            SpotType.COMPACT: }\DecValTok{8}\NormalTok{,}
+\NormalTok{            SpotType.LARGE: }\DecValTok{4}\NormalTok{,}
+\NormalTok{            SpotType.ELECTRIC: }\DecValTok{3}\NormalTok{,}
+\NormalTok{        \})),}
+\NormalTok{    ]}
+    \ControlFlowTok{return}\NormalTok{ ParkingLot(}\StringTok{"City Center Garage"}\NormalTok{, levels, HourlyPricing(rate\_per\_hour}\OperatorTok{=}\FloatTok{3.0}\NormalTok{))}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    lot }\OperatorTok{=}\NormalTok{ build\_parking\_lot()}
+\NormalTok{    lot.display\_availability()}
+
+\NormalTok{    moto }\OperatorTok{=}\NormalTok{ Motorcycle(}\StringTok{"MOTO{-}001"}\NormalTok{)}
+\NormalTok{    car1 }\OperatorTok{=}\NormalTok{ Car(}\StringTok{"CAR{-}001"}\NormalTok{)}
+\NormalTok{    truck }\OperatorTok{=}\NormalTok{ Truck(}\StringTok{"TRK{-}001"}\NormalTok{)}
+
+\NormalTok{    t1 }\OperatorTok{=}\NormalTok{ lot.park(moto)}
+\NormalTok{    t2 }\OperatorTok{=}\NormalTok{ lot.park(car1)}
+\NormalTok{    t3 }\OperatorTok{=}\NormalTok{ lot.park(truck)}
+\NormalTok{    lot.display\_availability()}
+
+    \CommentTok{\# Simulate time passing (normally you\textquotesingle{}d actually wait)}
+\NormalTok{    t2.entry\_time }\OperatorTok{{-}=} \DecValTok{7200}  \CommentTok{\# pretend car parked 2 hours ago}
+\NormalTok{    lot.unpark(t2.ticket\_id)}
+\NormalTok{    lot.unpark(t1.ticket\_id)}
+\NormalTok{    lot.display\_availability()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Extensibility discussion}\label{extensibility-discussion-1}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{New vehicle type (e.g., Bus):} Add \texttt{VehicleType.BUS}, create \texttt{class\ Bus(Vehicle)} with \texttt{allowed\_spot\_types}, register in \texttt{VehicleFactory.\_registry}. Zero changes to \texttt{ParkingLot} or \texttt{ParkingLevel}.
+\item
+  \textbf{New pricing (weekend/dynamic):} Implement \texttt{WeekendPricing(PricingStrategy)}. Pass it at construction. OCP satisfied.
+\item
+  \textbf{EV charging:} Add \texttt{SpotType.ELECTRIC}; \texttt{Car.allowed\_spot\_types} already supports it. Add \texttt{ChargeSession} attached to \texttt{Ticket}.
+\item
+  \textbf{Reservations:} Add \texttt{reserve(vehicle,\ start\_time)} that marks a spot with a future timestamp; \texttt{find\_spot} skips reserved spots for the overlapping window.
+\end{itemize}
+
+\textbf{Interview takeaway: Always name the Strategy pattern for pricing --- it\textquotesingle s the most common follow-up ("what if pricing changes on weekends?"). The answer is: new class, zero changes to existing code.}
+
+\section{3. Rate Limiter}\label{3-rate-limiter}
+
+\subsection{Requirements}\label{requirements-2}
+
+\textbf{Functional}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{allow(client\_id)\ -\textgreater{}\ bool} --- return True if request should be permitted.
+\item
+  Support Token Bucket, Sliding Window Log, Fixed Window Counter strategies.
+\item
+  Pluggable --- caller picks strategy at construction.
+\item
+  Per-client limiting (different clients independent).
+\end{itemize}
+
+\textbf{Clarifying questions to ask}
+
+\begin{itemize}
+\tightlist
+\item
+  Global limit or per-client? (Per-client.)
+\item
+  Burst tolerance? (Token Bucket allows bursts; fixed-window does not.)
+\item
+  Distributed (Redis-backed)? (Assume in-process for now; mention Redis extension.)
+\item
+  What happens on limit hit --- queue or reject? (Reject / return False.)
+\item
+  Thread-safe? (Yes, per-client locks.)
+\end{itemize}
+
+\subsection{Core entities / classes}\label{core-entities--classes-2}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3329}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6671}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{RateLimitStrategy} (ABC) & Interface: \texttt{is\_allowed(client\_id)\ -\textgreater{}\ bool} \\
+\rowcolor{zebra}
+\texttt{TokenBucketStrategy} & Refill tokens at fixed rate; allow if tokens \textgreater{} 0 \\
+\texttt{FixedWindowStrategy} & Count requests per fixed time window; reset on window roll \\
+\rowcolor{zebra}
+\texttt{SlidingWindowLogStrategy} & Keep timestamped log; count entries in last N seconds \\
+\texttt{RateLimiter} & Context object; delegates to strategy \\
+\end{longtable}
+
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-2}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{     RateLimiter      }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{ strategy: RateLimitStrategy}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{ allow(client\_id)}\OperatorTok{{-}\textgreater{}}\BuiltInTok{bool}\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+           \OperatorTok{|}
+           \OperatorTok{|}\NormalTok{ uses}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}\NormalTok{v}\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{\textless{}\textless{}}\NormalTok{ABC}\OperatorTok{\textgreater{}\textgreater{}}
+\OperatorTok{|}\NormalTok{ RateLimitStrategy    }\OperatorTok{|\textless{}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}                        \OperatorTok{|}
+\OperatorTok{|}\NormalTok{ is\_allowed(cid)}\OperatorTok{{-}\textgreater{}}\BuiltInTok{bool}\OperatorTok{|}          \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}          \OperatorTok{|}             \OperatorTok{|}             \OperatorTok{|}
+\NormalTok{                          TokenBucket   FixedWindow   SlidingWindowLog}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Design patterns used}\label{design-patterns-used-2}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Strategy} --- core pattern; swap algorithms at runtime.
+\item
+  \textbf{Factory / constructor injection} --- \texttt{RateLimiter(strategy=TokenBucketStrategy(...))}.
+\end{itemize}
+
+\subsection{Full code}\label{full-code-2}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ time}
+\ImportTok{import}\NormalTok{ threading}
+\ImportTok{from}\NormalTok{ abc }\ImportTok{import}\NormalTok{ ABC, abstractmethod}
+\ImportTok{from}\NormalTok{ collections }\ImportTok{import}\NormalTok{ deque}
+\ImportTok{from}\NormalTok{ dataclasses }\ImportTok{import}\NormalTok{ dataclass, field}
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Strategy Interface                                                  \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ RateLimitStrategy(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ is\_allowed(}\VariableTok{self}\NormalTok{, client\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+\NormalTok{        ...}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Strategy 1: Token Bucket                                            \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\AttributeTok{@dataclass}
+\KeywordTok{class}\NormalTok{ \_TokenBucketState:}
+\NormalTok{    tokens: }\BuiltInTok{float}
+\NormalTok{    last\_refill: }\BuiltInTok{float} \OperatorTok{=}\NormalTok{ field(default\_factory}\OperatorTok{=}\NormalTok{time.time)}
+
+
+\KeywordTok{class}\NormalTok{ TokenBucketStrategy(RateLimitStrategy):}
+    \CommentTok{"""}
+\CommentTok{    Each client starts with \textasciigrave{}capacity\textasciigrave{} tokens.}
+\CommentTok{    Tokens refill at \textasciigrave{}refill\_rate\textasciigrave{} tokens/second.}
+\CommentTok{    Each request consumes 1 token. Allows bursts up to \textasciigrave{}capacity\textasciigrave{}.}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, capacity: }\BuiltInTok{float}\NormalTok{, refill\_rate: }\BuiltInTok{float}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.capacity }\OperatorTok{=}\NormalTok{ capacity}
+        \VariableTok{self}\NormalTok{.refill\_rate }\OperatorTok{=}\NormalTok{ refill\_rate}
+        \VariableTok{self}\NormalTok{.\_buckets: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, \_TokenBucketState] }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.\_lock }\OperatorTok{=}\NormalTok{ threading.Lock()}
+
+    \KeywordTok{def}\NormalTok{ \_get\_bucket(}\VariableTok{self}\NormalTok{, client\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ \_TokenBucketState:}
+        \ControlFlowTok{if}\NormalTok{ client\_id }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.\_buckets:}
+            \VariableTok{self}\NormalTok{.\_buckets[client\_id] }\OperatorTok{=}\NormalTok{ \_TokenBucketState(tokens}\OperatorTok{=}\VariableTok{self}\NormalTok{.capacity)}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_buckets[client\_id]}
+
+    \KeywordTok{def}\NormalTok{ is\_allowed(}\VariableTok{self}\NormalTok{, client\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{with} \VariableTok{self}\NormalTok{.\_lock:}
+\NormalTok{            now }\OperatorTok{=}\NormalTok{ time.time()}
+\NormalTok{            bucket }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_get\_bucket(client\_id)}
+\NormalTok{            elapsed }\OperatorTok{=}\NormalTok{ now }\OperatorTok{{-}}\NormalTok{ bucket.last\_refill}
+\NormalTok{            bucket.tokens }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(}
+                \VariableTok{self}\NormalTok{.capacity,}
+\NormalTok{                bucket.tokens }\OperatorTok{+}\NormalTok{ elapsed }\OperatorTok{*} \VariableTok{self}\NormalTok{.refill\_rate}
+\NormalTok{            )}
+\NormalTok{            bucket.last\_refill }\OperatorTok{=}\NormalTok{ now}
+            \ControlFlowTok{if}\NormalTok{ bucket.tokens }\OperatorTok{\textgreater{}=} \DecValTok{1}\NormalTok{:}
+\NormalTok{                bucket.tokens }\OperatorTok{{-}=} \DecValTok{1}
+                \ControlFlowTok{return} \VariableTok{True}
+            \ControlFlowTok{return} \VariableTok{False}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Strategy 2: Fixed Window Counter                                    \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\AttributeTok{@dataclass}
+\KeywordTok{class}\NormalTok{ \_FixedWindowState:}
+\NormalTok{    count: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{0}
+\NormalTok{    window\_start: }\BuiltInTok{float} \OperatorTok{=}\NormalTok{ field(default\_factory}\OperatorTok{=}\NormalTok{time.time)}
+
+
+\KeywordTok{class}\NormalTok{ FixedWindowStrategy(RateLimitStrategy):}
+    \CommentTok{"""}
+\CommentTok{    Allow up to \textasciigrave{}limit\textasciigrave{} requests per \textasciigrave{}window\_seconds\textasciigrave{} window.}
+\CommentTok{    Window resets at the start of each period.}
+\CommentTok{    Weakness: burst at window boundary (2x limit in 2*epsilon seconds).}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, limit: }\BuiltInTok{int}\NormalTok{, window\_seconds: }\BuiltInTok{float}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.limit }\OperatorTok{=}\NormalTok{ limit}
+        \VariableTok{self}\NormalTok{.window\_seconds }\OperatorTok{=}\NormalTok{ window\_seconds}
+        \VariableTok{self}\NormalTok{.\_states: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, \_FixedWindowState] }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.\_lock }\OperatorTok{=}\NormalTok{ threading.Lock()}
+
+    \KeywordTok{def}\NormalTok{ is\_allowed(}\VariableTok{self}\NormalTok{, client\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{with} \VariableTok{self}\NormalTok{.\_lock:}
+\NormalTok{            now }\OperatorTok{=}\NormalTok{ time.time()}
+            \ControlFlowTok{if}\NormalTok{ client\_id }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.\_states:}
+                \VariableTok{self}\NormalTok{.\_states[client\_id] }\OperatorTok{=}\NormalTok{ \_FixedWindowState(window\_start}\OperatorTok{=}\NormalTok{now)}
+\NormalTok{            state }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_states[client\_id]}
+
+            \ControlFlowTok{if}\NormalTok{ now }\OperatorTok{{-}}\NormalTok{ state.window\_start }\OperatorTok{\textgreater{}=} \VariableTok{self}\NormalTok{.window\_seconds:}
+\NormalTok{                state.count }\OperatorTok{=} \DecValTok{0}
+\NormalTok{                state.window\_start }\OperatorTok{=}\NormalTok{ now}
+
+            \ControlFlowTok{if}\NormalTok{ state.count }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.limit:}
+\NormalTok{                state.count }\OperatorTok{+=} \DecValTok{1}
+                \ControlFlowTok{return} \VariableTok{True}
+            \ControlFlowTok{return} \VariableTok{False}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Strategy 3: Sliding Window Log                                      \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ SlidingWindowLogStrategy(RateLimitStrategy):}
+    \CommentTok{"""}
+\CommentTok{    Keep a deque of request timestamps per client.}
+\CommentTok{    On each request, prune entries older than \textasciigrave{}window\_seconds\textasciigrave{},}
+\CommentTok{    then check if remaining count \textless{} limit.}
+\CommentTok{    Most accurate; memory = O(limit) per client.}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, limit: }\BuiltInTok{int}\NormalTok{, window\_seconds: }\BuiltInTok{float}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.limit }\OperatorTok{=}\NormalTok{ limit}
+        \VariableTok{self}\NormalTok{.window\_seconds }\OperatorTok{=}\NormalTok{ window\_seconds}
+        \VariableTok{self}\NormalTok{.\_logs: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, deque[}\BuiltInTok{float}\NormalTok{]] }\OperatorTok{=}\NormalTok{ \{\}}
+        \VariableTok{self}\NormalTok{.\_lock }\OperatorTok{=}\NormalTok{ threading.Lock()}
+
+    \KeywordTok{def}\NormalTok{ is\_allowed(}\VariableTok{self}\NormalTok{, client\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{with} \VariableTok{self}\NormalTok{.\_lock:}
+\NormalTok{            now }\OperatorTok{=}\NormalTok{ time.time()}
+            \ControlFlowTok{if}\NormalTok{ client\_id }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.\_logs:}
+                \VariableTok{self}\NormalTok{.\_logs[client\_id] }\OperatorTok{=}\NormalTok{ deque()}
+\NormalTok{            log }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_logs[client\_id]}
+
+\NormalTok{            cutoff }\OperatorTok{=}\NormalTok{ now }\OperatorTok{{-}} \VariableTok{self}\NormalTok{.window\_seconds}
+            \ControlFlowTok{while}\NormalTok{ log }\KeywordTok{and}\NormalTok{ log[}\DecValTok{0}\NormalTok{] }\OperatorTok{\textless{}}\NormalTok{ cutoff:}
+\NormalTok{                log.popleft()}
+
+            \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(log) }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.limit:}
+\NormalTok{                log.append(now)}
+                \ControlFlowTok{return} \VariableTok{True}
+            \ControlFlowTok{return} \VariableTok{False}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Rate Limiter Context                                                \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ RateLimiter:}
+    \CommentTok{"""}
+\CommentTok{    Context class. Delegates to the injected strategy.}
+\CommentTok{    Swap strategy at runtime with \textasciigrave{}set\_strategy\textasciigrave{}.}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, strategy: RateLimitStrategy) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.\_strategy }\OperatorTok{=}\NormalTok{ strategy}
+
+    \KeywordTok{def}\NormalTok{ set\_strategy(}\VariableTok{self}\NormalTok{, strategy: RateLimitStrategy) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.\_strategy }\OperatorTok{=}\NormalTok{ strategy}
+
+    \KeywordTok{def}\NormalTok{ allow(}\VariableTok{self}\NormalTok{, client\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_strategy.is\_allowed(client\_id)}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Demo                                                                \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"=== Token Bucket (capacity=5, refill=1/s) ==="}\NormalTok{)}
+\NormalTok{    rl }\OperatorTok{=}\NormalTok{ RateLimiter(TokenBucketStrategy(capacity}\OperatorTok{=}\DecValTok{5}\NormalTok{, refill\_rate}\OperatorTok{=}\FloatTok{1.0}\NormalTok{))}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{7}\NormalTok{):}
+\NormalTok{        result }\OperatorTok{=}\NormalTok{ rl.allow(}\StringTok{"user\_A"}\NormalTok{)}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Request }\SpecialCharTok{\{}\NormalTok{i}\OperatorTok{+}\DecValTok{1}\SpecialCharTok{\}}\SpecialStringTok{: }\SpecialCharTok{\{}\StringTok{\textquotesingle{}ALLOWED\textquotesingle{}} \ControlFlowTok{if}\NormalTok{ result }\ControlFlowTok{else} \StringTok{\textquotesingle{}DENIED\textquotesingle{}}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{=== Fixed Window (limit=3, window=10s) ==="}\NormalTok{)}
+\NormalTok{    rl2 }\OperatorTok{=}\NormalTok{ RateLimiter(FixedWindowStrategy(limit}\OperatorTok{=}\DecValTok{3}\NormalTok{, window\_seconds}\OperatorTok{=}\DecValTok{10}\NormalTok{))}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{5}\NormalTok{):}
+\NormalTok{        result }\OperatorTok{=}\NormalTok{ rl2.allow(}\StringTok{"user\_B"}\NormalTok{)}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Request }\SpecialCharTok{\{}\NormalTok{i}\OperatorTok{+}\DecValTok{1}\SpecialCharTok{\}}\SpecialStringTok{: }\SpecialCharTok{\{}\StringTok{\textquotesingle{}ALLOWED\textquotesingle{}} \ControlFlowTok{if}\NormalTok{ result }\ControlFlowTok{else} \StringTok{\textquotesingle{}DENIED\textquotesingle{}}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{=== Sliding Window Log (limit=3, window=1s) ==="}\NormalTok{)}
+\NormalTok{    rl3 }\OperatorTok{=}\NormalTok{ RateLimiter(SlidingWindowLogStrategy(limit}\OperatorTok{=}\DecValTok{3}\NormalTok{, window\_seconds}\OperatorTok{=}\FloatTok{1.0}\NormalTok{))}
+    \ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{4}\NormalTok{):}
+\NormalTok{        result }\OperatorTok{=}\NormalTok{ rl3.allow(}\StringTok{"user\_C"}\NormalTok{)}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Request }\SpecialCharTok{\{}\NormalTok{i}\OperatorTok{+}\DecValTok{1}\SpecialCharTok{\}}\SpecialStringTok{: }\SpecialCharTok{\{}\StringTok{\textquotesingle{}ALLOWED\textquotesingle{}} \ControlFlowTok{if}\NormalTok{ result }\ControlFlowTok{else} \StringTok{\textquotesingle{}DENIED\textquotesingle{}}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+\NormalTok{    time.sleep(}\FloatTok{1.1}\NormalTok{)}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ rl3.allow(}\StringTok{"user\_C"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  After sleep: }\SpecialCharTok{\{}\StringTok{\textquotesingle{}ALLOWED\textquotesingle{}} \ControlFlowTok{if}\NormalTok{ result }\ControlFlowTok{else} \StringTok{\textquotesingle{}DENIED\textquotesingle{}}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Extensibility discussion}\label{extensibility-discussion-2}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Redis-backed distributed limiter:} Replace the in-memory \texttt{\_buckets}/\texttt{\_logs} dicts with Redis calls using atomic \texttt{INCR}/\texttt{EXPIRE} or Lua scripts. Strategy interface unchanged.
+\item
+  \textbf{New algorithm (leaky bucket):} Implement \texttt{LeakyBucketStrategy(RateLimitStrategy)}. Inject it. No other changes.
+\item
+  \textbf{Middleware integration:} Wrap \texttt{RateLimiter.allow} in a decorator or WSGI/ASGI middleware. The core class is unaware of HTTP.
+\item
+  \textbf{Per-endpoint limits:} Key on \texttt{f"\{client\_id\}:\{endpoint\}"} instead of just \texttt{client\_id}.
+\end{itemize}
+
+\textbf{Interview takeaway: Know the trade-offs: Token Bucket allows bursts; Fixed Window has boundary-burst weakness; Sliding Window Log is most accurate but costs O(limit) memory per client. Sliding Window Counter (hybrid) is the production sweet spot.}
+
+\section{4. Splitwise / Expense Sharing}\label{4-splitwise--expense-sharing}
+
+\subsection{Requirements}\label{requirements-3}
+
+\textbf{Functional}
+
+\begin{itemize}
+\tightlist
+\item
+  Add users to groups.
+\item
+  Add an expense: payer, amount, split type (EQUAL, EXACT, PERCENT), participants.
+\item
+  \texttt{show\_balances(user)} --- who owes whom and how much.
+\item
+  \texttt{simplify\_debts(group)} --- minimize number of transactions to settle.
+\end{itemize}
+
+\textbf{Clarifying questions to ask}
+
+\begin{itemize}
+\tightlist
+\item
+  Currency? (Single currency; mention multi-currency extension.)
+\item
+  Can the payer be a participant? (Yes --- they effectively owe zero or receive money.)
+\item
+  Simplify debts: across whole app or per-group? (Per-group for now.)
+\item
+  Partial payments / settle-up? (Yes --- add expense with type = SETTLE.)
+\item
+  Persistence? (In-memory; mention DB extension.)
+\end{itemize}
+
+\subsection{Core entities / classes}\label{core-entities--classes-3}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2851}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7149}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{User} & Name, id, personal balance map \\
+\rowcolor{zebra}
+\texttt{Group} & Collection of users + expenses \\
+\texttt{Expense} & Amount, payer, participants, split strategy \\
+\rowcolor{zebra}
+\texttt{SplitStrategy} (ABC) & \texttt{compute\_shares(amount,\ participants)\ -\textgreater{}\ dict{[}User,\ float{]}} \\
+\texttt{EqualSplit} & Divide evenly \\
+\rowcolor{zebra}
+\texttt{ExactSplit} & Caller specifies each person\textquotesingle s share \\
+\texttt{PercentSplit} & Caller specifies each person\textquotesingle s percentage \\
+\rowcolor{zebra}
+\texttt{Balance} & Utility: compute net balances + simplify \\
+\end{longtable}
+
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-3}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|}\NormalTok{  User    }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  Group   }\OperatorTok{|}       \OperatorTok{|}\NormalTok{  Expense   }\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\OperatorTok{|} \BuiltInTok{id}\NormalTok{: }\BuiltInTok{str}  \OperatorTok{|\textless{}{-}{-}{-}{-}{-}\textgreater{}|}\NormalTok{ users    }\OperatorTok{|\textless{}{-}{-}{-}{-}{-}{-}|}\NormalTok{ amount     }\OperatorTok{|}
+\OperatorTok{|}\NormalTok{ name: }\BuiltInTok{str}\OperatorTok{|}       \OperatorTok{|}\NormalTok{ expenses }\OperatorTok{|}       \OperatorTok{|}\NormalTok{ payer: User}\OperatorTok{|}
+\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}       \OperatorTok{|}\NormalTok{ split: Split}
+                                      \OperatorTok{+{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}+}
+                                            \OperatorTok{|}\NormalTok{ uses}
+                              \OperatorTok{\textless{}\textless{}}\NormalTok{ABC}\OperatorTok{\textgreater{}\textgreater{}}  \OperatorTok{+{-}{-}{-}{-}}\NormalTok{v}\OperatorTok{{-}{-}{-}{-}{-}{-}+}
+                         \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+|}\NormalTok{SplitStrat }\OperatorTok{|}
+                         \OperatorTok{|}\NormalTok{  Equal    }\OperatorTok{|+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                         \OperatorTok{|}\NormalTok{  Exact    }\OperatorTok{||}\NormalTok{ compute() }\OperatorTok{|}
+                         \OperatorTok{|}\NormalTok{  Percent  }\OperatorTok{|+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                         \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Design patterns used}\label{design-patterns-used-3}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Strategy} --- \texttt{SplitStrategy} for different split computations.
+\item
+  \textbf{Domain Model} --- \texttt{User}, \texttt{Group}, \texttt{Expense} map directly to business entities.
+\end{itemize}
+
+\subsection{Full code}\label{full-code-3}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{from}\NormalTok{ abc }\ImportTok{import}\NormalTok{ ABC, abstractmethod}
+\ImportTok{from}\NormalTok{ dataclasses }\ImportTok{import}\NormalTok{ dataclass, field}
+\ImportTok{from}\NormalTok{ enum }\ImportTok{import}\NormalTok{ Enum, auto}
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+\ImportTok{import}\NormalTok{ uuid}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Split Strategies                                                    \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ SplitStrategy(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ compute\_shares(}
+        \VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{, participants: }\BuiltInTok{list}\NormalTok{[User], }\OperatorTok{**}\NormalTok{kwargs}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]:}
+        \CommentTok{"""Return \{user\_id: share\_amount\} for each participant."""}
+\NormalTok{        ...}
+
+
+\KeywordTok{class}\NormalTok{ EqualSplit(SplitStrategy):}
+    \KeywordTok{def}\NormalTok{ compute\_shares(}
+        \VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{, participants: }\BuiltInTok{list}\NormalTok{[User], }\OperatorTok{**}\NormalTok{kwargs}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]:}
+\NormalTok{        share }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(amount }\OperatorTok{/} \BuiltInTok{len}\NormalTok{(participants), }\DecValTok{2}\NormalTok{)}
+\NormalTok{        result }\OperatorTok{=}\NormalTok{ \{u.user\_id: share }\ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in}\NormalTok{ participants\}}
+        \CommentTok{\# Correct rounding error on first participant}
+\NormalTok{        total }\OperatorTok{=} \BuiltInTok{sum}\NormalTok{(result.values())}
+\NormalTok{        diff }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(amount }\OperatorTok{{-}}\NormalTok{ total, }\DecValTok{2}\NormalTok{)}
+\NormalTok{        first }\OperatorTok{=}\NormalTok{ participants[}\DecValTok{0}\NormalTok{].user\_id}
+\NormalTok{        result[first] }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(result[first] }\OperatorTok{+}\NormalTok{ diff, }\DecValTok{2}\NormalTok{)}
+        \ControlFlowTok{return}\NormalTok{ result}
+
+
+\KeywordTok{class}\NormalTok{ ExactSplit(SplitStrategy):}
+    \KeywordTok{def}\NormalTok{ compute\_shares(}
+        \VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{, participants: }\BuiltInTok{list}\NormalTok{[User], }\OperatorTok{**}\NormalTok{kwargs}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]:}
+\NormalTok{        shares: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{] }\OperatorTok{=}\NormalTok{ kwargs.get(}\StringTok{"exact\_shares"}\NormalTok{, \{\})}
+        \ControlFlowTok{if} \BuiltInTok{abs}\NormalTok{(}\BuiltInTok{sum}\NormalTok{(shares.values()) }\OperatorTok{{-}}\NormalTok{ amount) }\OperatorTok{\textgreater{}} \FloatTok{0.01}\NormalTok{:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"Exact shares must sum to total amount"}\NormalTok{)}
+        \ControlFlowTok{return}\NormalTok{ \{u.user\_id: shares[u.user\_id] }\ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in}\NormalTok{ participants\}}
+
+
+\KeywordTok{class}\NormalTok{ PercentSplit(SplitStrategy):}
+    \KeywordTok{def}\NormalTok{ compute\_shares(}
+        \VariableTok{self}\NormalTok{, amount: }\BuiltInTok{float}\NormalTok{, participants: }\BuiltInTok{list}\NormalTok{[User], }\OperatorTok{**}\NormalTok{kwargs}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]:}
+\NormalTok{        percents: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{] }\OperatorTok{=}\NormalTok{ kwargs.get(}\StringTok{"percents"}\NormalTok{, \{\})}
+        \ControlFlowTok{if} \BuiltInTok{abs}\NormalTok{(}\BuiltInTok{sum}\NormalTok{(percents.values()) }\OperatorTok{{-}} \DecValTok{100}\NormalTok{) }\OperatorTok{\textgreater{}} \FloatTok{0.01}\NormalTok{:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"Percentages must sum to 100"}\NormalTok{)}
+        \ControlFlowTok{return}\NormalTok{ \{}
+\NormalTok{            u.user\_id: }\BuiltInTok{round}\NormalTok{(amount }\OperatorTok{*}\NormalTok{ percents[u.user\_id] }\OperatorTok{/} \DecValTok{100}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+            \ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in}\NormalTok{ participants}
+\NormalTok{        \}}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# User                                                                \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\AttributeTok{@dataclass}
+\KeywordTok{class}\NormalTok{ User:}
+\NormalTok{    name: }\BuiltInTok{str}
+\NormalTok{    user\_id: }\BuiltInTok{str} \OperatorTok{=}\NormalTok{ field(default\_factory}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{: }\BuiltInTok{str}\NormalTok{(uuid.uuid4())[:}\DecValTok{8}\NormalTok{])}
+
+    \KeywordTok{def} \FunctionTok{\_\_hash\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{int}\NormalTok{:}
+        \ControlFlowTok{return} \BuiltInTok{hash}\NormalTok{(}\VariableTok{self}\NormalTok{.user\_id)}
+
+    \KeywordTok{def} \FunctionTok{\_\_eq\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, other: }\BuiltInTok{object}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{return} \BuiltInTok{isinstance}\NormalTok{(other, User) }\KeywordTok{and} \VariableTok{self}\NormalTok{.user\_id }\OperatorTok{==}\NormalTok{ other.user\_id}
+
+    \KeywordTok{def} \FunctionTok{\_\_repr\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+        \ControlFlowTok{return} \SpecialStringTok{f"User(}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{)"}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Expense                                                             \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ SplitType(Enum):}
+\NormalTok{    EQUAL }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    EXACT }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    PERCENT }\OperatorTok{=}\NormalTok{ auto()}
+
+
+\AttributeTok{@dataclass}
+\KeywordTok{class}\NormalTok{ Expense:}
+\NormalTok{    expense\_id: }\BuiltInTok{str}
+\NormalTok{    description: }\BuiltInTok{str}
+\NormalTok{    amount: }\BuiltInTok{float}
+\NormalTok{    payer: User}
+\NormalTok{    participants: }\BuiltInTok{list}\NormalTok{[User]}
+\NormalTok{    split\_strategy: SplitStrategy}
+\NormalTok{    shares: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]  }\CommentTok{\# user\_id {-}\textgreater{} amount owed by that user}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Group                                                               \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Group:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, name: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.group\_id }\OperatorTok{=} \BuiltInTok{str}\NormalTok{(uuid.uuid4())[:}\DecValTok{8}\NormalTok{]}
+        \VariableTok{self}\NormalTok{.name }\OperatorTok{=}\NormalTok{ name}
+        \VariableTok{self}\NormalTok{.members: }\BuiltInTok{list}\NormalTok{[User] }\OperatorTok{=}\NormalTok{ []}
+        \VariableTok{self}\NormalTok{.expenses: }\BuiltInTok{list}\NormalTok{[Expense] }\OperatorTok{=}\NormalTok{ []}
+        \CommentTok{\# net\_balances[a][b] = amount b owes a (positive = b owes a)}
+        \VariableTok{self}\NormalTok{.\_net: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]] }\OperatorTok{=}\NormalTok{ \{\}}
+
+    \KeywordTok{def}\NormalTok{ add\_member(}\VariableTok{self}\NormalTok{, user: User) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ user }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.members:}
+            \VariableTok{self}\NormalTok{.members.append(user)}
+            \VariableTok{self}\NormalTok{.\_net.setdefault(user.user\_id, \{\})}
+
+    \KeywordTok{def}\NormalTok{ add\_expense(}
+        \VariableTok{self}\NormalTok{,}
+\NormalTok{        description: }\BuiltInTok{str}\NormalTok{,}
+\NormalTok{        amount: }\BuiltInTok{float}\NormalTok{,}
+\NormalTok{        payer: User,}
+\NormalTok{        participants: }\BuiltInTok{list}\NormalTok{[User],}
+\NormalTok{        strategy: SplitStrategy,}
+        \OperatorTok{**}\NormalTok{kwargs,}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Expense:}
+        \ControlFlowTok{if}\NormalTok{ payer }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.members:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{payer}\SpecialCharTok{\}}\SpecialStringTok{ is not a group member"}\NormalTok{)}
+\NormalTok{        shares }\OperatorTok{=}\NormalTok{ strategy.compute\_shares(amount, participants, }\OperatorTok{**}\NormalTok{kwargs)}
+\NormalTok{        expense }\OperatorTok{=}\NormalTok{ Expense(}
+\NormalTok{            expense\_id}\OperatorTok{=}\BuiltInTok{str}\NormalTok{(uuid.uuid4())[:}\DecValTok{8}\NormalTok{],}
+\NormalTok{            description}\OperatorTok{=}\NormalTok{description,}
+\NormalTok{            amount}\OperatorTok{=}\NormalTok{amount,}
+\NormalTok{            payer}\OperatorTok{=}\NormalTok{payer,}
+\NormalTok{            participants}\OperatorTok{=}\NormalTok{participants,}
+\NormalTok{            split\_strategy}\OperatorTok{=}\NormalTok{strategy,}
+\NormalTok{            shares}\OperatorTok{=}\NormalTok{shares,}
+\NormalTok{        )}
+        \VariableTok{self}\NormalTok{.expenses.append(expense)}
+        \VariableTok{self}\NormalTok{.\_update\_balances(expense)}
+        \ControlFlowTok{return}\NormalTok{ expense}
+
+    \KeywordTok{def}\NormalTok{ \_update\_balances(}\VariableTok{self}\NormalTok{, expense: Expense) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{        payer\_id }\OperatorTok{=}\NormalTok{ expense.payer.user\_id}
+        \ControlFlowTok{for}\NormalTok{ uid, share }\KeywordTok{in}\NormalTok{ expense.shares.items():}
+            \ControlFlowTok{if}\NormalTok{ uid }\OperatorTok{==}\NormalTok{ payer\_id:}
+                \ControlFlowTok{continue}  \CommentTok{\# payer doesn\textquotesingle{}t owe themselves}
+            \CommentTok{\# uid owes payer\_id \textasciigrave{}share\textasciigrave{} amount}
+            \VariableTok{self}\NormalTok{.\_net.setdefault(payer\_id, \{\})}
+            \VariableTok{self}\NormalTok{.\_net.setdefault(uid, \{\})}
+\NormalTok{            current }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_net[payer\_id].get(uid, }\DecValTok{0}\NormalTok{)}
+            \VariableTok{self}\NormalTok{.\_net[payer\_id][uid] }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(current }\OperatorTok{+}\NormalTok{ share, }\DecValTok{2}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ show\_balances(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"}\CharTok{\textbackslash{}n}\SpecialStringTok{{-}{-}{-} Balances in group \textquotesingle{}}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{\textquotesingle{} {-}{-}{-}"}\NormalTok{)}
+\NormalTok{        any\_balance }\OperatorTok{=} \VariableTok{False}
+        \ControlFlowTok{for}\NormalTok{ creditor\_id, debtors }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_net.items():}
+\NormalTok{            creditor\_name }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_user\_name(creditor\_id)}
+            \ControlFlowTok{for}\NormalTok{ debtor\_id, amount }\KeywordTok{in}\NormalTok{ debtors.items():}
+\NormalTok{                net }\OperatorTok{=}\NormalTok{ amount }\OperatorTok{{-}} \VariableTok{self}\NormalTok{.\_net.get(debtor\_id, \{\}).get(creditor\_id, }\DecValTok{0}\NormalTok{)}
+                \ControlFlowTok{if}\NormalTok{ net }\OperatorTok{\textgreater{}} \FloatTok{0.01}\NormalTok{:}
+\NormalTok{                    any\_balance }\OperatorTok{=} \VariableTok{True}
+\NormalTok{                    debtor\_name }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_user\_name(debtor\_id)}
+                    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  }\SpecialCharTok{\{}\NormalTok{debtor\_name}\SpecialCharTok{\}}\SpecialStringTok{ owes }\SpecialCharTok{\{}\NormalTok{creditor\_name}\SpecialCharTok{\}}\SpecialStringTok{: $}\SpecialCharTok{\{}\NormalTok{net}\SpecialCharTok{:.2f\}}\SpecialStringTok{"}\NormalTok{)}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ any\_balance:}
+            \BuiltInTok{print}\NormalTok{(}\StringTok{"  All settled up!"}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ simplify\_debts(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[}\BuiltInTok{tuple}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]]:}
+        \CommentTok{"""}
+\CommentTok{        Minimize number of transactions using a greedy creditor{-}debtor matching.}
+\CommentTok{        Returns list of (debtor\_name, creditor\_name, amount).}
+\CommentTok{        """}
+        \CommentTok{\# Compute net position for each user}
+\NormalTok{        net\_position: }\BuiltInTok{dict}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{] }\OperatorTok{=}\NormalTok{ \{m.user\_id: }\FloatTok{0.0} \ControlFlowTok{for}\NormalTok{ m }\KeywordTok{in} \VariableTok{self}\NormalTok{.members\}}
+        \ControlFlowTok{for}\NormalTok{ creditor\_id, debtors }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_net.items():}
+            \ControlFlowTok{for}\NormalTok{ debtor\_id, amount }\KeywordTok{in}\NormalTok{ debtors.items():}
+\NormalTok{                net\_position[creditor\_id] }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(net\_position[creditor\_id] }\OperatorTok{+}\NormalTok{ amount, }\DecValTok{2}\NormalTok{)}
+\NormalTok{                net\_position[debtor\_id] }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(net\_position[debtor\_id] }\OperatorTok{{-}}\NormalTok{ amount, }\DecValTok{2}\NormalTok{)}
+
+        \CommentTok{\# Separate into creditors (positive) and debtors (negative)}
+\NormalTok{        creditors }\OperatorTok{=}\NormalTok{ \{uid: amt }\ControlFlowTok{for}\NormalTok{ uid, amt }\KeywordTok{in}\NormalTok{ net\_position.items() }\ControlFlowTok{if}\NormalTok{ amt }\OperatorTok{\textgreater{}} \FloatTok{0.01}\NormalTok{\}}
+\NormalTok{        debtors }\OperatorTok{=}\NormalTok{ \{uid: }\OperatorTok{{-}}\NormalTok{amt }\ControlFlowTok{for}\NormalTok{ uid, amt }\KeywordTok{in}\NormalTok{ net\_position.items() }\ControlFlowTok{if}\NormalTok{ amt }\OperatorTok{\textless{}} \OperatorTok{{-}}\FloatTok{0.01}\NormalTok{\}}
+
+\NormalTok{        transactions: }\BuiltInTok{list}\NormalTok{[}\BuiltInTok{tuple}\NormalTok{[}\BuiltInTok{str}\NormalTok{, }\BuiltInTok{str}\NormalTok{, }\BuiltInTok{float}\NormalTok{]] }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{        cred\_list }\OperatorTok{=} \BuiltInTok{sorted}\NormalTok{(creditors.items(), key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: }\OperatorTok{{-}}\NormalTok{x[}\DecValTok{1}\NormalTok{])}
+\NormalTok{        debt\_list }\OperatorTok{=} \BuiltInTok{sorted}\NormalTok{(debtors.items(), key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: }\OperatorTok{{-}}\NormalTok{x[}\DecValTok{1}\NormalTok{])}
+
+\NormalTok{        i, j }\OperatorTok{=} \DecValTok{0}\NormalTok{, }\DecValTok{0}
+        \ControlFlowTok{while}\NormalTok{ i }\OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(cred\_list) }\KeywordTok{and}\NormalTok{ j }\OperatorTok{\textless{}} \BuiltInTok{len}\NormalTok{(debt\_list):}
+\NormalTok{            cid, c\_amt }\OperatorTok{=}\NormalTok{ cred\_list[i]}
+\NormalTok{            did, d\_amt }\OperatorTok{=}\NormalTok{ debt\_list[j]}
+\NormalTok{            settled }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(}\BuiltInTok{min}\NormalTok{(c\_amt, d\_amt), }\DecValTok{2}\NormalTok{)}
+\NormalTok{            transactions.append((}\VariableTok{self}\NormalTok{.\_user\_name(did), }\VariableTok{self}\NormalTok{.\_user\_name(cid), settled))}
+\NormalTok{            c\_amt }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(c\_amt }\OperatorTok{{-}}\NormalTok{ settled, }\DecValTok{2}\NormalTok{)}
+\NormalTok{            d\_amt }\OperatorTok{=} \BuiltInTok{round}\NormalTok{(d\_amt }\OperatorTok{{-}}\NormalTok{ settled, }\DecValTok{2}\NormalTok{)}
+\NormalTok{            cred\_list[i] }\OperatorTok{=}\NormalTok{ (cid, c\_amt)}
+\NormalTok{            debt\_list[j] }\OperatorTok{=}\NormalTok{ (d\_amt, d\_amt)  }\CommentTok{\# dummy; just advance index}
+            \ControlFlowTok{if}\NormalTok{ c\_amt }\OperatorTok{\textless{}} \FloatTok{0.01}\NormalTok{:}
+\NormalTok{                i }\OperatorTok{+=} \DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ d\_amt }\OperatorTok{\textless{}} \FloatTok{0.01}\NormalTok{:}
+\NormalTok{                j }\OperatorTok{+=} \DecValTok{1}
+
+        \ControlFlowTok{return}\NormalTok{ transactions}
+
+    \KeywordTok{def}\NormalTok{ \_user\_name(}\VariableTok{self}\NormalTok{, user\_id: }\BuiltInTok{str}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+        \ControlFlowTok{for}\NormalTok{ m }\KeywordTok{in} \VariableTok{self}\NormalTok{.members:}
+            \ControlFlowTok{if}\NormalTok{ m.user\_id }\OperatorTok{==}\NormalTok{ user\_id:}
+                \ControlFlowTok{return}\NormalTok{ m.name}
+        \ControlFlowTok{return}\NormalTok{ user\_id}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    alice }\OperatorTok{=}\NormalTok{ User(}\StringTok{"Alice"}\NormalTok{)}
+\NormalTok{    bob }\OperatorTok{=}\NormalTok{ User(}\StringTok{"Bob"}\NormalTok{)}
+\NormalTok{    charlie }\OperatorTok{=}\NormalTok{ User(}\StringTok{"Charlie"}\NormalTok{)}
+
+\NormalTok{    group }\OperatorTok{=}\NormalTok{ Group(}\StringTok{"Trip to Goa"}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ u }\KeywordTok{in}\NormalTok{ [alice, bob, charlie]:}
+\NormalTok{        group.add\_member(u)}
+
+    \CommentTok{\# Alice pays Rs 300 split equally}
+\NormalTok{    group.add\_expense(}
+        \StringTok{"Dinner"}\NormalTok{, }\FloatTok{300.0}\NormalTok{, alice, [alice, bob, charlie], EqualSplit()}
+\NormalTok{    )}
+
+    \CommentTok{\# Bob pays Rs 200: Charlie pays 50\%, Bob 30\%, Alice 20\%}
+\NormalTok{    group.add\_expense(}
+        \StringTok{"Cab"}\NormalTok{, }\FloatTok{200.0}\NormalTok{, bob,}
+\NormalTok{        [alice, bob, charlie], PercentSplit(),}
+\NormalTok{        percents}\OperatorTok{=}\NormalTok{\{alice.user\_id: }\DecValTok{20}\NormalTok{, bob.user\_id: }\DecValTok{30}\NormalTok{, charlie.user\_id: }\DecValTok{50}\NormalTok{\}}
+\NormalTok{    )}
+
+\NormalTok{    group.show\_balances()}
+
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{{-}{-}{-} Simplified transactions {-}{-}{-}"}\NormalTok{)}
+    \ControlFlowTok{for}\NormalTok{ debtor, creditor, amount }\KeywordTok{in}\NormalTok{ group.simplify\_debts():}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  }\SpecialCharTok{\{}\NormalTok{debtor}\SpecialCharTok{\}}\SpecialStringTok{ pays }\SpecialCharTok{\{}\NormalTok{creditor}\SpecialCharTok{\}}\SpecialStringTok{: $}\SpecialCharTok{\{}\NormalTok{amount}\SpecialCharTok{:.2f\}}\SpecialStringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Extensibility discussion}\label{extensibility-discussion-3}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{New split type (shares-based):} Add \texttt{SharesSplit(SplitStrategy)} where each participant has N shares; their fraction = N\_i / sum(N). Zero changes to \texttt{Group}.
+\item
+  \textbf{Multi-currency:} Add \texttt{currency:\ str} to \texttt{Expense}; convert to a base currency using an injected \texttt{CurrencyConverter} before updating balances.
+\item
+  \textbf{Settle-up:} \texttt{settle(payer,\ payee,\ amount)} is just \texttt{add\_expense("Settlement",\ amount,\ payer,\ {[}payer,\ payee{]},\ ExactSplit(),\ exact\_shares=\{payer.user\_id:0,\ payee.user\_id:amount\})}.
+\item
+  \textbf{Persistence:} Replace \texttt{self.\_net} updates with DB writes. The \texttt{Group} class becomes a service layer calling a repository.
+\end{itemize}
+
+\textbf{Interview takeaway: The debt-simplification algorithm is a classic greedy: compute net positions, then greedily match biggest creditor with biggest debtor. It\textquotesingle s O(N log N) and minimizes the number of transactions (though not necessarily the amounts).}
+
+\section{5. Elevator System}\label{5-elevator-system}
+
+\subsection{Requirements}\label{requirements-4}
+
+\textbf{Functional}
+
+\begin{itemize}
+\tightlist
+\item
+  Multiple elevators in a building.
+\item
+  External requests: \texttt{request\_floor(floor,\ direction)} --- someone on floor 3 wants to go UP.
+\item
+  Internal requests: \texttt{select\_floor(elevator\_id,\ floor)} --- someone inside presses a button.
+\item
+  Scheduler assigns best elevator to each external request.
+\item
+  Each elevator has states: IDLE, MOVING\_UP, MOVING\_DOWN, MAINTENANCE.
+\end{itemize}
+
+\textbf{Clarifying questions to ask}
+
+\begin{itemize}
+\tightlist
+\item
+  How many elevators / floors? (Configurable.)
+\item
+  Any elevator capacity / weight limit? (Mention, skip implementation.)
+\item
+  Priority floors (emergency)? (Out of scope for now.)
+\item
+  Which scheduling algorithm? (SCAN / "look" algorithm --- service in current direction first.)
+\item
+  Real-time simulation or just state transitions? (State transitions.)
+\end{itemize}
+
+\subsection{Core entities / classes}\label{core-entities--classes-4}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3037}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6963}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{ElevatorState} (enum) & IDLE, MOVING\_UP, MOVING\_DOWN, MAINTENANCE \\
+\rowcolor{zebra}
+\texttt{Direction} (enum) & UP, DOWN, IDLE \\
+\texttt{Request} & Floor + direction (external) or just floor (internal) \\
+\rowcolor{zebra}
+\texttt{Elevator} & Single car; state machine; queue of floors to serve \\
+\texttt{Scheduler} (ABC) & Assigns external request to an elevator \\
+\rowcolor{zebra}
+\texttt{ScanScheduler} & SCAN/LOOK algorithm implementation \\
+\texttt{ElevatorSystem} & Owns elevators + scheduler; top-level API \\
+\end{longtable}
+
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-4}
+
+\setcodelang{}
+
+\begin{verbatim}
++---------------------+
+|   ElevatorSystem    |
++---------------------+
+| elevators: list     |
+| scheduler: Scheduler|
++---------------------+
+| request(floor, dir) |
+| select_floor(eid,f) |
+| step()              |
++----------+----------+
+           |
+    +------+-------+      <<ABC>>
+    |   Elevator   |    +-----------+
+    +------+-------+    | Scheduler |
+    | id: int      |    +-----------+
+    | floor: int   |    | assign()  |
+    | state: State |    +-----+-----+
+    | destinations |          |
+    +--------------+    +-----v------+
+                        |ScanSched   |
+                        +------------+
+\end{verbatim}
+
+\subsection{Design patterns used}\label{design-patterns-used-4}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State} --- \texttt{ElevatorState} drives behavior. The transition table (\texttt{IDLE\ →\ MOVING\_UP}, etc.) is explicit.
+\item
+  \textbf{Strategy} --- \texttt{Scheduler} is pluggable (SCAN, Nearest-Car, Zone-based).
+\item
+  \textbf{Observer} (mention) --- In production, elevators would publish state-change events; floors would subscribe to update displays.
+\end{itemize}
+
+\visualfigure{../../figures/lld-coded/01-observer-pattern.pdf}{Observer lets a subject notify many observers of state changes without knowing their concrete types — the basis of event systems and reactive UIs.}
+
+\subsection{Full code}\label{full-code-4}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{from}\NormalTok{ abc }\ImportTok{import}\NormalTok{ ABC, abstractmethod}
+\ImportTok{from}\NormalTok{ enum }\ImportTok{import}\NormalTok{ Enum, auto}
+\ImportTok{from}\NormalTok{ dataclasses }\ImportTok{import}\NormalTok{ dataclass, field}
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+\ImportTok{import}\NormalTok{ heapq}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Enums                                                               \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ ElevatorState(Enum):}
+\NormalTok{    IDLE }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    MOVING\_UP }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    MOVING\_DOWN }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    MAINTENANCE }\OperatorTok{=}\NormalTok{ auto()}
+
+
+\KeywordTok{class}\NormalTok{ Direction(Enum):}
+\NormalTok{    UP }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    DOWN }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    IDLE }\OperatorTok{=}\NormalTok{ auto()}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Request                                                             \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\AttributeTok{@dataclass}
+\KeywordTok{class}\NormalTok{ Request:}
+\NormalTok{    floor: }\BuiltInTok{int}
+\NormalTok{    direction: Direction  }\CommentTok{\# Direction.IDLE for internal (in{-}elevator) requests}
+\NormalTok{    is\_internal: }\BuiltInTok{bool} \OperatorTok{=} \VariableTok{False}
+
+    \KeywordTok{def} \FunctionTok{\_\_repr\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+\NormalTok{        kind }\OperatorTok{=} \StringTok{"INT"} \ControlFlowTok{if} \VariableTok{self}\NormalTok{.is\_internal }\ControlFlowTok{else} \SpecialStringTok{f"EXT{-}}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{direction}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{"}
+        \ControlFlowTok{return} \SpecialStringTok{f"Req(floor=}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{floor}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\NormalTok{kind}\SpecialCharTok{\}}\SpecialStringTok{)"}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Elevator                                                            \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Elevator:}
+    \CommentTok{"""}
+\CommentTok{    Single elevator car.}
+
+\CommentTok{    Internally maintains two min{-}heaps:}
+\CommentTok{      {-} up\_queue: floors \textgreater{} current floor, to serve while going up (min{-}heap)}
+\CommentTok{      {-} down\_queue: floors \textless{} current floor, to serve while going down (max{-}heap via negation)}
+\CommentTok{    SCAN algorithm: exhaust current direction first, then reverse.}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, elevator\_id: }\BuiltInTok{int}\NormalTok{, initial\_floor: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{1}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.elevator\_id }\OperatorTok{=}\NormalTok{ elevator\_id}
+        \VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{=}\NormalTok{ initial\_floor}
+        \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.IDLE}
+        \VariableTok{self}\NormalTok{.direction }\OperatorTok{=}\NormalTok{ Direction.IDLE}
+        \VariableTok{self}\NormalTok{.\_up\_queue: }\BuiltInTok{list}\NormalTok{[}\BuiltInTok{int}\NormalTok{] }\OperatorTok{=}\NormalTok{ []    }\CommentTok{\# min{-}heap}
+        \VariableTok{self}\NormalTok{.\_down\_queue: }\BuiltInTok{list}\NormalTok{[}\BuiltInTok{int}\NormalTok{] }\OperatorTok{=}\NormalTok{ []  }\CommentTok{\# max{-}heap (store negatives)}
+
+    \KeywordTok{def}\NormalTok{ add\_destination(}\VariableTok{self}\NormalTok{, floor: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MAINTENANCE:}
+            \ControlFlowTok{raise} \PreprocessorTok{RuntimeError}\NormalTok{(}\SpecialStringTok{f"Elevator }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{ is under maintenance"}\NormalTok{)}
+        \ControlFlowTok{if}\NormalTok{ floor }\OperatorTok{==} \VariableTok{self}\NormalTok{.current\_floor:}
+            \ControlFlowTok{return}
+        \ControlFlowTok{if}\NormalTok{ floor }\OperatorTok{\textgreater{}} \VariableTok{self}\NormalTok{.current\_floor:}
+            \ControlFlowTok{if}\NormalTok{ floor }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.\_up\_queue:}
+\NormalTok{                heapq.heappush(}\VariableTok{self}\NormalTok{.\_up\_queue, floor)}
+        \ControlFlowTok{else}\NormalTok{:}
+            \ControlFlowTok{if} \OperatorTok{{-}}\NormalTok{floor }\KeywordTok{not} \KeywordTok{in} \VariableTok{self}\NormalTok{.\_down\_queue:}
+\NormalTok{                heapq.heappush(}\VariableTok{self}\NormalTok{.\_down\_queue, }\OperatorTok{{-}}\NormalTok{floor)}
+        \VariableTok{self}\NormalTok{.\_update\_state()}
+
+    \KeywordTok{def}\NormalTok{ step(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Optional[}\BuiltInTok{int}\NormalTok{]:}
+        \CommentTok{"""}
+\CommentTok{        Move one floor toward the next destination.}
+\CommentTok{        Returns the floor reached, or None if already at destination / idle.}
+\CommentTok{        """}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.IDLE }\KeywordTok{or} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MAINTENANCE:}
+            \ControlFlowTok{return} \VariableTok{None}
+
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MOVING\_UP:}
+            \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_up\_queue:}
+\NormalTok{                next\_floor }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_up\_queue[}\DecValTok{0}\NormalTok{]}
+                \VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{+=} \DecValTok{1}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Elevator }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{ ↑ Floor }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{current\_floor}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+                \ControlFlowTok{if} \VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{==}\NormalTok{ next\_floor:}
+\NormalTok{                    heapq.heappop(}\VariableTok{self}\NormalTok{.\_up\_queue)}
+                    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Elevator }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{ STOP at Floor }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{current\_floor}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+            \VariableTok{self}\NormalTok{.\_update\_state()}
+
+        \ControlFlowTok{elif} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MOVING\_DOWN:}
+            \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_down\_queue:}
+\NormalTok{                next\_floor }\OperatorTok{=} \OperatorTok{{-}}\VariableTok{self}\NormalTok{.\_down\_queue[}\DecValTok{0}\NormalTok{]}
+                \VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{{-}=} \DecValTok{1}
+                \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Elevator }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{ ↓ Floor }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{current\_floor}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+                \ControlFlowTok{if} \VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{==}\NormalTok{ next\_floor:}
+\NormalTok{                    heapq.heappop(}\VariableTok{self}\NormalTok{.\_down\_queue)}
+                    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Elevator }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{ STOP at Floor }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{current\_floor}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+            \VariableTok{self}\NormalTok{.\_update\_state()}
+
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.current\_floor}
+
+    \KeywordTok{def}\NormalTok{ \_update\_state(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{"""Transition state based on queues and current direction."""}
+        \ControlFlowTok{if} \KeywordTok{not} \VariableTok{self}\NormalTok{.\_up\_queue }\KeywordTok{and} \KeywordTok{not} \VariableTok{self}\NormalTok{.\_down\_queue:}
+            \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.IDLE}
+            \VariableTok{self}\NormalTok{.direction }\OperatorTok{=}\NormalTok{ Direction.IDLE}
+        \ControlFlowTok{elif} \VariableTok{self}\NormalTok{.direction }\OperatorTok{==}\NormalTok{ Direction.UP:}
+            \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_up\_queue:}
+                \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.MOVING\_UP}
+            \ControlFlowTok{else}\NormalTok{:}
+                \CommentTok{\# Exhausted upward requests; switch down}
+                \VariableTok{self}\NormalTok{.direction }\OperatorTok{=}\NormalTok{ Direction.DOWN}
+                \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.MOVING\_DOWN}
+        \ControlFlowTok{elif} \VariableTok{self}\NormalTok{.direction }\OperatorTok{==}\NormalTok{ Direction.DOWN:}
+            \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_down\_queue:}
+                \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.MOVING\_DOWN}
+            \ControlFlowTok{else}\NormalTok{:}
+                \VariableTok{self}\NormalTok{.direction }\OperatorTok{=}\NormalTok{ Direction.UP}
+                \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.MOVING\_UP}
+        \ControlFlowTok{else}\NormalTok{:}
+            \CommentTok{\# Was IDLE; pick direction based on first pending request}
+            \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_up\_queue }\KeywordTok{and}\NormalTok{ (}
+                \KeywordTok{not} \VariableTok{self}\NormalTok{.\_down\_queue }\KeywordTok{or} \VariableTok{self}\NormalTok{.\_up\_queue[}\DecValTok{0}\NormalTok{] }\OperatorTok{\textgreater{}=} \VariableTok{self}\NormalTok{.current\_floor}
+\NormalTok{            ):}
+                \VariableTok{self}\NormalTok{.direction }\OperatorTok{=}\NormalTok{ Direction.UP}
+                \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.MOVING\_UP}
+            \ControlFlowTok{else}\NormalTok{:}
+                \VariableTok{self}\NormalTok{.direction }\OperatorTok{=}\NormalTok{ Direction.DOWN}
+                \VariableTok{self}\NormalTok{.state }\OperatorTok{=}\NormalTok{ ElevatorState.MOVING\_DOWN}
+
+    \KeywordTok{def}\NormalTok{ cost\_to\_serve(}\VariableTok{self}\NormalTok{, floor: }\BuiltInTok{int}\NormalTok{, direction: Direction) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{int}\NormalTok{:}
+        \CommentTok{"""}
+\CommentTok{        Heuristic cost for scheduler: number of steps to reach \textasciigrave{}floor\textasciigrave{}.}
+\CommentTok{        Considers current direction and queued stops.}
+\CommentTok{        """}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MAINTENANCE:}
+            \ControlFlowTok{return} \BuiltInTok{float}\NormalTok{(}\StringTok{"inf"}\NormalTok{)  }\CommentTok{\# type: ignore[return{-}value]}
+
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.IDLE:}
+            \ControlFlowTok{return} \BuiltInTok{abs}\NormalTok{(}\VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{{-}}\NormalTok{ floor)}
+
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MOVING\_UP:}
+            \ControlFlowTok{if}\NormalTok{ floor }\OperatorTok{\textgreater{}=} \VariableTok{self}\NormalTok{.current\_floor }\KeywordTok{and}\NormalTok{ direction }\OperatorTok{==}\NormalTok{ Direction.UP:}
+                \ControlFlowTok{return}\NormalTok{ floor }\OperatorTok{{-}} \VariableTok{self}\NormalTok{.current\_floor}
+            \CommentTok{\# Must finish upward, come back}
+\NormalTok{            top }\OperatorTok{=} \BuiltInTok{max}\NormalTok{(}\VariableTok{self}\NormalTok{.\_up\_queue) }\ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_up\_queue }\ControlFlowTok{else} \VariableTok{self}\NormalTok{.current\_floor}
+            \ControlFlowTok{return}\NormalTok{ (top }\OperatorTok{{-}} \VariableTok{self}\NormalTok{.current\_floor) }\OperatorTok{+}\NormalTok{ (top }\OperatorTok{{-}}\NormalTok{ floor)}
+
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.state }\OperatorTok{==}\NormalTok{ ElevatorState.MOVING\_DOWN:}
+            \ControlFlowTok{if}\NormalTok{ floor }\OperatorTok{\textless{}=} \VariableTok{self}\NormalTok{.current\_floor }\KeywordTok{and}\NormalTok{ direction }\OperatorTok{==}\NormalTok{ Direction.DOWN:}
+                \ControlFlowTok{return} \VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{{-}}\NormalTok{ floor}
+\NormalTok{            bottom }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(}\OperatorTok{{-}}\NormalTok{x }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_down\_queue) }\ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_down\_queue }\ControlFlowTok{else} \VariableTok{self}\NormalTok{.current\_floor}
+            \ControlFlowTok{return}\NormalTok{ (}\VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{{-}}\NormalTok{ bottom) }\OperatorTok{+}\NormalTok{ (floor }\OperatorTok{{-}}\NormalTok{ bottom)}
+
+        \ControlFlowTok{return} \BuiltInTok{abs}\NormalTok{(}\VariableTok{self}\NormalTok{.current\_floor }\OperatorTok{{-}}\NormalTok{ floor)}
+
+    \KeywordTok{def} \FunctionTok{\_\_repr\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ (}
+            \SpecialStringTok{f"Elevator[}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{|Floor }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{current\_floor}\SpecialCharTok{\}}\SpecialStringTok{|"}
+            \SpecialStringTok{f"}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{state}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{|up=}\SpecialCharTok{\{}\BuiltInTok{list}\NormalTok{(}\VariableTok{self}\NormalTok{.\_up\_queue)}\SpecialCharTok{\}}\SpecialStringTok{|"}
+            \SpecialStringTok{f"down=}\SpecialCharTok{\{}\NormalTok{[}\OperatorTok{{-}}\NormalTok{x }\ControlFlowTok{for}\NormalTok{ x }\KeywordTok{in} \VariableTok{self}\NormalTok{.\_down\_queue]}\SpecialCharTok{\}}\SpecialStringTok{]"}
+\NormalTok{        )}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Scheduler                                                           \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Scheduler(ABC):}
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ assign(}\VariableTok{self}\NormalTok{, elevators: }\BuiltInTok{list}\NormalTok{[Elevator], request: Request) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Elevator:}
+\NormalTok{        ...}
+
+
+\KeywordTok{class}\NormalTok{ NearestCarScheduler(Scheduler):}
+    \CommentTok{"""Assign the elevator with the lowest cost\_to\_serve heuristic."""}
+
+    \KeywordTok{def}\NormalTok{ assign(}\VariableTok{self}\NormalTok{, elevators: }\BuiltInTok{list}\NormalTok{[Elevator], request: Request) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Elevator:}
+\NormalTok{        available }\OperatorTok{=}\NormalTok{ [e }\ControlFlowTok{for}\NormalTok{ e }\KeywordTok{in}\NormalTok{ elevators }\ControlFlowTok{if}\NormalTok{ e.state }\OperatorTok{!=}\NormalTok{ ElevatorState.MAINTENANCE]}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ available:}
+            \ControlFlowTok{raise} \PreprocessorTok{RuntimeError}\NormalTok{(}\StringTok{"No elevators available"}\NormalTok{)}
+        \ControlFlowTok{return} \BuiltInTok{min}\NormalTok{(}
+\NormalTok{            available,}
+\NormalTok{            key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ e: e.cost\_to\_serve(request.floor, request.direction)}
+\NormalTok{        )}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Elevator System                                                     \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ ElevatorSystem:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}
+        \VariableTok{self}\NormalTok{,}
+\NormalTok{        num\_elevators: }\BuiltInTok{int}\NormalTok{,}
+\NormalTok{        num\_floors: }\BuiltInTok{int}\NormalTok{,}
+\NormalTok{        scheduler: Optional[Scheduler] }\OperatorTok{=} \VariableTok{None}\NormalTok{,}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.num\_floors }\OperatorTok{=}\NormalTok{ num\_floors}
+        \VariableTok{self}\NormalTok{.elevators }\OperatorTok{=}\NormalTok{ [Elevator(i }\OperatorTok{+} \DecValTok{1}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(num\_elevators)]}
+        \VariableTok{self}\NormalTok{.scheduler }\OperatorTok{=}\NormalTok{ scheduler }\KeywordTok{or}\NormalTok{ NearestCarScheduler()}
+
+    \KeywordTok{def}\NormalTok{ external\_request(}\VariableTok{self}\NormalTok{, floor: }\BuiltInTok{int}\NormalTok{, direction: Direction) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{"""Someone on \textasciigrave{}floor\textasciigrave{} pressed the UP or DOWN button."""}
+        \VariableTok{self}\NormalTok{.\_validate\_floor(floor)}
+\NormalTok{        request }\OperatorTok{=}\NormalTok{ Request(floor}\OperatorTok{=}\NormalTok{floor, direction}\OperatorTok{=}\NormalTok{direction)}
+\NormalTok{        elevator }\OperatorTok{=} \VariableTok{self}\NormalTok{.scheduler.assign(}\VariableTok{self}\NormalTok{.elevators, request)}
+\NormalTok{        elevator.add\_destination(floor)}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Assigned }\SpecialCharTok{\{}\NormalTok{request}\SpecialCharTok{\}}\SpecialStringTok{ to Elevator }\SpecialCharTok{\{}\NormalTok{elevator}\SpecialCharTok{.}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ internal\_request(}\VariableTok{self}\NormalTok{, elevator\_id: }\BuiltInTok{int}\NormalTok{, floor: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{"""Passenger inside elevator presses button for \textasciigrave{}floor\textasciigrave{}."""}
+        \VariableTok{self}\NormalTok{.\_validate\_floor(floor)}
+\NormalTok{        elevator }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_get\_elevator(elevator\_id)}
+\NormalTok{        elevator.add\_destination(floor)}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  Elevator }\SpecialCharTok{\{}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{: internal request for floor }\SpecialCharTok{\{}\NormalTok{floor}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ step\_all(}\VariableTok{self}\NormalTok{, steps: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{1}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \CommentTok{"""Simulate \textasciigrave{}steps\textasciigrave{} time ticks."""}
+        \ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(steps):}
+            \ControlFlowTok{for}\NormalTok{ elevator }\KeywordTok{in} \VariableTok{self}\NormalTok{.elevators:}
+\NormalTok{                elevator.step()}
+
+    \KeywordTok{def}\NormalTok{ status(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{{-}{-}{-} Elevator Status {-}{-}{-}"}\NormalTok{)}
+        \ControlFlowTok{for}\NormalTok{ e }\KeywordTok{in} \VariableTok{self}\NormalTok{.elevators:}
+            \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  }\SpecialCharTok{\{}\NormalTok{e}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ \_validate\_floor(}\VariableTok{self}\NormalTok{, floor: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ (}\DecValTok{1} \OperatorTok{\textless{}=}\NormalTok{ floor }\OperatorTok{\textless{}=} \VariableTok{self}\NormalTok{.num\_floors):}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Floor }\SpecialCharTok{\{}\NormalTok{floor}\SpecialCharTok{\}}\SpecialStringTok{ out of range [1, }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{num\_floors}\SpecialCharTok{\}}\SpecialStringTok{]"}\NormalTok{)}
+
+    \KeywordTok{def}\NormalTok{ \_get\_elevator(}\VariableTok{self}\NormalTok{, elevator\_id: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Elevator:}
+        \ControlFlowTok{for}\NormalTok{ e }\KeywordTok{in} \VariableTok{self}\NormalTok{.elevators:}
+            \ControlFlowTok{if}\NormalTok{ e.elevator\_id }\OperatorTok{==}\NormalTok{ elevator\_id:}
+                \ControlFlowTok{return}\NormalTok{ e}
+        \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Elevator }\SpecialCharTok{\{}\NormalTok{elevator\_id}\SpecialCharTok{\}}\SpecialStringTok{ not found"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    system }\OperatorTok{=}\NormalTok{ ElevatorSystem(num\_elevators}\OperatorTok{=}\DecValTok{2}\NormalTok{, num\_floors}\OperatorTok{=}\DecValTok{10}\NormalTok{)}
+\NormalTok{    system.status()}
+
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{{-}{-}{-} Requests {-}{-}{-}"}\NormalTok{)}
+\NormalTok{    system.external\_request(}\DecValTok{5}\NormalTok{, Direction.UP)   }\CommentTok{\# person on floor 5 wants to go up}
+\NormalTok{    system.external\_request(}\DecValTok{3}\NormalTok{, Direction.DOWN)  }\CommentTok{\# person on floor 3 wants to go down}
+\NormalTok{    system.internal\_request(}\DecValTok{1}\NormalTok{, }\DecValTok{8}\NormalTok{)              }\CommentTok{\# inside elevator 1, press 8}
+
+\NormalTok{    system.status()}
+
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{{-}{-}{-} Simulating 10 steps {-}{-}{-}"}\NormalTok{)}
+\NormalTok{    system.step\_all(steps}\OperatorTok{=}\DecValTok{10}\NormalTok{)}
+\NormalTok{    system.status()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Extensibility discussion}\label{extensibility-discussion-4}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{New scheduler (zone-based):} Implement \texttt{ZoneScheduler(Scheduler)} that restricts each elevator to a floor range. Inject at construction.
+\item
+  \textbf{Emergency mode:} Add \texttt{ElevatorState.EMERGENCY}. Override \texttt{\_update\_state} to route all cars to ground floor first.
+\item
+  \textbf{Capacity tracking:} Add \texttt{current\_load:\ int} and \texttt{max\_capacity:\ int} to \texttt{Elevator}. Scheduler skips full elevators.
+\item
+  \textbf{Floor display / observer:} Elevators publish \texttt{FloorReachedEvent}; \texttt{FloorDisplay} objects subscribe and update arrow indicators.
+\end{itemize}
+
+\textbf{Interview takeaway: The SCAN algorithm (also called "elevator algorithm") is exactly how real elevator schedulers work --- it\textquotesingle s the same algorithm used by disk schedulers. Name it. The state machine with direction + two queues (up/down) is the key implementation insight.}
+
+\section{6. Tic-Tac-Toe (Clean OO Board Game)}\label{6-tic-tac-toe-clean-oo-board-game}
+
+\subsection{Requirements}\label{requirements-5}
+
+\textbf{Functional}
+
+\begin{itemize}
+\tightlist
+\item
+  Two players, configurable board size (default 3\(\times\)3).
+\item
+  \texttt{make\_move(player,\ row,\ col)} --- place mark; validate; check win/draw.
+\item
+  Win condition: any row, column, or diagonal fully owned by one player.
+\item
+  Draw: board full, no winner.
+\item
+  Support pluggable players (human, AI/random).
+\end{itemize}
+
+\textbf{Clarifying questions to ask}
+
+\begin{itemize}
+\tightlist
+\item
+  Board size always 3\(\times\)3 or configurable? (Configurable; win requires N-in-a-row.)
+\item
+  Two players only, or more? (Two for now; mention extension.)
+\item
+  AI player? (Optional; use Strategy.)
+\item
+  Can the same player go twice? (No --- enforce turn order.)
+\item
+  Replay / undo moves? (Out of scope; mention Command pattern for undo.)
+\end{itemize}
+
+\subsection{Core entities / classes}\label{core-entities--classes-5}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2288}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7712}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{Mark} (enum) & X, O, EMPTY \\
+\rowcolor{zebra}
+\texttt{Board} & Grid state; place/validate mark; check win/draw \\
+\texttt{Player} (ABC) & Name, mark, \texttt{choose\_move(board)\ -\textgreater{}\ (row,\ col)} \\
+\rowcolor{zebra}
+\texttt{HumanPlayer} & Reads from provided input (injectable for testing) \\
+\texttt{RandomAIPlayer} & Picks a random empty cell \\
+\rowcolor{zebra}
+\texttt{WinChecker} & Encapsulates win-detection logic (single responsibility) \\
+\texttt{Game} & Orchestrates turn loop; holds players + board \\
+\end{longtable}
+
+\subsection{Class diagram (ASCII UML)}\label{class-diagram-ascii-uml-5}
+
+\setcodelang{}
+
+\begin{verbatim}
+        +----------+
+        |   Game   |
+        +----------+
+        | board    |
+        | players  |
+        | checker  |
+        +----------+
+        | play()   |
+        +----+-----+
+             |
+     +-------+-------+
+     |               |
++----v----+   +------v-----+
+|  Board  |   | WinChecker |
++---------+   +------------+
+| grid    |   | is_win()   |
+| place() |   | is_draw()  |
++---------+   +------------+
+
+  <<ABC>>
++---------+
+| Player  |
++---------+
+| mark    |
+| choose_move()
++---------+
+    ^
+  +-+------+----------+
+  |                   |
+HumanPlayer    RandomAIPlayer
+\end{verbatim}
+
+\subsection{Design patterns used}\label{design-patterns-used-5}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Strategy} --- \texttt{Player.choose\_move} makes each player type a strategy for move selection.
+\item
+  \textbf{Template Method} --- \texttt{Game.play()} defines the fixed turn loop; player-specific behavior is deferred to \texttt{choose\_move}.
+\item
+  \textbf{Single Responsibility} --- \texttt{WinChecker} is separate from \texttt{Board} (board manages state; checker evaluates it).
+\item
+  \textbf{Command} (mention) --- For undo, wrap each move in a \texttt{Command} object with \texttt{execute}/\texttt{undo}.
+\end{itemize}
+
+\subsection{Full code}\label{full-code-5}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ random}
+\ImportTok{from}\NormalTok{ abc }\ImportTok{import}\NormalTok{ ABC, abstractmethod}
+\ImportTok{from}\NormalTok{ enum }\ImportTok{import}\NormalTok{ Enum, auto}
+\ImportTok{from}\NormalTok{ typing }\ImportTok{import}\NormalTok{ Optional}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Mark                                                                \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Mark(Enum):}
+\NormalTok{    EMPTY }\OperatorTok{=} \StringTok{"."}
+\NormalTok{    X }\OperatorTok{=} \StringTok{"X"}
+\NormalTok{    O }\OperatorTok{=} \StringTok{"O"}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Board                                                               \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Board:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, size: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{3}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.size }\OperatorTok{=}\NormalTok{ size}
+        \VariableTok{self}\NormalTok{.grid: }\BuiltInTok{list}\NormalTok{[}\BuiltInTok{list}\NormalTok{[Mark]] }\OperatorTok{=}\NormalTok{ [}
+\NormalTok{            [Mark.EMPTY] }\OperatorTok{*}\NormalTok{ size }\ControlFlowTok{for}\NormalTok{ \_ }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(size)}
+\NormalTok{        ]}
+        \VariableTok{self}\NormalTok{.\_moves\_made }\OperatorTok{=} \DecValTok{0}
+
+    \KeywordTok{def}\NormalTok{ place(}\VariableTok{self}\NormalTok{, row: }\BuiltInTok{int}\NormalTok{, col: }\BuiltInTok{int}\NormalTok{, mark: Mark) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ (}\DecValTok{0} \OperatorTok{\textless{}=}\NormalTok{ row }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.size }\KeywordTok{and} \DecValTok{0} \OperatorTok{\textless{}=}\NormalTok{ col }\OperatorTok{\textless{}} \VariableTok{self}\NormalTok{.size):}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Position (}\SpecialCharTok{\{}\NormalTok{row}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\NormalTok{col}\SpecialCharTok{\}}\SpecialStringTok{) out of bounds"}\NormalTok{)}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.grid[row][col] }\OperatorTok{!=}\NormalTok{ Mark.EMPTY:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\SpecialStringTok{f"Position (}\SpecialCharTok{\{}\NormalTok{row}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\NormalTok{col}\SpecialCharTok{\}}\SpecialStringTok{) already occupied"}\NormalTok{)}
+        \VariableTok{self}\NormalTok{.grid[row][col] }\OperatorTok{=}\NormalTok{ mark}
+        \VariableTok{self}\NormalTok{.\_moves\_made }\OperatorTok{+=} \DecValTok{1}
+
+    \KeywordTok{def}\NormalTok{ is\_full(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_moves\_made }\OperatorTok{==} \VariableTok{self}\NormalTok{.size }\OperatorTok{*} \VariableTok{self}\NormalTok{.size}
+
+    \KeywordTok{def}\NormalTok{ empty\_cells(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{list}\NormalTok{[}\BuiltInTok{tuple}\NormalTok{[}\BuiltInTok{int}\NormalTok{, }\BuiltInTok{int}\NormalTok{]]:}
+        \ControlFlowTok{return}\NormalTok{ [}
+\NormalTok{            (r, c)}
+            \ControlFlowTok{for}\NormalTok{ r }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\VariableTok{self}\NormalTok{.size)}
+            \ControlFlowTok{for}\NormalTok{ c }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\VariableTok{self}\NormalTok{.size)}
+            \ControlFlowTok{if} \VariableTok{self}\NormalTok{.grid[r][c] }\OperatorTok{==}\NormalTok{ Mark.EMPTY}
+\NormalTok{        ]}
+
+    \KeywordTok{def}\NormalTok{ display(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{        header }\OperatorTok{=} \StringTok{"  "} \OperatorTok{+} \StringTok{" "}\NormalTok{.join(}\BuiltInTok{str}\NormalTok{(c) }\ControlFlowTok{for}\NormalTok{ c }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\VariableTok{self}\NormalTok{.size))}
+        \BuiltInTok{print}\NormalTok{(header)}
+        \ControlFlowTok{for}\NormalTok{ r, row }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(}\VariableTok{self}\NormalTok{.grid):}
+            \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{r}\SpecialCharTok{\}}\SpecialStringTok{ "} \OperatorTok{+} \StringTok{" "}\NormalTok{.join(cell.value }\ControlFlowTok{for}\NormalTok{ cell }\KeywordTok{in}\NormalTok{ row))}
+        \BuiltInTok{print}\NormalTok{()}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Win Checker                                                         \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ WinChecker:}
+    \CommentTok{"""Stateless win{-}detection. Separated from Board (SRP)."""}
+
+    \KeywordTok{def}\NormalTok{ is\_winner(}\VariableTok{self}\NormalTok{, board: Board, mark: Mark) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+\NormalTok{        size }\OperatorTok{=}\NormalTok{ board.size}
+\NormalTok{        g }\OperatorTok{=}\NormalTok{ board.grid}
+
+        \CommentTok{\# Rows}
+        \ControlFlowTok{for}\NormalTok{ row }\KeywordTok{in}\NormalTok{ g:}
+            \ControlFlowTok{if} \BuiltInTok{all}\NormalTok{(cell }\OperatorTok{==}\NormalTok{ mark }\ControlFlowTok{for}\NormalTok{ cell }\KeywordTok{in}\NormalTok{ row):}
+                \ControlFlowTok{return} \VariableTok{True}
+        \CommentTok{\# Columns}
+        \ControlFlowTok{for}\NormalTok{ col }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(size):}
+            \ControlFlowTok{if} \BuiltInTok{all}\NormalTok{(g[row][col] }\OperatorTok{==}\NormalTok{ mark }\ControlFlowTok{for}\NormalTok{ row }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(size)):}
+                \ControlFlowTok{return} \VariableTok{True}
+        \CommentTok{\# Main diagonal}
+        \ControlFlowTok{if} \BuiltInTok{all}\NormalTok{(g[i][i] }\OperatorTok{==}\NormalTok{ mark }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(size)):}
+            \ControlFlowTok{return} \VariableTok{True}
+        \CommentTok{\# Anti{-}diagonal}
+        \ControlFlowTok{if} \BuiltInTok{all}\NormalTok{(g[i][size }\OperatorTok{{-}} \DecValTok{1} \OperatorTok{{-}}\NormalTok{ i] }\OperatorTok{==}\NormalTok{ mark }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(size)):}
+            \ControlFlowTok{return} \VariableTok{True}
+        \ControlFlowTok{return} \VariableTok{False}
+
+    \KeywordTok{def}\NormalTok{ is\_draw(}\VariableTok{self}\NormalTok{, board: Board) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{bool}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ board.is\_full()}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Players                                                             \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ Player(ABC):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, name: }\BuiltInTok{str}\NormalTok{, mark: Mark) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \VariableTok{self}\NormalTok{.name }\OperatorTok{=}\NormalTok{ name}
+        \VariableTok{self}\NormalTok{.mark }\OperatorTok{=}\NormalTok{ mark}
+
+    \AttributeTok{@abstractmethod}
+    \KeywordTok{def}\NormalTok{ choose\_move(}\VariableTok{self}\NormalTok{, board: Board) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{tuple}\NormalTok{[}\BuiltInTok{int}\NormalTok{, }\BuiltInTok{int}\NormalTok{]:}
+\NormalTok{        ...}
+
+    \KeywordTok{def} \FunctionTok{\_\_repr\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+        \ControlFlowTok{return} \SpecialStringTok{f"Player(}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{mark}\SpecialCharTok{.}\NormalTok{value}\SpecialCharTok{\}}\SpecialStringTok{)"}
+
+
+\KeywordTok{class}\NormalTok{ HumanPlayer(Player):}
+    \CommentTok{"""In tests, inject a moves iterator so no stdin needed."""}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}
+        \VariableTok{self}\NormalTok{,}
+\NormalTok{        name: }\BuiltInTok{str}\NormalTok{,}
+\NormalTok{        mark: Mark,}
+\NormalTok{        moves\_iter: Optional[}\BuiltInTok{iter}\NormalTok{] }\OperatorTok{=} \VariableTok{None}\NormalTok{,  }\CommentTok{\# type: ignore[type{-}arg]}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{(name, mark)}
+        \VariableTok{self}\NormalTok{.\_moves\_iter }\OperatorTok{=}\NormalTok{ moves\_iter}
+
+    \KeywordTok{def}\NormalTok{ choose\_move(}\VariableTok{self}\NormalTok{, board: Board) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{tuple}\NormalTok{[}\BuiltInTok{int}\NormalTok{, }\BuiltInTok{int}\NormalTok{]:}
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.\_moves\_iter }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:}
+            \ControlFlowTok{return} \BuiltInTok{next}\NormalTok{(}\VariableTok{self}\NormalTok{.\_moves\_iter)}
+        \ControlFlowTok{while} \VariableTok{True}\NormalTok{:}
+            \ControlFlowTok{try}\NormalTok{:}
+\NormalTok{                raw }\OperatorTok{=} \BuiltInTok{input}\NormalTok{(}\SpecialStringTok{f"}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{ (}\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{mark}\SpecialCharTok{.}\NormalTok{value}\SpecialCharTok{\}}\SpecialStringTok{), enter row col: "}\NormalTok{)}
+\NormalTok{                row, col }\OperatorTok{=} \BuiltInTok{map}\NormalTok{(}\BuiltInTok{int}\NormalTok{, raw.strip().split())}
+                \ControlFlowTok{return}\NormalTok{ row, col}
+            \ControlFlowTok{except}\NormalTok{ (}\PreprocessorTok{ValueError}\NormalTok{, }\PreprocessorTok{EOFError}\NormalTok{):}
+                \BuiltInTok{print}\NormalTok{(}\StringTok{"  Invalid input. Enter two integers: row col"}\NormalTok{)}
+
+
+\KeywordTok{class}\NormalTok{ RandomAIPlayer(Player):}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, name: }\BuiltInTok{str}\NormalTok{, mark: Mark, seed: Optional[}\BuiltInTok{int}\NormalTok{] }\OperatorTok{=} \VariableTok{None}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \BuiltInTok{super}\NormalTok{().}\FunctionTok{\_\_init\_\_}\NormalTok{(name, mark)}
+        \VariableTok{self}\NormalTok{.\_rng }\OperatorTok{=}\NormalTok{ random.Random(seed)}
+
+    \KeywordTok{def}\NormalTok{ choose\_move(}\VariableTok{self}\NormalTok{, board: Board) }\OperatorTok{{-}\textgreater{}} \BuiltInTok{tuple}\NormalTok{[}\BuiltInTok{int}\NormalTok{, }\BuiltInTok{int}\NormalTok{]:}
+\NormalTok{        empties }\OperatorTok{=}\NormalTok{ board.empty\_cells()}
+        \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ empties:}
+            \ControlFlowTok{raise} \PreprocessorTok{RuntimeError}\NormalTok{(}\StringTok{"No moves available"}\NormalTok{)}
+\NormalTok{        choice }\OperatorTok{=} \VariableTok{self}\NormalTok{.\_rng.choice(empties)}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  }\SpecialCharTok{\{}\VariableTok{self}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{ plays (}\SpecialCharTok{\{}\NormalTok{choice[}\DecValTok{0}\NormalTok{]}\SpecialCharTok{\}}\SpecialStringTok{,}\SpecialCharTok{\{}\NormalTok{choice[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{\}}\SpecialStringTok{)"}\NormalTok{)}
+        \ControlFlowTok{return}\NormalTok{ choice}
+
+
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+\CommentTok{\# Game                                                                \#}
+\CommentTok{\# {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} \#}
+
+\KeywordTok{class}\NormalTok{ GameResult(Enum):}
+\NormalTok{    WIN }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    DRAW }\OperatorTok{=}\NormalTok{ auto()}
+\NormalTok{    IN\_PROGRESS }\OperatorTok{=}\NormalTok{ auto()}
+
+
+\KeywordTok{class}\NormalTok{ Game:}
+    \CommentTok{"""}
+\CommentTok{    Orchestrates the turn loop.}
+\CommentTok{    Decoupled from I/O via injectable players.}
+\CommentTok{    """}
+
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}
+        \VariableTok{self}\NormalTok{,}
+\NormalTok{        player1: Player,}
+\NormalTok{        player2: Player,}
+\NormalTok{        board\_size: }\BuiltInTok{int} \OperatorTok{=} \DecValTok{3}\NormalTok{,}
+\NormalTok{    ) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{if}\NormalTok{ player1.mark }\OperatorTok{==}\NormalTok{ player2.mark:}
+            \ControlFlowTok{raise} \PreprocessorTok{ValueError}\NormalTok{(}\StringTok{"Players must have different marks"}\NormalTok{)}
+        \VariableTok{self}\NormalTok{.players }\OperatorTok{=}\NormalTok{ [player1, player2]}
+        \VariableTok{self}\NormalTok{.board }\OperatorTok{=}\NormalTok{ Board(size}\OperatorTok{=}\NormalTok{board\_size)}
+        \VariableTok{self}\NormalTok{.checker }\OperatorTok{=}\NormalTok{ WinChecker()}
+        \VariableTok{self}\NormalTok{.\_current\_idx }\OperatorTok{=} \DecValTok{0}
+        \VariableTok{self}\NormalTok{.winner: Optional[Player] }\OperatorTok{=} \VariableTok{None}
+
+    \AttributeTok{@property}
+    \KeywordTok{def}\NormalTok{ current\_player(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Player:}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.players[}\VariableTok{self}\NormalTok{.\_current\_idx]}
+
+    \KeywordTok{def}\NormalTok{ play\_turn(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ GameResult:}
+\NormalTok{        player }\OperatorTok{=} \VariableTok{self}\NormalTok{.current\_player}
+\NormalTok{        row, col }\OperatorTok{=}\NormalTok{ player.choose\_move(}\VariableTok{self}\NormalTok{.board)}
+        \VariableTok{self}\NormalTok{.board.place(row, col, player.mark)}
+        \VariableTok{self}\NormalTok{.board.display()}
+
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.checker.is\_winner(}\VariableTok{self}\NormalTok{.board, player.mark):}
+            \VariableTok{self}\NormalTok{.winner }\OperatorTok{=}\NormalTok{ player}
+            \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"  }\SpecialCharTok{\{}\NormalTok{player}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{ wins!"}\NormalTok{)}
+            \ControlFlowTok{return}\NormalTok{ GameResult.WIN}
+
+        \ControlFlowTok{if} \VariableTok{self}\NormalTok{.checker.is\_draw(}\VariableTok{self}\NormalTok{.board):}
+            \BuiltInTok{print}\NormalTok{(}\StringTok{"  It\textquotesingle{}s a draw!"}\NormalTok{)}
+            \ControlFlowTok{return}\NormalTok{ GameResult.DRAW}
+
+        \VariableTok{self}\NormalTok{.\_current\_idx }\OperatorTok{=} \DecValTok{1} \OperatorTok{{-}} \VariableTok{self}\NormalTok{.\_current\_idx}
+        \ControlFlowTok{return}\NormalTok{ GameResult.IN\_PROGRESS}
+
+    \KeywordTok{def}\NormalTok{ play(}\VariableTok{self}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ Optional[Player]:}
+        \CommentTok{"""Run the full game loop. Returns winner or None on draw."""}
+        \VariableTok{self}\NormalTok{.board.display()}
+        \ControlFlowTok{while} \VariableTok{True}\NormalTok{:}
+\NormalTok{            result }\OperatorTok{=} \VariableTok{self}\NormalTok{.play\_turn()}
+            \ControlFlowTok{if}\NormalTok{ result }\OperatorTok{!=}\NormalTok{ GameResult.IN\_PROGRESS:}
+                \ControlFlowTok{break}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.winner}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+    \CommentTok{\# Scripted demo: two AI players with fixed seeds for reproducibility}
+\NormalTok{    p1 }\OperatorTok{=}\NormalTok{ RandomAIPlayer(}\StringTok{"Alice"}\NormalTok{, Mark.X, seed}\OperatorTok{=}\DecValTok{42}\NormalTok{)}
+\NormalTok{    p2 }\OperatorTok{=}\NormalTok{ RandomAIPlayer(}\StringTok{"Bob"}\NormalTok{, Mark.O, seed}\OperatorTok{=}\DecValTok{99}\NormalTok{)}
+
+\NormalTok{    game }\OperatorTok{=}\NormalTok{ Game(p1, p2, board\_size}\OperatorTok{=}\DecValTok{3}\NormalTok{)}
+\NormalTok{    winner }\OperatorTok{=}\NormalTok{ game.play()}
+    \ControlFlowTok{if}\NormalTok{ winner:}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Winner: }\SpecialCharTok{\{}\NormalTok{winner}\SpecialCharTok{.}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+    \ControlFlowTok{else}\NormalTok{:}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"Game ended in a draw"}\NormalTok{)}
+
+    \CommentTok{\# Human vs AI example (uncomment for interactive play):}
+    \CommentTok{\# human = HumanPlayer("You", Mark.X)}
+    \CommentTok{\# ai = RandomAIPlayer("Bot", Mark.O)}
+    \CommentTok{\# Game(human, ai).play()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Extensibility discussion}\label{extensibility-discussion-5}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{N-in-a-row win (Connect-4 style):} Parameterize \texttt{WinChecker} with \texttt{win\_length\ \textless{}\ size}. Only the checker changes.
+\item
+  \textbf{More than 2 players:} Change \texttt{self.players} to a list; cycle with \texttt{(current\_idx\ +\ 1)\ \%\ len(players)}. \texttt{Board} already supports arbitrary marks.
+\item
+  \textbf{AI with Minimax:} Replace \texttt{RandomAIPlayer.choose\_move} with a minimax search tree. The \texttt{Player} interface is unchanged.
+\item
+  \textbf{Undo last move:} Wrap \texttt{board.place} in a \texttt{MoveCommand(Command)}. \texttt{game.undo()} calls \texttt{command.undo()} which clears the cell and decrements \texttt{\_moves\_made}.
+\item
+  \textbf{Networked game:} \texttt{RemotePlayer(Player)} overrides \texttt{choose\_move} to send the board state over a socket and wait for a response.
+\end{itemize}
+
+\textbf{Interview takeaway: The WinChecker separation is a key OOP point --- "Board manages state; WinChecker evaluates it." This satisfies SRP and makes unit testing trivial. Always mention the injectable moves iterator for testing HumanPlayer without stdin.}
+
+\section{Common Patterns Across LLD Problems}\label{common-patterns-across-lld-problems}
+
+\subsection{Entity-extraction checklist}\label{entity-extraction-checklist}
+
+When you get a new problem, run through this in 5 minutes:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Nouns \(\rightarrow\) candidate classes:} Underline every noun. Parking Lot \(\rightarrow\) ParkingLot, Level, Spot, Vehicle, Ticket, Fee.
+\item
+  \textbf{Verbs \(\rightarrow\) candidate methods:} Circle every verb. "find available spot" \(\rightarrow\) \texttt{find\_spot(vehicle)}.
+\item
+  \textbf{Prune attributes:} Nouns that are just data fields (name, price, timestamp) become fields, not classes.
+\item
+  \textbf{Find the variability:} What changes? Pricing? Split type? Scheduling algorithm? That variability \(\rightarrow\) Strategy pattern.
+\item
+  \textbf{Find the lifecycle:} What has state? Elevator (Idle \(\rightarrow\) Moving), Ticket (Open \(\rightarrow\) Closed) \(\rightarrow\) State pattern or enum.
+\item
+  \textbf{Find the singleton:} What is there exactly one of? ParkingLot, ElevatorSystem \(\rightarrow\) Singleton.
+\item
+  \textbf{Find the family:} Vehicles, Players, Strategies \(\rightarrow\) Factory + ABC.
+\end{enumerate}
+
+\subsection{Which pattern fits which need}\label{which-pattern-fits-which-need}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3477}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1683}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4840}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Need
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example in this file
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Swap algorithm at runtime & \textbf{Strategy} & Pricing, Split, Scheduler, Rate Limiter, Player \\
+\rowcolor{zebra}
+Object with lifecycle phases & \textbf{State} & Elevator (IDLE/MOVING/MAINTENANCE) \\
+One global instance & \textbf{Singleton} & ParkingLot, ElevatorSystem \\
+\rowcolor{zebra}
+Create family of objects & \textbf{Factory Method} & VehicleFactory \\
+Fixed algorithm, variable steps & \textbf{Template Method} & Vehicle.allowed\_spot\_types, Game.play \\
+\rowcolor{zebra}
+Undo / replayable actions & \textbf{Command} & Board moves (TicTacToe extension) \\
+Notify many on change & \textbf{Observer} & ElevatorSystem \(\rightarrow\) FloorDisplay \\
+\rowcolor{zebra}
+Wrap object with extra behavior & \textbf{Decorator} & Rate limiter middleware layer \\
+\end{longtable}
+
+\subsection{Revision cheat sheet}\label{revision-cheat-sheet}
+
+\setcodelang{}
+
+\begin{verbatim}
+LRU Cache        → HashMap + DLinkedList + sentinel head/tail
+Parking Lot      → Strategy(pricing) + Factory(vehicle) + Singleton(lot)
+Rate Limiter     → Strategy(algorithm) + per-client state
+Splitwise        → Strategy(split) + greedy debt simplification
+Elevator         → State machine + Strategy(scheduler) + SCAN algorithm
+Tic-Tac-Toe      → Strategy(player) + SRP (Board vs WinChecker)
+\end{verbatim}
+
+\subsection{The five questions interviewers ask at the end}\label{the-five-questions-interviewers-ask-at-the-end}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  "How would you make this thread-safe?" \(\rightarrow\) Locks per shared resource; mention \texttt{threading.Lock} / \texttt{concurrent.futures}.
+\item
+  "How would you scale this to 1M users?" \(\rightarrow\) Move to Redis/DB-backed storage; horizontal sharding; mention CAP theorem for rate limiter.
+\item
+  "Add feature X --- what changes?" \(\rightarrow\) Should be "add a new class, zero changes to existing" (OCP). If it isn\textquotesingle t, your design has a seam problem.
+\item
+  "How would you test this?" \(\rightarrow\) Unit test each strategy independently; mock dependencies; inject test doubles (e.g., moves iterator in TicTacToe).
+\item
+  "What did you deprioritize?" \(\rightarrow\) Show you know the tradeoffs: "I skipped persistence, thread-safety on the outer loop, and error telemetry. For production I\textquotesingle d add X."
+\end{enumerate}
+
+\textbf{Final interview takeaway: In a 45-min round, a clean, running 200-line solution with 4 well-named classes beats a 500-line "enterprise" solution with 12 interfaces that doesn\textquotesingle t run. Write the smallest correct design, name the patterns you used, and show one extensibility path. That\textquotesingle s the formula.}
+
+\end{document}

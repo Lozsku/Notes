@@ -1,0 +1,2283 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Vector Databases \& Embeddings}
+\newcommand{\ThemeKicker}{Data Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{0d9488}{2dd4bf}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} This is a deep, mechanism-level reference for FAANG SDE/ML interviews on vector search, embeddings, ANN indexes, and RAG retrieval. Read top to bottom once to build the mental model; then use the \textbf{Revision Cheat Sheet} and \textbf{Common Interview Questions} the night before. Every section pairs an explanation with real code, concrete numbers, and a trade-off. When an interviewer says "design semantic search over 100M docs," the \textbf{Worked Example} section is your script.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+A \textbf{vector database} is a system that stores high-dimensional numeric vectors (\textbf{embeddings}) and answers the query "\textbf{which stored vectors are closest to this query vector?}" in milliseconds, even across hundreds of millions of vectors.
+
+An \textbf{embedding} is a dense array of floating-point numbers --- say 768 of them --- that a neural network produces to represent the \emph{meaning} of a piece of content (a sentence, a paragraph, an image, a product). Two pieces of content that mean similar things land near each other in this 768-dimensional space; unrelated content lands far apart. The vector database makes "find the nearest meanings" fast.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1516}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4962}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3521}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Layer
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What it does
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Embedding model} & Turns text/image into a dense vector & \texttt{text-embedding-3-small}, \texttt{bge-large}, \texttt{e5}, CLIP \\
+\rowcolor{zebra}
+\textbf{Distance metric} & Defines "closeness" between vectors & cosine, dot product, L2 (Euclidean) \\
+\textbf{ANN index} & Finds approximate nearest neighbors fast & HNSW, IVF, IVF-PQ, ScaNN, Annoy, LSH \\
+\rowcolor{zebra}
+\textbf{Vector store} & Persists vectors + metadata, serves queries & Pinecone, Weaviate, Milvus, Qdrant, pgvector \\
+\textbf{Retrieval pipeline} & Chunk \(\rightarrow\) embed \(\rightarrow\) upsert \(\rightarrow\) retrieve \(\rightarrow\) rerank & RAG, semantic search, recommendations \\
+\rowcolor{zebra}
+\textbf{Filtering} & Restrict search by metadata (date, tenant, ACL) & "only docs from tenant X, after 2024" \\
+\end{longtable}
+
+\textbf{Key insight:} A vector database is not a replacement for Postgres. It is a specialized index --- the moral equivalent of a B-tree, but for \emph{semantic proximity} in high-dimensional space instead of \emph{sorted order} on a scalar key. The hard engineering problem it solves is that \textbf{exact nearest-neighbor search in high dimensions is brutally slow}, so it trades a tiny amount of accuracy (recall) for orders-of-magnitude speedups.
+
+\setcodelang{}
+
+\begin{verbatim}
+"How do I reset my password?"  ─embed─→ [0.12, -0.43, 0.87, ..., 0.31]  (768 floats)
+"Steps to recover account access" ─embed─→ [0.11, -0.41, 0.85, ..., 0.29]  ← very close
+"What is photosynthesis?"      ─embed─→ [-0.67, 0.82, -0.34, ..., 0.91]  ← far away
+
+Vector DB job: given the first vector, return the second (and not the third)
+               from among 100,000,000 stored vectors in < 50 ms.
+\end{verbatim}
+
+\section{Why It Exists}\label{why-it-exists}
+
+\textbf{The core problem: meaning is not keywords.}
+
+Traditional search (inverted index + BM25, the engine behind Elasticsearch and classic Google) matches \textbf{tokens}. If you search "reset password" it finds documents containing the literal words "reset" and "password." This breaks in three ways:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Synonymy} --- "recover account access" means the same thing but shares zero keywords with "reset password." Keyword search misses it entirely.
+\item
+  \textbf{Polysemy} --- "Apple stock" (fruit inventory vs. AAPL shares) --- the same token, different meanings. Keyword search can\textquotesingle t tell them apart.
+\item
+  \textbf{Paraphrase / intent} --- "my laptop won\textquotesingle t turn on" should match a doc titled "troubleshooting power issues on portable computers." No shared tokens.
+\end{enumerate}
+
+Embeddings solve this because the model maps \emph{meaning} to \emph{geometry}. "Reset password" and "recover account access" produce nearly identical vectors even though they share no words.
+
+\textbf{The second core problem: exact nearest-neighbor search is too slow.}
+
+Once you have vectors, you need to find the nearest ones. The naive approach --- compute the distance from the query to every stored vector and sort --- is \textbf{exact k-Nearest-Neighbor (kNN)}, and it costs \textbf{O(N \(\cdot\) d)} per query.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{N }\OperatorTok{=} \DecValTok{100}\NormalTok{,}\DecValTok{000}\NormalTok{,}\DecValTok{000}\NormalTok{ documents}
+\NormalTok{d }\OperatorTok{=} \DecValTok{768}\NormalTok{ dimensions}
+\NormalTok{Cost per query }\OperatorTok{=}\NormalTok{ N × d }\OperatorTok{=} \FloatTok{76.8}\NormalTok{ billion multiply}\OperatorTok{{-}}\NormalTok{adds}
+
+\NormalTok{At }\OperatorTok{\textasciitilde{}}\DecValTok{10}\NormalTok{ GFLOP}\OperatorTok{/}\NormalTok{s effective }\ControlFlowTok{for}\NormalTok{ a brute}\OperatorTok{{-}}\NormalTok{force dot}\OperatorTok{{-}}\NormalTok{product loop,}
+\NormalTok{that}\StringTok{\textquotesingle{}s \textasciitilde{}7.6 seconds per query. Per query. Unusable.}
+\end{Highlighting}
+\end{Shaded}
+
+You might think: "use a tree, like a k-d tree, the way we\textquotesingle d do 2D nearest-neighbor." That fails because of the \textbf{curse of dimensionality}:
+
+\subsection{Why k-d trees fail in high dimensions}\label{why-k-d-trees-fail-in-high-dimensions}
+
+A k-d tree partitions space by axis-aligned splits and prunes branches that can\textquotesingle t contain a closer point. In 2D or 3D this prunes \textasciitilde99\% of the tree and gives O(log N) search. But as dimensions grow:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Volume concentrates in the corners.} The fraction of a hypercube\textquotesingle s volume near the surface goes to 1. In 768 dimensions, essentially all points are "near the boundary," so the pruning bound rarely lets you skip a branch.
+\item
+  \textbf{Distances concentrate.} The ratio of the farthest to the nearest point distance approaches 1 as d \(\rightarrow\) \(\infty\). When the nearest and farthest neighbors are nearly equidistant, "nearest neighbor" is barely meaningful and pruning is impossible.
+\item
+  \textbf{Branching factor explosion.} To prune effectively in d dimensions you\textquotesingle d need \textasciitilde2\^{}d cells; for d=768 that\textquotesingle s astronomically more than any dataset.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Exact NN search method      | Works well up to dimension
+----------------------------|----------------------------
+k-d tree / ball tree        | ~10-20
+Cover tree                  | ~30-50
+Brute force (O(N·d))        | any d, but O(N) per query — too slow at scale
+ANN (HNSW/IVF/PQ)           | hundreds to thousands ← the only practical answer
+\end{verbatim}
+
+This is exactly why \textbf{Approximate} Nearest Neighbor (ANN) exists: give up the guarantee of finding \emph{the} exact nearest neighbor, accept finding \emph{almost always the right ones} (e.g., 95--99\% recall), and get a 100--1000\(\times\) speedup. The "approximate" is the whole point.
+
+\textbf{Before vector databases:} semantic search required hand-built NLP --- TF-IDF, latent semantic analysis (LSA/SVD), query expansion with synonym dictionaries, and entity linking. Each was brittle and shallow.
+
+\textbf{After embeddings + ANN:} a single embedding model plus an ANN index gives deep semantic matching out of the box, and it generalizes to images, audio, and code with the same machinery.
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\textbf{Google:} ANN is foundational. \textbf{ScaNN} (Scalable Nearest Neighbors) is Google\textquotesingle s own library, used in Search and YouTube recommendations. Vertex AI Matching Engine serves billion-vector indexes. Embedding-based retrieval is how Google does semantic ranking, "related searches," and RAG grounding for Gemini. Expect questions on ScaNN\textquotesingle s anisotropic quantization and on grounding LLMs.
+
+\textbf{Meta:} Built \textbf{FAISS} (Facebook AI Similarity Search) --- the most-used ANN library in the world. Meta runs embedding retrieval for feed ranking, ads retrieval (find candidate ads from billions), Reels recommendations, and content moderation (find near-duplicate / similar harmful content). "Two-tower" retrieval models feeding FAISS are a core interview topic.
+
+\textbf{Amazon:} Product search and recommendations ("customers who bought this") are embedding retrieval at planetary scale. OpenSearch (their Elasticsearch fork) ships kNN/HNSW. Amazon Bedrock Knowledge Bases is managed RAG. Cost-per-query and memory footprint directly hit AWS margins, so quantization (PQ) and sharding come up.
+
+\textbf{Microsoft:} Azure AI Search has native vector + hybrid search; it underpins Microsoft 365 Copilot\textquotesingle s retrieval over your org\textquotesingle s documents. They care about hybrid (dense + BM25) and ACL-aware filtered search (you must only retrieve docs you\textquotesingle re allowed to see).
+
+\textbf{Apple:} On-device semantic search (Spotlight, Photos "find pictures of dogs"), privacy-first, tight memory budgets --- making PQ/compression and small embedding models matter.
+
+\textbf{Netflix / Spotify / Pinterest:} Recommendations are retrieval. Spotify built \textbf{Annoy} (Approximate Nearest Neighbors Oh Yeah) for music recs. Pinterest\textquotesingle s PinSage/visual search is embedding retrieval over billions of pins.
+
+\textbf{Startups (Perplexity, Glean, Harvey, Notion AI, Cursor):} The product \emph{is} retrieval quality. Every one of them ships RAG; chunking, hybrid search, and reranking are daily decisions.
+
+\textbf{Why interviewers ask:} RAG is now standard in every AI product, so retrieval quality is a core competency. The recall/latency/memory trade-off is a clean systems-design question with real numbers. And it connects ML (embeddings, training objectives) with systems (indexes, sharding) --- a great signal for senior generalists.
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Semantic search vs. lexical search}\label{semantic-search-vs-lexical-search}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1574}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3738}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4688}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lexical (BM25 / inverted index)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Semantic (embeddings + ANN)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Matches on} & Exact tokens / stems & Meaning / intent \\
+\rowcolor{zebra}
+\textbf{Strength} & Rare terms, IDs, names, acronyms, code & Paraphrase, synonyms, concepts \\
+\textbf{Weakness} & Synonyms, paraphrase & Exact strings ("error code E-1042"), out-of-domain jargon \\
+\rowcolor{zebra}
+\textbf{Index} & Posting lists (sparse) & Dense vectors in ANN index \\
+\textbf{Scoring} & TF-IDF / BM25 & Cosine / dot product distance \\
+\rowcolor{zebra}
+\textbf{Best in practice} & --- & \textbf{Hybrid: use both, fuse the scores} \\
+\end{longtable}
+
+The professional answer is almost never "semantic only." It\textquotesingle s \textbf{hybrid search} --- semantic for recall on meaning, lexical for precision on exact terms --- fused together (covered later).
+
+\subsection{The vector space}\label{the-vector-space}
+
+After embedding, every document is a point in \(\mathbb{R}\)\^{}d. The geometry encodes semantics:
+
+\setcodelang{}
+
+\begin{verbatim}
+                 [photosynthesis]
+                       ●
+                                          ● [chlorophyll]
+
+
+   [reset password] ●
+         ● [recover account access]      ● [forgot login credentials]
+
+   ← Cluster of "account access help" sits in one region;
+     "biology/plants" sits in a far-away region.
+\end{verbatim}
+
+Three operations matter:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Nearest-neighbor query} --- given a query point, return the k closest stored points (search/RAG).
+\item
+  \textbf{Clustering} --- group points into regions (used internally by IVF; also for dedup, topic discovery).
+\item
+  \textbf{Filtered NN} --- nearest neighbors \emph{subject to} a metadata predicate ("only points where tenant=X").
+\end{itemize}
+
+\subsection{Exact kNN cost recap}\label{exact-knn-cost-recap}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+
+\KeywordTok{def}\NormalTok{ exact\_knn(query, vectors, k):}
+    \CommentTok{\# vectors: (N, d) matrix, query: (d,)}
+    \CommentTok{\# O(N*d) dot products + O(N log k) selection}
+\NormalTok{    sims }\OperatorTok{=}\NormalTok{ vectors }\OperatorTok{@}\NormalTok{ query           }\CommentTok{\# N*d multiply{-}adds}
+\NormalTok{    idx }\OperatorTok{=}\NormalTok{ np.argpartition(}\OperatorTok{{-}}\NormalTok{sims, k)[:k]}
+    \ControlFlowTok{return}\NormalTok{ idx[np.argsort(}\OperatorTok{{-}}\NormalTok{sims[idx])]}
+\end{Highlighting}
+\end{Shaded}
+
+At N=100M, d=768 this is \textasciitilde7.6 s/query (shown above). ANN indexes cut this to single-digit milliseconds by \emph{not} looking at most vectors --- they navigate a graph (HNSW) or only probe a few clusters (IVF).
+
+\textbf{Interview takeaway:} Brute force is fine up to \textasciitilde tens of thousands of vectors (a few ms). Past \textasciitilde100K--1M you need an ANN index. State this threshold explicitly.
+
+\section{Embeddings}\label{embeddings}
+
+\subsection{What a dense embedding is}\label{what-a-dense-embedding-is}
+
+A dense embedding is a fixed-length vector of real numbers where \textbf{every dimension carries (distributed) information} --- unlike a sparse one-hot or bag-of-words vector where most entries are zero. "Dense" means all d entries are meaningful floats; "embedding" means the vector lives in a learned space where geometric closeness \(\approx\) semantic similarity.
+
+\setcodelang{}
+
+\begin{verbatim}
+Sparse (bag-of-words, vocab=50,000):  [0,0,...,1,...,0,1,0,...,0]  ← 50,000 dims, mostly 0
+Dense (embedding):                    [0.12, -0.43, 0.87, ..., 0.31]  ← 768 dims, all informative
+\end{verbatim}
+
+No single dimension means "is about cats." Meaning is \textbf{distributed} across all dimensions --- direction in the space encodes concepts.
+
+\subsection{How models learn embeddings --- the training objective}\label{how-models-learn-embeddings--the-training-objective}
+
+Embeddings are learned, not designed. The dominant objective is \textbf{contrastive learning}: pull semantically-related pairs together and push unrelated pairs apart.
+
+\textbf{Contrastive / InfoNCE loss (the core idea):}
+
+For an anchor \texttt{a}, a positive \texttt{p} (something that should be similar), and negatives \texttt{n\_i} (things that should be dissimilar), minimize:
+
+\setcodelang{}
+
+\begin{verbatim}
+loss = -log(  exp(sim(a, p) / τ)  /  Σ_i exp(sim(a, n_i) / τ)  )
+\end{verbatim}
+
+Maximizing the numerator pulls \texttt{a} and \texttt{p} together; the denominator pushes \texttt{a} away from all negatives. \texttt{τ} is a temperature. \textbf{In-batch negatives} are the trick that makes this cheap: within a batch of B (anchor, positive) pairs, every other pair\textquotesingle s positive serves as a negative, giving B\(-\)1 negatives for free.
+
+\textbf{Self-supervised pretraining} generates the pairs without human labels:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Inverse cloze / span corruption} --- a sentence and its surrounding paragraph are a positive pair.
+\item
+  \textbf{Dropout-as-augmentation (SimCSE)} --- feed the \emph{same} sentence through the encoder twice with different dropout masks; the two outputs are a positive pair. Brilliantly simple and strong.
+\item
+  \textbf{Title--body, question--answer, query--clicked-document} mined from logs are natural positives.
+\end{itemize}
+
+\textbf{Sentence-transformers \& bi-encoders:} A \textbf{bi-encoder} encodes the query and the document \emph{independently} into vectors, then compares with a cheap dot product. This is what makes retrieval scalable: you embed all N documents \emph{once, offline}, store the vectors, and at query time only embed the query (one forward pass) and do ANN search. Contrast with a \textbf{cross-encoder} (used for reranking) which feeds {[}query, doc{]} \emph{together} through attention --- far more accurate but O(N) forward passes, impossible at retrieval scale.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sentence\_transformers }\ImportTok{import}\NormalTok{ SentenceTransformer}
+
+\NormalTok{model }\OperatorTok{=}\NormalTok{ SentenceTransformer(}\StringTok{"BAAI/bge{-}base{-}en{-}v1.5"}\NormalTok{)  }\CommentTok{\# bi{-}encoder, 768{-}dim}
+
+\CommentTok{\# Offline: embed the whole corpus once}
+\NormalTok{doc\_vecs }\OperatorTok{=}\NormalTok{ model.encode(documents, batch\_size}\OperatorTok{=}\DecValTok{256}\NormalTok{, normalize\_embeddings}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+\CommentTok{\# Online: embed only the query (one forward pass), then ANN search}
+\NormalTok{q }\OperatorTok{=}\NormalTok{ model.encode(}\StringTok{"how do I reset my password"}\NormalTok{, normalize\_embeddings}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\CommentTok{\# similarity = dot product because vectors are unit{-}normalized}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Dimensionality --- 384 vs 768 vs 1536 vs 3072}\label{dimensionality--384-vs-768-vs-1536-vs-3072}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3316}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3316}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2967}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Dims
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Typical models
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{384} & \texttt{all-MiniLM-L6-v2}, \texttt{bge-small} & Tiny, fast, 4\(\times\) less RAM than 1536 & Lower ceiling on quality \\
+\rowcolor{zebra}
+\textbf{768} & \texttt{bge-base}, \texttt{e5-base}, \texttt{nomic-embed} & Sweet spot quality/cost & Standard default \\
+\textbf{1024} & \texttt{bge-large}, \texttt{cohere-embed-v3} & Strong quality & More RAM/compute \\
+\rowcolor{zebra}
+\textbf{1536} & OpenAI \texttt{text-embedding-3-small}, \texttt{ada-002} & Excellent, managed API & 2\(\times\) RAM vs 768 \\
+\textbf{3072} & OpenAI \texttt{text-embedding-3-large} & Best OpenAI quality & 4\(\times\) RAM vs 768; often overkill \\
+\end{longtable}
+
+\textbf{The trade-off is concrete.} Memory and compute scale linearly with d:
+
+\setcodelang{}
+
+\begin{verbatim}
+100M vectors, float32 (4 bytes):
+  d=384  → 100M × 384 × 4 B  = 153.6 GB
+  d=768  → 100M × 768 × 4 B  = 307.2 GB
+  d=1536 → 100M × 1536 × 4 B = 614.4 GB
+  d=3072 → 100M × 3072 × 4 B = 1.23 TB
+\end{verbatim}
+
+Doubling dimensions doubles RAM, doubles distance-computation cost, and doubles network/storage. Higher d usually improves recall --- but with diminishing returns. \textbf{Matryoshka embeddings} (MRL, used by OpenAI v3 and nomic) train so that the \emph{first} k dimensions are themselves a usable embedding --- you can truncate 1536\(\rightarrow\)512 and keep \textasciitilde90\%+ of quality, getting a runtime knob for the cost/quality trade-off.
+
+\subsection{Normalization --- unit vectors}\label{normalization--unit-vectors}
+
+Most text embeddings are \textbf{L2-normalized} to unit length (‖v‖ = 1). This matters because:
+
+\begin{itemize}
+\tightlist
+\item
+  After normalization, \textbf{dot product = cosine similarity} (proof below), so you can use the faster \texttt{inner\ product} metric in the index and still get cosine ranking.
+\item
+  It removes magnitude as a confound --- you compare \emph{direction} (meaning) only, not length.
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{v }\OperatorTok{=}\NormalTok{ v }\OperatorTok{/}\NormalTok{ np.linalg.norm(v)   }\CommentTok{\# now ‖v‖ = 1; dot(a,b) == cosine(a,b)}
+\end{Highlighting}
+\end{Shaded}
+
+If your model emits normalized vectors, configure the index for \textbf{inner product (IP)}, not L2 --- it\textquotesingle s the same ranking and slightly cheaper.
+
+\subsection{Choosing / fine-tuning a domain model}\label{choosing--fine-tuning-a-domain-model}
+
+Off-the-shelf models are trained on web/general text. For specialized domains (legal, biomedical, code, your internal jargon) they under-perform because the \emph{geometry} doesn\textquotesingle t separate your domain\textquotesingle s concepts well.
+
+Decision order:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Start with a strong general model} (\texttt{bge-large}, \texttt{e5}, OpenAI v3). Measure recall on a golden set first.
+\item
+  \textbf{Try a domain pretrained model} if one exists (\texttt{BioBERT}/\texttt{PubMedBERT} for biomed, \texttt{CodeBERT}/\texttt{jina-code} for code).
+\item
+  \textbf{Fine-tune with contrastive pairs from your data} --- mined (query, clicked-doc) pairs, or synthetic (LLM generates a question for each chunk \(\rightarrow\) (question, chunk) positive). A few thousand pairs can lift recall@10 by 5--15 points.
+\end{enumerate}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sentence\_transformers }\ImportTok{import}\NormalTok{ SentenceTransformer, losses, InputExample}
+\ImportTok{from}\NormalTok{ torch.utils.data }\ImportTok{import}\NormalTok{ DataLoader}
+
+\NormalTok{model }\OperatorTok{=}\NormalTok{ SentenceTransformer(}\StringTok{"BAAI/bge{-}base{-}en{-}v1.5"}\NormalTok{)}
+\NormalTok{train }\OperatorTok{=}\NormalTok{ [InputExample(texts}\OperatorTok{=}\NormalTok{[q, positive\_chunk]) }\ControlFlowTok{for}\NormalTok{ q, positive\_chunk }\KeywordTok{in}\NormalTok{ mined\_pairs]}
+\NormalTok{loader }\OperatorTok{=}\NormalTok{ DataLoader(train, shuffle}\OperatorTok{=}\VariableTok{True}\NormalTok{, batch\_size}\OperatorTok{=}\DecValTok{64}\NormalTok{)}
+\NormalTok{loss }\OperatorTok{=}\NormalTok{ losses.MultipleNegativesRankingLoss(model)   }\CommentTok{\# in{-}batch negatives}
+\NormalTok{model.fit(train\_objectives}\OperatorTok{=}\NormalTok{[(loader, loss)], epochs}\OperatorTok{=}\DecValTok{1}\NormalTok{, warmup\_steps}\OperatorTok{=}\DecValTok{100}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{The hidden cost: fine-tuning changes the space.} New vectors are \emph{not comparable} to old ones, so you must \textbf{re-embed your entire corpus} with the new model. At 100M chunks and 1000 chunks/sec/GPU that\textquotesingle s \textasciitilde28 GPU-hours per pass --- a real operational event.
+
+\subsection{Multimodal --- CLIP and shared spaces}\label{multimodal--clip-and-shared-spaces}
+
+\textbf{CLIP} (Contrastive Language--Image Pretraining) trains an image encoder and a text encoder \emph{jointly} with a contrastive loss over (image, caption) pairs, so an image and its caption land at the \textbf{same point} in a shared 512/768-dim space. This enables cross-modal search: embed a text query and retrieve images, or embed an image and retrieve captions, all with one ANN index.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Search images with a text query — one shared space}
+\NormalTok{image\_vecs }\OperatorTok{=}\NormalTok{ clip.encode\_image(images)        }\CommentTok{\# stored offline}
+\NormalTok{q }\OperatorTok{=}\NormalTok{ clip.encode\_text(}\StringTok{"a golden retriever on a beach"}\NormalTok{)}
+\NormalTok{hits }\OperatorTok{=}\NormalTok{ index.search(q, k}\OperatorTok{=}\DecValTok{10}\NormalTok{)                   }\CommentTok{\# returns nearest IMAGE vectors}
+\end{Highlighting}
+\end{Shaded}
+
+The same recipe gives audio--text (CLAP), video--text, and document-layout embeddings. \textbf{Interview point:} multimodal RAG over PDFs with figures uses this --- embed page images and surrounding text into one space.
+
+\subsection{Embedding drift \& the cost of re-embedding}\label{embedding-drift--the-cost-of-re-embedding}
+
+Two distinct problems share the name "drift":
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Model drift (you change models):} A new model version \(\rightarrow\) entirely new geometry \(\rightarrow\) \textbf{full corpus re-embedding required} + index rebuild. Plan blue/green: build the new index alongside the old, validate recall on the golden set, then cut over. Never mix vectors from two models in one index.
+\item
+  \textbf{Data/semantic drift (the world changes):} New slang, new products, new entities appear that the embedding model (trained at an earlier cutoff) represents poorly. Symptoms: recall degrades over time on fresh queries. Mitigations: periodic fine-tuning, hybrid search (BM25 catches new exact terms the model never saw), and monitoring recall on a rolling golden set.
+\end{enumerate}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Re}\OperatorTok{{-}}\NormalTok{embed cost model (}\DecValTok{100}\ErrorTok{M}\NormalTok{ chunks):}
+\NormalTok{  throughput  }\OperatorTok{=} \DecValTok{1}\NormalTok{,}\DecValTok{000}\NormalTok{ chunks}\OperatorTok{/}\NormalTok{sec}\OperatorTok{/}\NormalTok{GPU (bge}\OperatorTok{{-}}\NormalTok{base on an A10)}
+\NormalTok{  total time  }\OperatorTok{=} \DecValTok{100}\NormalTok{,}\DecValTok{000}\NormalTok{,}\DecValTok{000} \OperatorTok{/} \DecValTok{1}\NormalTok{,}\DecValTok{000} \OperatorTok{=} \DecValTok{100}\NormalTok{,}\DecValTok{000}\NormalTok{ GPU}\OperatorTok{{-}}\NormalTok{sec ≈ }\FloatTok{27.8}\NormalTok{ GPU}\OperatorTok{{-}}\NormalTok{hours}
+  \ControlFlowTok{with} \DecValTok{8}\NormalTok{ GPUs ≈ }\FloatTok{3.5}\NormalTok{ wall}\OperatorTok{{-}}\NormalTok{clock hours }\OperatorTok{+}\NormalTok{ index build}
+\NormalTok{  API cost (}\ControlFlowTok{if}\NormalTok{ using OpenAI v3}\OperatorTok{{-}}\NormalTok{small }\OperatorTok{@} \OperatorTok{\textasciitilde{}}\NormalTok{$}\FloatTok{0.02}\OperatorTok{/}\DecValTok{1}\ErrorTok{M}\NormalTok{ tokens, }\OperatorTok{\textasciitilde{}}\DecValTok{300}\NormalTok{ tok}\OperatorTok{/}\NormalTok{chunk)}
+\NormalTok{            ≈ }\DecValTok{100}\ErrorTok{M}\NormalTok{ × }\DecValTok{300} \OperatorTok{/} \DecValTok{1}\ErrorTok{M}\NormalTok{ × $}\FloatTok{0.02} \OperatorTok{=}\NormalTok{ $}\DecValTok{600}\NormalTok{ per full re}\OperatorTok{{-}}\NormalTok{embed}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} Re-embedding is the single biggest hidden operational cost of a vector system. Always mention it when someone proposes "just upgrade the embedding model."
+
+\section{Similarity \& Distance Metrics}\label{similarity--distance-metrics}
+
+The index needs a notion of "closeness." Three matter; one dominates text.
+
+\subsection{Cosine similarity}\label{cosine-similarity}
+
+Measures the \textbf{angle} between two vectors, ignoring magnitude.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cos(a, b) }\OperatorTok{=}\NormalTok{ (a · b) }\OperatorTok{/}\NormalTok{ (‖a‖ · ‖b‖)}
+          \OperatorTok{=}\NormalTok{ Σ a\_i b\_i  }\OperatorTok{/}\NormalTok{  (sqrt(Σ a\_i²) · sqrt(Σ b\_i²))}
+
+\NormalTok{Range: [}\OperatorTok{{-}}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{]   (}\DecValTok{1} \OperatorTok{=}\NormalTok{ identical direction, }\DecValTok{0} \OperatorTok{=}\NormalTok{ orthogonal, }\OperatorTok{{-}}\DecValTok{1} \OperatorTok{=}\NormalTok{ opposite)}
+\NormalTok{Cosine distance }\OperatorTok{=} \DecValTok{1}\NormalTok{ − cos(a, b)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Why cosine is the text default:} Document length / token count inflates raw vector magnitude, but meaning is in the \emph{direction}. Two paraphrases of different lengths should match --- cosine ignores the length difference and compares semantic direction. Almost every sentence-transformer is trained with cosine objectives, so the geometry is calibrated for it.
+
+\subsection{Dot product (inner product)}\label{dot-product-inner-product}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{a · b }\OperatorTok{=}\NormalTok{ Σ a\_i b\_i }\OperatorTok{=}\NormalTok{ ‖a‖ ‖b‖ cos(a, b)}
+\end{Highlighting}
+\end{Shaded}
+
+Cosine \textbf{scaled by both magnitudes}. Use it when magnitude is meaningful (e.g., recommendation models that bake "popularity" or "confidence" into the norm). MIPS = Maximum Inner Product Search.
+
+\subsection{\texorpdfstring{The normalized \(\rightarrow\) cosine = dot equivalence (know this cold)}{The normalized \textbackslash rightarrow cosine = dot equivalence (know this cold)}}\label{the-normalized-rightarrow-cosine--dot-equivalence-know-this-cold}
+
+If both vectors are unit length (‖a‖ = ‖b‖ = 1):
+
+\setcodelang{}
+
+\begin{verbatim}
+a · b = ‖a‖ ‖b‖ cos(a,b) = 1 · 1 · cos(a,b) = cos(a,b)
+\end{verbatim}
+
+So: \textbf{normalize once, then use the cheap dot-product metric, and you get exact cosine ranking.} This is why production systems L2-normalize at embed time and configure the index for inner product. It saves the per-query norm computation.
+
+\subsection{Euclidean / L2 distance}\label{euclidean--l2-distance}
+
+\setcodelang{}
+
+\begin{verbatim}
+L2(a, b) = sqrt( Σ (a_i − b_i)² )
+\end{verbatim}
+
+Straight-line distance. For \textbf{unit-normalized} vectors, L2 and cosine produce the \emph{same ranking} (they\textquotesingle re monotonically related):
+
+\setcodelang{}
+
+\begin{verbatim}
+‖a − b‖² = ‖a‖² + ‖b‖² − 2(a·b) = 1 + 1 − 2 cos(a,b) = 2 − 2 cos(a,b)
+→ smaller L2  ⇔  larger cosine.  Same nearest neighbors.
+\end{verbatim}
+
+So on normalized text vectors, cosine / dot / L2 all rank identically --- pick whichever your DB optimizes. On \emph{un-normalized} vectors they differ, and L2 is sensitive to magnitude.
+
+\subsection{Manhattan (L1)}\label{manhattan-l1}
+
+\setcodelang{}
+
+\begin{verbatim}
+L1(a, b) = Σ |a_i − b_i|
+\end{verbatim}
+
+Sum of absolute differences. Rare in semantic search (less aligned with how embeddings are trained), more common in some recommender and tabular settings. Mention it for completeness; don\textquotesingle t default to it for text.
+
+\subsection{Which metric, when}\label{which-metric-when}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1299}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5174}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3527}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use when
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Cosine} & Text embeddings (default) & Direction = meaning; length-invariant \\
+\rowcolor{zebra}
+\textbf{Dot / IP} & Normalized vectors (= cosine, cheaper) OR magnitude encodes signal (recsys) & MIPS; OpenAI/Cohere vectors normalized \\
+\textbf{L2 (Euclidean)} & Image embeddings, normalized text (same ranking as cosine) & FAISS default metric \\
+\rowcolor{zebra}
+\textbf{L1 (Manhattan)} & Some tabular / recsys cases & Uncommon for text \\
+\end{longtable}
+
+\textbf{Interview takeaway:} For text, say "cosine --- but since I normalize, I configure the index for inner product, which gives identical ranking with less compute." That one sentence signals you understand the equivalence.
+
+\section{Approximate Nearest Neighbor (ANN) Indexes}\label{approximate-nearest-neighbor-ann-indexes}
+
+The heart of the system. Each index makes a different bet about how to avoid scanning all N vectors. Know HNSW deeply; know IVF and PQ well enough to combine them.
+
+\subsection{HNSW --- Hierarchical Navigable Small World (the default)}\label{hnsw--hierarchical-navigable-small-world-the-default}
+
+\textbf{Intuition: skip lists + small-world graphs.} A skip list speeds up linked-list search by adding sparse "express lanes" on top. HNSW does the same for nearest-neighbor search: it builds a multi-layer graph where the top layers have few nodes with long-range links (express lanes) and the bottom layer has every node with short-range links (local roads). You enter at the top, take big hops to get near the answer, then drop down to refine.
+
+A \textbf{navigable small-world (NSW)} graph is one where greedy "always move to the neighbor closest to the query" reaches the true nearest neighbor in a few hops --- like the "six degrees of separation" property of social networks. HNSW makes it \emph{hierarchical} for O(log N) navigation.
+
+\setcodelang{}
+
+\begin{verbatim}
+HNSW layered structure (query q enters at the top):
+
+Layer 2 (sparse, long links):   [A]━━━━━━━━━━━━━━━━━━━━[H]
+                                  │                      │
+Layer 1 (medium):               [A]━━━[D]━━━[F]━━━━━━━━[H]
+                                         │
+Layer 0 (ALL nodes, dense):  [A]─[B]─[C]─[D]─[E]─[F]─[G]─[H]─[I]
+                              └ short, local connections everywhere ┘
+
+Greedy search for q:
+  1. Enter at A (top layer). Move to whichever neighbor is closest to q.
+     A → H (H is closer to q at layer 2). No closer neighbor → descend.
+  2. Layer 1 from H: check H's neighbors (F, ...). F closer → move to F.
+     No closer → descend.
+  3. Layer 0 from F: explore E, G, ... maintain a candidate set of size ef_search,
+     greedily expand the closest unvisited, stop when no improvement.
+  4. Return the top-k from the candidate set.
+
+Total hops ≈ O(log N). Each hop touches a handful of neighbors.
+\end{verbatim}
+
+\textbf{Greedy search walkthrough (concrete):} Suppose q is closest to node E. At layer 2 we hop A\(\rightarrow\)H (overshoot, but cheap). At layer 1 we hop H\(\rightarrow\)F (getting warmer). At layer 0 we explore F\textquotesingle s neighborhood, keep the \texttt{ef\_search} best candidates in a priority queue, expand the closest, discover E, find nothing closer, and return E (plus the next-best as the rest of top-k). We touched maybe 50--200 nodes out of 100M.
+
+\textbf{Construction.} Insert nodes one at a time. Each new node picks a random maximum layer (geometric distribution --- most nodes only exist at layer 0, few reach the top). For each layer from its top down to 0, it runs the same greedy search to find its \texttt{M} nearest existing nodes and links to them. \texttt{ef\_construction} controls how thorough that search is during building.
+
+\textbf{Parameters:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1220}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3008}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3252}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2520}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Param
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Higher value \(\rightarrow\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Typical
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{M} & Max neighbors per node (graph degree) & Better recall, more memory, slower build & 16--48 \\
+\rowcolor{zebra}
+\textbf{ef\_construction} & Candidate list size during \emph{build} & Better graph quality, slower build & 100--400 \\
+\textbf{ef\_search} & Candidate list size during \emph{query} & Higher recall, higher latency & 50--500 (tunable at query time!) \\
+\end{longtable}
+
+The killer feature: \textbf{\texttt{ef\_search} is a query-time knob.} You build the graph once, then dial recall vs. latency per query without rebuilding --- set \texttt{ef\_search=64} for a fast path and \texttt{ef\_search=512} for a high-recall path.
+
+\textbf{Memory cost.} HNSW stores the full vectors \emph{plus} the graph edges:
+
+\setcodelang{}
+
+\begin{verbatim}
+Per vector: d × 4 bytes (float32) + M × ~8 bytes (neighbor links, both directions ~2M)
+For d=768, M=32:
+  vector  = 768 × 4   = 3,072 bytes
+  graph   ≈ 2 × 32 × 8 = 512 bytes
+  total   ≈ 3,584 bytes/vector
+100M vectors ≈ 358 GB RAM.  ← This is why HNSW alone doesn't scale to billions cheaply.
+\end{verbatim}
+
+\textbf{Why it\textquotesingle s the default:} highest recall at a given latency, no training step, supports incremental inserts, query-time recall knob. Used by Pinecone, Weaviate, Qdrant, Milvus, pgvector, Elasticsearch/OpenSearch, Lucene. \textbf{Cons:} memory-hungry (stores full vectors), deletes are awkward (tombstones; graph degrades, eventually rebuild), build is slower than IVF.
+
+\subsection{IVF --- Inverted File (cluster-and-probe)}\label{ivf--inverted-file-cluster-and-probe}
+
+\textbf{Intuition:} Partition the space into clusters once; at query time, only search the few clusters near the query instead of all N vectors.
+
+\textbf{Mechanism (Voronoi cells via k-means):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Train} a coarse quantizer: run k-means on a sample to find \texttt{nlist} centroids (e.g., 4096). Each centroid "owns" a Voronoi cell.
+\item
+  \textbf{Assign} every vector to its nearest centroid \(\rightarrow\) an inverted list per centroid (centroid \(\rightarrow\) {[}vector ids in that cell{]}).
+\item
+  \textbf{Query:} find the \texttt{nprobe} centroids nearest the query, then brute-force search only the vectors in those \texttt{nprobe} lists.
+\end{enumerate}
+
+\setcodelang{}
+
+\begin{verbatim}
+Space partitioned into nlist=8 Voronoi cells (centroids ●):
+
+       ●C1      ●C2          q = query
+   ┌────────┬────────┐       nprobe=2 → search cells C5 and C6 only
+   │  C1    │  C2    │       (the two centroids nearest q),
+   ├────────┼────────┤       skip the other 6 cells entirely.
+   │  C5  q │  C6    │
+   ●C5──────┴──────●C6
+\end{verbatim}
+
+\textbf{Parameters:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2616}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6861}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Param
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Trade-off
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{nlist} & Number of clusters (centroids) & More cells = fewer vectors/cell = faster probe, but need higher nprobe for recall. Rule of thumb: \texttt{nlist\ ≈\ sqrt(N)} to \texttt{4·sqrt(N)} \\
+\rowcolor{zebra}
+\textbf{nprobe} & Cells searched per query & Higher = better recall, slower. Query-time knob, like ef\_search \\
+\end{longtable}
+
+\setcodelang{}
+
+\begin{verbatim}
+N = 100M, nlist = 16,384  → ~6,100 vectors per cell on average
+nprobe = 32 → search ~32 × 6,100 = ~195,000 vectors (vs 100M brute force)
+            → ~500× fewer distance computations
+\end{verbatim}
+
+\textbf{Training requirement (the catch):} IVF must be \emph{trained} (k-means) on a representative sample before you can add vectors. If your data distribution shifts, the cells become unbalanced (some huge, some empty) and recall drops --- you must retrain. HNSW needs no training. The \textbf{edge-of-cell problem}: a query near a cell boundary may have its true nearest neighbor in an adjacent, un-probed cell --- that\textquotesingle s a recall miss, mitigated by higher nprobe.
+
+\textbf{When to use:} very large datasets where HNSW memory is too high, and you can tolerate a training step. Almost always combined with \textbf{PQ} (next) to cut memory.
+
+\subsection{Product Quantization (PQ) --- compressing vectors}\label{product-quantization-pq--compressing-vectors}
+
+\textbf{The problem PQ solves:} storing full float32 vectors costs too much RAM at billion scale (a 1B \(\times\) 768 \(\times\) 4B index = 3 TB). PQ compresses each vector to a few bytes.
+
+\textbf{Mechanism:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Split} each d-dim vector into \texttt{m} sub-vectors (e.g., d=768, m=96 \(\rightarrow\) each sub-vector is 8 dims).
+\item
+  For each of the m sub-spaces, run k-means to learn a \textbf{codebook} of \texttt{k=256} centroids (so each centroid id fits in 1 byte).
+\item
+  \textbf{Encode} a vector by replacing each sub-vector with the \emph{id} of its nearest codebook centroid \(\rightarrow\) the whole vector becomes \texttt{m} bytes.
+\end{enumerate}
+
+\setcodelang{}
+
+\begin{verbatim}
+Original vector (768 float32 = 3,072 bytes):
+  [─sub1─][─sub2─]...[─sub96─]   each sub = 8 floats
+
+After PQ (m=96 sub-vectors, 256 centroids each):
+  [id1][id2]...[id96]   each id = 1 byte  → 96 bytes total
+
+Compression: 3,072 → 96 bytes = 32× smaller.
+\end{verbatim}
+
+\textbf{Asymmetric Distance Computation (ADC):} at query time you do \emph{not} quantize the query. Instead, you precompute a lookup table: for each sub-space, the distance from the query\textquotesingle s sub-vector to all 256 centroids (m \(\times\) 256 distances). Then the approximate distance to any stored code is just \texttt{m} table lookups + adds --- no full distance math. This keeps accuracy higher than quantizing both sides ("symmetric").
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PQ distance(query, code):}
+\NormalTok{  precompute LUT[m][}\DecValTok{256}\NormalTok{] }\OperatorTok{=}\NormalTok{ dist(query\_sub\_j, centroid\_c) }\ControlFlowTok{for} \BuiltInTok{all}\NormalTok{ j, c   }\CommentTok{\# once per query}
+  \ControlFlowTok{for}\NormalTok{ each stored vector }\ControlFlowTok{with}\NormalTok{ codes [c1..cm]:}
+\NormalTok{      approx\_dist }\OperatorTok{=}\NormalTok{ LUT[}\DecValTok{0}\NormalTok{][c1] }\OperatorTok{+}\NormalTok{ LUT[}\DecValTok{1}\NormalTok{][c2] }\OperatorTok{+}\NormalTok{ ... }\OperatorTok{+}\NormalTok{ LUT[m}\OperatorTok{{-}}\DecValTok{1}\NormalTok{][cm]        }\CommentTok{\# m adds}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{The memory math (the number to quote):}
+
+\setcodelang{}
+
+\begin{verbatim}
+1 BILLION vectors, d=768:
+  float32 (no compression):  1e9 × 768 × 4 B   = 3.07 TB   (won't fit in RAM)
+  PQ, m=96, 8-bit codes:     1e9 × 96 × 1 B    = 96 GB     (fits on one big box)
+  → 32× memory reduction.
+  Cost: recall drops (lossy compression). Typically recall@10 ~0.85–0.95
+        depending on m, recoverable by re-ranking the PQ candidates with exact
+        distances on the float vectors (if kept on disk/SSD).
+\end{verbatim}
+
+\textbf{IVF-PQ (the workhorse for billion-scale):} combine them --- IVF narrows to \texttt{nprobe} cells (avoid scanning all N), PQ compresses the vectors in those cells (fit in RAM). This is the standard FAISS recipe for billion-vector indexes (\texttt{IndexIVFPQ}). A refinement, \textbf{IVF-PQ + reranking} (\texttt{IndexIVFPQR} / \texttt{OPQ}): retrieve top-100 by PQ approx distance, then re-score those 100 with exact float distances for final ranking.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ faiss}
+\NormalTok{d, nlist, m, nbits }\OperatorTok{=} \DecValTok{768}\NormalTok{, }\DecValTok{16384}\NormalTok{, }\DecValTok{96}\NormalTok{, }\DecValTok{8}
+\NormalTok{quantizer }\OperatorTok{=}\NormalTok{ faiss.IndexFlatIP(d)                     }\CommentTok{\# coarse quantizer (centroids)}
+\NormalTok{index }\OperatorTok{=}\NormalTok{ faiss.IndexIVFPQ(quantizer, d, nlist, m, nbits)}
+\NormalTok{index.train(sample\_vectors)                          }\CommentTok{\# k{-}means for IVF + PQ codebooks}
+\NormalTok{index.add(all\_vectors)                               }\CommentTok{\# stored as PQ codes}
+\NormalTok{index.nprobe }\OperatorTok{=} \DecValTok{32}
+\NormalTok{D, I }\OperatorTok{=}\NormalTok{ index.search(query, k}\OperatorTok{=}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{LSH --- Locality-Sensitive Hashing}\label{lsh--locality-sensitive-hashing}
+
+\textbf{Intuition:} design hash functions so that \emph{similar} vectors collide (land in the same bucket) with high probability. Query by hashing the query and only scanning its bucket(s).
+
+For cosine, use \textbf{random hyperplane hashing}: pick r random hyperplanes; each vector\textquotesingle s hash bit is the sign of its dot product with that hyperplane\textquotesingle s normal. Vectors on the same side of all hyperplanes share a hash \(\rightarrow\) likely similar.
+
+\setcodelang{}
+
+\begin{verbatim}
+hash(v) = ( sign(v·r1), sign(v·r2), ..., sign(v·rb) )   # b bits, b random hyperplanes
+Similar vectors → same signs → same bucket → small candidate set to brute-force.
+Multiple hash tables (L of them) raise recall (a miss in one table may hit another).
+\end{verbatim}
+
+\textbf{Trade-off:} simple, theoretically clean, supports streaming inserts. But in practice it needs many tables/bits to hit high recall, which costs memory, and it generally loses to HNSW on the recall-per-byte and recall-per-millisecond curves. Mostly of historical/theoretical importance now; still used for near-duplicate detection (MinHash for sets).
+
+\subsection{Tree-based --- Annoy}\label{tree-based--annoy}
+
+\textbf{Annoy} (Spotify) builds a \textbf{forest of random projection trees}. Each tree recursively splits the dataset by a random hyperplane; a leaf holds a small bucket. Querying descends multiple trees and unions the leaf candidates.
+
+\setcodelang{}
+
+\begin{verbatim}
+Random split tree:           Forest = many such trees with different random splits.
+        (hyperplane h1)      Query descends all trees, collects candidate leaves,
+        /          \         then exact-distances the union → top-k.
+   (h2)              (h3)
+   /  \             /   \
+[leaf][leaf]    [leaf] [leaf]
+\end{verbatim}
+
+\textbf{Trade-off:} memory-mapped files \(\rightarrow\) great for \textbf{read-only}, shareable indexes (Spotify serves the same index across many machines via mmap). But the index is \textbf{immutable} --- you rebuild to add data. Lower recall-per-memory than HNSW. Good when you have a static corpus and want simple, mmap-able files.
+
+\subsection{ScaNN --- Anisotropic quantization (Google)}\label{scann--anisotropic-quantization-google}
+
+\textbf{ScaNN\textquotesingle s insight:} standard PQ minimizes \emph{reconstruction} error (how well the code approximates the original vector). But for \textbf{maximum inner product search} what actually matters is preserving the \emph{inner product with likely query directions}. ScaNN uses \textbf{anisotropic vector quantization} --- it weights quantization error by how much it distorts inner products in the directions that matter, penalizing errors parallel to the vector more than orthogonal ones. Result: higher recall at the same compression. Combined with a fast SIMD-optimized scan, it tops the ann-benchmarks recall/latency frontier for in-memory MIPS.
+
+\textbf{Trade-off:} state-of-the-art speed/recall, but more complex to tune; strongest as a library (or via Vertex AI) rather than a turnkey DB.
+
+\subsection{ANN comparison table}\label{ann-comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0668}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0735}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1626}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1394}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1685}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1452}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1859}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Index
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Build time
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Query speed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Recall
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Memory
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Inserts
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Training?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{HNSW} & Slow & Very fast & Very high & High (full vecs + graph) & Incremental & No & Default; \textless\textasciitilde100M, recall-critical \\
+\rowcolor{zebra}
+\textbf{IVF (Flat)} & Fast & Fast & High (tune nprobe) & Full vecs & Add anytime; retrain on drift & Yes (k-means) & Large, memory-ok \\
+\textbf{IVF-PQ} & Moderate & Fast & Moderate--high & \textbf{Very low} (PQ codes) & Add anytime & Yes (k-means + codebooks) & Billion-scale, RAM-bound \\
+\rowcolor{zebra}
+\textbf{PQ (flat)} & Moderate & Fast & Moderate & Very low & Add anytime & Yes (codebooks) & Memory-extreme \\
+\textbf{LSH} & Fast & Fast & Moderate (needs many tables) & Moderate--high & Streaming & No & Near-dup detection, theory \\
+\rowcolor{zebra}
+\textbf{Annoy} & Moderate & Fast & Moderate & Low (mmap) & \textbf{Immutable} (rebuild) & No & Static, read-only, mmap-shared \\
+\textbf{ScaNN} & Moderate & \textbf{Very fast} & Very high & Low--moderate & Rebuild-ish & Yes & In-memory MIPS at scale (Google) \\
+\end{longtable}
+
+\textbf{Interview takeaway:} Default to \textbf{HNSW} for most workloads (\textless100M, recall matters, RAM available). Reach for \textbf{IVF-PQ} when memory is the binding constraint (billions of vectors). Mention \textbf{ScaNN} if asked about Google or the absolute speed/recall frontier. Mention \textbf{Annoy} for static, mmap-shared, read-only indexes.
+
+\section{The Recall / Latency / Memory Trade-off}\label{the-recall--latency--memory-trade-off}
+
+Every ANN system lives inside a triangle. You cannot maximize all three; you pick a point.
+
+\setcodelang{}
+
+\begin{verbatim}
+                    RECALL (accuracy)
+                        ▲
+                       ╱ ╲
+                      ╱   ╲
+                     ╱     ╲
+        LATENCY ◄───╱───────╲───► MEMORY
+        (speed)                   (footprint/cost)
+
+  HNSW with high M, high ef_search → high recall, high memory, moderate latency
+  IVF-PQ with low m, low nprobe    → low memory, low latency, lower recall
+  Brute force                      → perfect recall, huge latency, full memory
+\end{verbatim}
+
+\subsection{Recall@k --- the metric}\label{recallk--the-metric}
+
+\texttt{Recall@k} = of the \emph{true} top-k nearest neighbors (per exact brute force), what fraction did the ANN index return in \emph{its} top-k?
+
+\setcodelang{}
+
+\begin{verbatim}
+True top-10 for a query: {d3, d7, d9, d11, d14, d20, d22, d31, d40, d55}
+ANN returned top-10:     {d3, d7, d9, d11, d14, d20, d22, d31, d40, d99}
+                          9 of 10 correct → recall@10 = 0.90
+\end{verbatim}
+
+You compute it by running exact kNN on a sample of queries (the ground truth) and comparing. Target recall depends on the product: web search tolerates \textasciitilde0.90; medical/legal retrieval may demand \textasciitilde0.99.
+
+\subsection{How parameters tune the triangle}\label{how-parameters-tune-the-triangle}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1155}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2566}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3778}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2502}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Want
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+HNSW lever
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IVF / IVF-PQ lever
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Side effect
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\(\uparrow\) Recall & \(\uparrow\) \texttt{ef\_search}, \(\uparrow\) \texttt{M} & \(\uparrow\) \texttt{nprobe}, \(\uparrow\) \texttt{nlist} resolution, \(\downarrow\) PQ compression (\(\uparrow\) m) & \(\uparrow\) latency and/or \(\uparrow\) memory \\
+\rowcolor{zebra}
+\(\downarrow\) Latency & \(\downarrow\) \texttt{ef\_search} & \(\downarrow\) \texttt{nprobe} & \(\downarrow\) recall \\
+\(\downarrow\) Memory & (limited --- vecs are full) use PQ variant & use \textbf{PQ} (\(\downarrow\) m bytes), 8-bit\(\rightarrow\)4-bit & \(\downarrow\) recall \\
+\end{longtable}
+
+\textbf{Concrete tuning scenario (100M, d=768, HNSW):}
+
+\setcodelang{}
+
+\begin{verbatim}
+M=16, ef_search=64   → recall@10 ≈ 0.92, p95 latency ≈ 8 ms,  ~330 GB RAM
+M=32, ef_search=128  → recall@10 ≈ 0.97, p95 latency ≈ 15 ms, ~358 GB RAM
+M=48, ef_search=512  → recall@10 ≈ 0.99, p95 latency ≈ 40 ms, ~390 GB RAM
+\end{verbatim}
+
+\textbf{Concrete tuning scenario (1B, d=768, IVF-PQ):}
+
+\setcodelang{}
+
+\begin{verbatim}
+m=96 (8-bit), nprobe=16  → recall@10 ≈ 0.82, p95 ≈ 6 ms,  ~96 GB RAM
+m=96,         nprobe=64  → recall@10 ≈ 0.90, p95 ≈ 18 ms, ~96 GB RAM
+m=96, nprobe=64 + rerank top-200 with float vecs on SSD → recall@10 ≈ 0.96, p95 ≈ 30 ms
+\end{verbatim}
+
+\textbf{The reranking trick to break the triangle:} retrieve a \emph{larger} candidate set cheaply (high speed, lower per-candidate accuracy), then re-score the small candidate set with exact distances (or a cross-encoder). You buy back recall/precision without paying full-index cost.
+
+\textbf{Interview takeaway:} Never say "I\textquotesingle ll use HNSW" and stop. Say: "HNSW with M=32, and I\textquotesingle d tune \texttt{ef\_search} against a recall@10 target of 0.97 measured on a golden set, accepting \textasciitilde15 ms p95 and \textasciitilde358 GB RAM --- if memory is the constraint I\textquotesingle d switch to IVF-PQ and rerank." That\textquotesingle s the senior answer.
+
+\section{Building a RAG / Semantic-Search Pipeline}\label{building-a-rag--semantic-search-pipeline}
+
+RAG = Retrieval-Augmented Generation: retrieve relevant chunks from a vector store, inject them into an LLM prompt, generate a grounded answer. Semantic search is the same pipeline minus the generation step. Retrieval quality dominates final quality --- "garbage retrieved, garbage generated."
+
+\setcodelang{}
+
+\begin{verbatim}
+INGEST (offline):  Docs → Parse → Chunk → Embed → Upsert(vector + metadata)
+QUERY  (online):   Query → Embed → ANN retrieve top-k (+ BM25) → Fuse → Rerank → top 3-5 → LLM
+\end{verbatim}
+
+\subsection{Chunking strategies}\label{chunking-strategies}
+
+You don\textquotesingle t embed whole documents --- you embed \textbf{chunks}, because (a) embedding models have token limits (256--512 tokens is the trained sweet spot for many), and (b) retrieval precision needs the \emph{relevant passage}, not a 50-page PDF.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2053}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3762}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1737}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2448}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pitfall
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Fixed-size} & Every N tokens (e.g., 512) & Quick start & Cuts mid-sentence, splits ideas \\
+\rowcolor{zebra}
+\textbf{Recursive character} & Split on \texttt{\textbackslash{}n\textbackslash{}n}, then \texttt{\textbackslash{}n}, then \texttt{.\ }, then space until \(\leq\) N & General text (default) & Still misses semantic units \\
+\textbf{Sentence / paragraph} & Split on sentence/para boundaries & FAQs, articles & Uneven sizes \\
+\rowcolor{zebra}
+\textbf{Semantic chunking} & Embed sentences; split where consecutive similarity drops & Dense technical docs & Expensive (embed to chunk) \\
+\textbf{Structural (Markdown/HTML)} & Split on headers H1/H2/H3, code blocks, tables & Docs, wikis & Uneven chunk sizes \\
+\rowcolor{zebra}
+\textbf{Parent--child} & Retrieve small child chunk, feed larger parent to LLM & Precision + context & Two-level indexing \\
+\end{longtable}
+
+\textbf{Overlap.} Adjacent chunks share a sliding window (e.g., 50--100 tokens) so a sentence split across a boundary still appears whole in at least one chunk. Costs storage (more chunks) but prevents "answer cut in half" misses.
+
+\textbf{The size trade-off (with examples):}
+
+\setcodelang{}
+
+\begin{verbatim}
+Chunk too SMALL (e.g., 64 tokens):
+  Chunk = "Click Settings, then Security."
+  Query = "how do I enable two-factor authentication?"
+  → retrieved, but lacks the surrounding steps → LLM can't answer fully. (low context)
+
+Chunk too LARGE (e.g., 2000 tokens):
+  Chunk = entire 8-page "Account Security" article.
+  Query = "reset password" → chunk matches, but 95% is irrelevant text that
+          dilutes the embedding (averaged meaning) AND wastes the LLM context window.
+          The relevant 2 sentences are buried. (low precision, high cost)
+
+Sweet spot: 256–512 tokens, 10–20% overlap.
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ langchain\_text\_splitters }\ImportTok{import}\NormalTok{ RecursiveCharacterTextSplitter}
+
+\NormalTok{splitter }\OperatorTok{=}\NormalTok{ RecursiveCharacterTextSplitter(}
+\NormalTok{    chunk\_size}\OperatorTok{=}\DecValTok{512}\NormalTok{, chunk\_overlap}\OperatorTok{=}\DecValTok{64}\NormalTok{,           }\CommentTok{\# \textasciitilde{}512 tokens, \textasciitilde{}12\% overlap}
+\NormalTok{    separators}\OperatorTok{=}\NormalTok{[}\StringTok{"}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{, }\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\StringTok{". "}\NormalTok{, }\StringTok{" "}\NormalTok{, }\StringTok{""}\NormalTok{],   }\CommentTok{\# prefer semantic boundaries}
+\NormalTok{)}
+\NormalTok{chunks }\OperatorTok{=}\NormalTok{ splitter.split\_text(document\_text)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Metadata is non-negotiable} --- store it alongside every vector for filtering and citation:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{record }\OperatorTok{=}\NormalTok{ \{}
+    \StringTok{"id"}\NormalTok{: }\StringTok{"doc42\#chunk7"}\NormalTok{,}
+    \StringTok{"vector"}\NormalTok{: embed(chunk\_text),}
+    \StringTok{"metadata"}\NormalTok{: \{}
+        \StringTok{"text"}\NormalTok{: chunk\_text,}
+        \StringTok{"source"}\NormalTok{: }\StringTok{"security\_guide\_v3.pdf"}\NormalTok{,}
+        \StringTok{"page"}\NormalTok{: }\DecValTok{12}\NormalTok{, }\StringTok{"section"}\NormalTok{: }\StringTok{"Two{-}Factor Auth"}\NormalTok{,}
+        \StringTok{"tenant\_id"}\NormalTok{: }\StringTok{"acme"}\NormalTok{, }\StringTok{"acl"}\NormalTok{: [}\StringTok{"support"}\NormalTok{, }\StringTok{"admin"}\NormalTok{],}
+        \StringTok{"created\_at"}\NormalTok{: }\StringTok{"2025{-}02{-}01"}\NormalTok{, }\StringTok{"doc\_id"}\NormalTok{: }\StringTok{"doc42"}\NormalTok{,}
+\NormalTok{    \},}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Embed + upsert}\label{embed--upsert}
+
+Use the \textbf{same model} for ingest and query (different models \(\rightarrow\) incompatible geometry \(\rightarrow\) garbage retrieval). Normalize. Upsert in batches.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ itertools}
+\KeywordTok{def}\NormalTok{ batched(it, n):}
+\NormalTok{    it }\OperatorTok{=} \BuiltInTok{iter}\NormalTok{(it)}
+    \ControlFlowTok{while}\NormalTok{ batch }\OperatorTok{:=} \BuiltInTok{list}\NormalTok{(itertools.islice(it, n)):}
+        \ControlFlowTok{yield}\NormalTok{ batch}
+
+\ControlFlowTok{for}\NormalTok{ batch }\KeywordTok{in}\NormalTok{ batched(chunks, }\DecValTok{256}\NormalTok{):}
+\NormalTok{    vecs }\OperatorTok{=}\NormalTok{ model.encode([c.text }\ControlFlowTok{for}\NormalTok{ c }\KeywordTok{in}\NormalTok{ batch], normalize\_embeddings}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{    index.upsert([(c.}\BuiltInTok{id}\NormalTok{, v, c.metadata) }\ControlFlowTok{for}\NormalTok{ c, v }\KeywordTok{in} \BuiltInTok{zip}\NormalTok{(batch, vecs)])}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Retrieval top-k}\label{retrieval-top-k}
+
+Retrieve more than you\textquotesingle ll show the LLM (e.g., top-20--50), then narrow via fusion/rerank. Over-retrieving improves the chance the right chunk is in the candidate set.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{q }\OperatorTok{=}\NormalTok{ model.encode(user\_query, normalize\_embeddings}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{candidates }\OperatorTok{=}\NormalTok{ index.search(q, k}\OperatorTok{=}\DecValTok{30}\NormalTok{, }\BuiltInTok{filter}\OperatorTok{=}\NormalTok{\{}\StringTok{"tenant\_id"}\NormalTok{: }\StringTok{"acme"}\NormalTok{\})}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Metadata filtering --- pre- vs post-filter (a real correctness/perf trap)}\label{metadata-filtering--pre--vs-post-filter-a-real-correctnessperf-trap}
+
+You often must restrict results ("only this tenant," "only docs the user can see," "only after 2024"). There are two ways, and the difference is a classic interview gotcha:
+
+\setcodelang{}
+
+\begin{verbatim}
+POST-FILTER:  ANN returns top-k by vector distance, THEN drop those failing the predicate.
+  Problem: if only 1% of vectors match the filter, your top-30 might contain ZERO matches
+           → you return nothing, even though good matches exist deeper in the ranking.
+           Correctness bug. To compensate you over-fetch (k=3000), which is slow.
+
+PRE-FILTER:  Restrict the candidate set to matching vectors FIRST, then do ANN within it.
+  Correct results, but naive pre-filtering breaks the ANN graph (HNSW navigates through
+  nodes that may be filtered out → can't traverse → recall collapses).
+
+PRODUCTION ANSWER: "filtered ANN" — the index integrates the predicate INTO traversal.
+  Qdrant: payload index + filterable HNSW. Weaviate/Milvus: similar. pgvector: combine
+  with a B-tree/partial index, or partition by tenant. For very selective filters (a
+  handful of matches), fall back to exact brute force over the matching subset — it's tiny.
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Qdrant filtered search — predicate is applied DURING graph traversal}
+\ImportTok{from}\NormalTok{ qdrant\_client.models }\ImportTok{import}\NormalTok{ Filter, FieldCondition, MatchValue}
+\NormalTok{hits }\OperatorTok{=}\NormalTok{ client.search(}
+\NormalTok{    collection\_name}\OperatorTok{=}\StringTok{"docs"}\NormalTok{,}
+\NormalTok{    query\_vector}\OperatorTok{=}\NormalTok{q,}
+\NormalTok{    query\_filter}\OperatorTok{=}\NormalTok{Filter(must}\OperatorTok{=}\NormalTok{[FieldCondition(key}\OperatorTok{=}\StringTok{"tenant\_id"}\NormalTok{, match}\OperatorTok{=}\NormalTok{MatchValue(value}\OperatorTok{=}\StringTok{"acme"}\NormalTok{))]),}
+\NormalTok{    limit}\OperatorTok{=}\DecValTok{30}\NormalTok{,}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} When asked "how do you restrict search to a tenant?" the wrong answer is "filter the results afterward." The right answer names the post-filter recall bug and proposes filtered-ANN (predicate fused into traversal) or partitioning, with exact brute force for highly selective filters.
+
+\subsection{Hybrid search --- dense + sparse (BM25) with RRF}\label{hybrid-search--dense--sparse-bm25-with-rrf}
+
+Dense embeddings miss exact strings (SKUs, error codes, rare names); BM25 nails them. BM25 misses paraphrase; dense nails it. Run \textbf{both} and fuse.
+
+\textbf{Reciprocal Rank Fusion (RRF)} combines ranked lists using only the \emph{rank} (not the raw, incomparable scores):
+
+\setcodelang{}
+
+\begin{verbatim}
+RRF_score(doc) = Σ_over_lists  1 / (k + rank_in_that_list)      # k ≈ 60 by convention
+
+A doc ranked #1 by BM25 and #3 by dense:  1/(60+1) + 1/(60+3) = 0.0164 + 0.0159 = 0.0323
+A doc ranked #2 by dense only:            1/(60+2)            = 0.0161
+→ The doc both methods like ranks highest. Robust, no score normalization needed.
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ rrf(rank\_lists, k}\OperatorTok{=}\DecValTok{60}\NormalTok{, top\_n}\OperatorTok{=}\DecValTok{20}\NormalTok{):}
+\NormalTok{    scores }\OperatorTok{=}\NormalTok{ \{\}}
+    \ControlFlowTok{for}\NormalTok{ ranked }\KeywordTok{in}\NormalTok{ rank\_lists:                       }\CommentTok{\# each is [doc\_id, ...] best{-}first}
+        \ControlFlowTok{for}\NormalTok{ rank, doc\_id }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(ranked):}
+\NormalTok{            scores[doc\_id] }\OperatorTok{=}\NormalTok{ scores.get(doc\_id, }\FloatTok{0.0}\NormalTok{) }\OperatorTok{+} \FloatTok{1.0} \OperatorTok{/}\NormalTok{ (k }\OperatorTok{+}\NormalTok{ rank)}
+    \ControlFlowTok{return} \BuiltInTok{sorted}\NormalTok{(scores, key}\OperatorTok{=}\NormalTok{scores.get, reverse}\OperatorTok{=}\VariableTok{True}\NormalTok{)[:top\_n]}
+
+\NormalTok{dense\_hits }\OperatorTok{=}\NormalTok{ [h.}\BuiltInTok{id} \ControlFlowTok{for}\NormalTok{ h }\KeywordTok{in}\NormalTok{ index.search(q, k}\OperatorTok{=}\DecValTok{50}\NormalTok{)]}
+\NormalTok{bm25\_hits  }\OperatorTok{=}\NormalTok{ [h.}\BuiltInTok{id} \ControlFlowTok{for}\NormalTok{ h }\KeywordTok{in}\NormalTok{ bm25.search(user\_query, k}\OperatorTok{=}\DecValTok{50}\NormalTok{)]}
+\NormalTok{fused }\OperatorTok{=}\NormalTok{ rrf([dense\_hits, bm25\_hits])}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Reranking --- the two-stage retrieve \(\rightarrow\) rerank pattern}{Reranking --- the two-stage retrieve \textbackslash rightarrow rerank pattern}}\label{reranking--the-two-stage-retrieve-rightarrow-rerank-pattern}
+
+Retrieval uses a \textbf{bi-encoder} (query and doc embedded \emph{independently}) --- fast, scalable, but it never lets the query and document "see" each other, so it\textquotesingle s coarse. A \textbf{cross-encoder} feeds \texttt{{[}query,\ doc{]}} \emph{together} through a transformer with full cross-attention and outputs a single relevance score --- far more accurate, but O(candidates) forward passes, so you can\textquotesingle t run it over the whole corpus.
+
+\textbf{The two-stage architecture resolves this:} retrieve top-30--50 cheaply with the bi-encoder ANN index, then \textbf{rerank just those 30--50} with the cross-encoder and keep the top 3--5 for the LLM.
+
+\setcodelang{}
+
+\begin{verbatim}
+Stage 1 (recall):    bi-encoder ANN over 100M docs → top 50 candidates   (fast, coarse)
+Stage 2 (precision): cross-encoder scores 50 (query,doc) pairs → top 5   (slow, accurate)
+                     50 forward passes is cheap; 100M would be impossible.
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sentence\_transformers }\ImportTok{import}\NormalTok{ CrossEncoder}
+\NormalTok{reranker }\OperatorTok{=}\NormalTok{ CrossEncoder(}\StringTok{"cross{-}encoder/ms{-}marco{-}MiniLM{-}L{-}6{-}v2"}\NormalTok{)}
+
+\KeywordTok{def}\NormalTok{ retrieve\_and\_rerank(query, top\_n}\OperatorTok{=}\DecValTok{5}\NormalTok{):}
+\NormalTok{    q }\OperatorTok{=}\NormalTok{ model.encode(query, normalize\_embeddings}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{    candidates }\OperatorTok{=}\NormalTok{ index.search(q, k}\OperatorTok{=}\DecValTok{50}\NormalTok{)                      }\CommentTok{\# bi{-}encoder, fast}
+\NormalTok{    pairs }\OperatorTok{=}\NormalTok{ [(query, c.metadata[}\StringTok{"text"}\NormalTok{]) }\ControlFlowTok{for}\NormalTok{ c }\KeywordTok{in}\NormalTok{ candidates]}
+\NormalTok{    scores }\OperatorTok{=}\NormalTok{ reranker.predict(pairs)                        }\CommentTok{\# cross{-}encoder, accurate}
+\NormalTok{    ranked }\OperatorTok{=}\NormalTok{ [c }\ControlFlowTok{for}\NormalTok{ \_, c }\KeywordTok{in} \BuiltInTok{sorted}\NormalTok{(}\BuiltInTok{zip}\NormalTok{(scores, candidates), key}\OperatorTok{=}\KeywordTok{lambda}\NormalTok{ x: }\OperatorTok{{-}}\NormalTok{x[}\DecValTok{0}\NormalTok{])]}
+    \ControlFlowTok{return}\NormalTok{ ranked[:top\_n]}
+\end{Highlighting}
+\end{Shaded}
+
+Commercial rerankers: \textbf{Cohere Rerank, Voyage rerank, Jina Reranker}. Reranking 50 docs adds \textasciitilde30--80 ms but lifts answer quality substantially --- almost always worth it in production.
+
+\subsection{Putting it together --- query pipeline}\label{putting-it-together--query-pipeline}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ rag\_answer(user\_query, tenant\_id, user\_acl):}
+\NormalTok{    q }\OperatorTok{=}\NormalTok{ model.encode(user\_query, normalize\_embeddings}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{    dense }\OperatorTok{=}\NormalTok{ index.search(q, k}\OperatorTok{=}\DecValTok{50}\NormalTok{, }\BuiltInTok{filter}\OperatorTok{=}\NormalTok{\{}\StringTok{"tenant\_id"}\NormalTok{: tenant\_id, }\StringTok{"acl"}\NormalTok{: \{}\StringTok{"$in"}\NormalTok{: user\_acl\}\})}
+\NormalTok{    bm25  }\OperatorTok{=}\NormalTok{ bm25\_index.search(user\_query, k}\OperatorTok{=}\DecValTok{50}\NormalTok{, }\BuiltInTok{filter}\OperatorTok{=}\NormalTok{\{}\StringTok{"tenant\_id"}\NormalTok{: tenant\_id\})}
+\NormalTok{    fused\_ids }\OperatorTok{=}\NormalTok{ rrf([[h.}\BuiltInTok{id} \ControlFlowTok{for}\NormalTok{ h }\KeywordTok{in}\NormalTok{ dense], [h.}\BuiltInTok{id} \ControlFlowTok{for}\NormalTok{ h }\KeywordTok{in}\NormalTok{ bm25]], top\_n}\OperatorTok{=}\DecValTok{50}\NormalTok{)}
+\NormalTok{    fused }\OperatorTok{=}\NormalTok{ [lookup(i) }\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in}\NormalTok{ fused\_ids]}
+\NormalTok{    top }\OperatorTok{=}\NormalTok{ rerank(user\_query, fused, top\_n}\OperatorTok{=}\DecValTok{5}\NormalTok{)}
+\NormalTok{    context }\OperatorTok{=} \StringTok{"}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{.join(}
+        \SpecialStringTok{f"[}\SpecialCharTok{\{}\NormalTok{c}\SpecialCharTok{.}\NormalTok{metadata[}\StringTok{\textquotesingle{}source\textquotesingle{}}\NormalTok{]}\SpecialCharTok{\}}\SpecialStringTok{ p}\SpecialCharTok{\{}\NormalTok{c}\SpecialCharTok{.}\NormalTok{metadata[}\StringTok{\textquotesingle{}page\textquotesingle{}}\NormalTok{]}\SpecialCharTok{\}}\SpecialStringTok{]}\CharTok{\textbackslash{}n}\SpecialCharTok{\{}\NormalTok{c}\SpecialCharTok{.}\NormalTok{metadata[}\StringTok{\textquotesingle{}text\textquotesingle{}}\NormalTok{]}\SpecialCharTok{\}}\SpecialStringTok{"} \ControlFlowTok{for}\NormalTok{ c }\KeywordTok{in}\NormalTok{ top}
+\NormalTok{    )}
+    \ControlFlowTok{return}\NormalTok{ llm.generate(}
+        \SpecialStringTok{f"Answer using ONLY this context. Cite sources.}\CharTok{\textbackslash{}n\textbackslash{}n}\SpecialCharTok{\{}\NormalTok{context}\SpecialCharTok{\}}\CharTok{\textbackslash{}n\textbackslash{}n}\SpecialStringTok{Q: }\SpecialCharTok{\{}\NormalTok{user\_query}\SpecialCharTok{\}}\SpecialStringTok{"}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Vector Database Systems}\label{vector-database-systems}
+
+You can use a \textbf{library} (FAISS, ScaNN, Annoy --- you manage storage, sharding, persistence, filtering yourself) or a \textbf{database} (Pinecone, Weaviate, Milvus, Qdrant, pgvector --- they add metadata, filtering, replication, APIs, persistence).
+
+\subsection{pgvector (Postgres extension) --- the "use what you have" choice}\label{pgvector-postgres-extension--the-use-what-you-have-choice}
+
+If you\textquotesingle re already on Postgres, \texttt{pgvector} adds a \texttt{vector} column type plus HNSW and IVF indexes. You get SQL joins, transactions, existing backups/replication, and ACID filtering \emph{for free}.
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{CREATE}\NormalTok{ EXTENSION }\ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ vector;}
+
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ chunks (}
+    \KeywordTok{id}\NormalTok{        bigserial }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    doc\_id    text,}
+\NormalTok{    tenant\_id text,}
+\NormalTok{    page      }\DataTypeTok{int}\NormalTok{,}
+\NormalTok{    text      text,}
+\NormalTok{    embedding vector(}\DecValTok{768}\NormalTok{)          }\CommentTok{{-}{-} 768{-}dim dense vector}
+\NormalTok{);}
+
+\CommentTok{{-}{-} HNSW index (cosine). vector\_ip\_ops for inner product, vector\_l2\_ops for L2.}
+\KeywordTok{CREATE} \KeywordTok{INDEX} \KeywordTok{ON}\NormalTok{ chunks}
+    \KeywordTok{USING}\NormalTok{ hnsw (embedding vector\_cosine\_ops)}
+    \KeywordTok{WITH}\NormalTok{ (m }\OperatorTok{=} \DecValTok{16}\NormalTok{, ef\_construction }\OperatorTok{=} \DecValTok{64}\NormalTok{);}
+
+\CommentTok{{-}{-} Partial index for a tenant (helps filtered search)}
+\KeywordTok{CREATE} \KeywordTok{INDEX} \KeywordTok{ON}\NormalTok{ chunks (tenant\_id);}
+
+\CommentTok{{-}{-} Query: top{-}10 nearest, filtered by tenant (pre{-}filter via WHERE + index)}
+\KeywordTok{SET}\NormalTok{ hnsw.ef\_search }\OperatorTok{=} \DecValTok{100}\NormalTok{;          }\CommentTok{{-}{-} query{-}time recall knob}
+\KeywordTok{SELECT} \KeywordTok{id}\NormalTok{, doc\_id, page, text,}
+       \DecValTok{1} \OperatorTok{{-}}\NormalTok{ (embedding }\OperatorTok{\textless{}=\textgreater{}}\NormalTok{ $}\DecValTok{1}\NormalTok{) }\KeywordTok{AS}\NormalTok{ cosine\_similarity   }\CommentTok{{-}{-} \textless{}=\textgreater{} is cosine distance}
+\KeywordTok{FROM}\NormalTok{ chunks}
+\KeywordTok{WHERE}\NormalTok{ tenant\_id }\OperatorTok{=} \StringTok{\textquotesingle{}acme\textquotesingle{}}
+\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ embedding }\OperatorTok{\textless{}=\textgreater{}}\NormalTok{ $}\DecValTok{1}          \CommentTok{{-}{-} \textless{}=\textgreater{} cosine, \textless{}\#\textgreater{} inner product, \textless{}{-}\textgreater{} L2}
+\KeywordTok{LIMIT} \DecValTok{10}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{\textless{}=\textgreater{}} = cosine distance, \texttt{\textless{}\#\textgreater{}} = negative inner product, \texttt{\textless{}-\textgreater{}} = L2. \textbf{Caveat:} at very high N (\textgreater50--100M) and high-selectivity filters, pgvector\textquotesingle s HNSW can lose recall under tight \texttt{WHERE} filters; partition by tenant or move to a dedicated vector DB.
+
+\subsection{The major systems}\label{the-major-systems}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1486}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0743}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1600}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+DB
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Index
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Scale
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Filtering
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Highlights
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{pgvector} & Postgres ext & HNSW, IVFFlat & \textasciitilde10s of M & SQL \texttt{WHERE} (pre-filter) & SQL joins, ACID, reuse infra & Already on Postgres \\
+\rowcolor{zebra}
+\textbf{Pinecone} & Managed SaaS & proprietary (HNSW-like) & Billions & Metadata filters & Zero ops, auto-scale, serverless & Fast to production \\
+\textbf{Weaviate} & OSS + Cloud & HNSW & Millions--B & Strong, filterable HNSW & GraphQL, modules, hybrid built-in & Feature-rich OSS, hybrid \\
+\rowcolor{zebra}
+\textbf{Qdrant} & OSS + Cloud & HNSW & Millions--B & \textbf{Excellent} payload + filterable HNSW & Rust, fast, quantization built-in & Filtered search, performance \\
+\textbf{Milvus} & OSS + Cloud & HNSW, IVF-PQ, DiskANN, GPU & \textbf{Billions} & Yes & Most scalable OSS, many index types & Massive self-hosted \\
+\rowcolor{zebra}
+\textbf{FAISS} & Library & Flat, HNSW, IVF, IVF-PQ, OPQ & Billions & DIY & Max control, GPU, all algorithms & Research, custom infra \\
+\textbf{ScaNN} & Library & Anisotropic + tree & Billions & DIY & Fastest in-memory MIPS (Google) & Speed-critical MIPS \\
+\rowcolor{zebra}
+\textbf{Annoy} & Library & RP-tree forest & Millions & DIY & mmap, immutable, simple & Static read-only, recsys \\
+\textbf{Elasticsearch / OpenSearch} & Search engine & HNSW (Lucene) & Millions--B & Native & Best hybrid (BM25 + vector in one) & Already on ES, hybrid \\
+\end{longtable}
+
+\subsection{Managed vs self-hosted}\label{managed-vs-self-hosted}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1279}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5043}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3677}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Managed (Pinecone, Weaviate Cloud, Qdrant Cloud)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Self-hosted (Milvus, Qdrant, FAISS)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Ops burden} & Near zero & You run sharding, replication, upgrades \\
+\rowcolor{zebra}
+\textbf{Cost} & \$ per pod/usage (can be high at scale) & Hardware + eng time \\
+\textbf{Control} & Limited tuning & Full (custom indexes, GPU) \\
+\rowcolor{zebra}
+\textbf{Data residency} & Their cloud (compliance concerns) & Your infra \\
+\textbf{Scale ceiling} & Very high (their problem) & Yours to engineer \\
+\end{longtable}
+
+\textbf{Interview takeaway:} Default recommendation --- "If we\textquotesingle re on Postgres and \textless{} \textasciitilde10M vectors, pgvector. For fast time-to-production, Pinecone. For self-hosted scale with filtering, Qdrant or Milvus. For maximum control / research / GPU / billion-scale custom, FAISS. If we already run Elasticsearch and need hybrid, use its native kNN."
+
+\section{Scaling, Updates \& Operations}\label{scaling-updates--operations}
+
+\subsection{Sharding}\label{sharding}
+
+At billions of vectors, one machine can\textquotesingle t hold the index. Shard the vectors across nodes; query all shards in parallel; merge the per-shard top-k.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1948}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2797}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2542}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2712}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pro
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Con
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Shard by id (random/hash)} & \texttt{hash(id)\ \%\ num\_shards} & Even load, simple & \textbf{Every query hits every shard} (scatter-gather) \\
+\rowcolor{zebra}
+\textbf{Shard by cluster (IVF centroid)} & Route query to shards owning the nearest centroids & Query touches few shards & Skewed cells = hot shards; rebalancing on drift \\
+\textbf{Shard by tenant/metadata} & One shard (or index) per tenant & Filtered queries hit one shard; isolation & Uneven tenant sizes; many small indexes \\
+\end{longtable}
+
+\setcodelang{}
+
+\begin{verbatim}
+SCATTER-GATHER (hash sharding):
+  Query → [shard0 top-k][shard1 top-k]...[shardN top-k] → merge → global top-k
+  Latency = max(shard latency) + merge. Tail latency dominated by the slowest shard.
+
+ROUTED (cluster sharding):
+  Query → nearest 2 centroids → only their 2 shards → merge.
+  Fewer shards touched → less load, but a query near a boundary may miss → lower recall.
+\end{verbatim}
+
+\subsection{Replication}\label{replication}
+
+Each shard is replicated (e.g., 3\(\times\)) for availability and read throughput. Reads load-balance across replicas; a replica failure doesn\textquotesingle t drop data. Writes go to a primary and propagate. Same leader-follower trade-offs as any distributed store (replication lag \(\rightarrow\) a just-upserted vector may not yet be searchable on all replicas \(\rightarrow\) "freshness").
+
+\subsection{Inserts vs deletes --- the hard part}\label{inserts-vs-deletes--the-hard-part}
+
+\textbf{Inserts} are easy for HNSW (incremental graph insertion) and IVF (assign to nearest cell). The cost: HNSW insertion runs a search to find neighbors (\(\approx\) query cost), so high write rates are heavier than reads.
+
+\textbf{Deletes} are the genuinely hard problem:
+
+\begin{itemize}
+\tightlist
+\item
+  HNSW graphs don\textquotesingle t support clean node removal --- deleting a node would orphan its neighbors\textquotesingle{} links and degrade navigability.
+\item
+  The standard solution is \textbf{tombstones (soft delete):} mark the vector deleted, keep it in the graph, filter it out of results at query time.
+\item
+  Tombstones accumulate \(\rightarrow\) wasted memory + degraded recall (the graph routes through dead nodes) \(\rightarrow\) periodic \textbf{rebuild/compaction} to physically remove them, analogous to LSM-tree compaction.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+Delete v:  mark v.deleted = true   (tombstone; still in graph, filtered at query)
+When tombstone ratio > ~20-30%  →  rebuild index from live vectors  (offline or shadow)
+\end{verbatim}
+
+IVF handles updates better (just drop the id from a cell\textquotesingle s list), but accumulated churn unbalances cells \(\rightarrow\) eventual retrain.
+
+\subsection{Filtered search at scale (recap with the scaling angle)}\label{filtered-search-at-scale-recap-with-the-scaling-angle}
+
+The pre/post-filter problem (from the RAG section) gets worse at scale. For \textbf{selective} filters (few matches), exact brute force over the matching subset beats ANN. For \textbf{non-selective} filters, filtered-HNSW or partitioning. Partitioning by the common filter key (tenant, time bucket) is often the cleanest: each partition is its own small index, queried directly --- no recall loss.
+
+\subsection{Re-embedding when the model changes (full rebuild)}\label{re-embedding-when-the-model-changes-full-rebuild}
+
+This is the operational elephant. A new embedding model = new geometry = \textbf{every vector must be recomputed and the index rebuilt}. Old and new vectors are not comparable; you cannot incrementally migrate.
+
+\setcodelang{}
+
+\begin{verbatim}
+Blue/Green re-embed (zero-downtime):
+  1. Stand up a NEW index (green) alongside the live one (blue).
+  2. Re-embed the whole corpus with the new model → populate green.
+  3. Validate: run the golden query set against green; require recall@10 ≥ blue.
+  4. Dual-write new ingests to both during the transition.
+  5. Cut traffic over to green; decommission blue.
+
+Cost (100M chunks): ~28 GPU-hours embed + index build + 2× storage during overlap.
+\end{verbatim}
+
+\subsection{Freshness}\label{freshness}
+
+How fast must a new document be searchable? Real-time chat memory needs seconds; a docs corpus can tolerate hours. Patterns: a small \textbf{hot index} (recent inserts, frequently rebuilt or HNSW with fast inserts) merged with a large \textbf{cold index} (rebuilt nightly); queries hit both and merge. Trade freshness against rebuild cost.
+
+\textbf{Interview takeaway:} "Deletes via tombstones + periodic rebuild; inserts incremental but \textasciitilde as costly as a query; model upgrades force a full blue/green re-embed --- that\textquotesingle s the biggest operational risk, budget \textasciitilde28 GPU-hours per 100M chunks." Saying this signals real operational experience.
+
+\section{Evaluation}\label{evaluation}
+
+You cannot tune recall/latency/memory without measuring. Build a \textbf{golden set} and track retrieval metrics offline, then confirm online.
+
+\subsection{Building a golden set}\label{building-a-golden-set}
+
+A golden set is a list of \texttt{(query,\ relevant\_doc\_ids)} pairs --- the ground truth of what \emph{should} be retrieved.
+
+Sources: hand-labeled by experts; mined from click logs (clicked results = relevant); or \textbf{synthetically generated} (LLM reads each chunk and writes a question it answers \(\rightarrow\) (question, chunk\_id) is a positive pair). Aim for a few hundred to a few thousand queries spanning head (common) and tail (rare) cases.
+
+\subsection{Retrieval metrics}\label{retrieval-metrics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1145}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5005}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3850}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Formula / idea
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Captures
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Recall@k} & (relevant retrieved in top-k) / (total relevant) & Did we \emph{find} the right docs? \\
+\rowcolor{zebra}
+\textbf{Precision@k} & (relevant in top-k) / k & Are top-k \emph{clean} (not noisy)? \\
+\textbf{MRR} & mean of 1/rank of the first relevant result & How high is the \emph{first} good hit? \\
+\rowcolor{zebra}
+\textbf{nDCG@k} & DCG / ideal DCG, with graded relevance \& position discount & Ranking quality with graded relevance \\
+\textbf{Hit@k} & fraction of queries with \(\geq\)1 relevant in top-k & Coarse "did we get anything right?" \\
+\end{longtable}
+
+\setcodelang{}
+
+\begin{verbatim}
+MRR example:  query A first-relevant at rank 1 → 1/1
+              query B first-relevant at rank 3 → 1/3
+              query C first-relevant at rank 2 → 1/2
+              MRR = (1 + 0.333 + 0.5) / 3 = 0.611
+
+nDCG@k:  DCG = Σ_i  rel_i / log2(i+1)   (rel can be graded 0/1/2/3)
+         nDCG = DCG / IDCG (DCG of the perfect ranking). Range [0,1].
+         Rewards putting the most-relevant doc at the top, not just somewhere in top-k.
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ recall\_at\_k(retrieved\_ids, relevant\_ids, k):}
+\NormalTok{    top }\OperatorTok{=} \BuiltInTok{set}\NormalTok{(retrieved\_ids[:k])}
+    \ControlFlowTok{return} \BuiltInTok{len}\NormalTok{(top }\OperatorTok{\&} \BuiltInTok{set}\NormalTok{(relevant\_ids)) }\OperatorTok{/} \BuiltInTok{len}\NormalTok{(relevant\_ids)}
+
+\KeywordTok{def}\NormalTok{ mrr(list\_of\_retrieved, list\_of\_relevant):}
+\NormalTok{    total }\OperatorTok{=} \FloatTok{0.0}
+    \ControlFlowTok{for}\NormalTok{ retrieved, relevant }\KeywordTok{in} \BuiltInTok{zip}\NormalTok{(list\_of\_retrieved, list\_of\_relevant):}
+\NormalTok{        rel }\OperatorTok{=} \BuiltInTok{set}\NormalTok{(relevant)}
+        \ControlFlowTok{for}\NormalTok{ rank, doc }\KeywordTok{in} \BuiltInTok{enumerate}\NormalTok{(retrieved, start}\OperatorTok{=}\DecValTok{1}\NormalTok{):}
+            \ControlFlowTok{if}\NormalTok{ doc }\KeywordTok{in}\NormalTok{ rel:}
+\NormalTok{                total }\OperatorTok{+=} \FloatTok{1.0} \OperatorTok{/}\NormalTok{ rank}
+                \ControlFlowTok{break}
+    \ControlFlowTok{return}\NormalTok{ total }\OperatorTok{/} \BuiltInTok{len}\NormalTok{(list\_of\_retrieved)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{ANN recall vs end-to-end recall (don\textquotesingle t conflate)}\label{ann-recall-vs-end-to-end-recall-dont-conflate}
+
+Two different "recall" numbers:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ANN recall@k} --- does the index return the \emph{exact} nearest vectors? (Index quality; ground truth = brute force.)
+\item
+  \textbf{Retrieval recall@k} --- did we retrieve the \emph{truly relevant documents}? (System quality; ground truth = golden labels.)
+\end{itemize}
+
+You can have 0.99 ANN recall but poor retrieval recall if the \emph{embedding model} (not the index) is bad --- the index faithfully returns the wrong neighbors. Diagnose by comparing ANN-vs-brute-force (isolates index) against golden-set recall (isolates whole system).
+
+\subsection{Offline vs online}\label{offline-vs-online}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0641}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4271}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5088}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Offline
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Online
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Signal} & Recall@k, nDCG, MRR vs golden set & Click-through, dwell time, answer thumbs-up, task success \\
+\rowcolor{zebra}
+\textbf{Speed} & Minutes & Days (statistical significance) \\
+\textbf{Use} & Gate every change (model/index/chunking) & A/B test the winners; catch real-world gaps \\
+\end{longtable}
+
+\textbf{For full RAG} (with generation), add faithfulness/groundedness and answer-relevance (RAGAS, LLM-as-judge) --- but retrieval recall is the upstream lever; fix it first.
+
+\textbf{Interview takeaway:} "I\textquotesingle d build a golden set (synthetic + log-mined), track recall@k and nDCG offline to gate index/model/chunking changes, separate ANN recall from retrieval recall to localize regressions, and A/B test online for click-through and answer success."
+
+\section{Designing Search over 100M Documents (Worked Example)}\label{designing-search-over-100m-documents-worked-example}
+
+\textbf{Prompt:} "Design semantic search / RAG over 100 million documents with sub-100 ms p95 latency."
+
+Walk it as: clarify \(\rightarrow\) estimate \(\rightarrow\) embedding \(\rightarrow\) chunking \(\rightarrow\) index \(\rightarrow\) sharding \(\rightarrow\) hybrid+rerank \(\rightarrow\) budget.
+
+\subsection{1. Clarify requirements}\label{1-clarify-requirements}
+
+\begin{itemize}
+\tightlist
+\item
+  100M \emph{documents}; after chunking, expect \textasciitilde5 chunks/doc \(\rightarrow\) **\textasciitilde500M vectors**.
+\item
+  Latency target: p95 \textless{} 100 ms end-to-end. Recall target: recall@10 \(\geq\) 0.95.
+\item
+  Filters: tenant + ACL + date. Freshness: new docs searchable within minutes. Read-heavy (1000s QPS).
+\end{itemize}
+
+\subsection{2. Back-of-envelope sizing}\label{2-back-of-envelope-sizing}
+
+\setcodelang{}
+
+\begin{verbatim}
+Vectors: 100M docs × 5 chunks = 500,000,000 chunks
+Model: bge-base, d=768, normalized → use inner-product metric
+Raw float32 storage: 500M × 768 × 4 B = 1.536 TB  (too big for one box's RAM)
+\end{verbatim}
+
+This number forces the architecture: 1.5 TB of raw vectors \(\rightarrow\) either many HNSW machines or compress with PQ. We\textquotesingle ll do \textbf{IVF-PQ + sharding + reranking}.
+
+\subsection{3. Embedding model}\label{3-embedding-model}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{bge-base-en-v1.5} (768-dim)} --- strong open-source, self-hostable (no per-call API cost at 500M scale), 256--512 token sweet spot. L2-normalize \(\rightarrow\) inner-product metric.
+\item
+  Fine-tune later on mined (query, clicked-chunk) pairs if golden-set recall is weak.
+\item
+  Embedding cost: 500M chunks \(\div\) 1000 chunks/s/GPU = 500K GPU-sec \(\approx\) 139 GPU-hours (one-time, parallelizable across GPUs).
+\end{itemize}
+
+\subsection{4. Chunking}\label{4-chunking}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Recursive character split}, 512 tokens, 64-token overlap, prefer header/paragraph boundaries (structural for the docs that have markup).
+\item
+  Store metadata: \texttt{\{text,\ doc\_id,\ source,\ page,\ tenant\_id,\ acl{[}{]},\ created\_at\}}.
+\end{itemize}
+
+\subsection{5. Index choice + params}\label{5-index-choice--params}
+
+500M vectors \(\rightarrow\) memory is the binding constraint \(\rightarrow\) \textbf{IVF-PQ} (compress) with a \textbf{rerank} stage:
+
+\setcodelang{}
+
+\begin{verbatim}
+IVF:  nlist = 4 × sqrt(500M) ≈ 4 × 22,360 ≈ 90,000 centroids
+      → ~5,500 vectors per cell.   nprobe = 64 (query-time tunable).
+PQ:   d=768, m=96 sub-vectors (8 dims each), 8-bit codes (256 centroids/sub).
+      Per-vector storage: 96 bytes (+ a few bytes overhead).
+Memory: 500M × ~100 B ≈ 50 GB of PQ codes  ← now fits across a few machines.
+Rerank: keep full float vectors on NVMe SSD; for the top-200 IVF-PQ candidates,
+        re-score with exact inner product → recovers recall@10 to ~0.96.
+\end{verbatim}
+
+Compared with HNSW-flat which would need \textasciitilde500M \(\times\) 3.5 KB \(\approx\) \textbf{1.75 TB RAM} (many more machines) --- IVF-PQ is \textasciitilde35\(\times\) cheaper on memory, accepting a rerank step.
+
+\subsection{6. Sharding \& replication}\label{6-sharding--replication}
+
+\setcodelang{}
+
+\begin{verbatim}
+Shard by hash(chunk_id) into, say, 8 shards → ~62.5M vectors / ~6.5 GB PQ codes each.
+Each shard: 3 replicas (availability + read throughput).
+Query = scatter-gather: fan out to 8 shards, each returns top-50, merge → top-200,
+        then rerank. Latency ≈ max(shard) + merge + rerank.
+For tenant isolation, optionally co-locate a tenant's chunks (route filtered queries
+to fewer shards). Large tenants get dedicated indexes.
+\end{verbatim}
+
+\subsection{7. Hybrid + rerank pipeline}\label{7-hybrid--rerank-pipeline}
+
+\setcodelang{}
+
+\begin{verbatim}
+Query
+  ├─► embed (bge-base) → IVF-PQ ANN (nprobe=64) per shard → merge top-200   [~25 ms]
+  ├─► BM25 (Elasticsearch/Lucene) → top-100                                  [~15 ms, parallel]
+  ▼
+RRF fuse (k=60) → top-100
+  ▼
+Cross-encoder rerank (ms-marco MiniLM) on 100 → top-5                        [~40 ms]
+  ▼
+(RAG) inject top-5 into LLM prompt with citations
+\end{verbatim}
+
+\subsection{8. Latency \& resource budget}\label{8-latency--resource-budget}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Embed query (}\DecValTok{1}\NormalTok{ forward }\ControlFlowTok{pass}\NormalTok{, GPU}\OperatorTok{/}\NormalTok{CPU)     }\OperatorTok{\textasciitilde{}}\DecValTok{5}\NormalTok{ ms}
+\NormalTok{IVF}\OperatorTok{{-}}\NormalTok{PQ scatter}\OperatorTok{{-}}\NormalTok{gather (}\DecValTok{8}\NormalTok{ shards parallel) }\OperatorTok{\textasciitilde{}}\DecValTok{25}\NormalTok{ ms  (p95}\OperatorTok{;}\NormalTok{ tail }\OperatorTok{=}\NormalTok{ slowest shard)}
+\NormalTok{BM25 (parallel, overlaps)                 }\OperatorTok{\textasciitilde{}}\DecValTok{15}\NormalTok{ ms}
+\NormalTok{RRF fuse                                  }\OperatorTok{\textasciitilde{}}\DecValTok{2}\NormalTok{ ms}
+\NormalTok{SSD rerank of top}\OperatorTok{{-}}\DecValTok{200}\NormalTok{ (exact }\BuiltInTok{float}\NormalTok{)       }\OperatorTok{\textasciitilde{}}\DecValTok{10}\NormalTok{ ms}
+\NormalTok{Cross}\OperatorTok{{-}}\NormalTok{encoder rerank top}\OperatorTok{{-}}\DecValTok{100}              \OperatorTok{\textasciitilde{}}\DecValTok{40}\NormalTok{ ms}
+
+\NormalTok{End}\OperatorTok{{-}}\NormalTok{to}\OperatorTok{{-}}\NormalTok{end p95                            }\OperatorTok{\textasciitilde{}}\DecValTok{80}\NormalTok{ ms  ✓ under }\DecValTok{100}\NormalTok{ ms}
+\NormalTok{Recall}\OperatorTok{@}\DecValTok{10}\NormalTok{ (post}\OperatorTok{{-}}\NormalTok{rerank)                   }\OperatorTok{\textasciitilde{}}\FloatTok{0.96}\NormalTok{   ✓}
+\NormalTok{Memory (PQ codes, replicated }\DecValTok{3}\NormalTok{×)          }\OperatorTok{\textasciitilde{}}\DecValTok{150}\NormalTok{ GB total  (}\DecValTok{50}\NormalTok{ GB × }\DecValTok{3}\NormalTok{)}
+\NormalTok{One}\OperatorTok{{-}}\NormalTok{time embed                            }\OperatorTok{\textasciitilde{}}\DecValTok{139}\NormalTok{ GPU}\OperatorTok{{-}}\NormalTok{hours}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{9. Trade-offs to state aloud}\label{9-trade-offs-to-state-aloud}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{IVF-PQ vs HNSW:} chose PQ for \textasciitilde35\(\times\) memory savings; pay with a rerank stage and a k-means training step (retrain on drift). If memory weren\textquotesingle t constrained, HNSW (M=32) would give \textasciitilde0.97 recall with no rerank but \textasciitilde1.75 TB RAM.
+\item
+  \textbf{nprobe / ef\_search} are the live recall-vs-latency knobs.
+\item
+  \textbf{Filtering:} filtered-IVF or tenant partitioning; exact brute force for highly selective ACL filters.
+\item
+  \textbf{Model upgrade:} blue/green full re-embed (\textasciitilde139 GPU-hours), validate on golden set, cut over.
+\item
+  \textbf{Freshness:} small hot HNSW index for recent inserts merged with the big IVF-PQ cold index; nightly compaction.
+\end{itemize}
+
+\textbf{Interview takeaway:} The number \texttt{500M\ vectors\ →\ 1.5\ TB\ raw} is what justifies every later decision (PQ, sharding, rerank). Derive it early and let it drive the design.
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{Full RAG Pipeline (ingest + query)}\label{full-rag-pipeline-ingest--query}
+
+\setcodelang{}
+
+\begin{verbatim}
+══════════════════════════ INGEST (offline) ══════════════════════════
+
+[Raw Docs]→[Parse]→[Clean]→[Chunk 512/64]→[Embed bge-768]→[Upsert]
+ PDF/HTML   text    norm     recursive       normalize       vector + metadata
+ DOCX/MD    extract ws       split           (unit vecs)     → Vector DB (IVF-PQ/HNSW)
+                                                              → BM25 inverted index
+
+══════════════════════════ QUERY (online) ════════════════════════════
+
+[User Query]
+     │
+     ├─►[Embed Query (same model!)]─►[ANN search + metadata filter]─►top-50
+     │                                                                   │
+     └─►[BM25 keyword search + filter]──────────────────────────►top-50  │
+                                                                   │      │
+                                            [RRF fuse: 1/(k+rank)]◄┘──────┘
+                                                       │
+                                          [Cross-encoder rerank top-50]
+                                                       │
+                                               [Top 3–5 chunks]
+                                                       │
+                                      [Inject into LLM prompt + cite]
+                                                       │
+                                            [Grounded answer]
+\end{verbatim}
+
+\subsection{HNSW search}\label{hnsw-search}
+
+\setcodelang{}
+
+\begin{verbatim}
+QUERY q = [0.12, -0.43, 0.87, ...]
+
+Layer 2 (sparse, long links):   [N1]━━━━━━━━━━━━━━━[N8]
+                                  │                 │
+Layer 1 (medium):               [N1]━[N3]━[N5]━━━━[N8]
+                                          │
+Layer 0 (all nodes, local):  [N1]─[N2]─[N3]─[N4]─[N5]─[N6]─[N7]─[N8]─[N9]
+
+1. Enter top layer at N1, greedily hop toward q  → N8
+2. Descend to L1, hop                            → N5
+3. Descend to L0, expand candidate set (ef_search), refine → top-k
+Result: approx nearest neighbors in ~O(log N) hops.
+\end{verbatim}
+
+\subsection{IVF-PQ retrieval}\label{ivf-pq-retrieval}
+
+\setcodelang{}
+
+\begin{verbatim}
+Query q
+   │
+   ▼  find nprobe nearest centroids (coarse quantizer)
+[C12][C57][C90][...]   ← nprobe=64 cells chosen out of nlist=90,000
+   │
+   ▼  scan only those cells' PQ codes (96 bytes each) via ADC lookup table
+[approx top-200]
+   │
+   ▼  (optional) rerank with exact float vectors from SSD
+[top-10]
+\end{verbatim}
+
+\subsection{Sharded vector service}\label{sharded-vector-service}
+
+\setcodelang{}
+
+\begin{verbatim}
+                       ┌──────────────┐
+   Query ─────────────►│ Query Router │  embed + fan-out
+                       └──────┬───────┘
+        ┌──────────────┬──────┴───────┬──────────────┐
+        ▼              ▼              ▼              ▼
+   ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
+   │ Shard 0 │    │ Shard 1 │    │ Shard 2 │    │ Shard 3 │   each: 3 replicas,
+   │ IVF-PQ  │    │ IVF-PQ  │    │ IVF-PQ  │    │ IVF-PQ  │   ~62M vecs, ~6.5GB
+   └────┬────┘    └────┬────┘    └────┬────┘    └────┬────┘
+        └─────top-50───┴──────merge───┴─────top-50───┘
+                          │
+                    [global top-200] → RRF (with BM25) → rerank → top-5
+\end{verbatim}
+
+\subsection{Vector vs lexical vs hybrid}\label{vector-vs-lexical-vs-hybrid}
+
+\setcodelang{}
+
+\begin{verbatim}
+                 RECALL on meaning   PRECISION on exact terms
+  Dense only     ████████████░░░░    ████░░░░░░░░░░░░
+  BM25 only      ████░░░░░░░░░░░░    ████████████░░░░
+  Hybrid (RRF)   ████████████████    ████████████████   ← best of both
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\subsection{Google Search / YouTube (ScaNN)}\label{google-search--youtube-scann}
+
+Embedding-based retrieval ("neural matching") finds semantically related results; ScaNN\textquotesingle s anisotropic quantization serves billion-vector MIPS in milliseconds. YouTube recommendations are two-tower retrieval (user tower, video tower) \(\rightarrow\) ANN over the video embedding index. \textbf{Lesson:} at Google scale, quantization quality (recall-per-byte) is the whole ballgame.
+
+\subsection{Meta Ads \& FAISS}\label{meta-ads--faiss}
+
+Ads retrieval: a request embeds user/context, FAISS returns thousands of candidate ads from billions, then a heavy ranker scores them. FAISS IVF-PQ on GPU drives the candidate-generation stage. \textbf{Lesson:} two-stage (cheap ANN retrieve \(\rightarrow\) expensive rerank) is universal.
+
+\subsection{Spotify (Annoy)}\label{spotify-annoy}
+
+Music recommendations: embed tracks/users, Annoy\textquotesingle s mmap-able read-only forest serves the same static daily-built index across many machines cheaply. \textbf{Lesson:} for a static corpus, an immutable mmap index is operationally simple and memory-efficient.
+
+\subsection{Pinterest visual search (PinSage)}\label{pinterest-visual-search-pinsage}
+
+Embed pins (image + text), ANN retrieve visually/semantically similar pins over billions. \textbf{Lesson:} multimodal embeddings + ANN power "more like this."
+
+\subsection{Perplexity / enterprise RAG (Glean, Notion AI, Microsoft 365 Copilot)}\label{perplexity--enterprise-rag-glean-notion-ai-microsoft-365-copilot}
+
+Query \(\rightarrow\) hybrid retrieve (dense + BM25) over chunked corpus \(\rightarrow\) rerank \(\rightarrow\) LLM with citations. Copilot adds \textbf{ACL-aware filtered search} --- you only retrieve documents you\textquotesingle re permitted to see (the pre/post-filter correctness issue is a real security requirement, not just performance). \textbf{Lesson:} filtering correctness = security boundary.
+
+\subsection{Semantic cache for LLMs}\label{semantic-cache-for-llms}
+
+Embed each incoming LLM query; if a past query\textquotesingle s vector is within cosine 0.97, return the cached answer --- skip an expensive LLM call. A vector DB used as a cache. \textbf{Lesson:} vector search isn\textquotesingle t only for documents.
+
+\subsection{Near-duplicate detection / dedup}\label{near-duplicate-detection--dedup}
+
+Embed content, find pairs above a high similarity threshold to dedup a corpus or detect plagiarism / repost spam. \textbf{Lesson:} the same NN machinery serves dedup, not just search.
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One vivid frame: a vast, smart library where books are placed by meaning, not just by title.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2624}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7376}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Library Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Embedding} & A book\textquotesingle s location in a "meaning map" --- books on similar topics sit on nearby shelves, regardless of title spelling \\
+\rowcolor{zebra}
+\textbf{Vector space} & The whole floor plan where proximity = topical similarity, not alphabetical order \\
+\textbf{Dimensionality (768)} & The number of independent ways books can differ (topic, tone, era, difficulty, ...) --- 768 such axes \\
+\rowcolor{zebra}
+\textbf{Cosine similarity} & Comparing the \emph{direction} you walk to reach two books from the entrance, ignoring how far each is \\
+\textbf{Normalization (unit vectors)} & Putting every book at the same distance from the entrance, so only the \emph{direction} (meaning) matters \\
+\rowcolor{zebra}
+\textbf{Exact kNN} & Walking past \emph{every} shelf to find the closest book --- correct but you\textquotesingle d spend all day \\
+\textbf{Curse of dimensionality} & In a building with 768 floors, every book ends up "near a wall," so shortcuts (skip whole wings) stop working \\
+\rowcolor{zebra}
+\textbf{ANN} & A clever guide who takes you \emph{almost} always to the right shelf in seconds, occasionally missing by one \\
+\textbf{HNSW} & Express elevators (top floors, few stops) to get you to the right wing fast, then local stairs to the exact shelf \\
+\rowcolor{zebra}
+\textbf{IVF (clusters)} & The library is divided into themed rooms; you only enter the few rooms nearest your topic \\
+\textbf{nprobe} & How many themed rooms you\textquotesingle re willing to walk into before settling for what you found \\
+\rowcolor{zebra}
+\textbf{Product Quantization} & Replacing each book with a compact index card describing it --- 32\(\times\) lighter to carry, slightly fuzzy \\
+\textbf{Reranking (cross-encoder)} & After a runner brings 50 candidate books, the expert librarian reads each against your exact question and hands you the best 5 \\
+\rowcolor{zebra}
+\textbf{Hybrid search} & Using both the meaning-map \emph{and} the old title catalogue, because some patrons ask by exact title (an ISBN) and some by vibe \\
+\textbf{Chunking} & Cutting fat books into chapters so the runner can hand you just the relevant chapter, not the whole tome \\
+\rowcolor{zebra}
+\textbf{Metadata filter} & "Only books from the law section that you\textquotesingle re cleared to read" --- applied while searching, not after \\
+\textbf{Tombstone delete} & A "withdrawn" sticker on a book still on the shelf --- ignored by patrons until the next big reshelving \\
+\rowcolor{zebra}
+\textbf{Re-embedding (model change)} & The library adopts a new classification system --- every book must be re-placed and the whole map redrawn \\
+\textbf{Recall@k} & Of the 10 best books that exist for your question, how many the guide actually brought you \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\textbf{ANN index pick --- "HIP-LAS"}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{H}NSW --- default (graph, high recall, high memory)
+\item
+  \textbf{I}VF --- clusters (probe nearby cells)
+\item
+  \textbf{P}Q --- compress (codes, low memory)
+\item
+  \textbf{L}SH --- hashing (similar collide)
+\item
+  \textbf{A}nnoy --- trees (mmap, immutable)
+\item
+  \textbf{S}caNN --- anisotropic (Google, fast MIPS)
+\end{itemize}
+
+\textbf{The trade-off triangle --- "RLM, pick a point"}
+\textbf{R}ecall / \textbf{L}atency / \textbf{M}emory --- you optimize two, sacrifice the third. (Reranking lets you cheat a little.)
+
+\textbf{Distance default --- "Cosine for text; normalize and it\textquotesingle s just dot."}
+Unit vectors \(\Rightarrow\) cosine = dot product = (monotone with) L2. Same neighbors.
+
+\textbf{HNSW knobs --- "M builds it, ef searches it."}
+\texttt{M} and \texttt{ef\_construction} set graph quality at build time; \texttt{ef\_search} tunes recall at query time (the live knob).
+
+\textbf{IVF knobs --- "nlist cuts the cake, nprobe takes the slices."}
+More \texttt{nlist} = smaller cells; more \texttt{nprobe} = more cells searched = higher recall.
+
+\textbf{RAG retrieval order --- "Chunk, Embed, Retrieve, Fuse, Rerank, Generate" \(\rightarrow\) "CERFRG"}
+("Can Every Robot Find Really Good {[}answers{]}")
+
+\textbf{RRF formula --- "one over k-plus-rank, summed."} \texttt{Σ\ 1/(60\ +\ rank)}.
+
+\textbf{Bi vs cross --- "Bi is fast and blind; cross is slow and sees."}
+Bi-encoder embeds separately (scalable retrieval); cross-encoder reads the pair together (accurate rerank).
+
+\textbf{The hidden cost --- "New model, new map."}
+Change the embedding model \(\Rightarrow\) re-embed everything \(\Rightarrow\) rebuild the index.
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: Why not just use exact kNN or a k-d tree for vector search?}\label{q1-why-not-just-use-exact-knn-or-a-k-d-tree-for-vector-search}
+
+\textbf{Model answer:} Exact kNN is O(N\(\cdot\)d) per query --- at 100M vectors \(\times\) 768 dims that\textquotesingle s \textasciitilde77B operations, multiple seconds per query, unusable. k-d trees (and other space-partition trees) work in low dimensions but collapse under the curse of dimensionality: in high-d, distances concentrate (nearest and farthest neighbors become nearly equidistant) and almost all volume is near cell boundaries, so the pruning that makes trees fast almost never fires --- they degrade to near-brute-force. That\textquotesingle s why we use ANN (HNSW/IVF/PQ): accept \textasciitilde95--99\% recall for a 100--1000\(\times\) speedup.
+
+\textbf{Follow-ups:} \emph{At what N do you switch from brute force to ANN?} (\textasciitilde100K--1M; below that, exact is fine and simpler.) \emph{What\textquotesingle s the recall cost?} (Tunable via ef\_search/nprobe; measure on a golden set.)
+
+\subsection{Q2: Explain HNSW. Why is it the default?}\label{q2-explain-hnsw-why-is-it-the-default}
+
+\textbf{Model answer:} HNSW is a hierarchical, navigable small-world graph --- a skip-list idea applied to nearest-neighbor search. Upper layers are sparse with long-range links (express lanes); the bottom layer holds all nodes with short local links. You enter at the top, greedily hop toward the query, descend layer by layer, and refine at layer 0 keeping \texttt{ef\_search} candidates. Search is \textasciitilde O(log N). It\textquotesingle s the default because it gives the highest recall at a given latency, needs no training step, supports incremental inserts, and exposes a query-time recall knob (\texttt{ef\_search}). Its costs are high memory (stores full vectors plus graph edges --- \textasciitilde3.5 KB/vector at d=768, M=32) and awkward deletes (tombstones + periodic rebuild).
+
+\textbf{Follow-ups:} \emph{What do M, ef\_construction, ef\_search do?} (Graph degree; build-time search width; query-time search width.) \emph{Memory for 100M vectors?} (\textasciitilde358 GB.) \emph{How do you delete?} (Tombstone, filter at query, rebuild when bloat exceeds \textasciitilde25\%.)
+
+\subsection{Q3: How does IVF-PQ let you index a billion vectors?}\label{q3-how-does-ivf-pq-let-you-index-a-billion-vectors}
+
+\textbf{Model answer:} Two ideas combined. \textbf{IVF} k-means-partitions the space into \texttt{nlist} Voronoi cells; at query time you only search the \texttt{nprobe} cells nearest the query, skipping \textasciitilde99\% of vectors. \textbf{PQ} compresses each vector: split it into \texttt{m} sub-vectors, learn a 256-entry codebook per sub-space, and store each vector as \texttt{m} 1-byte codes --- e.g., 768 floats (3072 B) \(\rightarrow\) 96 bytes, a 32\(\times\) reduction. At query time, asymmetric distance computation precomputes a lookup table so each candidate\textquotesingle s approximate distance is \texttt{m} table adds. For 1B \(\times\) 768: raw float32 = 3.07 TB (won\textquotesingle t fit), PQ = 96 GB (fits). IVF avoids scanning everything; PQ makes what you do scan tiny. Add a rerank of the top candidates with exact float vectors to recover recall.
+
+\textbf{Follow-ups:} \emph{Why asymmetric (don\textquotesingle t quantize the query)?} (Higher accuracy --- query stays full precision.) \emph{Downside of PQ?} (Lossy \(\rightarrow\) lower recall; needs training; retrain on drift.) \emph{How to recover recall?} (Rerank top-N with exact distances.)
+
+\subsection{Q4: Cosine vs dot product vs L2 --- which and why for text?}\label{q4-cosine-vs-dot-product-vs-l2--which-and-why-for-text}
+
+\textbf{Model answer:} Cosine is the text default: it compares direction (meaning), ignoring magnitude (which correlates with length, not meaning). But if I L2-normalize the vectors --- which most text embedding models do --- then dot product equals cosine (since ‖a‖=‖b‖=1 \(\Rightarrow\) a\(\cdot\)b = cos), and L2 produces the \emph{same ranking} (‖a\(-\)b‖\(^2\) = 2 \(-\) 2cos). So in practice I normalize once and configure the index for inner product, getting exact cosine ranking with less per-query compute. L2 is the FAISS default and fine on normalized vectors; un-normalized, cosine and L2 differ because L2 is magnitude-sensitive.
+
+\textbf{Follow-ups:} \emph{When would dot product (not cosine) be right?} (Recsys where magnitude encodes popularity/confidence --- MIPS.) \emph{Prove cosine=dot for unit vectors.} (a\(\cdot\)b = ‖a‖‖b‖cos\(\theta\) = cos\(\theta\).)
+
+\subsection{Q5: How do you choose chunk size, and what\textquotesingle s the trade-off?}\label{q5-how-do-you-choose-chunk-size-and-whats-the-trade-off}
+
+\textbf{Model answer:} Chunks are what you embed and retrieve, so size controls precision vs. context. Too small (e.g., 64 tokens): high precision but the chunk lacks enough context to answer ("Click Settings, then Security" without the rest of the steps). Too large (e.g., 2000 tokens): the relevant sentence is diluted by irrelevant text --- the averaged embedding is fuzzy (low precision) and you waste the LLM\textquotesingle s context window. The sweet spot is 256--512 tokens with 10--20\% overlap so a sentence split at a boundary still appears whole somewhere. For structured docs I split on headers; for high precision I use parent-child (retrieve a small child, feed the larger parent to the LLM).
+
+\textbf{Follow-ups:} \emph{What\textquotesingle s overlap for?} (Avoid cutting an answer across a boundary.) \emph{Parent-child?} (Embed small chunks for precise retrieval, but pass the surrounding parent to the LLM for context.)
+
+\subsection{Q6: Walk me through filtered search. What\textquotesingle s the gotcha?}\label{q6-walk-me-through-filtered-search-whats-the-gotcha}
+
+\textbf{Model answer:} The gotcha is \textbf{post-filtering}: if you ANN-retrieve top-k and \emph{then} drop non-matching results, a selective filter (say 1\% of vectors match) can leave you with zero results even though good matches exist --- a correctness bug --- and over-fetching to compensate is slow. Naive \textbf{pre-filtering} breaks HNSW because the graph navigates through nodes that may be filtered out, collapsing recall. The production answer is \textbf{filtered ANN}: the predicate is fused into graph traversal (Qdrant, Weaviate, Milvus do this), or you partition by the filter key (one index per tenant), or --- for highly selective filters --- fall back to exact brute force over the tiny matching subset. In ACL-aware enterprise RAG this isn\textquotesingle t just performance; it\textquotesingle s a security boundary.
+
+\textbf{Follow-ups:} \emph{How does partitioning help?} (Each partition is its own small index, queried directly --- no recall loss.) \emph{When is brute force fine?} (When the filter leaves few candidates.)
+
+\subsection{Q7: Why hybrid search, and how do you combine the two rankings?}\label{q7-why-hybrid-search-and-how-do-you-combine-the-two-rankings}
+
+\textbf{Model answer:} Dense embeddings excel at paraphrase/concept matching but miss exact strings --- SKUs, error codes, rare proper nouns the model never saw. BM25 nails those exact terms but misses synonyms. Neither alone is best, so I run both and fuse with \textbf{Reciprocal Rank Fusion}: score each doc by \(\Sigma\) 1/(k+rank) across the two lists (k\(\approx\)60). RRF uses only ranks, so it sidesteps the problem that BM25 scores and cosine scores aren\textquotesingle t comparable. A doc both methods rank highly wins; the method works without score normalization or tuning.
+
+\textbf{Follow-ups:} \emph{Why rank-based not score-based fusion?} (Scores live on incomparable scales; ranks are robust.) \emph{What does k control?} (Higher k flattens the contribution of top ranks --- smoother fusion.)
+
+\subsection{Q8: Explain retrieve-then-rerank. Why two stages?}\label{q8-explain-retrieve-then-rerank-why-two-stages}
+
+\textbf{Model answer:} Retrieval uses a bi-encoder --- query and documents embedded independently --- which is fast and scalable (embed the corpus once offline, ANN at query time) but coarse, since the query and document never attend to each other. A cross-encoder feeds \texttt{{[}query,\ doc{]}} together through full attention and outputs a precise relevance score, but it needs one forward pass per document --- impossible over 100M docs. So: stage 1 retrieves top-30--50 cheaply with the bi-encoder ANN; stage 2 reranks just those 30--50 with the cross-encoder and keeps the top 3--5. You get the cross-encoder\textquotesingle s accuracy at the bi-encoder\textquotesingle s scale. Reranking \textasciitilde50 docs adds \textasciitilde40 ms but materially improves answer quality.
+
+\textbf{Follow-ups:} \emph{Why not cross-encode everything?} (O(N) forward passes --- billions of transformer runs.) \emph{Commercial options?} (Cohere/Voyage/Jina rerankers.)
+
+\subsection{Q9: You upgrade your embedding model. What happens operationally?}\label{q9-you-upgrade-your-embedding-model-what-happens-operationally}
+
+\textbf{Model answer:} A new model produces a different vector space --- old and new vectors aren\textquotesingle t comparable --- so you must \textbf{re-embed the entire corpus and rebuild the index}; you can\textquotesingle t mix or incrementally migrate. I\textquotesingle d do blue/green: stand up a new (green) index, re-embed everything into it, validate recall@10 on the golden set against the live (blue) index, dual-write new ingests during transition, then cut over and decommission blue. Budget roughly 28 GPU-hours per 100M chunks plus 2\(\times\) storage during overlap. This re-embed cost is the single biggest hidden operational risk of a vector system.
+
+\textbf{Follow-ups:} \emph{Can you avoid re-embedding?} (No --- geometry changes. Matryoshka embeddings let you truncate dims without re-embedding, but a \emph{new model} still requires it.) \emph{How do you validate the new index?} (Golden-set recall must meet or beat the old.)
+
+\subsection{Q10: How do you measure whether retrieval is good?}\label{q10-how-do-you-measure-whether-retrieval-is-good}
+
+\textbf{Model answer:} Build a golden set of (query, relevant\_doc\_ids) --- from expert labels, click logs, or LLM-generated questions per chunk. Then track recall@k (did we find the relevant docs?), precision@k (are top-k clean?), MRR (how high is the first hit?), and nDCG@k (graded ranking quality). Crucially, separate \textbf{ANN recall} (index returns the true nearest vectors, ground-truthed by brute force) from \textbf{retrieval recall} (we return the truly relevant documents, ground-truthed by labels): a bad embedding model gives perfect ANN recall but poor retrieval recall. Gate every index/model/chunking change on offline metrics, then A/B test online for click-through and answer success.
+
+\textbf{Follow-ups:} \emph{Define nDCG.} (DCG = \(\Sigma\) rel\_i/log2(i+1), normalized by ideal DCG; rewards ranking the best doc first.) \emph{Recall 0.99 but bad answers --- why?} (Embedding model or chunking, not the index.)
+
+\subsection{Q11: Design semantic search over 100M documents with \textless100 ms p95.}\label{q11-design-semantic-search-over-100m-documents-with-100-ms-p95}
+
+\textbf{Model answer:} 100M docs \(\times\) \textasciitilde5 chunks \(\approx\) 500M vectors. At d=768 float32 that\textquotesingle s 1.5 TB raw --- too big for one box, so memory drives the design. Use bge-base (768-dim, self-hosted, normalized \(\rightarrow\) inner product), recursive 512/64-token chunks with metadata. Index: IVF-PQ (nlist\(\approx\)90K, nprobe=64, m=96 8-bit codes \(\rightarrow\) \textasciitilde50 GB codes) plus a rerank of top-200 against exact float vectors on SSD. Shard by hash into 8 shards (\textasciitilde62M each), 3 replicas; scatter-gather and merge. Add BM25, fuse with RRF, then cross-encoder rerank to top-5. Budget: \textasciitilde5 ms query embed + \textasciitilde25 ms ANN + \textasciitilde15 ms BM25 (parallel) + \textasciitilde10 ms SSD rerank + \textasciitilde40 ms cross-encoder \(\approx\) 80 ms p95, recall@10 \(\approx\) 0.96, \textasciitilde150 GB RAM (3\(\times\) replicated). If memory weren\textquotesingle t constrained I\textquotesingle d use HNSW (M=32) for \textasciitilde0.97 recall and skip the rerank, at \textasciitilde1.75 TB RAM.
+
+\textbf{Follow-ups:} \emph{Why IVF-PQ over HNSW here?} (35\(\times\) memory savings; HNSW = 1.75 TB.) \emph{How do filters/freshness work?} (Tenant partition + filtered IVF; hot HNSW index for recent inserts merged with cold IVF-PQ.)
+
+\subsection{Q12: How do deletes work in a vector index?}\label{q12-how-do-deletes-work-in-a-vector-index}
+
+\textbf{Model answer:} Deletes are the hard operation. HNSW graphs can\textquotesingle t cleanly remove a node without orphaning neighbors\textquotesingle{} links, so the standard approach is a \textbf{tombstone}: mark the vector deleted, leave it in the graph, and filter it out of query results. Tombstones accumulate --- wasting memory and degrading recall because the graph still routes through dead nodes --- so when the tombstone ratio passes \textasciitilde20--30\% you \textbf{rebuild} the index from live vectors (often as a shadow index, then swap), analogous to LSM-tree compaction. IVF handles it more gracefully (drop the id from a cell\textquotesingle s posting list), though churn eventually unbalances cells and triggers a retrain.
+
+\textbf{Follow-ups:} \emph{Why not remove the HNSW node immediately?} (Breaks graph navigability.) \emph{How does this resemble databases?} (Tombstones + compaction = LSM-tree; MVCC dead tuples + VACUUM.)
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\subsection{Memory is usually the binding constraint, not CPU}\label{memory-is-usually-the-binding-constraint-not-cpu}
+
+At scale, the question "will the index fit in RAM?" dictates the architecture. HNSW stores full vectors (\textasciitilde3.5 KB/vec at d=768) \(\rightarrow\) great recall, but 100M = 358 GB and 1B = 3.5 TB. PQ trades recall for a 32\(\times\) memory cut. The senior move is to start from the raw-size estimate (N \(\times\) d \(\times\) 4 B) and let it choose between HNSW (memory available) and IVF-PQ (+ rerank) (memory bound). Disk-based ANN (DiskANN, Milvus) pushes vectors to NVMe with a small in-RAM graph for even larger scale at higher latency.
+
+\subsection{Two-stage retrieval is universal}\label{two-stage-retrieval-is-universal}
+
+Cheap-recall then expensive-precision appears everywhere: ANN retrieve \(\rightarrow\) cross-encoder rerank; IVF-PQ approx \(\rightarrow\) exact float rerank; candidate generation \(\rightarrow\) heavy ranker (ads/recs). Always retrieve more than you show. The cost asymmetry (cheap stage over millions, expensive stage over dozens) is the whole point.
+
+\subsection{Embedding quality dominates index quality}\label{embedding-quality-dominates-index-quality}
+
+Teams obsess over ef\_search while their embedding model is the actual bottleneck. A perfect index over bad vectors returns the wrong neighbors faithfully. Diagnose by separating ANN recall (vs brute force) from retrieval recall (vs golden labels). Often the highest-ROI move is fine-tuning the embedding model on in-domain (query, doc) pairs, not tuning the index.
+
+\subsection{Hybrid + rerank beats bigger models}\label{hybrid--rerank-beats-bigger-models}
+
+Before reaching for a 3072-dim model or a 7B embedder, add BM25 + RRF + a cross-encoder reranker. Hybrid fixes the exact-term blind spot of dense vectors; reranking fixes ordering. This stack usually beats a larger single bi-encoder at lower cost.
+
+\subsection{Filtering correctness is a security boundary}\label{filtering-correctness-is-a-security-boundary}
+
+In multi-tenant / ACL systems, "retrieve only what this user can see" is not a perf nicety --- leaking a retrieved chunk is a data breach. Post-filtering can both miss results (correctness) and, if implemented sloppily, leak. Use filtered-ANN or partition by tenant, and treat the filter as part of the authorization path.
+
+\subsection{The re-embed treadmill}\label{the-re-embed-treadmill}
+
+Every embedding-model upgrade forces a full corpus re-embed + index rebuild. This caps how often you can chase model improvements and argues for (a) self-hosting embeddings to avoid per-call costs at re-embed time, (b) Matryoshka models to get a dim knob without re-embedding, and (c) blue/green pipelines so upgrades are routine, not heroic.
+
+\subsection{Freshness vs rebuild cost}\label{freshness-vs-rebuild-cost}
+
+Real-time use cases (chat memory) need second-level freshness; doc search tolerates hours. The hot/cold split (small frequently-rebuilt index + large nightly-rebuilt index, queried together) is the standard answer. State your freshness SLA explicitly; it changes the design.
+
+\subsection{Quantization recall recovery}\label{quantization-recall-recovery}
+
+PQ\textquotesingle s recall hit is recoverable: retrieve a larger candidate set by PQ approx distance, then re-score with exact float vectors (kept on SSD). This decouples "fit in RAM" (PQ codes) from "final ranking accuracy" (exact rerank) --- a clean way to break the recall/memory tension.
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Saying "just use cosine similarity" with no mention of normalization or the dot-product equivalence.} The signal is knowing that normalized vectors make cosine = dot, so you configure the index for inner product.
+\item
+  \textbf{Proposing exact kNN or a k-d tree at scale.} Shows no awareness of O(N\(\cdot\)d) cost or the curse of dimensionality. Name ANN immediately for N \textgreater{} \textasciitilde1M.
+\item
+  \textbf{Treating filtering as a post-step.} Post-filtering causes the empty-results correctness bug and, in ACL systems, security risk. Always raise filtered-ANN or partitioning.
+\item
+  \textbf{Confusing bi-encoder and cross-encoder.} Bi = independent embeddings for scalable retrieval; cross = joint attention for accurate reranking. Mixing them up reveals shallow RAG understanding.
+\item
+  \textbf{Ignoring chunking.} Retrieval quality is dominated by chunk size/overlap/strategy. "I\textquotesingle ll embed the documents" without chunking is a red flag.
+\item
+  \textbf{Forgetting the re-embed cost of model upgrades.} Many candidates think you can swap embedding models freely. You can\textquotesingle t --- it\textquotesingle s a full corpus rebuild.
+\item
+  \textbf{Conflating ANN recall with retrieval recall.} A great index over a bad embedding model still returns wrong results. Separate the two when diagnosing.
+\item
+  \textbf{"HNSW always" with no memory math.} HNSW is the default, but at billions of vectors its memory (full vectors + graph) is prohibitive; that\textquotesingle s when IVF-PQ wins. Quote the numbers.
+\item
+  \textbf{Skipping hybrid search.} Pure dense search misses exact terms (SKUs, error codes). Mention BM25 + RRF.
+\item
+  \textbf{No golden set / no evaluation plan.} "I\textquotesingle d tune ef\_search" without saying \emph{against what metric on what data} is hand-waving. Recall@k on a golden set gates everything.
+\item
+  \textbf{Claiming PQ is lossless.} PQ is lossy compression; it reduces recall. The fix is reranking with exact vectors, not pretending there\textquotesingle s no cost.
+\item
+  \textbf{Forgetting deletes are hard.} Saying "just delete the vector" ignores HNSW\textquotesingle s tombstone-and-rebuild reality.
+\end{enumerate}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2046}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7954}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Connection
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{LLM Applications / RAG} & Vector search is the retrieval engine of RAG; chunking, hybrid, rerank all live here \\
+\rowcolor{zebra}
+\textbf{Databases (08)} & ANN index = the B-tree analog for semantic proximity; tombstones + rebuild mirror LSM compaction + VACUUM; filtered search \(\approx\) index + predicate; sharding/replication are identical concepts \\
+\textbf{Distributed Systems} & Sharding (scatter-gather vs routed), replication, consistency/freshness, quorum reads for vector shards \\
+\rowcolor{zebra}
+\textbf{Machine Learning} & Embedding models, contrastive/InfoNCE training, bi/cross-encoders, two-tower retrieval, CLIP/multimodal \\
+\textbf{Data Structures \& Algorithms} & Skip lists (HNSW intuition), k-means (IVF/PQ), graphs (NSW), priority queues (candidate sets), k-d trees and why they fail in high-d \\
+\rowcolor{zebra}
+\textbf{System Design} & Retrieval service design, latency budgets, capacity estimation, hot/cold indexes, caching \\
+\textbf{Information Retrieval} & BM25/TF-IDF, inverted indexes, RRF, nDCG/MRR/precision/recall, evaluation methodology \\
+\rowcolor{zebra}
+\textbf{Performance Engineering} & SIMD distance kernels, memory bandwidth limits, quantization, GPU vs CPU ANN, mmap \\
+\textbf{Security / Privacy} & ACL-aware filtered retrieval as an authorization boundary; on-device embeddings for privacy \\
+\end{longtable}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Lead with the size estimate.} "N vectors \(\times\) d dims \(\times\) 4 bytes" is the number that drives every architectural choice. Compute it out loud first.
+\item
+  \textbf{Always name the recall/latency/memory triangle} and which corner you\textquotesingle re optimizing, then name the knob (\texttt{ef\_search} / \texttt{nprobe}) you\textquotesingle d tune against a recall@k target.
+\item
+  \textbf{Default to HNSW, switch to IVF-PQ when memory-bound.} Justify with the memory math (358 GB vs 96 GB), don\textquotesingle t just name-drop.
+\item
+  \textbf{Never say "filter the results."} Say "filtered-ANN or partition by the filter key; exact brute force for selective filters" --- and flag the post-filter correctness/security bug.
+\item
+  \textbf{Propose hybrid + rerank by default.} Dense + BM25 fused with RRF, then a cross-encoder. It beats a bigger model cheaper.
+\item
+  \textbf{Use the same embedding model for ingest and query}, normalized, inner-product metric. State the cosine=dot equivalence.
+\item
+  \textbf{Bring up the re-embed cost} whenever model choice or upgrades come up --- it\textquotesingle s the senior signal.
+\item
+  \textbf{Separate ANN recall from retrieval recall} when discussing evaluation; tie everything to a golden set.
+\item
+  \textbf{For Google, mention ScaNN/anisotropic quantization; for Meta, FAISS and two-tower; for Amazon, OpenSearch kNN and cost.} Company-specific knowledge reads as systems maturity.
+\item
+  \textbf{State trade-offs explicitly.} "PQ saves 32\(\times\) memory but loses recall; I recover it by reranking the top-200 with exact float vectors on SSD." Quantified trade-offs win.
+\end{enumerate}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+\textbf{The problem:} find nearest vectors by \emph{meaning}. Exact kNN is O(N\(\cdot\)d) (seconds at 100M); k-d trees die to the curse of dimensionality. So use \textbf{ANN} --- \textasciitilde95--99\% recall for 100--1000\(\times\) speedup.
+
+\textbf{Embeddings:} dense learned vectors where geometric closeness = semantic similarity. Trained contrastively (InfoNCE, in-batch negatives, SimCSE). Bi-encoder = independent embeddings (scalable retrieval); cross-encoder = joint attention (accurate rerank). Dims 384/768/1536/3072 trade quality vs memory (linear). Normalize \(\rightarrow\) cosine = dot. Model upgrade = full re-embed + rebuild.
+
+\textbf{Metrics:} cosine for text (direction = meaning); normalized \(\Rightarrow\) cosine = dot = (monotone) L2 --- same neighbors. Pick inner product on normalized vectors.
+
+\textbf{Indexes:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{HNSW} --- hierarchical small-world graph; \textasciitilde O(log N); knobs M / ef\_construction / ef\_search; high recall, high memory (full vectors + graph). \textbf{Default.}
+\item
+  \textbf{IVF} --- k-means cells; probe \texttt{nprobe} nearest cells; needs training.
+\item
+  \textbf{PQ} --- split into m sub-vectors, codebooks, m-byte codes; 32\(\times\) memory cut; lossy; ADC lookup.
+\item
+  \textbf{IVF-PQ} --- billion-scale workhorse (FAISS).
+\item
+  \textbf{LSH} (hashing), \textbf{Annoy} (mmap trees, immutable), \textbf{ScaNN} (anisotropic, Google, fastest MIPS).
+\end{itemize}
+
+\textbf{Triangle:} Recall / Latency / Memory --- pick a point; tune via ef\_search/nprobe; rerank to cheat.
+
+\textbf{RAG pipeline:} chunk (512/64 tokens, recursive) \(\rightarrow\) embed \(\rightarrow\) upsert \(\rightarrow\) retrieve top-k \(\rightarrow\) metadata filter (filtered-ANN, not post-filter) \(\rightarrow\) hybrid (dense + BM25, fuse with RRF = \(\Sigma\)1/(60+rank)) \(\rightarrow\) cross-encoder rerank \(\rightarrow\) top 3--5 \(\rightarrow\) LLM.
+
+\textbf{Ops:} inserts incremental (\textasciitilde query cost); deletes = tombstone + rebuild; shard (hash scatter-gather vs cluster-routed) + replicate; re-embed on model change (blue/green); freshness via hot/cold split.
+
+\textbf{Eval:} golden set; recall@k, precision@k, MRR, nDCG; separate ANN recall (vs brute force) from retrieval recall (vs labels); offline-gate, online A/B.
+
+\subsection{Key Numbers to Know}\label{key-numbers-to-know}
+
+\begin{itemize}
+\tightlist
+\item
+  Exact kNN: O(N\(\cdot\)d). 100M \(\times\) 768 \(\approx\) 77B ops \(\approx\) seconds/query.
+\item
+  HNSW memory: \textasciitilde3.5 KB/vector (d=768, M=32) \(\rightarrow\) 100M \(\approx\) 358 GB, 1B \(\approx\) 3.5 TB.
+\item
+  PQ: 768 floats (3072 B) \(\rightarrow\) 96 bytes = 32\(\times\) cut. 1B \(\times\) 768: 3.07 TB float32 \(\rightarrow\) 96 GB PQ.
+\item
+  IVF: \texttt{nlist\ ≈\ sqrt(N)}--\texttt{4·sqrt(N)}; nprobe = recall knob.
+\item
+  Chunks: 256--512 tokens, 10--20\% overlap.
+\item
+  RRF k \(\approx\) 60.
+\item
+  Re-embed: \textasciitilde28 GPU-hours / 100M chunks.
+\item
+  Typical recall targets: 0.90 (web) to 0.99 (medical/legal).
+\item
+  Dims: 384 / 768 / 1024 / 1536 / 3072; memory linear in d.
+\end{itemize}
+
+\subsection{Most Important Concepts for Interviews}\label{most-important-concepts-for-interviews}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5575}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3911}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Rank
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Why exact kNN / k-d trees fail (curse of dimensionality) & Justifies ANN\textquotesingle s existence \\
+\rowcolor{zebra}
+2 & HNSW mechanism + M/ef params + memory & The default index; asked constantly \\
+3 & IVF-PQ + the memory math & Billion-scale; quantization \\
+\rowcolor{zebra}
+4 & Recall/latency/memory triangle + tuning knobs & The core trade-off \\
+5 & Cosine vs dot vs L2 + normalization equivalence & Distance fundamentals \\
+\rowcolor{zebra}
+6 & Chunking size/overlap trade-off & Dominates RAG quality \\
+7 & Hybrid (dense + BM25) + RRF & Beats dense-only, cheap \\
+\rowcolor{zebra}
+8 & Retrieve \(\rightarrow\) rerank (bi vs cross encoder) & Two-stage architecture \\
+9 & Filtered search pre/post-filter gotcha & Correctness + security \\
+\rowcolor{zebra}
+10 & Re-embed cost on model change & Senior operational signal \\
+11 & Evaluation: recall@k/nDCG, golden set, ANN vs retrieval recall & How you know it works \\
+\rowcolor{zebra}
+12 & Sharding + tombstone deletes & Scaling/ops \\
+\end{longtable}
+
+\subsection{Cheat-Sheet Summary Table}\label{cheat-sheet-summary-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3987}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6013}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Question
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Quick Answer
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Exact kNN cost? & O(N\(\cdot\)d) --- seconds at 100M; use ANN \\
+\rowcolor{zebra}
+Why not k-d tree? & Curse of dimensionality --- pruning fails \textgreater{} \textasciitilde20 dims \\
+Default ANN index? & HNSW \\
+\rowcolor{zebra}
+Billion-scale, RAM-bound? & IVF-PQ + rerank \\
+Query-time recall knob? & HNSW \texttt{ef\_search}, IVF \texttt{nprobe} \\
+\rowcolor{zebra}
+Text distance metric? & Cosine; normalize \(\rightarrow\) use inner product \\
+Cosine = dot when? & Unit-normalized vectors \\
+\rowcolor{zebra}
+PQ memory cut? & \textasciitilde32\(\times\) (768 floats \(\rightarrow\) 96 bytes) \\
+Chunk size? & 256--512 tokens, 10--20\% overlap \\
+\rowcolor{zebra}
+Combine dense + BM25? & RRF: \(\Sigma\) 1/(60 + rank) \\
+Rerank model type? & Cross-encoder (joint attention) \\
+\rowcolor{zebra}
+Filter correctly? & Filtered-ANN or partition; never naive post-filter \\
+Delete from HNSW? & Tombstone + periodic rebuild \\
+\rowcolor{zebra}
+Model upgrade? & Full re-embed + rebuild (blue/green) \\
+Retrieval metric? & Recall@k, nDCG, MRR on a golden set \\
+\rowcolor{zebra}
+ANN recall vs retrieval recall? & Index correctness vs system correctness --- separate them \\
+Spotify\textquotesingle s library? & Annoy (mmap, immutable) \\
+\rowcolor{zebra}
+Meta\textquotesingle s library? & FAISS \\
+Google\textquotesingle s library? & ScaNN (anisotropic quantization) \\
+\end{longtable}
+
+\end{document}

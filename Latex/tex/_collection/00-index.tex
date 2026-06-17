@@ -1,0 +1,247 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Master Index}
+\newcommand{\ThemeKicker}{Study Roadmap}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{6366f1}{8b5cf6}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+Comprehensive, first-principles, interview-focused notes across 11 core SDE/Senior-SDE topics.
+
+Each topic follows the same structure:
+\textbf{Overview \(\rightarrow\) Why it exists \(\rightarrow\) Why FAANG cares \(\rightarrow\) Core concepts \(\rightarrow\) Architecture/diagrams \(\rightarrow\) Real-world examples \(\rightarrow\) Real-life analogy \(\rightarrow\) Memory tricks \(\rightarrow\) Common interview questions \(\rightarrow\) Senior-level discussion \(\rightarrow\) Interview tips \(\rightarrow\) Revision cheat sheet.}
+
+\section{Night-Before Cram}\label{night-before-cram}
+
+\textbf{\url{CHEATSHEET.md}} --- one-page all-topics recall (all 11 topics condensed, \textasciitilde20 min read). Start here the night before.
+
+\section{Magazine Editions (premium PDFs)}\label{magazine-editions-premium-pdfs}
+
+Publication-quality, magazine-style PDFs of every topic --- custom typography, framed diagrams, infographic callouts and color-coded sections. Each is self-contained (fonts embedded).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3864}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4318}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0909}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PDF
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PDF
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Concurrency & \href{Concurrency-Multithreading-Magazine.pdf}{PDF} & Distributed Systems & \href{Distributed-Systems-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+Operating Systems & \href{OS-Magazine.pdf}{PDF} & Databases & \href{Databases-Magazine.pdf}{PDF} \\
+Computer Networks & \href{Networks-Magazine.pdf}{PDF} & Performance Eng. & \href{Performance-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+Cloud \& Infra & \href{Cloud-Magazine.pdf}{PDF} & Security & \href{Security-Magazine.pdf}{PDF} \\
+System Design & \href{System-Design-Magazine.pdf}{PDF} & Behavioral & \href{Behavioral-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+Low-Level Design & \href{LLD-Magazine.pdf}{PDF} & & \\
+\end{longtable}
+
+= flagship hand-crafted edition (custom infographics). Others are generated from the source notes with the same design system. The cheat sheet also has a \href{CHEATSHEET.pdf}{print PDF}. Builders live in \texttt{.magazine/}.
+
+\textbf{Applied-pack magazines:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4310}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0690}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4310}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0690}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pack
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PDF
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pack
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PDF
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DSA \(\cdot\) Coding Patterns & \href{DSA/DSA-Patterns-Magazine.pdf}{PDF} & System Design Problems I & \href{System-Design-Problems/SD-Problems-Part1-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+DSA \(\cdot\) Data Structures & \href{DSA/DSA-DataStructures-Magazine.pdf}{PDF} & System Design Problems II & \href{System-Design-Problems/SD-Problems-Part2-Magazine.pdf}{PDF} \\
+DSA \(\cdot\) Algorithms & \href{DSA/DSA-Algorithms-Magazine.pdf}{PDF} & LLD \(\cdot\) Machine Coding & \href{LLD-Problems/LLD-Problems-Magazine.pdf}{PDF} \\
+\end{longtable}
+
+** AI / ML series** (see \url{AI-ML/00-INDEX.md}):
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3962}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0755}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4528}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0755}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Edition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PDF
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Edition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+PDF
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ML Fundamentals & \href{AI-ML/ML-Fundamentals-Magazine.pdf}{PDF} & Transformers \& LLMs & \href{AI-ML/Transformers-and-LLMs-Magazine.pdf}{PDF} \\
+\rowcolor{zebra}
+Classic ML Algorithms & \href{AI-ML/Classic-ML-Algorithms-Magazine.pdf}{PDF} & LLM Applications \& GenAI & \href{AI-ML/LLM-Applications-Magazine.pdf}{PDF} \\
+Deep Learning & \href{AI-ML/Deep-Learning-Magazine.pdf}{PDF} & MLOps \& ML System Design & \href{AI-ML/MLOps-ML-System-Design-Magazine.pdf}{PDF} \\
+\end{longtable}
+
+\begin{quote}
+Preview \& edit any edition live: \texttt{cd\ .magazine\ \&\&\ python3\ serve.py} \(\rightarrow\) http://localhost:8000
+\end{quote}
+
+\section{Topics}\label{topics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5068}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4384}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+File
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & Concurrency \& Multithreading & \url{01-concurrency-multithreading.md} \\
+\rowcolor{zebra}
+2 & Operating Systems & \url{02-operating-systems.md} \\
+3 & Computer Networks & \url{03-computer-networks.md} \\
+\rowcolor{zebra}
+4 & Cloud \& Infrastructure & \url{04-cloud-infrastructure.md} \\
+5 & System Design & \url{05-system-design.md} \\
+\rowcolor{zebra}
+6 & Low-Level Design (LLD) & \url{06-low-level-design.md} \\
+6½ & Object-Oriented Programming (OOP) & \url{12-oop-concepts.md} \\
+\rowcolor{zebra}
+7 & Distributed Systems & \url{07-distributed-systems.md} \\
+8 & Databases & \url{08-databases.md} \\
+\rowcolor{zebra}
+9 & Performance Engineering & \url{09-performance-engineering.md} \\
+10 & Security Fundamentals & \url{10-security-fundamentals.md} \\
+\rowcolor{zebra}
+11 & Behavioral / Leadership / Googleyness & \url{11-behavioral-leadership.md} \\
+13 & Design Patterns & \url{13-design-patterns.md} \\
+\rowcolor{zebra}
+14 & API Design & \url{14-api-design.md} \\
+15 & Caching & \url{15-caching.md} \\
+\rowcolor{zebra}
+16 & Message Queues \& Streaming & \url{16-message-queues.md} \\
+17 & Testing \& Code Quality & \url{17-testing.md} \\
+\rowcolor{zebra}
+18 & Observability & \url{18-observability.md} \\
+19 & Git \& Dev Workflow & \url{19-git-version-control.md} \\
+\rowcolor{zebra}
+20 & Linux \& the Command Line & \url{20-linux-cli.md} \\
+21 & Vector Databases \& Embeddings & \url{21-vector-databases.md} \\
+\end{longtable}
+
+\begin{quote}
+AI Agents \& Tool Use lives in the \href{AI-ML/00-INDEX.md}{AI-ML series}.
+\end{quote}
+
+\section{Applied Practice Packs}\label{applied-practice-packs}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2030}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7970}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pack
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What\textquotesingle s inside
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{\href{DSA/00-INDEX.md}{DSA / Coding Round}} & Pattern recognition + templates, data structures, algorithms \& complexity --- the \#1 interview filter. \\
+\rowcolor{zebra}
+\textbf{System Design Problems} & 8 fully worked end-to-end designs: \href{System-Design-Problems/part1-foundational.md}{Part 1 --- TinyURL, Rate Limiter, News Feed, Chat} \(\cdot\) \href{System-Design-Problems/part2-advanced.md}{Part 2 --- YouTube, Uber, Distributed Cache, Web Crawler} \\
+\textbf{\href{LLD-Problems/coded-solutions.md}{LLD / Machine-Coding}} & 6 complete runnable Python solutions: LRU Cache, Parking Lot, Rate Limiter, Splitwise, Elevator, Tic-Tac-Toe. \\
+\end{longtable}
+
+\section{How topics connect}\label{how-topics-connect}
+
+\setcodelang{}
+
+\begin{verbatim}
+        OS ◄──────► Concurrency & Multithreading
+        │                    │
+        ▼                    ▼
+   Networks ◄──────► System Design ◄──────► Distributed Systems
+        │                    │                      │
+        ▼                    ▼                      ▼
+  Cloud & Infra ◄──► Performance Eng.        Databases
+        │                                          │
+        ▼                                          ▼
+   Security ◄────────────────────────────► Low-Level Design
+
+  Behavioral / Leadership wraps ALL of the above (how you communicate them).
+\end{verbatim}
+
+\section{Suggested revision order (last-week-before-interview)}\label{suggested-revision-order-last-week-before-interview}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  System Design (5) + Distributed Systems (7) --- highest signal for senior loops
+\item
+  Databases (8) + Concurrency (1) --- deep technical follow-ups
+\item
+  Networks (3) + OS (2) --- fundamentals screens
+\item
+  LLD (6) + Cloud (4) + Performance (9) + Security (10)
+\item
+  Behavioral (11) --- review your STAR stories nightly
+\end{enumerate}
+
+\end{document}

@@ -1,6 +1,6 @@
 # Anki flashcards
 
-Auto-generated from the Q&A sections of the notes — **118 cards**.
+Auto-generated from the Q&A sections of the notes — **242 cards**.
 
 ## Import into Anki
 1. Anki → File → Import → choose `ALL-flashcards.tsv` (or a single topic's `.tsv`).
@@ -30,3 +30,13 @@ Auto-generated from the Q&A sections of the notes — **118 cards**.
 - Transformers & LLMs: 9
 - LLM Applications & GenAI: 6
 - MLOps & ML System Design: 5
+- Design Patterns: 12
+- API Design: 14
+- Caching: 12
+- Message Queues & Streaming: 13
+- Testing & Code Quality: 12
+- Observability: 12
+- Git & Dev Workflow: 12
+- Linux & the Command Line: 12
+- Vector Databases & Embeddings: 13
+- AI Agents & Tool Use: 12

@@ -1,0 +1,417 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{The Grand Cheat Sheet}
+\newcommand{\ThemeKicker}{Last-Minute Revision}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{111827}{6366f1}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+Dense, high-signal recall. For depth, open the per-topic file. Read top-to-bottom in \textasciitilde20 min.
+\end{quote}
+
+\section{1. Concurrency \& Multithreading}\label{1-concurrency--multithreading}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Concurrency \(\neq\) Parallelism}: concurrency = \emph{dealing with} many things (structure); parallelism = \emph{doing} many things at once (execution).
+\item
+  \textbf{Process} = own memory space; \textbf{Thread} = shared memory, own stack. Threads cheaper, but share state \(\rightarrow\) bugs.
+\item
+  \textbf{Race condition}: outcome depends on timing of unsynchronized access to shared state. Fix with synchronization.
+\item
+  \textbf{Mutex} = lock, 1 owner (mutual exclusion). \textbf{Semaphore} = counter, N permits. \textbf{Binary semaphore \(\approx\) mutex} (but no ownership). \textbf{Condition variable} = wait/signal on a predicate.
+\item
+  \textbf{Deadlock 4 conditions (must ALL hold)} \(\rightarrow\) mnemonic \textbf{"MHNC"}: \textbf{M}utual exclusion, \textbf{H}old \& wait, \textbf{N}o preemption, \textbf{C}ircular wait. Break any one to prevent. (Order locks globally \(\rightarrow\) kills circular wait.)
+\item
+  \textbf{Livelock} = threads act but no progress; \textbf{Starvation} = thread never scheduled.
+\item
+  \textbf{Producer-Consumer}: bounded buffer + 2 semaphores (\texttt{empty}, \texttt{full}) + mutex. \textbf{Reader-Writer}: many readers OR one writer.
+\item
+  \textbf{CAS / lock-free}: atomic compare-and-swap, no locks; \textbf{ABA problem} lurks. \textbf{volatile} = visibility (not atomicity).
+\item
+  \textbf{Thread pool}: reuse N worker threads from a queue \(\rightarrow\) avoid thread-creation cost; bound concurrency.
+\item
+  \textbf{Takeaway}: "Shared mutable state + no synchronization = bug." Prefer immutability / message-passing.
+\end{itemize}
+
+\section{2. Operating Systems}\label{2-operating-systems}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Process vs Thread}: process = isolation + own address space; thread = shared address space, lighter context switch.
+\item
+  \textbf{Scheduling}: FCFS (convoy effect), SJF (optimal avg wait, needs prediction), \textbf{Round Robin} (fair, time-slice), Priority (starvation\(\rightarrow\)aging), \textbf{MLFQ} (adaptive), Linux \textbf{CFS} (fair via vruntime).
+\item
+  \textbf{Virtual memory}: every process sees its own contiguous address space; MMU maps virtual\(\rightarrow\)physical via \textbf{page tables} (+\textbf{TLB} cache).
+\item
+  \textbf{Paging}: fixed-size pages; \textbf{page fault} \(\rightarrow\) load from disk. \textbf{Replacement}: Optimal \textgreater{} LRU \textgreater{} Clock \textgreater{} FIFO (Belady\textquotesingle s anomaly = FIFO can worsen with more frames).
+\item
+  \textbf{Thrashing}: too many page faults, CPU stalls on I/O \(\rightarrow\) fix with working-set model / reduce multiprogramming.
+\item
+  \textbf{Context switch}: save/restore registers + PC + memory maps; expensive (flush TLB). Threads cheaper than processes.
+\item
+  \textbf{IPC}: pipes, shared memory (fastest), message queues, sockets. \textbf{fork()} = copy process (\textbf{copy-on-write}); \textbf{exec()} = replace image.
+\item
+  \textbf{File system}: \textbf{inode} = file metadata + block pointers; \textbf{journaling} = crash consistency.
+\item
+  \textbf{Takeaway}: kernel/user mode + system calls = the privilege boundary; virtual memory = the great illusion.
+\end{itemize}
+
+\section{3. Computer Networks}\label{3-computer-networks}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{OSI} (mnemonic \emph{"Please Do Not Throw Sausage Pizza Away"}): Physical, Data-link, Network, Transport, Session, Presentation, Application.
+\item
+  \textbf{TCP vs UDP}: TCP = reliable, ordered, connection (3-way handshake \textbf{SYN\(\rightarrow\)SYN-ACK\(\rightarrow\)ACK}), flow+congestion control. UDP = fast, fire-and-forget (video, DNS, games).
+\item
+  \textbf{TLS handshake}: ClientHello \(\rightarrow\) ServerHello+cert \(\rightarrow\) key exchange \(\rightarrow\) finished. \textbf{Asymmetric to exchange a symmetric session key}, then symmetric for speed. TLS 1.3 = 1-RTT.
+\item
+  \textbf{DNS resolution}: browser cache \(\rightarrow\) OS \(\rightarrow\) resolver \(\rightarrow\) root \(\rightarrow\) TLD (.com) \(\rightarrow\) authoritative \(\rightarrow\) IP.
+\item
+  \textbf{REST} (stateless, resources, HTTP verbs, cacheable) vs \textbf{gRPC} (HTTP/2, protobuf, streaming, fast internal RPC) vs \textbf{GraphQL} (client picks fields).
+\item
+  \textbf{HTTP/1.1} (head-of-line blocking) \(\rightarrow\) \textbf{HTTP/2} (multiplexing, server push, binary) \(\rightarrow\) \textbf{HTTP/3} (QUIC over UDP, no TCP HOL blocking).
+\item
+  \textbf{WebSocket} = full-duplex persistent; \textbf{SSE} = server\(\rightarrow\)client stream; \textbf{long-polling} = fallback.
+\item
+  \textbf{L4 LB} (transport, IP/port, fast) vs \textbf{L7 LB} (application, content-aware routing).
+\item
+  \textbf{Idempotency}: GET/PUT/DELETE idempotent; POST not.
+\item
+  \textbf{"Type google.com \(\rightarrow\) ?"}: DNS \(\rightarrow\) TCP handshake \(\rightarrow\) TLS \(\rightarrow\) HTTP GET \(\rightarrow\) server \(\rightarrow\) render. Know every hop.
+\end{itemize}
+
+\section{4. Cloud \& Infrastructure}\label{4-cloud--infrastructure}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Container vs VM}: container shares host kernel (namespaces=isolation, cgroups=limits), MBs, secs; VM = full OS, GBs, mins.
+\item
+  \textbf{Docker image} = layered (union FS), immutable; container = running instance.
+\item
+  \textbf{Kubernetes}: control plane (\textbf{API server, etcd, scheduler, controller-mgr}) + nodes (\textbf{kubelet, kube-proxy}). Pod = smallest unit; Deployment = replicas+rollout; Service = stable virtual IP; Ingress = L7 routing.
+\item
+  \textbf{Autoscaling}: HPA (pods by metric), VPA (resize), Cluster Autoscaler (nodes).
+\item
+  \textbf{Service mesh} (Istio/Envoy sidecar): mTLS, retries, traffic-splitting, observability --- off the app code.
+\item
+  \textbf{CI/CD deploys}: \textbf{Rolling} (gradual), \textbf{Blue-Green} (instant switch, easy rollback), \textbf{Canary} (small \% first).
+\item
+  \textbf{IaC}: Terraform (declarative, multi-cloud) vs CloudFormation (AWS).
+\item
+  \textbf{Observability = 3 pillars}: \textbf{Metrics} (Prometheus, aggregate), \textbf{Logs} (events), \textbf{Traces} (request across services). \textbf{SLI} (measured) \(\rightarrow\) \textbf{SLO} (target) \(\rightarrow\) \textbf{SLA} (contract+penalty); \textbf{error budget} = 1\(-\)SLO.
+\item
+  K8s = "desired state" reconciliation loop. You declare; controllers converge.
+\end{itemize}
+
+\section{5. System Design}\label{5-system-design}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Framework}: Requirements (functional + non-functional) \(\rightarrow\) Estimation \(\rightarrow\) API \(\rightarrow\) Data model \(\rightarrow\) High-level diagram \(\rightarrow\) Deep dive \(\rightarrow\) Bottlenecks/trade-offs.
+\item
+  \textbf{Scale}: \textbf{Vertical} (bigger box, limit + SPOF) vs \textbf{Horizontal} (more boxes, needs statelessness + LB). \textbf{Stateless} scales easily.
+\item
+  \textbf{Caching strategies}: \textbf{Cache-aside} (lazy, app manages), \textbf{Write-through} (write cache+db together), \textbf{Write-back} (write cache, async db --- fast but risky), \textbf{Write-around}. Eviction: \textbf{LRU/LFU}. Hardest problem = \textbf{invalidation}.
+\item
+  \textbf{CDN}: cache static content at edge, near users.
+\item
+  \textbf{Sharding} (partition data horizontally; watch hot partitions) + \textbf{Replication} (copies; leader-follower = read scaling, multi-leader = write availability).
+\item
+  \textbf{CAP}: on partition, pick \textbf{C} (reject) or \textbf{A} (serve stale). CA only without partitions (single node). \textbf{PACELC}: else, latency vs consistency.
+\item
+  \textbf{Message queues} (Kafka/SQS/RabbitMQ): decouple, buffer, smooth spikes, async. \textbf{Event-driven} = react to events, loose coupling.
+\item
+  \textbf{Microservices}: independent deploy/scale; cost = distributed complexity, network, data consistency.
+\item
+  \textbf{Latency numbers}: L1\(\approx\)1ns, RAM\(\approx\)100ns, SSD\(\approx\)100µs, disk seek\(\approx\)10ms, network RT (same DC)\(\approx\)0.5ms, cross-continent\(\approx\)150ms.
+\item
+  Always state assumptions + estimates + trade-offs out loud. Silence loses points.
+\end{itemize}
+
+\section{6. Low-Level Design (LLD)}\label{6-low-level-design-lld}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{OOP 4 pillars} (mnemonic \textbf{"A PIE"}): \textbf{A}bstraction, \textbf{P}olymorphism, \textbf{I}nheritance, \textbf{E}ncapsulation.
+\item
+  \textbf{SOLID}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{S}ingle Responsibility --- one reason to change.
+  \item
+    \textbf{O}pen/Closed --- open to extend, closed to modify.
+  \item
+    \textbf{L}iskov Substitution --- subtype usable as base type.
+  \item
+    \textbf{I}nterface Segregation --- small focused interfaces.
+  \item
+    \textbf{D}ependency Inversion --- depend on abstractions, not concretions.
+  \end{itemize}
+\item
+  \textbf{Composition \textgreater{} Inheritance} ("has-a" \textgreater{} "is-a"); low coupling, high cohesion; DRY/KISS/YAGNI.
+\item
+  \textbf{Patterns} (by category):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Creational}: Singleton, Factory, Abstract Factory, Builder, Prototype.
+  \item
+    \textbf{Structural}: Adapter, Decorator, Facade, Proxy, Composite.
+  \item
+    \textbf{Behavioral}: Strategy, Observer, Command, State, Template Method, Iterator.
+  \end{itemize}
+\item
+  \textbf{UML relationships}: inheritance (\(\triangleleft\)-\/-), composition (\(\blacklozenge\)-\/-, owns lifecycle), aggregation (\(\lozenge\)-\/-, shared), association (-\/-), dependency (- - \textgreater).
+\item
+  LLD approach: clarify \(\rightarrow\) nouns=classes, verbs=methods \(\rightarrow\) relationships \(\rightarrow\) apply patterns \(\rightarrow\) code core \(\rightarrow\) discuss extensibility. Don\textquotesingle t over-pattern.
+\end{itemize}
+
+\section{7. Distributed Systems}\label{7-distributed-systems}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{8 Fallacies}: network is reliable, latency=0, bandwidth \(\infty\), network secure, topology stable, one admin, transport cost=0, network homogeneous --- \emph{all false}.
+\item
+  \textbf{CAP} \(\rightarrow\) see \#5. \textbf{Consistency models}: Strong \textgreater{} Linearizable \textgreater{} Causal \textgreater{} Read-your-writes \textgreater{} Eventual.
+\item
+  \textbf{Consistent hashing}: hash nodes+keys onto a ring; adding/removing a node moves only \textasciitilde K/N keys. \textbf{Virtual nodes} smooth load.
+\item
+  \textbf{Quorum}: \textbf{R + W \textgreater{} N} \(\rightarrow\) strong consistency (overlap guarantees latest read). W=N (durable), R=1 (fast reads).
+\item
+  \textbf{Consensus} (agree on one value despite failures): \textbf{Raft} = leader election (terms, votes) + log replication + safety (commit when majority). \textbf{Paxos} = correct but notoriously hard to grok. Used by etcd/ZooKeeper/Spanner.
+\item
+  \textbf{Leader election}: avoid \textbf{split-brain} with quorum + fencing tokens.
+\item
+  \textbf{Vector clocks / Lamport timestamps}: order events / detect concurrent updates.
+\item
+  \textbf{2PC} (blocking, coordinator SPOF) vs \textbf{Saga} (local txns + compensations, eventual).
+\item
+  \textbf{Delivery}: at-most-once, at-least-once (retries\(\rightarrow\)dedup needed), \textbf{"exactly-once" = at-least-once + idempotency} (true E2E is a myth).
+\item
+  \textbf{Kafka}: topic \(\rightarrow\) partitions (ordered, parallel) \(\rightarrow\) consumer groups; offset-based, replayable, durable log.
+\item
+  Real systems: DynamoDB/Cassandra = AP/tunable; Spanner = CP (TrueTime); etcd/ZK = consensus.
+\end{itemize}
+
+\section{8. Databases}\label{8-databases}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ACID}: Atomicity (all-or-nothing), Consistency (valid state), Isolation (concurrent = serial-ish), Durability (survives crash).
+\item
+  \textbf{Isolation levels \(\times\) anomalies}:
+\end{itemize}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2640}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1898}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2657}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2805}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dirty Read
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Non-Repeatable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Phantom
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Read Uncommitted & possible & & \\
+\rowcolor{zebra}
+Read Committed & & & \\
+Repeatable Read & & & (MySQL: via MVCC) \\
+\rowcolor{zebra}
+Serializable & & & \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Indexes}: \textbf{B+tree} (range queries, reads, RDBMS) vs \textbf{LSM-tree} (write-heavy, Cassandra/RocksDB; memtable\(\rightarrow\)SSTables\(\rightarrow\)compaction). \textbf{Clustered} = data sorted by key (1/table); \textbf{non-clustered} = separate pointer structure.
+\item
+  \textbf{Joins}: INNER (both), LEFT (all left + matches), RIGHT, FULL, CROSS (cartesian).
+\item
+  \textbf{CTE} = \texttt{WITH\ x\ AS\ (...)} readable/recursive. \textbf{Window functions} = \texttt{OVER(PARTITION\ BY\ ...\ ORDER\ BY\ ...)} (ROW\_NUMBER, RANK, LAG/LEAD) --- aggregate \emph{without} collapsing rows.
+\item
+  \textbf{Locking}: \textbf{Optimistic} (version check at commit, low contention) vs \textbf{Pessimistic} (lock upfront, high contention). \textbf{MVCC} = readers don\textquotesingle t block writers.
+\item
+  \textbf{SQL vs NoSQL}: SQL = relations, ACID, joins, vertical. NoSQL families: \textbf{KV} (Redis), \textbf{Document} (Mongo), \textbf{Column-family} (Cassandra), \textbf{Graph} (Neo4j) --- denormalize, scale horizontally, BASE.
+\item
+  Index = faster reads, slower writes + storage. Don\textquotesingle t index everything.
+\end{itemize}
+
+\section{9. Performance Engineering}\label{9-performance-engineering}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Latency} (time/request) vs \textbf{Throughput} (requests/sec) vs \textbf{Bandwidth} (max capacity). Optimize for the one that matters.
+\item
+  \textbf{Tail latency}: track \textbf{p50/p90/p99/p999} --- averages lie. At scale, p99 hits most users on a fan-out request (Google "Tail at Scale").
+\item
+  \textbf{Little\textquotesingle s Law}: \texttt{L\ =\ λ\ ×\ W} (items-in-system = arrival-rate \(\times\) time-in-system). \textbf{Amdahl\textquotesingle s Law}: speedup capped by serial fraction.
+\item
+  \textbf{USE} (resources: Utilization, Saturation, Errors) + \textbf{RED} (services: Rate, Errors, Duration).
+\item
+  \textbf{Bound types}: CPU-bound (high util, profile hot path), I/O-bound (waiting, batch/async), memory-bound (cache misses, GC), network-bound.
+\item
+  \textbf{Memory hierarchy} (cache locality matters): register\(\rightarrow\)L1(1ns)\(\rightarrow\)L2\(\rightarrow\)L3\(\rightarrow\)RAM(100ns)\(\rightarrow\)SSD(100µs)\(\rightarrow\)disk(10ms)\(\rightarrow\)network.
+\item
+  \textbf{Workflow}: \textbf{Measure \(\rightarrow\) Profile (flame graph) \(\rightarrow\) find bottleneck \(\rightarrow\) fix ONE thing \(\rightarrow\) re-measure.} "Premature optimization is the root of all evil."
+\item
+  \textbf{Memory leak}: heap grows unbounded; find via heap dumps / allocation profiling.
+\item
+  \textbf{Speed levers}: caching, batching, connection pooling, pipelining, async, reducing N+1.
+\item
+  "Service got 10\(\times\) slower" \(\rightarrow\) check recent deploys, metrics (USE/RED), profile, narrow CPU vs I/O vs lock contention vs downstream.
+\end{itemize}
+
+\section{10. Security Fundamentals}\label{10-security-fundamentals}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{AuthN} = \emph{who are you} (identity) vs \textbf{AuthZ} = \emph{what can you do} (permissions). AuthN before AuthZ.
+\item
+  \textbf{CIA triad}: Confidentiality, Integrity, Availability.
+\item
+  \textbf{Encryption vs Hashing vs Encoding}: encryption = reversible w/ key (confidentiality); hashing = one-way (integrity, passwords); encoding = not security (Base64).
+\item
+  \textbf{Symmetric} (AES, one shared key, fast, bulk data) vs \textbf{Asymmetric} (RSA/ECC, public/private, key exchange + signatures, slow).
+\item
+  \textbf{Password storage}: hash + \textbf{unique salt} with \textbf{bcrypt/argon2/scrypt} (slow on purpose). Never plaintext/MD5.
+\item
+  \textbf{OAuth 2.0} = delegated \emph{authorization} (give app access without password); use \textbf{Authorization Code + PKCE} for apps. \textbf{OIDC} adds \emph{authentication} (ID token) on top. \textbf{JWT} = \texttt{header.payload.signature} --- signed (not encrypted by default!); verify signature, check exp, don\textquotesingle t store secrets in payload.
+\item
+  \textbf{OWASP Top 10} (know a few cold): Broken Access Control (\#1), Cryptographic Failures, \textbf{Injection} (SQLi \(\rightarrow\) parameterized queries), Insecure Design, Misconfiguration, Vulnerable Components, Auth Failures, Data Integrity, Logging Failures, SSRF.
+\item
+  \textbf{Web attacks}: \textbf{XSS} (inject script \(\rightarrow\) escape output/CSP), \textbf{CSRF} (forged request \(\rightarrow\) anti-CSRF token/SameSite), \textbf{SQLi} (\(\rightarrow\) prepared statements).
+\item
+  \textbf{Principles}: least privilege, defense in depth, zero trust, secrets in \textbf{Vault/KMS} (never in code/env-in-git), rotate secrets.
+\item
+  "Design secure login": TLS + hashed/salted passwords + rate limiting + MFA + secure session/JWT + least privilege.
+\end{itemize}
+
+\section{11. Behavioral / Leadership / Googleyness}\label{11-behavioral--leadership--googleyness}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{STAR}: \textbf{S}ituation (context, brief) \(\rightarrow\) \textbf{T}ask (your responsibility) \(\rightarrow\) \textbf{A}ction (what \textbf{YOU} did, 60\%) \(\rightarrow\) \textbf{R}esult (\textbf{quantified} impact).
+\item
+  \textbf{Use "I" not "we"} for your actions. Always end with metrics ("reduced latency 40\%", "saved \$200k/yr").
+\item
+  \textbf{Themes \& what they probe}: Leadership (drive without authority), Ownership (end-to-end, beyond your scope), Conflict (disagree respectfully, data-driven, \textbf{disagree \& commit}), Collaboration (cross-team influence), Ambiguity (act with incomplete info), Mentoring (grow others), Impact (measurable outcomes).
+\item
+  \textbf{Amazon LPs} (bar raiser): Customer Obsession, Ownership, Invent \& Simplify, Dive Deep, Have Backbone; Disagree \& Commit, Deliver Results, etc. Map a story to each.
+\item
+  \textbf{Google "Googleyness"}: comfort with ambiguity, collaboration, intellectual humility, doing the right thing.
+\item
+  \textbf{Story bank}: prep \textbf{6--8 stories} that flex across themes (1 conflict, 1 failure, 1 leadership/impact, 1 ambiguity, 1 mentoring, 1 cross-team). Build a story \(\times\) theme matrix.
+\item
+  \textbf{Failure question}: pick a \emph{real} failure, own it, show what you \emph{learned/changed}. Never blame others; never a fake-humble "I work too hard."
+\item
+  Top mistakes: rambling, no metrics, "we" instead of "I", no failure story, blaming others. Be concise + structured + quantified.
+\end{itemize}
+
+\section{Cross-Topic Memory Hooks}\label{cross-topic-memory-hooks}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4383}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5617}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Connection
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hook
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+OS \(\leftrightarrow\) Concurrency & Threads/processes/scheduling/locks are OS primitives concurrency builds on \\
+\rowcolor{zebra}
+Networks \(\leftrightarrow\) System Design & LB, caching, CDN, protocols = the plumbing of every design \\
+Databases \(\leftrightarrow\) Distributed Systems & CAP, replication, sharding, quorum, consistency overlap heavily \\
+\rowcolor{zebra}
+Cloud \(\leftrightarrow\) Distributed Systems & K8s/service-mesh = distributed-systems patterns productized \\
+Performance \(\leftrightarrow\) everything & Profiling + tail latency + caching cut across OS, DB, network \\
+\rowcolor{zebra}
+Security \(\leftrightarrow\) Networks/System Design & TLS, auth, secrets are non-functional requirements in every design \\
+\end{longtable}
+
+\section{The 12 Highest-Frequency Interview Concepts (memorize cold)}\label{the-12-highest-frequency-interview-concepts-memorize-cold}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  CAP theorem + consistency models
+\item
+  TCP handshake + TLS + "type a URL" flow
+\item
+  Caching strategies + invalidation
+\item
+  Sharding + replication + consistent hashing
+\item
+  ACID + isolation levels matrix
+\item
+  B+tree vs LSM-tree indexes
+\item
+  Deadlock 4 conditions ("MHNC")
+\item
+  Process vs thread + virtual memory/paging
+\item
+  SOLID + composition over inheritance
+\item
+  Tail latency (p99) + measure-before-optimize
+\item
+  OAuth/JWT + OWASP injection/XSS/CSRF
+\item
+  STAR with quantified "I" results
+\end{enumerate}
+
+\begin{quote}
+\textbf{Golden rule for every round}: state assumptions \(\rightarrow\) think out loud \(\rightarrow\) give the trade-off, not just the answer.
+\end{quote}
+
+\end{document}

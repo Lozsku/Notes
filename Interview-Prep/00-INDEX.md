@@ -56,6 +56,17 @@ Publication-quality, magazine-style PDFs of every topic — custom typography, f
 | 9 | Performance Engineering | [09-performance-engineering.md](09-performance-engineering.md) |
 | 10 | Security Fundamentals | [10-security-fundamentals.md](10-security-fundamentals.md) |
 | 11 | Behavioral / Leadership / Googleyness | [11-behavioral-leadership.md](11-behavioral-leadership.md) |
+| 13 | Design Patterns | [13-design-patterns.md](13-design-patterns.md) |
+| 14 | API Design | [14-api-design.md](14-api-design.md) |
+| 15 | Caching | [15-caching.md](15-caching.md) |
+| 16 | Message Queues & Streaming | [16-message-queues.md](16-message-queues.md) |
+| 17 | Testing & Code Quality | [17-testing.md](17-testing.md) |
+| 18 | Observability | [18-observability.md](18-observability.md) |
+| 19 | Git & Dev Workflow | [19-git-version-control.md](19-git-version-control.md) |
+| 20 | Linux & the Command Line | [20-linux-cli.md](20-linux-cli.md) |
+| 21 | Vector Databases & Embeddings | [21-vector-databases.md](21-vector-databases.md) |
+
+> AI Agents & Tool Use lives in the [AI-ML series](AI-ML/00-INDEX.md).
 
 ## 🧩 Applied Practice Packs
 

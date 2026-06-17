@@ -1,0 +1,2041 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Caching}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{c2410c}{fb923c}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} Read top-to-bottom for deep mastery. "Add a cache" is the most common scaling answer in system design --- but the senior signal is the \emph{details}: which pattern, which eviction policy, how you invalidate, and how you survive a stampede. Jump to §Common Interview Questions + §Revision Cheat Sheet for last-minute revision. The hard part is never the cache hit --- it\textquotesingle s \textbf{invalidation} and \textbf{failure modes}.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+A \textbf{cache} is a fast, usually in-memory store of frequently-accessed or expensive-to-compute data, placed in front of a slower source of truth (database, microservice, disk, or a remote API) to cut \textbf{latency} and \textbf{load}.
+
+The fundamental trade is \textbf{freshness for speed}: a cache returns a \emph{possibly-stale} copy quickly instead of the authoritative-but-slow original. Caching works because of \textbf{locality} --- in almost every real workload a small fraction of the data receives most of the requests (a Pareto / power-law / Zipfian distribution). Cache that small hot set and you absorb the majority of traffic in microseconds.
+
+\setcodelang{}
+
+\begin{verbatim}
+Without cache:  Client ───────────────> DB        every read hits the DB (~5–50 ms)
+With cache:     Client ─> Cache (hit, ~0.2 ms) ──> return
+                          └─ miss ─> DB ─> fill cache ─> return
+\end{verbatim}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1911}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8089}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Term
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Hit} & Requested key found in cache --- served fast \\
+\rowcolor{zebra}
+\textbf{Miss} & Not found --- fall through to the source, then populate ("fill") \\
+\textbf{Hit ratio} & \texttt{hits\ /\ (hits\ +\ misses)} --- the single most important cache metric \\
+\rowcolor{zebra}
+\textbf{TTL} & Time-to-live; after it expires, the entry is treated as absent \\
+\textbf{Eviction} & Removing an entry to make room when the cache is full \\
+\rowcolor{zebra}
+\textbf{Invalidation} & Removing/refreshing an entry because the source changed \\
+\textbf{Working set} & The data actively used in a time window; the cache should fit it \\
+\end{longtable}
+
+A cache is \textbf{not a database}. It is allowed to forget. The defining property of a cache is that \emph{losing the cache must never lose data and must never break correctness} --- only performance. The moment you depend on the cache for durability, you have built a fragile database, not a cache.
+
+\section{Why It Exists}\label{why-it-exists}
+
+Memory is fast; everything else is slow. The whole justification for caching lives in the \textbf{latency ladder} --- the orders-of-magnitude gaps between layers of the memory/storage/network hierarchy.
+
+\setcodelang{}
+
+\begin{verbatim}
+Operation                         Latency        Relative to L1     Human-scale (×1B)
+──────────────────────────────────────────────────────────────────────────────────
+L1 cache reference                ~0.5 ns         1×                 0.5 sec
+Branch mispredict                 ~5   ns        10×                 5 sec
+L2 cache reference                ~5   ns        10×                 5 sec
+L3 / LLC reference                ~20  ns        40×                 20 sec
+Main memory (DRAM) reference      ~100 ns       200×                 100 sec (~1.5 min)
+Read 1 MB sequentially from RAM   ~3   µs                            ~50 min
+Redis GET over LAN (in DC)        ~0.1–0.5 ms   200,000–1M×          1–5 days
+SSD random read (NVMe)            ~100 µs       200,000×             ~1 day
+Round trip within same DC         ~0.5 ms       1M×                  ~5.8 days
+Read 1 MB sequentially from SSD   ~1   ms                            ~11 days
+Disk (HDD) seek                   ~5–10 ms      10M–20M×             ~6 months
+Round trip CA → Netherlands       ~150 ms       300M×               ~9.5 years
+\end{verbatim}
+
+The takeaway: a \textbf{DRAM/Redis read is 100--1000\(\times\) faster than a database query that touches disk}, and the database query may itself involve parsing, planning, locking, B-tree traversal, and network hops. If the same answer is requested many times, recomputing or re-reading it is pure waste.
+
+\subsection{Locality --- why caches work at all}\label{locality--why-caches-work-at-all}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Temporal locality} --- data used recently is likely to be used again soon. (You refresh your own profile page 10 times in a session.) \(\rightarrow\) keep recently-used keys.
+\item
+  \textbf{Spatial locality} --- data near recently-used data is likely to be used. (Reading row 100 \(\rightarrow\) you\textquotesingle ll probably read rows 101--110.) \(\rightarrow\) fetch and cache in blocks/pages.
+\item
+  \textbf{Popularity skew (Zipf)} --- the \emph{k}-th most popular item gets traffic \(\propto\) 1/\emph{k}. The top 20\% of keys often serve 80\%+ of requests. This is \emph{why} a cache one-tenth the size of the dataset can still hit 90\% of the time.
+\end{itemize}
+
+\subsection{Hit-ratio math --- the core formula}\label{hit-ratio-math--the-core-formula}
+
+The \textbf{effective (average) latency} of a read path with a cache:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{T\_effective }\OperatorTok{=}\NormalTok{ h · t\_cache }\OperatorTok{+}\NormalTok{ (}\DecValTok{1}\NormalTok{ − h) · t\_miss}
+
+\NormalTok{where  h        }\OperatorTok{=}\NormalTok{ hit ratio (}\FloatTok{0..1}\NormalTok{)}
+\NormalTok{       t\_cache  }\OperatorTok{=}\NormalTok{ latency of a cache hit}
+\NormalTok{       t\_miss   }\OperatorTok{=}\NormalTok{ latency of a miss (cache lookup }\OperatorTok{+}\NormalTok{ DB fetch }\OperatorTok{+}\NormalTok{ fill)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Worked numbers.} Say \texttt{t\_cache\ =\ 0.5\ ms}, \texttt{t\_db\ =\ 20\ ms}, so \texttt{t\_miss\ ≈\ 0.5\ +\ 20\ =\ 20.5\ ms}.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2293}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2231}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5476}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Hit ratio \texttt{h}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{T\_effective}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Speedup vs no cache (20 ms)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0\% (no cache) & 20.0 ms & 1.0\(\times\) \\
+\rowcolor{zebra}
+50\% & 10.5 ms & 1.9\(\times\) \\
+80\% & 4.5 ms & 4.4\(\times\) \\
+\rowcolor{zebra}
+90\% & 2.5 ms & 8.0\(\times\) \\
+95\% & 1.5 ms & 13\(\times\) \\
+\rowcolor{zebra}
+99\% & 0.7 ms & 29\(\times\) \\
+99.9\% & 0.52 ms & 38\(\times\) \\
+\end{longtable}
+
+Notice the curve: the jump from 90\% \(\rightarrow\) 99\% (8\(\times\) \(\rightarrow\) 29\(\times\)) is enormous. \textbf{The last few percent of hit ratio matter most} --- this is why teams obsess over shaving misses. It is an Amdahl\textquotesingle s-Law-style argument: the misses are the serial fraction that dominates as \texttt{h\ →\ 1}.
+
+\subsection{Load reduction --- the other half}\label{load-reduction--the-other-half}
+
+Hit ratio also dictates \textbf{how much load reaches the DB}. If reads arrive at 100,000 QPS and \texttt{h\ =\ 0.95}, the DB sees only \texttt{(1\ −\ 0.95)\ ×\ 100,000\ =\ 5,000\ QPS}. A 20\(\times\) reduction. \textbf{This is usually the real reason to cache} --- not user latency, but protecting a database that physically cannot serve 100K QPS from melting down. Raising \texttt{h} from 95\% \(\rightarrow\) 99\% drops DB load from 5,000 \(\rightarrow\) 1,000 QPS, a 5\(\times\) further reduction on the part that actually hurts.
+
+\begin{quote}
+Caching is the highest-leverage scaling lever for read-heavy systems --- and the hardest to keep correct. A 95\% hit ratio means a 1-node DB can pretend to be a 20-node DB.
+\end{quote}
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{System design ubiquity} --- "the DB is the bottleneck" \(\rightarrow\) "add a cache" is a near-universal move. The interviewer immediately probes the \emph{details}: pattern, TTL, invalidation, stampede protection, hit-ratio estimate. A vague "I\textquotesingle d use Redis" scores nothing; a precise "cache-aside on \texttt{product:\{id\}} with a 5-min TTL plus 10\% jitter, delete-on-write, single-flight on miss, expecting \textasciitilde92\% hit ratio" signals seniority.
+\item
+  \textbf{The famous hard problem} --- \emph{"There are only two hard things in computer science: cache invalidation and naming things."} (Phil Karlton). Reasoning crisply about staleness windows is a senior signal.
+\item
+  \textbf{Real production impact at FAANG:}
+\end{itemize}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1671}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8329}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Caching reality
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Meta} & \texttt{memcached} fronts MySQL at massive scale; the \emph{"Scaling Memcache at Facebook"} paper introduces \textbf{leases} (anti-stampede + anti-stale-set), regional pools, and the "look-aside" architecture. TAO is a graph cache over MySQL. \\
+\rowcolor{zebra}
+\textbf{Netflix} & \textbf{EVCache} (a Memcached-based, multi-region replicated cache) absorbs huge read volume; sized so a full region failover still has warm caches. \\
+\textbf{Amazon} & \textbf{ElastiCache} (Redis/Memcached) + \textbf{DAX} (in-front-of-DynamoDB cache) + \textbf{CloudFront} CDN. DynamoDB itself is partly a giant managed KV cache pattern. \\
+\rowcolor{zebra}
+\textbf{Google} & CPU caches \(\rightarrow\) memcache-style tiers \(\rightarrow\) \textbf{edge caching} for Search/YouTube. The "Tail at Scale" paper shows why a single cold cache miss in a fan-out request poisons p99. \\
+\textbf{Cloudflare/Akamai/Fastly} & Their \emph{entire business} is caching (CDN at the edge). \\
+\end{longtable}
+
+\section{Core Concepts}\label{core-concepts}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Hit / miss / fill} --- found vs not; a miss triggers a fetch from the source and a \emph{fill} (populate) of the cache.
+\item
+  \textbf{TTL (time-to-live)} --- expiry after which an entry is stale and must be refetched. The cheapest invalidation mechanism.
+\item
+  \textbf{Hot vs cold keys} --- frequently vs rarely accessed. Caches keep the hot set; cold keys churn.
+\item
+  \textbf{Working set} --- the data touched in a window. If the working set fits in cache memory, hit ratio is high; if not, you thrash.
+\item
+  \textbf{Cache warming / cold start} --- an empty cache (post-deploy, post-restart) has 0\% hit ratio; every request misses and the DB takes the full load. Mitigate with pre-warming.
+\item
+  \textbf{Consistency vs freshness} --- how stale a read may be. Tuned \emph{per use case}: a stale stock price is dangerous, a stale avatar is harmless.
+\item
+  \textbf{Negative caching} --- caching the fact that a key does \emph{not} exist (to stop penetration).
+\item
+  \textbf{Read/write amplification} --- extra ops caused by fills and invalidations (e.g., a celebrity post invalidating 100M follower feed entries).
+\item
+  \textbf{Cardinality} --- number of distinct keys. High cardinality + low reuse = poor cache fit.
+\end{itemize}
+
+\section{Caching Patterns}\label{caching-patterns}
+
+The pattern defines \textbf{who reads/writes the cache and the DB, and in what order}. This is the single most-asked caching topic. Get the read flow, the write flow, and the race conditions for each.
+
+\setcodelang{}
+
+\begin{verbatim}
+CACHE-ASIDE (look-aside / lazy)        READ-THROUGH
+Read:  app→cache(miss)→db→fill→return  Read:  app→cache lib→(miss)→db→fill (lib does it)
+Write: app→db, then DELETE cache key   Write: (separate; often write-through)
+
+WRITE-THROUGH                          WRITE-BACK (write-behind)
+Write: app→cache→db (both, sync)       Write: app→cache (return), async flush→db
+Read:  app→cache (always fresh)        Risk:  data loss on crash before flush
+
+WRITE-AROUND
+Write: app→db (skip cache)
+Read:  app→cache(miss)→db→fill
+\end{verbatim}
+
+\subsection{Cache-aside (lazy loading) --- the default}\label{cache-aside-lazy-loading--the-default}
+
+The application is in charge. The cache is a "dumb" KV store that knows nothing about the DB.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ get\_user(user\_id):}
+\NormalTok{    key }\OperatorTok{=} \SpecialStringTok{f"user:}\SpecialCharTok{\{}\NormalTok{user\_id}\SpecialCharTok{\}}\SpecialStringTok{"}
+\NormalTok{    val }\OperatorTok{=}\NormalTok{ cache.get(key)}
+    \ControlFlowTok{if}\NormalTok{ val }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:           }\CommentTok{\# HIT}
+        \ControlFlowTok{return}\NormalTok{ deserialize(val)}
+    \CommentTok{\# MISS}
+\NormalTok{    row }\OperatorTok{=}\NormalTok{ db.query(}\StringTok{"SELECT * FROM users WHERE id = }\SpecialCharTok{\%s}\StringTok{"}\NormalTok{, user\_id)}
+    \ControlFlowTok{if}\NormalTok{ row }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:}
+\NormalTok{        cache.}\BuiltInTok{set}\NormalTok{(key, serialize(row), ex}\OperatorTok{=}\DecValTok{300}\NormalTok{)   }\CommentTok{\# fill with 5{-}min TTL}
+    \ControlFlowTok{return}\NormalTok{ row}
+
+\KeywordTok{def}\NormalTok{ update\_user(user\_id, changes):}
+\NormalTok{    db.update(}\StringTok{"users"}\NormalTok{, user\_id, changes)   }\CommentTok{\# 1. write the source of truth}
+\NormalTok{    cache.delete(}\SpecialStringTok{f"user:}\SpecialCharTok{\{}\NormalTok{user\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)        }\CommentTok{\# 2. invalidate (DELETE, not update)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Why it\textquotesingle s the default:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Resilient} --- if Redis is down, reads fall through to the DB. Cache outage = slower, not broken.
+\item
+  \textbf{Lazy} --- only data that\textquotesingle s actually requested ends up cached; you don\textquotesingle t waste memory on cold rows.
+\item
+  \textbf{Simple mental model} --- the app owns both paths.
+\end{itemize}
+
+\textbf{Costs:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{First read is always a miss} (cold key) \(\rightarrow\) one extra round trip + fill.
+\item
+  \textbf{Staleness window} between a DB write and the cache delete.
+\item
+  \textbf{The stale-read race} (below) --- the classic cache-aside correctness bug.
+\end{itemize}
+
+\subsubsection{The cache-aside stale-read race (draw this in the interview)}\label{the-cache-aside-stale-read-race-draw-this-in-the-interview}
+
+Two operations interleave: a reader filling the cache after a miss, and a writer updating the DB and deleting the key.
+
+\setcodelang{}
+
+\begin{verbatim}
+Time   Reader R (reading user:42)        Writer W (updating user:42)
+────────────────────────────────────────────────────────────────────
+t1     GET user:42  → MISS
+t2     SELECT users WHERE id=42 → v1
+                                          UPDATE users SET ... → v2 (commit)
+t3                                        DELETE user:42      (cache empty)
+t4     SET user:42 = v1   ⚠️  STALE!
+────────────────────────────────────────────────────────────────────
+Result: cache now holds v1 forever (until TTL), DB holds v2.
+\end{verbatim}
+
+R read the \emph{old} value at t2, W committed the \emph{new} value and deleted the (already-empty) key at t3, then R \emph{re-populated the cache with the stale v1} at t4. The cache is now wrong until the TTL expires.
+
+\textbf{Mitigations (in order of practicality):}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{TTL as a backstop} --- the stale value self-heals after the TTL. Cheap, bounds the damage. Usually "good enough."
+\item
+  \textbf{Facebook-style leases} --- on a miss, the cache hands the reader a \emph{lease token}. A write invalidates outstanding leases, so a stale fill is rejected. (From the Meta memcache paper.) This closes the race.
+\item
+  \textbf{Delete-after-delay (double delete)} --- writer deletes the key, and schedules a \emph{second} delete \textasciitilde1 second later to catch a stale fill that landed in between. Pragmatic and common.
+\item
+  \textbf{Versioning / CAS} --- store a version with the value; only fill if the version is still current.
+\end{enumerate}
+
+\begin{quote}
+\textbf{Interview takeaway:} Cache-aside has a real read-after-write race. Knowing it exists --- and that \textbf{TTL bounds it} while \textbf{leases/double-delete close it} --- is a strong senior signal. Most candidates don\textquotesingle t know this race exists.
+\end{quote}
+
+\subsection{Read-through}\label{read-through}
+
+Like cache-aside, but the \emph{cache library/proxy} owns the miss\(\rightarrow\)DB\(\rightarrow\)fill logic, not the app. The app just calls \texttt{cache.get(key)} and a configured loader function fetches from the DB transparently (e.g., Caffeine \texttt{LoadingCache}, DynamoDB DAX). Cleaner app code, but couples the cache to the data source and you lose some control over the miss path.
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{LoadingCache}\OperatorTok{\textless{}}\BuiltInTok{Long}\OperatorTok{,}\NormalTok{ User}\OperatorTok{\textgreater{}}\NormalTok{ cache }\OperatorTok{=}\NormalTok{ Caffeine}\OperatorTok{.}\FunctionTok{newBuilder}\OperatorTok{()}
+    \OperatorTok{.}\FunctionTok{maximumSize}\OperatorTok{(}\DecValTok{100\_000}\OperatorTok{)}
+    \OperatorTok{.}\FunctionTok{expireAfterWrite}\OperatorTok{(}\BuiltInTok{Duration}\OperatorTok{.}\FunctionTok{ofMinutes}\OperatorTok{(}\DecValTok{5}\OperatorTok{))}
+    \OperatorTok{.}\FunctionTok{refreshAfterWrite}\OperatorTok{(}\BuiltInTok{Duration}\OperatorTok{.}\FunctionTok{ofMinutes}\OperatorTok{(}\DecValTok{1}\OperatorTok{))}   \CommentTok{// stale{-}while{-}revalidate{-}ish}
+    \OperatorTok{.}\FunctionTok{build}\OperatorTok{(}\NormalTok{userId }\OperatorTok{{-}\textgreater{}}\NormalTok{ db}\OperatorTok{.}\FunctionTok{loadUser}\OperatorTok{(}\NormalTok{userId}\OperatorTok{));}        \CommentTok{// the loader = read{-}through}
+
+\NormalTok{User u }\OperatorTok{=}\NormalTok{ cache}\OperatorTok{.}\FunctionTok{get}\OperatorTok{(}\DecValTok{42L}\OperatorTok{);}  \CommentTok{// returns cached, or loads via the loader on miss}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Write-through}\label{write-through}
+
+Every write goes to \textbf{cache and DB synchronously}. The cache is always fresh for what\textquotesingle s been written.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ update\_user(user\_id, changes):}
+\NormalTok{    row }\OperatorTok{=}\NormalTok{ db.update(}\StringTok{"users"}\NormalTok{, user\_id, changes)   }\CommentTok{\# write DB}
+\NormalTok{    cache.}\BuiltInTok{set}\NormalTok{(}\SpecialStringTok{f"user:}\SpecialCharTok{\{}\NormalTok{user\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{, serialize(row), ex}\OperatorTok{=}\DecValTok{300}\NormalTok{)  }\CommentTok{\# write cache (same txn{-}ish)}
+    \ControlFlowTok{return}\NormalTok{ row}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pro:} reads after a write are always fresh; no stale-read race on written keys.
+\item
+  \textbf{Con:} higher write latency (two writes on the critical path); you cache data that may \emph{never be read} (wasted memory); doesn\textquotesingle t help cold reads (key only cached if written).
+\item
+  \textbf{Note:} if the cache write fails after the DB write, you have an inconsistency --- usually solved by treating cache as best-effort and relying on TTL, or by deleting instead of setting.
+\end{itemize}
+
+\subsection{Write-back (write-behind)}\label{write-back-write-behind}
+
+Write to the \textbf{cache only}, return immediately, and flush to the DB \textbf{asynchronously} (batched).
+
+\setcodelang{}
+
+\begin{verbatim}
+app → cache (ACK now) ──┐
+                        └─ background flusher ─(batch every 100ms / 1000 writes)→ DB
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pro:} lowest write latency, highest write throughput, batches/coalesces writes (10 updates to the same key \(\rightarrow\) 1 DB write). Great for high-frequency counters, view counts, "last seen" timestamps.
+\item
+  \textbf{Con / the durability risk:} if the cache node crashes before the flush, \textbf{those writes are lost}. The cache temporarily \emph{is} the source of truth --- exactly the trap. Use only where loss of a few seconds of writes is acceptable (analytics counters), or pair with a durable write-ahead log (Redis AOF, Kafka).
+\item
+  Used inside OS page caches and SSD controllers, and by metric pipelines.
+\end{itemize}
+
+\subsection{Write-around}\label{write-around}
+
+Writes go \textbf{straight to the DB, bypassing the cache}. The cache is populated only on read (lazy).
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pro:} avoids polluting the cache with write-heavy data that won\textquotesingle t be read soon (e.g., bulk imports, logs). Keeps the cache focused on the read-hot set.
+\item
+  \textbf{Con:} a read immediately after a write is a guaranteed miss (the value isn\textquotesingle t cached yet).
+\end{itemize}
+
+\subsection{Comparison table}\label{comparison-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0786}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1633}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2801}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1331}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1028}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2420}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Write path
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Read path
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Consistency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Write latency
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Cache-aside} & DB, then delete key & cache \(\rightarrow\) miss \(\rightarrow\) DB \(\rightarrow\) fill & Eventual (TTL-bounded) & Low & Default; read-heavy, tolerable staleness \\
+\rowcolor{zebra}
+\textbf{Read-through} & (paired separately) & cache lib loads on miss & Eventual & Low & Clean code; cache owns the load \\
+\textbf{Write-through} & cache + DB sync & cache (always fresh) & Strong on written keys & Higher (2 writes) & Read-heavy, low staleness tolerance \\
+\rowcolor{zebra}
+\textbf{Write-back} & cache, async \(\rightarrow\) DB & cache & Eventual + \textbf{loss risk} & Lowest & Write-heavy counters, can tolerate loss \\
+\textbf{Write-around} & DB only & cache \(\rightarrow\) miss \(\rightarrow\) DB \(\rightarrow\) fill & Eventual & Low & Write-heavy data rarely re-read \\
+\end{longtable}
+
+\textbf{Which pattern for which workload?}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Read-heavy, staleness OK} (product catalog, profiles, feeds) \(\rightarrow\) \textbf{cache-aside} (with TTL).
+\item
+  \textbf{Read-heavy, must be fresh} (config, feature flags) \(\rightarrow\) \textbf{write-through} or cache-aside + CDC invalidation.
+\item
+  \textbf{Write-heavy, ephemeral} (counters, sessions, rate limits) \(\rightarrow\) \textbf{write-back} or just use Redis as the store with AOF.
+\item
+  \textbf{Write-heavy, rarely re-read} (event logs, bulk loads) \(\rightarrow\) \textbf{write-around}.
+\end{itemize}
+
+\begin{quote}
+\textbf{Interview takeaway:} Default to \textbf{cache-aside}. Reach for write-through only when you can\textquotesingle t tolerate the stale-read window, and write-back only when you can tolerate data loss. Always name the trade-off out loud.
+\end{quote}
+
+\section{Eviction Policies}\label{eviction-policies}
+
+When the cache is full and a new key must be inserted, \textbf{which existing entry do we drop?} Eviction policy is what makes a fixed-size cache approximate an infinite one. The goal: evict the entry \emph{least likely to be used again} (Bélády\textquotesingle s optimal algorithm evicts the one used furthest in the future --- unknowable, so we approximate).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1004}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2224}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3321}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3451}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evicts
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{LRU} & least \emph{recently} used & great for temporal locality; O(1) & one big scan flushes the hot set (scan pollution) \\
+\rowcolor{zebra}
+\textbf{LFU} & least \emph{frequently} used & keeps genuinely popular items; scan-resistant & needs counters; can keep stale-popular items without aging \\
+\textbf{FIFO} & oldest \emph{inserted} & trivial; O(1) & ignores access pattern; can evict hot items \\
+\rowcolor{zebra}
+\textbf{MRU} & most \emph{recently} used & good when recent = won\textquotesingle t reuse (e.g. sequential scans) & rare; counter-intuitive \\
+\textbf{Random} & a random entry & O(1), no metadata; surprisingly OK at scale & no locality awareness \\
+\rowcolor{zebra}
+\textbf{TTL / volatile} & expired (or soonest-to-expire) & freshness-bound data & not about capacity per se \\
+\textbf{ARC} & adaptive recency+frequency & self-tunes; scan-resistant & patented (historically); more memory \\
+\rowcolor{zebra}
+\textbf{W-TinyLFU} & frequency-gated admission + LRU & near-optimal hit ratios; scan-resistant & more complex (Caffeine) \\
+\end{longtable}
+
+\subsection{LRU --- full O(1) implementation}\label{lru--full-o1-implementation}
+
+LRU is the canonical interview implementation: a \textbf{hash map} for O(1) lookup + a \textbf{doubly-linked list} for O(1) recency ordering. Most-recently-used at the head, least at the tail. On access, move the node to the head; to evict, drop the tail.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Node:}
+    \FunctionTok{\_\_slots\_\_} \OperatorTok{=}\NormalTok{ (}\StringTok{"key"}\NormalTok{, }\StringTok{"val"}\NormalTok{, }\StringTok{"prev"}\NormalTok{, }\StringTok{"next"}\NormalTok{)}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, key, val):}
+        \VariableTok{self}\NormalTok{.key, }\VariableTok{self}\NormalTok{.val }\OperatorTok{=}\NormalTok{ key, val}
+        \VariableTok{self}\NormalTok{.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{None}
+
+\KeywordTok{class}\NormalTok{ LRUCache:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, capacity):}
+        \VariableTok{self}\NormalTok{.cap }\OperatorTok{=}\NormalTok{ capacity}
+        \VariableTok{self}\NormalTok{.}\BuiltInTok{map} \OperatorTok{=}\NormalTok{ \{\}                 }\CommentTok{\# key {-}\textgreater{} Node  (O(1) lookup)}
+        \CommentTok{\# sentinel head/tail to avoid null checks}
+        \VariableTok{self}\NormalTok{.head }\OperatorTok{=}\NormalTok{ Node(}\VariableTok{None}\NormalTok{, }\VariableTok{None}\NormalTok{)  }\CommentTok{\# MRU side}
+        \VariableTok{self}\NormalTok{.tail }\OperatorTok{=}\NormalTok{ Node(}\VariableTok{None}\NormalTok{, }\VariableTok{None}\NormalTok{)  }\CommentTok{\# LRU side}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{self}\NormalTok{.tail}
+        \VariableTok{self}\NormalTok{.tail.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.head}
+
+    \KeywordTok{def}\NormalTok{ \_remove(}\VariableTok{self}\NormalTok{, node):}
+\NormalTok{        node.prev.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node.}\BuiltInTok{next}
+\NormalTok{        node.}\BuiltInTok{next}\NormalTok{.prev }\OperatorTok{=}\NormalTok{ node.prev}
+
+    \KeywordTok{def}\NormalTok{ \_add\_front(}\VariableTok{self}\NormalTok{, node):       }\CommentTok{\# insert right after head (MRU)}
+\NormalTok{        node.}\BuiltInTok{next} \OperatorTok{=} \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next}
+\NormalTok{        node.prev }\OperatorTok{=} \VariableTok{self}\NormalTok{.head}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next}\NormalTok{.prev }\OperatorTok{=}\NormalTok{ node}
+        \VariableTok{self}\NormalTok{.head.}\BuiltInTok{next} \OperatorTok{=}\NormalTok{ node}
+
+    \KeywordTok{def}\NormalTok{ get(}\VariableTok{self}\NormalTok{, key):}
+\NormalTok{        node }\OperatorTok{=} \VariableTok{self}\NormalTok{.}\BuiltInTok{map}\NormalTok{.get(key)}
+        \ControlFlowTok{if}\NormalTok{ node }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+            \ControlFlowTok{return} \OperatorTok{{-}}\DecValTok{1}                 \CommentTok{\# MISS}
+        \VariableTok{self}\NormalTok{.\_remove(node)            }\CommentTok{\# touch → move to front}
+        \VariableTok{self}\NormalTok{.\_add\_front(node)}
+        \ControlFlowTok{return}\NormalTok{ node.val}
+
+    \KeywordTok{def}\NormalTok{ put(}\VariableTok{self}\NormalTok{, key, val):}
+        \ControlFlowTok{if}\NormalTok{ key }\KeywordTok{in} \VariableTok{self}\NormalTok{.}\BuiltInTok{map}\NormalTok{:}
+\NormalTok{            node }\OperatorTok{=} \VariableTok{self}\NormalTok{.}\BuiltInTok{map}\NormalTok{[key]}
+\NormalTok{            node.val }\OperatorTok{=}\NormalTok{ val}
+            \VariableTok{self}\NormalTok{.\_remove(node)}
+            \VariableTok{self}\NormalTok{.\_add\_front(node)}
+            \ControlFlowTok{return}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\VariableTok{self}\NormalTok{.}\BuiltInTok{map}\NormalTok{) }\OperatorTok{\textgreater{}=} \VariableTok{self}\NormalTok{.cap:           }\CommentTok{\# evict LRU (tail.prev)}
+\NormalTok{            lru }\OperatorTok{=} \VariableTok{self}\NormalTok{.tail.prev}
+            \VariableTok{self}\NormalTok{.\_remove(lru)}
+            \KeywordTok{del} \VariableTok{self}\NormalTok{.}\BuiltInTok{map}\NormalTok{[lru.key]}
+\NormalTok{        node }\OperatorTok{=}\NormalTok{ Node(key, val)}
+        \VariableTok{self}\NormalTok{.}\BuiltInTok{map}\NormalTok{[key] }\OperatorTok{=}\NormalTok{ node}
+        \VariableTok{self}\NormalTok{.\_add\_front(node)}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{}
+
+\begin{verbatim}
+Doubly-linked list (recency order):
+
+  head ⇄ [k9] ⇄ [k4] ⇄ [k7] ⇄ ... ⇄ [k2] ⇄ tail
+          MRU                          LRU
+  get(k7) → unlink k7, splice after head:
+  head ⇄ [k7] ⇄ [k9] ⇄ [k4] ⇄ ... ⇄ [k2] ⇄ tail
+  put when full → drop tail.prev (k2), the least-recently-used.
+\end{verbatim}
+
+Every operation is O(1). (In Java: \texttt{LinkedHashMap} with \texttt{accessOrder=true} and an overridden \texttt{removeEldestEntry} gives you LRU for free.)
+
+\subsection{LFU --- counts, and the aging problem}\label{lfu--counts-and-the-aging-problem}
+
+LFU evicts the entry with the \textbf{lowest access count}. A clean O(1) LFU uses a hash map \texttt{key→(value,\ freq)} plus a map \texttt{freq→doubly-linked-list-of-keys} and a \texttt{min\_freq} pointer.
+
+\textbf{The flaw:} an item that was hammered yesterday but is dead today keeps a huge count and never gets evicted ("cache pollution by stale popularity"). \textbf{Fix = aging:} periodically halve all counts, or use a \emph{windowed/decaying} frequency (exponential decay). Redis\textquotesingle s LFU uses an 8-bit logarithmic counter with a configurable decay (\texttt{lfu-log-factor}, \texttt{lfu-decay-time}).
+
+\subsection{FIFO / MRU}\label{fifo--mru}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FIFO} evicts by insertion order regardless of use --- a queue. Simple but can evict the hottest key just because it was inserted first. Rarely the right default.
+\item
+  \textbf{MRU} evicts the \emph{most}-recently-used. Useful only for access patterns where "just touched it \(\rightarrow\) won\textquotesingle t touch again soon," e.g., scanning a file once front-to-back. Niche.
+\end{itemize}
+
+\subsection{ARC (Adaptive Replacement Cache)}\label{arc-adaptive-replacement-cache}
+
+Used in ZFS and historically in PostgreSQL/IBM. Maintains \textbf{four lists}: T1 (recent, seen once), T2 (frequent, seen \(\geq\)2\(\times\)), and \emph{ghost} lists B1/B2 (recently-evicted keys, metadata only). Hits in the ghost lists tell ARC whether it\textquotesingle s being hurt more by lack of recency or lack of frequency, and it \textbf{self-tunes the balance} between an LRU-ish and LFU-ish split. Scan-resistant because a one-time scan lands in T1 and is evicted before it can pollute T2.
+
+\subsection{W-TinyLFU --- what Caffeine uses}\label{w-tinylfu--what-caffeine-uses}
+
+The modern state of the art (Caffeine, the default Java cache; also in CDN caches). Key ideas:
+
+\begin{itemize}
+\tightlist
+\item
+  An \textbf{admission filter}: before a new item is admitted into the main cache, a tiny approximate-frequency sketch (a \textbf{Count-Min Sketch}) compares the \emph{candidate\textquotesingle s} estimated frequency to the \emph{victim} it would evict. The candidate is admitted only if it\textquotesingle s been requested more often. This \textbf{gates out one-hit-wonders} --- scan resistance for nearly free.
+\item
+  An aging mechanism (periodic halving of the sketch counters) so old popularity decays.
+\item
+  A small \textbf{window LRU} in front to catch bursty recency.
+\end{itemize}
+
+Result: hit ratios close to Bélády-optimal across diverse workloads, with O(1) ops and tiny metadata. \textbf{If asked "what does a production cache library use?" \(\rightarrow\) W-TinyLFU (Caffeine).}
+
+\subsection{Scan resistance --- why it matters}\label{scan-resistance--why-it-matters}
+
+A \textbf{scan} (e.g., a batch job reading every row once, or an analytics query) brings in thousands of keys that will each be used exactly once. Under plain \textbf{LRU}, these flood the cache and \textbf{evict the real hot set}, tanking your hit ratio right when load is highest. LFU, ARC, and W-TinyLFU resist this because a single access isn\textquotesingle t enough to earn (or keep) a slot. This is a top reason production caches moved past naive LRU.
+
+\subsection{\texorpdfstring{Redis \texttt{maxmemory-policy} options}{Redis maxmemory-policy options}}\label{redis-maxmemory-policy-options}
+
+When Redis hits \texttt{maxmemory}, the policy decides what to evict:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2017}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7983}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Behavior
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{noeviction} & reject writes with an error (default for some setups) --- protects data, risks errors \\
+\rowcolor{zebra}
+\texttt{allkeys-lru} & evict any key, approximated LRU \\
+\texttt{volatile-lru} & evict LRU \textbf{among keys with a TTL} only \\
+\rowcolor{zebra}
+\texttt{allkeys-lfu} & evict any key, approximated LFU (Redis 4+) \\
+\texttt{volatile-lfu} & LFU among keys with a TTL \\
+\rowcolor{zebra}
+\texttt{allkeys-random} & random key \\
+\texttt{volatile-random} & random among TTL keys \\
+\rowcolor{zebra}
+\texttt{volatile-ttl} & evict the key with the \textbf{shortest remaining TTL} \\
+\end{longtable}
+
+Redis\textquotesingle s LRU/LFU are \textbf{approximate} (sampled): it samples \texttt{maxmemory-samples} (default 5) random keys and evicts the best among them --- O(1)-ish, avoids maintaining a global linked list across millions of keys. With 10 samples it\textquotesingle s near-exact.
+
+\begin{quote}
+\textbf{Interview takeaway:} Default to \textbf{LRU} and know the O(1) hashmap+DLL implementation cold. Mention \textbf{LFU for scan resistance}, \textbf{W-TinyLFU/Caffeine} as the production answer, and that \textbf{Redis eviction is sampled/approximate}, not exact.
+\end{quote}
+
+\section{Cache Invalidation}\label{cache-invalidation}
+
+\emph{"There are only two hard things in CS\ldots"} --- this is the hard one. The job: keep the cache consistent enough with the source of truth, accepting a bounded staleness window you can defend.
+
+\subsection{1. TTL expiry --- the workhorse}\label{1-ttl-expiry--the-workhorse}
+
+Set an expiry; after it, the entry is gone and the next read repopulates. \textbf{Choose TTL by how stale you can tolerate}, not by gut feel.
+
+\begin{itemize}
+\tightlist
+\item
+  Stock price: TTL \textasciitilde1 s (or no cache).
+\item
+  Product details: TTL \textasciitilde5 min.
+\item
+  User avatar URL: TTL \textasciitilde1 hour.
+\item
+  Country list: TTL \textasciitilde1 day.
+\end{itemize}
+
+\textbf{Always add jitter} (see avalanche). A fixed TTL set on a million keys at deploy time means a million simultaneous expiries later. Jitter = \texttt{ttl\ =\ base\ ±\ random(0,\ base*0.1)}.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ random}
+\KeywordTok{def}\NormalTok{ ttl\_with\_jitter(base\_seconds, pct}\OperatorTok{=}\FloatTok{0.1}\NormalTok{):}
+    \ControlFlowTok{return} \BuiltInTok{int}\NormalTok{(base\_seconds }\OperatorTok{*}\NormalTok{ (}\DecValTok{1} \OperatorTok{+}\NormalTok{ random.uniform(}\OperatorTok{{-}}\NormalTok{pct, pct)))}
+\NormalTok{cache.}\BuiltInTok{set}\NormalTok{(key, val, ex}\OperatorTok{=}\NormalTok{ttl\_with\_jitter(}\DecValTok{300}\NormalTok{))   }\CommentTok{\# 270–330s}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{2. Write-time invalidation: DELETE, not UPDATE}\label{2-write-time-invalidation-delete-not-update}
+
+On a DB write, \textbf{delete} the cache key so the next read repopulates from the fresh DB value. Do \textbf{not} try to update the cache in place with the new value.
+
+\textbf{Why delete beats update --- the concurrent-writer race:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Two writers update user:42.
+
+Time   Writer A (sets balance=100)       Writer B (sets balance=200)
+──────────────────────────────────────────────────────────────────
+t1     UPDATE db balance=100 (commit)
+t2                                        UPDATE db balance=200 (commit)
+t3                                        SET cache user:42 = 200   ✅ correct so far
+t4     SET cache user:42 = 100   ⚠️       (A was slow) cache=100, DB=200  STALE
+\end{verbatim}
+
+If both writers \emph{update} the cache, their cache writes can land in the \textbf{opposite order} from their DB commits, leaving a stale value. With \textbf{delete}, the worst case is both delete the key (idempotent) and the next read repopulates the \emph{current} DB value --- self-correcting.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ update(key\_id, changes):}
+\NormalTok{    db.update(key\_id, changes)         }\CommentTok{\# source of truth first}
+\NormalTok{    cache.delete(}\SpecialStringTok{f"user:}\SpecialCharTok{\{}\NormalTok{key\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)     }\CommentTok{\# idempotent; next read refills fresh}
+\end{Highlighting}
+\end{Shaded}
+
+Edge note: even delete has the \emph{cache-aside stale-read race} (a slow reader refilling after the delete). TTL/leases/double-delete handle that residual window.
+
+\subsection{3. CDC / binlog-driven invalidation}\label{3-cdc--binlog-driven-invalidation}
+
+Instead of the application remembering to invalidate, \textbf{tail the database\textquotesingle s change log} (MySQL binlog, Postgres WAL via logical replication / Debezium) and emit invalidations.
+
+\setcodelang{}
+
+\begin{verbatim}
+DB write ─> binlog ─> Debezium/CDC ─> Kafka topic ─> invalidator service ─> cache.delete(key)
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pro:} decoupled --- \emph{any} writer (including ones that bypass the app, batch jobs, admin tools) triggers invalidation. Keeps \textbf{multiple services\textquotesingle{} caches} in sync from one source of truth. No "we forgot to invalidate" bugs.
+\item
+  \textbf{Con:} infrastructure + a small lag (ms--seconds). This is how large companies keep distributed caches coherent.
+\end{itemize}
+
+\subsection{4. Versioned keys}\label{4-versioned-keys}
+
+Embed a version/etag in the key. Bump the version on change; old entries are simply never read again (and expire out via LRU/TTL).
+
+\setcodelang{}
+
+\begin{verbatim}
+key = f"product:{id}:v{version}"     # product:42:v7
+# on change, increment version (stored e.g. in a tiny `version` row or another key)
+# readers compute the current key from the current version → old entries are orphaned
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pro:} no delete needed; immutable entries are safe to cache forever and even to share across CDN edges. Atomic-feeling cutover.
+\item
+  \textbf{Con:} orphaned old versions linger until evicted (waste memory); need a place to store the current version.
+\end{itemize}
+
+\subsection{5. Stale-while-revalidate (SWR)}\label{5-stale-while-revalidate-swr}
+
+Serve the \textbf{stale value immediately} while \textbf{asynchronously refreshing} in the background. The user never waits for a miss; the next user gets the fresh value.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ get\_swr(key, ttl}\OperatorTok{=}\DecValTok{300}\NormalTok{, stale\_ttl}\OperatorTok{=}\DecValTok{600}\NormalTok{):}
+\NormalTok{    entry }\OperatorTok{=}\NormalTok{ cache.get\_with\_meta(key)             }\CommentTok{\# \{value, age\}}
+    \ControlFlowTok{if}\NormalTok{ entry }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ load\_and\_fill(key, ttl)           }\CommentTok{\# hard miss}
+    \ControlFlowTok{if}\NormalTok{ entry.age }\OperatorTok{\textless{}=}\NormalTok{ ttl:}
+        \ControlFlowTok{return}\NormalTok{ entry.value                       }\CommentTok{\# fresh}
+    \ControlFlowTok{if}\NormalTok{ entry.age }\OperatorTok{\textless{}=}\NormalTok{ stale\_ttl:}
+\NormalTok{        async\_refresh(key, ttl)                  }\CommentTok{\# serve stale, refresh in bg}
+        \ControlFlowTok{return}\NormalTok{ entry.value}
+    \ControlFlowTok{return}\NormalTok{ load\_and\_fill(key, ttl)               }\CommentTok{\# too stale → block \& refresh}
+\end{Highlighting}
+\end{Shaded}
+
+Built into HTTP via \texttt{Cache-Control:\ max-age=300,\ stale-while-revalidate=600}. Excellent UX + natural stampede protection (only one background refresh).
+
+\subsection{The read-after-write inconsistency window}\label{the-read-after-write-inconsistency-window}
+
+Under cache-aside, between "DB committed" and "cache deleted" (and the residual refill race), there\textquotesingle s a window where a reader sees old data. Quantify it: usually \textbf{single-digit milliseconds} (delete latency) plus the rare refill race bounded by TTL. For "read-your-own-writes" (a user must see \emph{their} edit immediately), route that user\textquotesingle s next read to the DB (or write-through just their key) for a couple of seconds --- don\textquotesingle t rely on the cache to reflect their write instantly.
+
+\begin{quote}
+\textbf{Interview takeaway:} \textbf{Delete, don\textquotesingle t update}, on writes (avoids the writer-ordering race). Use \textbf{TTL + jitter} as the universal backstop. For cross-service coherence, use \textbf{CDC/binlog}. For zero-wait freshness, \textbf{stale-while-revalidate}. Always state the \textbf{staleness window} explicitly.
+\end{quote}
+
+\section{The Thundering Herd \& Friends (Failure Modes)}\label{the-thundering-herd--friends-failure-modes}
+
+These four failure modes are interview gold. For each: the mechanism, the math, and the fix.
+
+\setcodelang{}
+
+\begin{verbatim}
+Cache Stampede     many concurrent misses for the SAME hot key → all hit the DB at once
+Cache Penetration  queries for keys that DON'T EXIST → every one bypasses cache to DB
+Cache Avalanche    MANY keys expire at the SAME TIME → DB load spike / collapse
+Hot Key            one key gets disproportionate traffic → one shard/node melts
+\end{verbatim}
+
+\subsection{Cache stampede (thundering herd / dog-pile)}\label{cache-stampede-thundering-herd--dog-pile}
+
+\textbf{Mechanism:} a single hot key (say a \texttt{product:viral} requested 50,000\(\times\)/s) expires. For the brief moment the cache is empty, \emph{all} 50,000 in-flight requests miss simultaneously, and \textbf{all 50,000 hit the DB} to recompute the same value. The DB, sized for \textasciitilde5,000 QPS, falls over. The cache never gets repopulated fast enough, so it cascades.
+
+\textbf{Fix A --- Single-flight / request coalescing (per-key lock).} Only the \emph{first} miss recomputes; everyone else waits and reads the freshly-filled value.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ threading}
+\NormalTok{\_locks }\OperatorTok{=}\NormalTok{ \{\}                       }\CommentTok{\# key {-}\textgreater{} Lock (use a striped lock map in prod)}
+\NormalTok{\_locks\_guard }\OperatorTok{=}\NormalTok{ threading.Lock()}
+
+\KeywordTok{def}\NormalTok{ \_lock\_for(key):}
+    \ControlFlowTok{with}\NormalTok{ \_locks\_guard:}
+        \ControlFlowTok{return}\NormalTok{ \_locks.setdefault(key, threading.Lock())}
+
+\KeywordTok{def}\NormalTok{ get\_singleflight(key, ttl}\OperatorTok{=}\DecValTok{300}\NormalTok{):}
+\NormalTok{    val }\OperatorTok{=}\NormalTok{ cache.get(key)}
+    \ControlFlowTok{if}\NormalTok{ val }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ val}
+\NormalTok{    lock }\OperatorTok{=}\NormalTok{ \_lock\_for(key)}
+    \ControlFlowTok{with}\NormalTok{ lock:                     }\CommentTok{\# only ONE thread per key proceeds}
+\NormalTok{        val }\OperatorTok{=}\NormalTok{ cache.get(key)      }\CommentTok{\# double{-}check: someone may have filled it}
+        \ControlFlowTok{if}\NormalTok{ val }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:}
+            \ControlFlowTok{return}\NormalTok{ val}
+\NormalTok{        val }\OperatorTok{=}\NormalTok{ db.load(key)        }\CommentTok{\# the single DB hit}
+\NormalTok{        cache.}\BuiltInTok{set}\NormalTok{(key, val, ex}\OperatorTok{=}\NormalTok{ttl\_with\_jitter(ttl))}
+        \ControlFlowTok{return}\NormalTok{ val}
+\end{Highlighting}
+\end{Shaded}
+
+In a \textbf{distributed} setting the lock must be shared --- use a Redis lock (\texttt{SET\ lock:key\ token\ NX\ PX\ 5000}). Other nodes that fail to grab the lock either wait-and-retry the cache, or serve a slightly stale value.
+
+\setcodelang{Redis}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SET lock:product:viral \textless{}token\textgreater{} NX PX 5000   \# acquire (NX = only if absent, PX = 5s expiry)}
+\NormalTok{\# ... load from DB, SET the real key ...}
+\NormalTok{\# release with a Lua compare{-}and{-}delete on \textless{}token\textgreater{} (see Redlock section)}
+\end{Highlighting}
+\end{Shaded}
+
+Facebook\textquotesingle s memcache solves this with \textbf{leases}: the first miss gets a lease token; concurrent missers are told "wait, someone\textquotesingle s fetching." Only the lease holder may set the value.
+
+\textbf{Fix B --- Probabilistic early expiration (XFetch).} Refresh the value \emph{before} it expires, with a probability that rises as expiry approaches, so exactly one request (statistically) refreshes early and the herd never forms.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ math, random, time}
+\KeywordTok{def}\NormalTok{ xfetch(key, ttl, beta}\OperatorTok{=}\FloatTok{1.0}\NormalTok{):}
+\NormalTok{    value, delta, expiry }\OperatorTok{=}\NormalTok{ cache.get\_meta(key)   }\CommentTok{\# delta = time the last recompute took}
+\NormalTok{    now }\OperatorTok{=}\NormalTok{ time.time()}
+    \CommentTok{\# recompute early if this draws past the expiry boundary}
+    \ControlFlowTok{if}\NormalTok{ value }\KeywordTok{is} \VariableTok{None} \KeywordTok{or}\NormalTok{ now }\OperatorTok{{-}}\NormalTok{ delta }\OperatorTok{*}\NormalTok{ beta }\OperatorTok{*}\NormalTok{ math.log(random.random()) }\OperatorTok{\textgreater{}=}\NormalTok{ expiry:}
+\NormalTok{        start }\OperatorTok{=}\NormalTok{ time.time()}
+\NormalTok{        value }\OperatorTok{=}\NormalTok{ db.load(key)}
+\NormalTok{        delta }\OperatorTok{=}\NormalTok{ time.time() }\OperatorTok{{-}}\NormalTok{ start}
+\NormalTok{        cache.set\_meta(key, value, delta, expiry}\OperatorTok{=}\NormalTok{now }\OperatorTok{+}\NormalTok{ ttl)}
+    \ControlFlowTok{return}\NormalTok{ value}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{-delta\ *\ beta\ *\ log(random())} term makes expensive-to-recompute keys (large \texttt{delta}) refresh earlier and more eagerly. From the paper \emph{"Optimal Probabilistic Cache Stampede Prevention."}
+
+\textbf{Fix C --- Stale-while-revalidate} (above): serve stale, one background refresh.
+
+\subsection{Cache penetration}\label{cache-penetration}
+
+\textbf{Mechanism:} requests for keys that \textbf{don\textquotesingle t exist in the DB at all} (e.g., \texttt{user:99999999}, often malicious enumeration). Every such request misses the cache (correctly --- nothing to cache) and falls through to the DB. The cache provides \emph{zero} protection because there\textquotesingle s nothing to cache. An attacker sending random non-existent IDs drives 100\% of traffic to the DB.
+
+\textbf{Fix A --- Negative caching.} Cache the \emph{absence} with a short TTL.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SENTINEL }\OperatorTok{=} \StringTok{"\_\_MISS\_\_"}
+\KeywordTok{def}\NormalTok{ get\_with\_negcache(key, ttl}\OperatorTok{=}\DecValTok{300}\NormalTok{, neg\_ttl}\OperatorTok{=}\DecValTok{30}\NormalTok{):}
+\NormalTok{    val }\OperatorTok{=}\NormalTok{ cache.get(key)}
+    \ControlFlowTok{if}\NormalTok{ val }\OperatorTok{==}\NormalTok{ SENTINEL:}
+        \ControlFlowTok{return} \VariableTok{None}                       \CommentTok{\# known{-}absent, served from cache}
+    \ControlFlowTok{if}\NormalTok{ val }\KeywordTok{is} \KeywordTok{not} \VariableTok{None}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ val}
+\NormalTok{    row }\OperatorTok{=}\NormalTok{ db.load(key)}
+    \ControlFlowTok{if}\NormalTok{ row }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+\NormalTok{        cache.}\BuiltInTok{set}\NormalTok{(key, SENTINEL, ex}\OperatorTok{=}\NormalTok{neg\_ttl)   }\CommentTok{\# cache the miss (short TTL!)}
+        \ControlFlowTok{return} \VariableTok{None}
+\NormalTok{    cache.}\BuiltInTok{set}\NormalTok{(key, serialize(row), ex}\OperatorTok{=}\NormalTok{ttl)}
+    \ControlFlowTok{return}\NormalTok{ row}
+\end{Highlighting}
+\end{Shaded}
+
+Keep the negative TTL \textbf{short} so a key that gets created later becomes visible quickly, and so an attacker can\textquotesingle t fill memory with junk negative keys indefinitely.
+
+\textbf{Fix B --- Bloom filter.} A \textbf{Bloom filter} is a space-efficient probabilistic set: it answers "is this key \emph{possibly} present?" with \textbf{no false negatives} (if it says "no," the key is definitely absent \(\rightarrow\) reject without touching the DB) and tunable false positives (a "maybe" that\textquotesingle s actually absent just costs one wasted DB lookup).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pre{-}populate a Bloom filter with all existing IDs (or maintain it on insert).}
+\KeywordTok{def}\NormalTok{ get\_with\_bloom(key):}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ bloom.might\_contain(key):     }\CommentTok{\# definitely absent → skip DB entirely}
+        \ControlFlowTok{return} \VariableTok{None}
+    \ControlFlowTok{return}\NormalTok{ get\_with\_negcache(key)        }\CommentTok{\# maybe present → normal path}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Bloom math:} for \texttt{n} items and \texttt{m} bits with \texttt{k} hash functions, the false-positive rate is \texttt{p\ ≈\ (1\ −\ e\^{}(−kn/m))\^{}k}, minimized at \texttt{k\ =\ (m/n)\ ln\ 2}. Rule of thumb: \textbf{\textasciitilde10 bits per element \(\rightarrow\) \textasciitilde1\% false positive}; \textasciitilde14.4 bits \(\rightarrow\) \textasciitilde0.1\%. So 100M existing IDs at 1\% FP needs \textasciitilde120 MB --- tiny vs protecting the DB. Redis has \texttt{BF.ADD} / \texttt{BF.EXISTS} (RedisBloom module). Downside: classic Bloom filters don\textquotesingle t support deletes (use a \textbf{Counting} or \textbf{Cuckoo filter} if you must delete).
+
+\subsection{Cache avalanche}\label{cache-avalanche}
+
+\textbf{Mechanism:} a \emph{large set} of keys expire (or the cache restarts) at nearly the \textbf{same instant} \(\rightarrow\) a flood of simultaneous misses overwhelms the DB. Common cause: bulk-loading the cache at deploy time with one fixed TTL \(\rightarrow\) all keys expire together exactly \texttt{TTL} later. Or a Redis crash/restart \(\rightarrow\) 0\% hit ratio cold cache \(\rightarrow\) DB takes 100\% of read traffic and dies.
+
+\textbf{Fixes:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{TTL jitter} --- randomize expiry (\texttt{base\ ±\ 10\%}) so expiries are spread over time, not spiked. Single cheapest, most important fix.
+\item
+  \textbf{Staggered / gradual warmup} --- on cold start, don\textquotesingle t let all traffic hit the DB; ramp up, or pre-warm the top-N hot keys before taking traffic.
+\item
+  \textbf{Request coalescing} (above) so even simultaneous misses on the same key collapse to one DB hit.
+\item
+  \textbf{Circuit breaker / load shedding} in front of the DB so a cache failure degrades (serve errors/stale) rather than collapsing the DB.
+\item
+  \textbf{Multi-tier caching} --- an L1 in-process cache survives an L2 (Redis) restart, smoothing the avalanche.
+\end{enumerate}
+
+\setcodelang{}
+
+\begin{verbatim}
+Without jitter (avalanche):       With jitter (smooth):
+DB QPS                            DB QPS
+  │        █                        │
+  │        █                        │     ▁▂▃▂▁▂▃▂▁
+  │ ▁▁▁▁▁▁ █ ▁▁▁▁▁                  │ ▁▁▂▃▂▃▂▃▂▃▂▁▁
+  └──────────────► time             └──────────────► time
+        ▲ all TTLs fire at once          spread over the window
+\end{verbatim}
+
+\subsection{Hot key}\label{hot-key}
+
+\textbf{Mechanism:} a single key (a celebrity\textquotesingle s profile, a viral product, a global config) gets a \emph{disproportionate} share of traffic --- say 30\% of all reads on one key. In a sharded cache, that key lives on \textbf{one node}, so that one node\textquotesingle s CPU/NIC saturates while others idle. The cache itself becomes the bottleneck (not the DB).
+
+\textbf{Fixes:}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Local (L1) cache} --- cache the hot key in-process on every app server with a short TTL (1--5 s). 1,000 app servers \(\rightarrow\) the hot key is read from the L2 only \textasciitilde1,000\(\times\)/s total instead of millions. Bounded staleness (the L1 TTL).
+\item
+  \textbf{Key replication / splitting} --- store N copies under suffixed keys (\texttt{config:global\#1\ …\ config:global\#N}) and have each reader pick a random replica. Spreads load across N nodes. On write, update all N (or delete all N).
+\item
+  \textbf{Dedicated node / read replicas} for known hot keys.
+\item
+  \textbf{Client-side request coalescing} so each app server makes at most one upstream read per interval for the hot key.
+\end{enumerate}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ get\_hot(key, fan}\OperatorTok{=}\DecValTok{16}\NormalTok{):}
+\NormalTok{    replica }\OperatorTok{=} \SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{key}\SpecialCharTok{\}}\SpecialStringTok{\#}\SpecialCharTok{\{}\NormalTok{random}\SpecialCharTok{.}\NormalTok{randint(}\DecValTok{0}\NormalTok{, fan}\OperatorTok{{-}}\DecValTok{1}\NormalTok{)}\SpecialCharTok{\}}\SpecialStringTok{"}   \CommentTok{\# spread across fan nodes}
+\NormalTok{    val }\OperatorTok{=}\NormalTok{ cache.get(replica)}
+    \ControlFlowTok{if}\NormalTok{ val }\KeywordTok{is} \VariableTok{None}\NormalTok{:}
+\NormalTok{        val }\OperatorTok{=}\NormalTok{ db.load(key)}
+\NormalTok{        cache.}\BuiltInTok{set}\NormalTok{(replica, val, ex}\OperatorTok{=}\NormalTok{ttl\_with\_jitter(}\DecValTok{5}\NormalTok{))}
+    \ControlFlowTok{return}\NormalTok{ val}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\textbf{Interview takeaway:} Memorize the four: \textbf{Stampede} (same key, mass miss \(\rightarrow\) single-flight / SWR / probabilistic-early-expiry); \textbf{Penetration} (missing keys \(\rightarrow\) negative cache + Bloom filter); \textbf{Avalanche} (mass simultaneous expiry \(\rightarrow\) TTL jitter + warmup); \textbf{Hot key} (one key, one node \(\rightarrow\) L1 + key splitting/replication). Naming the fix \emph{before} being asked is the senior move.
+\end{quote}
+
+\section{Redis Deep Dive}\label{redis-deep-dive}
+
+Redis (REmote DIctionary Server) is the default distributed cache and far more --- an in-memory data-structure server. Memcached is the simpler alternative.
+
+\subsection{Data structures (and what to cache with each)}\label{data-structures-and-what-to-cache-with-each}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1328}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3335}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5338}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Description
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cache/use case
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{String} & bytes up to 512 MB; ints (INCR) & serialized objects/JSON, counters, simple KV, rate-limit tokens \\
+\rowcolor{zebra}
+\textbf{Hash} & field\(\rightarrow\)value map & a cached row/object by field (\texttt{HSET\ user:42\ name\ Alice\ age\ 30}) --- update one field without re-serializing \\
+\textbf{List} & linked list, push/pop both ends & queues, recent-activity feeds, capped logs (\texttt{LPUSH} + \texttt{LTRIM}) \\
+\rowcolor{zebra}
+\textbf{Set} & unordered unique members & tags, unique visitors, set ops (intersection of followers) \\
+\textbf{Sorted Set (ZSet)} & members ordered by score & \textbf{leaderboards}, priority queues, time-ranges (\texttt{ZRANGEBYSCORE}), rate limiting by timestamp \\
+\rowcolor{zebra}
+\textbf{Stream} & append-only log with consumer groups & event sourcing, durable pub/sub, work queues \\
+\textbf{HyperLogLog (HLL)} & probabilistic cardinality, \textasciitilde12 KB for billions & unique-visitor counts within \textasciitilde0.81\% error (\texttt{PFADD}/\texttt{PFCOUNT}) \\
+\rowcolor{zebra}
+\textbf{Bitmap} & bit ops on strings & daily active users (1 bit/user/day), feature flags, presence \\
+\textbf{Geo} & geospatial (ZSet under the hood) & "drivers near me," radius queries \\
+\end{longtable}
+
+\setcodelang{Redis}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Leaderboard with a sorted set:}
+\NormalTok{ZADD game:leaderboard 5000 "alice" 4200 "bob" 6100 "carol"}
+\NormalTok{ZREVRANGE game:leaderboard 0 9 WITHSCORES     \# top 10}
+\NormalTok{ZREVRANK game:leaderboard "bob"                \# bob\textquotesingle{}s 0{-}based rank}
+
+\NormalTok{\# Cache a row as a hash (partial updates without re{-}serializing the whole object):}
+\NormalTok{HSET user:42 name "Alice" age 30 city "NYC"}
+\NormalTok{HGET user:42 name}
+\NormalTok{EXPIRE user:42 300}
+
+\NormalTok{\# Atomic rate limiter (fixed window): N requests per 60s}
+\NormalTok{INCR rl:user:42}
+\NormalTok{EXPIRE rl:user:42 60     \# set on first INCR; if INCR result \textgreater{} N → reject}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Single-threaded model + pipelining}\label{single-threaded-model--pipelining}
+
+Redis executes commands on a \textbf{single thread} (the command-processing core; I/O threads exist in 6+ but command execution is serialized). Consequences:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{No locks needed} for individual commands \(\rightarrow\) each command is \textbf{atomic}. \texttt{INCR}, \texttt{LPUSH}, \texttt{ZADD} are race-free by construction. This is \emph{why} Redis is great for counters and locks.
+\item
+  \textbf{One slow command blocks everyone} --- never run \texttt{KEYS\ *} or a giant \texttt{SORT} on prod; they stall the single thread. Use \texttt{SCAN} (cursor-based, incremental) instead.
+\item
+  Throughput comes from doing each op in \textbf{microseconds}, so a single thread handles \textbf{100K--1M ops/sec}.
+\end{itemize}
+
+\textbf{Pipelining} amortizes network round trips by sending many commands without waiting for each reply:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Without pipelining: }\DecValTok{1000}\NormalTok{ GETs }\OperatorTok{=} \DecValTok{1000}\NormalTok{ RTTs × }\FloatTok{0.5}\NormalTok{ ms }\OperatorTok{=} \DecValTok{500}\NormalTok{ ms}
+\NormalTok{With pipelining:    }\DecValTok{1000}\NormalTok{ GETs }\KeywordTok{in}\NormalTok{ one batch }\OperatorTok{=} \OperatorTok{\textasciitilde{}}\DecValTok{1}\NormalTok{ RTT }\OperatorTok{+}\NormalTok{ processing ≈ }\DecValTok{1}\NormalTok{–}\DecValTok{2}\NormalTok{ ms}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{MULTI/EXEC} wraps commands in a transaction (queued, executed atomically, no interleaving). \textbf{Lua scripts} (\texttt{EVAL}) run server-side atomically --- the right tool for read-modify-write logic (e.g., a correct rate limiter or a compare-and-delete lock release).
+
+\subsection{Persistence: RDB vs AOF}\label{persistence-rdb-vs-aof}
+
+Redis is in-memory but can persist so a restart doesn\textquotesingle t start cold (or lose write-back data).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1704}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4127}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4169}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{RDB (snapshot)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{AOF (append-only file)}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+What & point-in-time binary dump (\texttt{fork} + copy-on-write) & logs every write command \\
+\rowcolor{zebra}
+Recovery & fast load (compact file) & slower replay, but more recent \\
+Data loss on crash & up to the last snapshot interval (minutes) & tunable by fsync policy \\
+\rowcolor{zebra}
+Disk/CPU & periodic spike (fork) & continuous, file grows (needs rewrite/compaction) \\
+\end{longtable}
+
+\textbf{AOF fsync policies (durability vs latency):}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{appendfsync\ always} --- fsync every write: safest, slowest (each write waits for disk \textasciitilde ms).
+\item
+  \texttt{appendfsync\ everysec} --- fsync once/second: \textbf{the common choice}; lose \(\leq\)1 s of writes on crash.
+\item
+  \texttt{appendfsync\ no} --- let the OS decide: fastest, can lose tens of seconds.
+\end{itemize}
+
+Many run \textbf{RDB + AOF together} (fast restart from RDB-style base + recent AOF tail). For a \emph{pure cache}, persistence is often \textbf{off} --- you accept a cold start and let the DB refill. Persistence matters when Redis holds write-back data or is used as a primary store.
+
+\subsection{Replication \& Sentinel}\label{replication--sentinel}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Replication:} a primary asynchronously streams writes to replicas. Replicas serve reads (scale reads) and act as failover targets. \textbf{Async \(\rightarrow\) replication lag} (a read on a replica can be slightly stale).
+\item
+  \textbf{Sentinel:} monitors primary/replicas, performs automatic failover (promotes a replica) and tells clients the new primary. Provides HA for a non-clustered setup.
+\end{itemize}
+
+\subsection{Redis Cluster --- 16384 hash slots}\label{redis-cluster--16384-hash-slots}
+
+Horizontal scaling/sharding. The keyspace is partitioned into \textbf{16384 hash slots}; each key maps to a slot via \texttt{CRC16(key)\ mod\ 16384}. Each primary node owns a contiguous range of slots; clients are redirected (\texttt{MOVED}/\texttt{ASK}) to the node owning a key\textquotesingle s slot.
+
+\setcodelang{}
+
+\begin{verbatim}
+slot(key) = CRC16(key) % 16384
+Node A: slots 0–5460     Node B: slots 5461–10922     Node C: slots 10923–16383
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Resharding} moves slots (and their keys) between nodes; only the moved slots are affected (consistent-hashing-like minimal movement).
+\item
+  \textbf{Multi-key ops} (e.g., \texttt{MGET}, transactions) must touch keys in the \emph{same} slot \(\rightarrow\) use \textbf{hash tags}: \texttt{\{user:42\}:profile} and \texttt{\{user:42\}:settings} both hash on \texttt{user:42}, landing in the same slot.
+\item
+  16384 (= 2\^{}14) was chosen so the per-node slot bitmap in the cluster gossip messages stays small.
+\end{itemize}
+
+\subsection{Distributed locks: Redlock and its criticism}\label{distributed-locks-redlock-and-its-criticism}
+
+A single-node lock: \texttt{SET\ lock:resource\ \textless{}token\textgreater{}\ NX\ PX\ 10000} (acquire only if absent, auto-expire in 10 s). \textbf{Release must be a compare-and-delete} (only delete if the token is still yours) via Lua, else you might delete someone else\textquotesingle s lock after your TTL expired:
+
+\setcodelang{Redis}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{{-}{-} release: delete only if the value still matches our token (atomic via Lua)}
+\NormalTok{if redis.call("get", KEYS[1]) == ARGV[1] then}
+\NormalTok{    return redis.call("del", KEYS[1])}
+\NormalTok{else}
+\NormalTok{    return 0}
+\NormalTok{end}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Redlock} extends this across N independent Redis masters: acquire the lock on a majority (\(\geq\) N/2 + 1) within a time bound; the lock holds only if a majority granted it and enough TTL remains. \textbf{Martin Kleppmann\textquotesingle s critique:} Redlock is unsafe for correctness-critical mutual exclusion because of clock drift, GC/STW pauses (a process can pause past its lease and act as if it still holds the lock), and timing assumptions. \textbf{Antirez (Redis author) rebutted} that with fencing it\textquotesingle s fine for many uses. \textbf{Resolution:} for \emph{efficiency} (avoid duplicate work) a Redis lock is fine; for \emph{correctness} (must never have two holders), add a \textbf{monotonic fencing token} that the protected resource checks, or use a consensus system (ZooKeeper/etcd) built for this. Say this nuance and you\textquotesingle ve nailed the question.
+
+\subsection{Rate limiting in Redis}\label{rate-limiting-in-redis}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Fixed window:} \texttt{INCR\ key;\ EXPIRE\ key\ 60} --- simple, but allows 2\(\times\) burst at window edges.
+\item
+  \textbf{Sliding window log:} a ZSet of request timestamps; \texttt{ZREMRANGEBYSCORE} to drop old, \texttt{ZCARD} to count --- accurate, more memory.
+\item
+  \textbf{Token bucket:} a Lua script that refills tokens based on elapsed time and decrements per request --- smooth, the production standard.
+\end{itemize}
+
+\subsection{Pub/Sub}\label{pubsub}
+
+\texttt{SUBSCRIBE\ channel} / \texttt{PUBLISH\ channel\ msg} --- fire-and-forget messaging (no persistence; offline subscribers miss messages). Common for \textbf{cache invalidation broadcasts} ("delete key X everywhere"). For durable/replayable streams, use \textbf{Redis Streams} with consumer groups instead.
+
+\subsection{Redis vs Memcached}\label{redis-vs-memcached}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1270}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4324}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4406}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Redis}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Memcached}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Data types & rich (string/hash/list/set/zset/stream/HLL/bitmap/geo) & strings/objects only \\
+\rowcolor{zebra}
+Threading & single-threaded core (atomic ops) & \textbf{multi-threaded} (scales on big multicore boxes) \\
+Persistence & RDB + AOF & none (pure cache) \\
+\rowcolor{zebra}
+Replication/HA & yes (Sentinel, Cluster) & none built-in (client-side sharding) \\
+Eviction & many policies (LRU/LFU/TTL/random) & LRU (slab-based) \\
+\rowcolor{zebra}
+Use when & you need data structures, persistence, pub/sub, locks, HA & you want a \emph{simple, blazing}, multi-threaded LRU string cache \\
+Memory model & jemalloc; can fragment & slab allocator (fixed-size chunks; some waste, predictable) \\
+\end{longtable}
+
+\textbf{Pick Memcached} for a pure, huge, simple string cache on big boxes (Meta\textquotesingle s classic use). \textbf{Pick Redis} for everything richer --- which is most cases today.
+
+\begin{quote}
+\textbf{Interview takeaway:} Redis is single-threaded (\(\rightarrow\) atomic commands, but don\textquotesingle t block it), shards via \textbf{16384 hash slots}, persists via \textbf{RDB+AOF} (\texttt{everysec} is the common fsync), and offers data structures that make leaderboards/rate-limits/locks trivial. Know the \textbf{Redlock critique} and the \textbf{fencing-token} answer.
+\end{quote}
+
+\section{CDN \& HTTP Caching}\label{cdn--http-caching}
+
+The cache tiers \emph{closest to the user} --- often the highest-leverage of all because a hit here means \textbf{zero} origin/app/DB load and the lowest possible latency (served from a PoP physically near the user).
+
+\subsection{CDN (Content Delivery Network)}\label{cdn-content-delivery-network}
+
+A globally-distributed network of \textbf{edge servers (PoPs)} that cache content near users (Cloudflare, Akamai, CloudFront, Fastly).
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{What\textquotesingle s cached:} static assets (images, JS, CSS, video segments) always; \textbf{cacheable dynamic} content (API responses with cache headers) increasingly.
+\item
+  \textbf{Cache key:} typically \texttt{(host,\ path,\ query,\ selected\ headers)}. Tuning the key matters --- including a \texttt{?utm=...} tracking param in the key needlessly fragments the cache (cache busting); strip irrelevant query params.
+\item
+  \textbf{Origin shield:} a mid-tier cache between edges and origin so a global miss storm collapses to one origin fetch (stampede protection at CDN scale).
+\item
+  \textbf{TTL:} governed by \texttt{Cache-Control:\ s-maxage} / \texttt{max-age} from the origin, or CDN config.
+\item
+  \textbf{Purge / invalidation:} push-based --- call the CDN API to purge a URL or a \emph{cache tag} (e.g., purge everything tagged \texttt{product-42}). Purge-by-tag/surrogate-key is how you invalidate dynamic content at the edge. Purges propagate to all PoPs in seconds.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+User (Tokyo) ─> CDN PoP (Tokyo)  ──hit──> served in ~10 ms, origin untouched
+                       └─ miss ─> Origin shield ─> Origin (US) ─> fill PoP
+Next Tokyo user: hit.
+\end{verbatim}
+
+\subsection{HTTP caching headers --- the protocol}\label{http-caching-headers--the-protocol}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Cache{-}Control: public, max{-}age=3600, s{-}maxage=86400, stale{-}while{-}revalidate=60}
+\NormalTok{ETag: "a1b2c3"}
+\NormalTok{Vary: Accept{-}Encoding, Accept{-}Language}
+\NormalTok{Age: 120}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{\texttt{Cache-Control} directives:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2834}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7166}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Directive
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{max-age=N} & fresh for N seconds (applies to browser \textbf{and} shared caches) \\
+\rowcolor{zebra}
+\texttt{s-maxage=N} & freshness for \textbf{shared} caches (CDN/proxy) only; overrides \texttt{max-age} there \\
+\texttt{no-cache} & may store, but \textbf{must revalidate} with the origin before reuse (not "don\textquotesingle t cache"!) \\
+\rowcolor{zebra}
+\texttt{no-store} & do not store at all (sensitive data --- banking, PII) \\
+\texttt{private} & only the \textbf{browser} may cache (per-user data); shared caches must not \\
+\rowcolor{zebra}
+\texttt{public} & any cache may store (even with auth headers) \\
+\texttt{immutable} & won\textquotesingle t change before expiry \(\rightarrow\) skip revalidation (great for hashed asset URLs) \\
+\rowcolor{zebra}
+\texttt{stale-while-revalidate=N} & serve stale up to N s while revalidating in background \\
+\end{longtable}
+
+\textbf{\texttt{no-cache} \(\neq\) \texttt{no-store}} --- a classic gotcha. \texttt{no-cache} means "store it, but revalidate before each use." \texttt{no-store} means "never write it down." Use \texttt{no-store} for truly sensitive responses.
+
+\subsection{\texorpdfstring{ETag + conditional requests \(\rightarrow\) 304}{ETag + conditional requests \textbackslash rightarrow 304}}\label{etag--conditional-requests-rightarrow-304}
+
+An \textbf{ETag} is a content fingerprint (hash or version). The browser sends it back; if unchanged, the origin replies \textbf{304 Not Modified} with \emph{no body} --- saving bandwidth while still confirming freshness.
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# First response:}
+\NormalTok{HTTP/1.1 200 OK}
+\NormalTok{ETag: "a1b2c3"}
+\NormalTok{Cache{-}Control: no{-}cache          \# must revalidate each time}
+\NormalTok{\textless{}body...\textgreater{}}
+
+\NormalTok{\# Browser\textquotesingle{}s revalidation request:}
+\NormalTok{GET /resource HTTP/1.1}
+\NormalTok{If{-}None{-}Match: "a1b2c3"}
+
+\NormalTok{\# Origin, if unchanged:}
+\NormalTok{HTTP/1.1 304 Not Modified        \# no body — browser reuses its cached copy}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{Last-Modified} + \texttt{If-Modified-Since} is the timestamp-based alternative (weaker --- 1-second granularity, and content can change without the mtime changing).
+
+\subsection{\texorpdfstring{\texttt{Vary} and \texttt{Age}}{Vary and Age}}\label{vary-and-age}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{\texttt{Vary}} --- tells caches which \emph{request headers} differentiate the response. \texttt{Vary:\ Accept-Encoding} \(\rightarrow\) store gzip and brotli variants separately. \texttt{Vary:\ Accept-Language} \(\rightarrow\) per-language variants. Over-varying (e.g., \texttt{Vary:\ User-Agent}) \textbf{fragments the cache} and kills hit ratio.
+\item
+  \textbf{\texttt{Age}} --- how long (seconds) the response has been sitting in caches. \texttt{Age:\ 120} with \texttt{max-age=3600} \(\rightarrow\) 3480 s of freshness remain.
+\end{itemize}
+
+\subsection{Browser vs CDN vs origin}\label{browser-vs-cdn-vs-origin}
+
+\setcodelang{}
+
+\begin{verbatim}
+Browser cache  → private, per-user, max-age, ETag revalidation (zero network on hit)
+   ↓ miss
+CDN / edge     → shared, s-maxage, public assets, purge-by-tag, origin shield
+   ↓ miss
+Origin (app)   → app L1 + Redis L2 + DB (everything earlier in this doc)
+\end{verbatim}
+
+\begin{quote}
+\textbf{Interview takeaway:} The cheapest cache hit is the one nearest the user. Master \texttt{Cache-Control} (\texttt{max-age} vs \texttt{s-maxage}, \texttt{no-cache} vs \texttt{no-store}, \texttt{private} vs \texttt{public}), \textbf{\texttt{ETag}+\texttt{If-None-Match}\(\rightarrow\)304} for cheap revalidation, and \texttt{Vary} (don\textquotesingle t over-vary). CDN invalidation = \textbf{purge by tag/surrogate-key}, not by guessing TTLs.
+\end{quote}
+
+\section{Consistency \& Multi-Region}\label{consistency--multi-region}
+
+\subsection{Staleness windows --- name them, bound them}\label{staleness-windows--name-them-bound-them}
+
+Every cache introduces a window where readers may see old data. The senior skill is to \emph{quantify and defend} it:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{TTL-bounded:} staleness \(\leq\) TTL. A 5-min TTL = "reads may be up to 5 min stale." Pick TTL = max tolerable staleness.
+\item
+  \textbf{Invalidation-bounded:} staleness \(\approx\) propagation delay of the delete/CDC event (ms--seconds), plus the refill race (TTL-bounded backstop).
+\item
+  \textbf{Replication-bounded:} with cache replicas, add replica lag.
+\end{itemize}
+
+State it as: \emph{"Reads can be stale by up to \textasciitilde5 min (TTL), or \textasciitilde50 ms in the common case (delete propagation). For prices that\textquotesingle s unacceptable, so we use a 2 s TTL there; for product descriptions 5 min is fine."}
+
+\subsection{Cache coherence across nodes/regions}\label{cache-coherence-across-nodesregions}
+
+A distributed cache (many Redis nodes, or per-app-server L1s) can hold \textbf{divergent copies} of the same key. After a write:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{L1 (in-process) caches} are the worst offenders --- a delete must be \textbf{broadcast} to every app server (via Redis pub/sub or a message bus) or they serve stale until their local TTL. Keep L1 TTLs short (1--5 s) so divergence self-heals fast.
+\item
+  \textbf{Multi-region:} a write in region A must invalidate caches in regions B and C. Cross-region pub/sub adds latency (50--150 ms). Approaches:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{CDC/event stream} fanned out to all regions (durable, ordered).
+  \item
+    \textbf{Versioned keys} --- a global version bump means stale entries are simply never read (no race, no broadcast timing problem). Often the cleanest cross-region answer.
+  \item
+    \textbf{Per-region TTL} as a backstop everywhere.
+  \end{itemize}
+\end{itemize}
+
+\subsection{When NOT to cache}\label{when-not-to-cache}
+
+Caching is not free or always correct. \textbf{Don\textquotesingle t cache} when:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Strong consistency is required} and you can\textquotesingle t tolerate any staleness (financial balances at point of trade, inventory at checkout for the last unit).
+\item
+  \textbf{Low reuse / high cardinality} --- if each key is read \textasciitilde once (uniform random access, unique per-request data), the hit ratio is near zero and you pay overhead for nothing (your hit-ratio math shows no benefit).
+\item
+  \textbf{Write-heavy with low read-back} --- you\textquotesingle d thrash fills/invalidations.
+\item
+  \textbf{Highly personalized, non-shared data} that\textquotesingle s cheap to compute.
+\item
+  \textbf{Security-sensitive responses} at shared caches (set \texttt{private}/\texttt{no-store}).
+\item
+  \textbf{Tiny/fast sources} --- caching adds a hop and a consistency problem for no latency win.
+\end{itemize}
+
+\begin{quote}
+\textbf{Interview takeaway:} Always say the \textbf{staleness window} out loud and tie the TTL to business tolerance. For multi-region, \textbf{versioned keys / CDC} beat TTL guesses. And know \textbf{when not to cache} --- naming that is a maturity signal.
+\end{quote}
+
+\section{Designing a Cache (Worked Example)}\label{designing-a-cache-worked-example}
+
+\textbf{Prompt:} \emph{"Design caching for a product catalog + a hot leaderboard for an e-commerce flash-sale site. Reads \textasciitilde200K QPS, writes \textasciitilde2K QPS. DB (Postgres) can serve \textasciitilde10K QPS comfortably."}
+
+\subsection{1. Clarify access patterns \& SLOs}\label{1-clarify-access-patterns--slos}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Reads ≫ writes} (100:1) \(\rightarrow\) caching is the obvious lever.
+\item
+  Catalog reads are \textbf{shareable} (every user sees the same product) \(\rightarrow\) high reuse, ideal.
+\item
+  \textbf{Skew:} a flash sale means a handful of products are \emph{viral} (hot keys) and bursts cause stampede/avalanche risk at sale start.
+\item
+  SLO: p99 product read \textless{} 20 ms; DB must stay \textless{} 10K QPS.
+\end{itemize}
+
+\subsection{2. Choose tiers}\label{2-choose-tiers}
+
+\setcodelang{}
+
+\begin{verbatim}
+Browser/CDN (static assets, images)         ─ s-maxage=86400, immutable hashed URLs
+        ↓ miss
+App-local L1 (Caffeine, W-TinyLFU)          ─ top hot products, TTL 5s, 50k entries
+        ↓ miss
+Redis L2 (cluster, cache-aside)             ─ all products, TTL 5min + jitter
+        ↓ miss
+Postgres (source of truth, read replicas)
+\end{verbatim}
+
+\subsection{3. Keys, values, TTLs}\label{3-keys-values-ttls}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1947}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1681}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1947}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1770}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2655}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Data
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+TTL
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pattern
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Product detail & \texttt{product:\{id\}:v\{ver\}} & JSON (hash) & 5 min \(\pm\) 10\% jitter & cache-aside \\
+\rowcolor{zebra}
+Price (volatile) & \texttt{price:\{id\}} & string & 5 s & cache-aside + CDC invalidation \\
+Leaderboard & \texttt{sale:leaderboard} & ZSet (\texttt{ZADD}/\texttt{ZREVRANGE}) & live, no TTL & write-through to ZSet \\
+\rowcolor{zebra}
+Inventory (last units) & --- & \textbf{not cached} at checkout & --- & DB with row lock \\
+\end{longtable}
+
+\subsection{4. Invalidation}\label{4-invalidation}
+
+\begin{itemize}
+\tightlist
+\item
+  Product edits \(\rightarrow\) \textbf{delete \texttt{product:\{id\}}} (or bump version \(\rightarrow\) \texttt{:v\{ver\}}). Use \textbf{CDC (Debezium \(\rightarrow\) Kafka)} so admin tools / batch price updates also invalidate, across regions.
+\item
+  Price changes are frequent \(\rightarrow\) short TTL (5 s) \textbf{plus} CDC delete for immediacy. Read-your-own-writes for sellers: route their next read to the DB for 2 s.
+\item
+  Inventory at the \emph{last unit} \(\rightarrow\) \textbf{don\textquotesingle t cache}; correctness \textgreater{} latency (avoid overselling).
+\end{itemize}
+
+\subsection{5. Stampede / avalanche / hot-key protection}\label{5-stampede--avalanche--hot-key-protection}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sale start avalanche:} pre-warm the top-200 product keys \textbf{before} opening the sale; jitter TTLs so they don\textquotesingle t expire together.
+\item
+  \textbf{Viral product stampede:} \textbf{single-flight} (Redis \texttt{SET\ NX} lock) on miss for hot keys; or \textbf{stale-while-revalidate} so the herd is served stale during a refresh.
+\item
+  \textbf{Hot key (the one viral product at 30\% of traffic):} \textbf{L1 cache} on every app server (5 s TTL) \(\rightarrow\) the millions of reads collapse to \textasciitilde(\#app-servers) reads/s on Redis; optionally \textbf{key-split} the Redis entry across replicas.
+\item
+  \textbf{Penetration} (bots hitting random/expired product IDs): \textbf{negative cache} (30 s) + a \textbf{Bloom filter} of valid product IDs (\textasciitilde10 bits/ID).
+\end{itemize}
+
+\subsection{6. Expected hit ratio \& load math}\label{6-expected-hit-ratio--load-math}
+
+With CDN+L1+L2 and a Zipfian catalog, assume \textbf{L2 hit ratio \(\approx\) 96\%}.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DB read QPS }\OperatorTok{=}\NormalTok{ (}\DecValTok{1}\NormalTok{ − }\FloatTok{0.96}\NormalTok{) × }\DecValTok{200}\NormalTok{,}\DecValTok{000} \OperatorTok{=} \DecValTok{8}\NormalTok{,}\DecValTok{000}\NormalTok{ QPS   }\OperatorTok{\textless{}} \DecValTok{10}\NormalTok{,}\DecValTok{000}\NormalTok{ ✅ (within budget)}
+\NormalTok{Effective read latency ≈ }\FloatTok{0.96}\NormalTok{ × }\FloatTok{0.5}\ErrorTok{ms} \OperatorTok{+} \FloatTok{0.04}\NormalTok{ × }\DecValTok{20}\ErrorTok{ms} \OperatorTok{=} \FloatTok{0.48} \OperatorTok{+} \FloatTok{0.8} \OperatorTok{=} \FloatTok{1.28}\NormalTok{ ms  ✅}
+\end{Highlighting}
+\end{Shaded}
+
+Push L2 to \textbf{98\%} (better warmup/jitter/longer TTL where safe) \(\rightarrow\) DB sees \textbf{4,000 QPS}, halving DB load and giving headroom for traffic spikes. The L1 tier further shields Redis from the hot keys. The leaderboard is a single Redis ZSet --- \texttt{ZREVRANGE\ 0\ 9} is microseconds and never touches the DB.
+
+\begin{quote}
+\textbf{Interview takeaway:} Drive the design from \textbf{access pattern \(\rightarrow\) tiers \(\rightarrow\) keys/TTL \(\rightarrow\) invalidation \(\rightarrow\) failure-mode protection \(\rightarrow\) hit-ratio/load math}. Ending with "this keeps the DB at 8K QPS under its 10K budget" turns a hand-wave into an engineering answer.
+\end{quote}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{Cache-aside read/write flow}\label{cache-aside-readwrite-flow}
+
+\setcodelang{}
+
+\begin{verbatim}
+READ
+  app ──GET key──> cache ──hit──────────────> return value
+                      │
+                      └─ miss ─> DB SELECT ─> SET key (TTL+jitter) ─> return
+
+WRITE
+  app ──UPDATE──> DB (source of truth)
+        └────────> DELETE key   (next read repopulates fresh)
+\end{verbatim}
+
+\subsection{Multi-tier cache hierarchy}\label{multi-tier-cache-hierarchy}
+
+\setcodelang{}
+
+\begin{verbatim}
+Client
+  │  Browser cache (private, ETag/max-age)        ~0 ms on hit
+  ▼
+CDN edge PoP (shared, s-maxage, purge-by-tag)     ~10 ms, 0 origin load
+  ▼  (miss → origin shield → origin)
+App server
+  │  L1 in-process (Caffeine/W-TinyLFU)            ~0.1 µs, per-instance
+  ▼
+Redis L2 (cluster, 16384 slots, cache-aside)      ~0.3 ms, shared
+  ▼
+DB buffer pool → disk                              ~5–50 ms
+   each tier absorbs the misses of the tier to its left
+\end{verbatim}
+
+\subsection{Stampede: herd vs single-flight}\label{stampede-herd-vs-single-flight}
+
+\setcodelang{}
+
+\begin{verbatim}
+WITHOUT single-flight (stampede)        WITH single-flight (coalesced)
+   key expires                            key expires
+   ┌──┬──┬──┬──┬──┐                        ┌──┬──┬──┬──┬──┐
+   r1 r2 r3 r4 ...rN  all miss             r1 r2 r3 r4 ...rN  all miss
+   │  │  │  │     │                        │  (acquire lock; others wait)
+   ▼  ▼  ▼  ▼     ▼                        ▼
+   DB DB DB DB ...DB  (N hits 💥)          DB (1 hit) → fill → r2..rN read cache ✅
+\end{verbatim}
+
+\subsection{Where caches live (request path)}\label{where-caches-live-request-path}
+
+\setcodelang{}
+
+\begin{verbatim}
+Client → DNS → CDN(edge) → LB → App(L1) → Redis(L2) → DB(buffer pool) → CPU L1/L2/L3
+ ▲hit→0ms              ▲hit→~10ms      ▲hit→µs   ▲hit→~0.3ms   ▲hit→RAM   ▲hit→ns
+ each layer turns a "miss" below it into a "hit", shrinking latency and load left-to-right
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Meta / \texttt{memcached} in front of MySQL} --- the \emph{"Scaling Memcache at Facebook"} paper: a giant look-aside cache layer. Introduces \textbf{leases} (a token issued on miss) to (a) prevent stampedes --- only the lease holder fetches --- and (b) prevent stale sets --- a write invalidates outstanding leases so a slow refill is rejected. Regional pools and a "mcrouter" proxy route and replicate.
+\item
+  \textbf{Netflix EVCache} --- a Memcached-based, \textbf{multi-region replicated} cache. Each region holds a full copy of hot data so a regional failover still serves warm; writes replicate cross-region asynchronously. Sized for resilience, not just hit ratio.
+\item
+  \textbf{Amazon DynamoDB Accelerator (DAX)} --- a write-through/read-through cache \emph{in front of DynamoDB} giving microsecond reads; ElastiCache (Redis/Memcached) for general caching; CloudFront for the edge.
+\item
+  \textbf{Twitter/X timelines} --- Redis (sorted sets) cache precomputed timelines (fan-out-on-write). Celebrity posts use \textbf{fan-out-on-read} (hot-key avoidance) rather than invalidating 100M follower caches.
+\item
+  \textbf{CDNs (Cloudflare/Akamai/Fastly)} --- the entire product is edge caching: static assets, plus cacheable dynamic content with \textbf{purge-by-surrogate-key}. Fastly\textquotesingle s instant purge is famous (sub-150 ms global).
+\item
+  \textbf{CPU caches (L1/L2/L3)} --- the same locality principle in hardware: a 64-byte cache line, LRU-ish replacement, and the reason cache-friendly memory access patterns can beat a better Big-O with poor locality.
+\item
+  \textbf{DNS resolvers} --- cache \texttt{A}/\texttt{AAAA} records with TTLs; a TTL-driven cache that the whole internet depends on.
+\end{enumerate}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One household kitchen --- every concept is a shelf, a habit, or a chore.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2093}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7907}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Cache} & Your \textbf{kitchen counter} --- the few ingredients you use daily kept within arm\textquotesingle s reach; the pantry/supermarket (DB) holds everything but is slower to reach \\
+\rowcolor{zebra}
+\textbf{Hit / miss} & Reaching for salt: it\textquotesingle s on the counter (hit) vs you have to walk to the pantry (miss) \\
+\textbf{Hit ratio} & The fraction of times what you need is already on the counter --- the better stocked for \emph{your} habits, the fewer pantry trips \\
+\rowcolor{zebra}
+\textbf{TTL} & The \textbf{milk\textquotesingle s expiry date} --- past it you stop trusting the carton and go back to the store (source of truth) \\
+\textbf{Cache-aside} & "\textbf{Check the fridge first}; if it\textquotesingle s empty, go shopping and \emph{then} restock the fridge" --- and you only stock what you actually went looking for \\
+\rowcolor{zebra}
+\textbf{Write-through} & Every time you buy milk you \textbf{immediately put it both in the fridge and note it on the shopping list} --- always consistent, but a little extra work each time \\
+\textbf{Write-back} & Jotting purchases on a sticky note and \textbf{updating the master list later} --- fast now, but if you lose the sticky note before copying it, those purchases are gone \\
+\rowcolor{zebra}
+\textbf{Write-around} & Buying a bulk sack of flour and putting it \textbf{straight in the pantry}, skipping the counter --- it won\textquotesingle t be used today, no point cluttering the counter \\
+\textbf{LRU} & When the counter is full, \textbf{clear off whatever you haven\textquotesingle t touched in the longest} to make room \\
+\rowcolor{zebra}
+\textbf{LFU} & Keep the things you use \textbf{most often} (the everyday salt and oil) even if you didn\textquotesingle t touch them in the last hour; toss the gadget you used once \\
+\textbf{Scan pollution} & Hosting a one-off dinner party floods the counter with specialty items you\textquotesingle ll never use again, \textbf{shoving your daily staples into the pantry} --- LFU/W-TinyLFU refuse to let a one-time guest evict your staples \\
+\rowcolor{zebra}
+\textbf{Invalidation (delete on write)} & When a recipe changes, you \textbf{throw out the old prepped portion} rather than trying to edit it in place --- next time you re-prep from the current recipe \\
+\textbf{TTL jitter} & Staggering expiry dates so \textbf{not every carton spoils on the same Monday}, sparing you one giant emergency shopping trip \\
+\rowcolor{zebra}
+\textbf{Cache stampede} & The milk expires at breakfast and the \textbf{whole family bolts to the store at once}; a single "I\textquotesingle ll go, everyone wait" (single-flight) sends one person instead of five \\
+\textbf{Cache penetration} & A kid keeps asking for an ingredient you\textquotesingle ve \textbf{never owned}; you put a sticky note "we don\textquotesingle t have unicorn jam" (negative cache) so you stop checking the empty pantry each time \\
+\rowcolor{zebra}
+\textbf{Cache avalanche} & The whole fridge \textbf{expires the same day}, forcing a full restock all at once --- staggering dates (jitter) prevents the pile-up \\
+\textbf{Hot key} & Everyone wants the \textbf{one popular sauce}; you keep a small bottle on \emph{every} counter (L1 replication) so they don\textquotesingle t all crowd the single pantry shelf \\
+\rowcolor{zebra}
+\textbf{CDN} & \textbf{Corner convenience stores} stocking popular items near each neighborhood, so people don\textquotesingle t all drive to the central supermarket \\
+\textbf{ETag / 304} & You phone the store: "is the recipe card still version a1b2c3?" --- "yep, unchanged" --- so you \textbf{don\textquotesingle t re-copy the whole card}, just trust your copy \\
+\rowcolor{zebra}
+\textbf{Stale-while-revalidate} & You \textbf{use yesterday\textquotesingle s bread right now} while a fresh loaf bakes in the background --- no one waits hungry \\
+\textbf{Bloom filter} & A doormat sign listing what\textquotesingle s \textbf{definitely not} in the house --- if it\textquotesingle s on the "we never stock this" sign, don\textquotesingle t even open the pantry \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Patterns --- "Aside, Through, Back, Around":} lazy / sync / async / bypass.
+\item
+  \textbf{Cache-aside rule --- "Read fills, Write deletes."} (Never \emph{update} the cache on write.)
+\item
+  \textbf{The four failure modes --- "SPAH"} (Stampede, Penetration, Avalanche, Hot-key) and their fixes:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{S}tampede \(\rightarrow\) \textbf{S}ingle-flight (+ SWR / probabilistic early expiry)
+  \item
+    \textbf{P}enetration \(\rightarrow\) \textbf{P}robabilistic filter (Bloom) + negative cache
+  \item
+    \textbf{A}valanche \(\rightarrow\) \textbf{A}dd jitter (+ warmup)
+  \item
+    \textbf{H}ot-key \(\rightarrow\) \textbf{H}ave a local L1 (+ key splitting)
+  \end{itemize}
+\item
+  \textbf{"Two hard things: cache invalidation and naming things."}
+\item
+  \textbf{Eviction --- "LRU = recency, LFU = frequency, W-TinyLFU = the smart one (Caffeine)."}
+\item
+  \textbf{Hit-ratio intuition --- "90\(\rightarrow\)99\% matters more than 0\(\rightarrow\)90\%"} (the tail dominates effective latency).
+\item
+  \textbf{HTTP --- "no-cache stores-but-asks; no-store never writes."}
+\item
+  \textbf{Redis sharding --- "16384 slots, CRC16 mod."}
+\item
+  \textbf{Durability --- "RDB = snapshot, AOF = journal; everysec is the sweet spot."}
+\end{itemize}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: Explain cache-aside, and when would you choose it over write-through?}\label{q1-explain-cache-aside-and-when-would-you-choose-it-over-write-through}
+
+\textbf{Model answer:} In \textbf{cache-aside}, the app checks the cache; on a miss it reads the DB and \emph{fills} the cache, and on writes it updates the DB and \textbf{deletes} the key (not update --- deletion avoids the writer-ordering race). It\textquotesingle s the default because it\textquotesingle s simple and resilient: if the cache is down, reads fall through to the DB, so a cache outage degrades latency, not correctness. Use \textbf{write-through} (write cache+DB synchronously) when reads must be fresh immediately after a write and you can tolerate higher write latency --- but it wastes memory caching data that may never be read and only caches keys that have been written. Cache-aside suits read-heavy workloads with tolerable staleness; write-through suits low-staleness-tolerance, read-heavy data like config.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Why delete instead of update the cache on write?"} \(\rightarrow\) Two concurrent writers can apply their cache writes in the opposite order to their DB commits, leaving a stale value. Delete is idempotent and self-correcting --- the next read refills the current value.
+\item
+  \emph{"What\textquotesingle s the residual race even with delete?"} \(\rightarrow\) A slow reader that read the old DB value before the writer\textquotesingle s commit can fill the cache with stale data \emph{after} the delete. Bound it with TTL, or close it with leases / double-delete.
+\end{itemize}
+
+\subsection{Q2: How do you keep a cache consistent with the database?}\label{q2-how-do-you-keep-a-cache-consistent-with-the-database}
+
+\textbf{Model answer:} You can\textquotesingle t make it perfectly consistent cheaply, so you bound the staleness. Options, in increasing strength/cost: \textbf{TTL} (accept staleness \(\leq\) TTL --- always add jitter); \textbf{delete-on-write} (next read refills); \textbf{CDC/binlog invalidation} (tail the DB change log \(\rightarrow\) emit deletes, so even non-app writers and other services stay coherent); \textbf{versioned keys} (bump a version; stale entries are orphaned, never read --- great cross-region); \textbf{stale-while-revalidate} for zero-wait reads. I\textquotesingle d pick TTL+delete for a single service, and CDC or versioned keys for cross-service/cross-region coherence --- and I\textquotesingle d state the staleness window explicitly (e.g., "\(\leq\)5 min via TTL, \textasciitilde50 ms typical via delete propagation").
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"User must see their own edit immediately?"} \(\rightarrow\) Read-your-own-writes: route that user\textquotesingle s reads to the DB (or write-through their key) for a couple of seconds after their write.
+\end{itemize}
+
+\subsection{Q3: What is a cache stampede (thundering herd) and how do you prevent it?}\label{q3-what-is-a-cache-stampede-thundering-herd-and-how-do-you-prevent-it}
+
+\textbf{Model answer:} A \textbf{stampede} happens when a single hot key expires and many concurrent requests all miss and hit the DB at once to recompute the same value --- at, say, 50K QPS on one key, that\textquotesingle s 50K simultaneous DB queries that can topple the DB. Prevent it with \textbf{single-flight / request coalescing}: a per-key lock (in distributed setups, a Redis \texttt{SET\ NX} lock) so only the first miss recomputes while others wait and then read the filled value. Alternatives: \textbf{stale-while-revalidate} (serve the old value, one background refresh) and \textbf{probabilistic early expiration} (refresh slightly before TTL with rising probability, so the herd never forms). For \emph{mass} simultaneous expiry, that\textquotesingle s avalanche \(\rightarrow\) add \textbf{TTL jitter}.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"How does Facebook do it?"} \(\rightarrow\) Leases: on a miss the cache issues a lease token; only the holder may set the value, and a concurrent write invalidates the lease, also preventing stale sets.
+\end{itemize}
+
+\subsection{Q4: How do you protect against queries for keys that don\textquotesingle t exist (penetration)?}\label{q4-how-do-you-protect-against-queries-for-keys-that-dont-exist-penetration}
+
+\textbf{Model answer:} Those queries (often malicious ID enumeration) bypass the cache because there\textquotesingle s genuinely nothing to cache, so 100\% hit the DB. Two defenses: \textbf{negative caching} --- cache a sentinel "absent" value with a \emph{short} TTL (so a later-created key appears quickly and attackers can\textquotesingle t bloat memory); and a \textbf{Bloom filter} of valid keys in front --- it has no false negatives, so a "definitely not present" answer rejects the request without a DB hit. Bloom math: \textasciitilde10 bits/element \(\rightarrow\) \textasciitilde1\% false positives, so 100M IDs \(\approx\) 120 MB to shield the DB. Combine both for robustness.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Bloom filter can\textquotesingle t delete --- what if a key is removed?"} \(\rightarrow\) Use a Counting Bloom or Cuckoo filter, or rebuild periodically; a false-positive just costs one wasted DB lookup, which is safe.
+\end{itemize}
+
+\subsection{Q5: LRU vs LFU --- implement LRU and explain when each wins.}\label{q5-lru-vs-lfu--implement-lru-and-explain-when-each-wins}
+
+\textbf{Model answer:} \textbf{LRU} evicts the least-recently-used and captures temporal locality; implement O(1) with a hash map (lookup) + doubly-linked list (recency): on access move the node to the head, evict from the tail. \textbf{LFU} evicts the least-frequently-used; it keeps genuinely popular items and resists \textbf{scan pollution} (a one-time bulk read won\textquotesingle t evict the long-term hot set, as it would under LRU), but it needs frequency counters and \textbf{aging} (decay counts) so yesterday\textquotesingle s hot item doesn\textquotesingle t stick forever. Production caches use \textbf{W-TinyLFU} (Caffeine) --- a frequency-gated admission filter over a windowed LRU --- for near-optimal hit ratios with scan resistance.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"How does Redis do LRU?"} \(\rightarrow\) Approximate/sampled: it samples \texttt{maxmemory-samples} random keys and evicts the best, avoiding a global linked list across millions of keys.
+\end{itemize}
+
+\subsection{Q6: Where would you place caches in a web architecture, and what does each buy you?}\label{q6-where-would-you-place-caches-in-a-web-architecture-and-what-does-each-buy-you}
+
+\textbf{Model answer:} Layered, each absorbing the misses of the one in front: \textbf{browser/HTTP cache} (free, nearest the user, via \texttt{ETag}/\texttt{Cache-Control}, zero network on a hit); \textbf{CDN} at the edge for static and cacheable dynamic content (zero origin load on a hit); \textbf{app-local L1} (in-process, microseconds, per-instance --- great for hot keys and shielding Redis); a \textbf{distributed L2 (Redis)} shared across instances for hot rows/sessions/leaderboards; and the \textbf{DB buffer pool}. Each tier shrinks latency and downstream load left-to-right; an L1 also survives an L2 restart, smoothing avalanches.
+
+\subsection{Q7: Walk me through Redis internals you\textquotesingle d rely on for a cache.}\label{q7-walk-me-through-redis-internals-youd-rely-on-for-a-cache}
+
+\textbf{Model answer:} Redis is an in-memory data-structure server with a \textbf{single-threaded} command core, so each command (\texttt{INCR}, \texttt{ZADD}, \texttt{SET\ NX}) is \textbf{atomic} --- ideal for counters, rate limiters, and locks --- but you must never run blocking commands like \texttt{KEYS\ *} (use \texttt{SCAN}). \textbf{Pipelining} amortizes RTTs (1000 GETs in \textasciitilde1 RTT). It shards via \textbf{16384 hash slots} (\texttt{CRC16(key)\ mod\ 16384}) in Cluster mode; co-locate related keys with \textbf{hash tags} \texttt{\{user:42\}}. Persistence is \textbf{RDB} (snapshots) and/or \textbf{AOF} (write log; \texttt{appendfsync\ everysec} is the usual durability/latency sweet spot) --- though a pure cache often runs without persistence and accepts a cold start. Rich types (hashes for rows, sorted sets for leaderboards, HLL for cardinality, bitmaps for DAU) let me cache the right shape directly.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Redis vs Memcached?"} \(\rightarrow\) Memcached is multi-threaded, strings-only, no persistence --- a simple blazing LRU for big boxes; Redis adds data structures, persistence, replication/cluster, pub/sub, and locks. Pick Redis unless you specifically want Memcached\textquotesingle s simplicity/multithreading.
+\end{itemize}
+
+\subsection{Q8: How do distributed locks work in Redis, and what are the caveats?}\label{q8-how-do-distributed-locks-work-in-redis-and-what-are-the-caveats}
+
+\textbf{Model answer:} A single-node lock is \texttt{SET\ lock:res\ \textless{}token\textgreater{}\ NX\ PX\ 10000} (acquire only if absent, auto-expire), released by a \textbf{Lua compare-and-delete} so you only release \emph{your} token (never delete a lock that already expired and was re-acquired). \textbf{Redlock} extends this to a majority of N independent masters for HA. The caveat (Kleppmann): it\textquotesingle s unsafe for \emph{correctness}-critical mutual exclusion because of clock drift and GC/STW pauses --- a process can pause past its lease and still think it holds the lock. So for \emph{efficiency} (dedupe work) a Redis lock is fine; for \emph{correctness} add a monotonic \textbf{fencing token} that the protected resource validates, or use ZooKeeper/etcd. State that nuance.
+
+\subsection{\texorpdfstring{Q9: Explain HTTP caching: \texttt{Cache-Control}, \texttt{ETag}, and what 304 saves.}{Q9: Explain HTTP caching: Cache-Control, ETag, and what 304 saves.}}\label{q9-explain-http-caching-cache-control-etag-and-what-304-saves}
+
+\textbf{Model answer:} \texttt{Cache-Control} governs caching: \texttt{max-age} (browser+shared), \texttt{s-maxage} (shared/CDN only), \texttt{private} (browser only --- per-user data), \texttt{public}, \texttt{no-cache} (store but \textbf{revalidate} before use), \texttt{no-store} (never store --- sensitive data), \texttt{immutable} (skip revalidation). An \textbf{\texttt{ETag}} is a content fingerprint; the browser revalidates with \texttt{If-None-Match}, and if unchanged the origin returns \textbf{304 Not Modified} with \textbf{no body} --- confirming freshness while saving the bandwidth of resending the payload. \texttt{Vary} declares which request headers split cache variants (don\textquotesingle t over-vary --- it fragments the cache). \texttt{s-maxage} lets a CDN cache aggressively while the browser revalidates more often.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"\texttt{no-cache} vs \texttt{no-store}?"} \(\rightarrow\) \texttt{no-cache} = store but revalidate each use; \texttt{no-store} = never write it down (for truly sensitive responses).
+\end{itemize}
+
+\subsection{Q10: Design caching for a product catalog under a flash sale.}\label{q10-design-caching-for-a-product-catalog-under-a-flash-sale}
+
+\textbf{Model answer:} \emph{(see the Worked Example)} Tiers: CDN for images, L1 (Caffeine) for hot products with a 5 s TTL, Redis L2 cache-aside for all products with a 5 min TTL + jitter, Postgres + read replicas as source of truth. Keys \texttt{product:\{id\}:v\{ver\}}; prices on a short 5 s TTL + CDC invalidation. Pre-warm top products before the sale (avalanche), single-flight or SWR on viral keys (stampede), L1 replication for the one hot product (hot key), Bloom + negative cache for bot-driven non-existent IDs (penetration), and \textbf{don\textquotesingle t cache the last-unit inventory} (correctness \textgreater{} latency). At \textasciitilde96\% L2 hit ratio, the DB sees \texttt{(1−0.96)×200K\ =\ 8K\ QPS}, under its 10K budget --- push to 98\% for headroom.
+
+\subsection{Q11: Your cache just went down in production. What happens, and how should the system behave?}\label{q11-your-cache-just-went-down-in-production-what-happens-and-how-should-the-system-behave}
+
+\textbf{Model answer:} Ideally the system \textbf{degrades, not fails}: cache-aside means reads fall through to the DB, so correctness is preserved but the DB now takes 100\% of read traffic --- which can overwhelm it (a cold-cache avalanche). Protections: a \textbf{circuit breaker / load shedder} in front of the DB, an \textbf{L1 in-process cache} that survives the L2 outage, \textbf{request coalescing} so simultaneous misses collapse, and \textbf{gradual warmup} rather than full traffic on a cold cache. The anti-pattern is depending on the cache for correctness (e.g., write-back losing un-flushed writes) --- that turns a performance incident into a data-loss incident.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"How do you warm it back up?"} \(\rightarrow\) Pre-load the top-N hot keys from the DB before taking full traffic, or shadow/ramp traffic; jitter TTLs so the refilled keys don\textquotesingle t avalanche later.
+\end{itemize}
+
+\subsection{Q12: How do you choose a TTL?}\label{q12-how-do-you-choose-a-ttl}
+
+\textbf{Model answer:} TTL = the \textbf{maximum staleness the business tolerates} for that data, not a gut number. Stock price \textasciitilde1 s (or don\textquotesingle t cache), inventory near-zero, not cached; product detail \textasciitilde5 min; avatar \textasciitilde1 hour; country list \textasciitilde1 day. \textbf{Always add jitter} (\(\pm\)10\%) to avoid avalanche, and combine TTL with \textbf{event-driven invalidation} for freshness-critical keys so you get immediacy \emph{and} a TTL backstop. Shorter TTL = fresher but lower hit ratio and more DB load; longer TTL = higher hit ratio but staler --- quantify both with the hit-ratio/load formulas.
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Caching is a correctness decision, not just performance.} Every cache adds a staleness window you must defend \emph{per use case}. A stale price can cause a mispriced trade; a stale avatar is harmless. Senior engineers tie TTL/invalidation to business tolerance, not convenience.
+\item
+  \textbf{Hit ratio is the lever --- and it\textquotesingle s an Amdahl\textquotesingle s-Law curve.} The jump from 90\(\rightarrow\)99\% matters far more than 0\(\rightarrow\)90\% because misses dominate effective latency and DB load as \texttt{h→1}. Model the access distribution (Zipf) before claiming a cache helps; uniform-random/low-reuse workloads barely benefit.
+\item
+  \textbf{The cache as source of truth is a trap.} Write-back can lose un-flushed data; depending on the cache for durability converts a perf incident into data loss. DB stays authoritative; cache is allowed to forget.
+\item
+  \textbf{Stampede protection must be designed in, not bolted on.} Single-flight, SWR, probabilistic early expiration, and Facebook leases each have trade-offs (latency vs staleness vs complexity). At CDN scale, an \textbf{origin shield} is the same idea.
+\item
+  \textbf{Multi-region invalidation is genuinely hard.} TTL guesses are fragile across regions; CDC/event streams and \textbf{versioned keys} (no timing race) are the robust answers. Quantify cross-region propagation (50--150 ms).
+\item
+  \textbf{L1 vs L2 trade-off.} An in-process L1 gives microsecond hits and shields the L2/DB from hot keys and L2 outages, but multiplies the \textbf{coherence} problem (every instance has its own copy) --- keep L1 TTLs short and broadcast invalidations.
+\item
+  \textbf{Observability is the early-warning system.} Track \textbf{hit ratio, eviction rate, p99, key cardinality, memory fragmentation.} A \emph{falling hit ratio} often precedes an incident (working set outgrew memory, or a scan is polluting LRU \(\rightarrow\) consider W-TinyLFU).
+\item
+  \textbf{Memory accounting \& fragmentation.} Redis memory \(\neq\) data size (jemalloc fragmentation, per-key overhead \textasciitilde50--90 bytes). Watch \texttt{mem\_fragmentation\_ratio}; huge numbers of tiny keys waste memory --- consider hashing/packing.
+\item
+  \textbf{Serialization cost is real.} A "fast" Redis cache can be dominated by JSON (de)serialization on the app side. Use compact formats (MessagePack/protobuf) and cache the \emph{deserialized} shape in L1.
+\end{itemize}
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{"Just add Redis"} --- no pattern, TTL, invalidation, or stampede story. The details are the whole answer.
+\item
+  \textbf{Updating the cache on write} instead of \textbf{deleting} the key --- introduces the writer-ordering stale race.
+\item
+  \textbf{Uniform TTLs} \(\rightarrow\) avalanche. Forgetting \textbf{jitter} is the single most common omission.
+\item
+  \textbf{No stampede protection} for hot keys --- assuming a TTL expiry is harmless when it\textquotesingle s a thundering herd.
+\item
+  \textbf{Ignoring penetration} --- not handling non-existent-key floods (negative cache + Bloom filter).
+\item
+  \textbf{Caching everything} --- low reuse \(\rightarrow\) near-zero hit ratio, wasted memory; cache the \emph{hot set}, prove it with the hit-ratio math.
+\item
+  \textbf{Treating the cache as the source of truth} --- write-back data loss; depending on it for correctness.
+\item
+  \textbf{Ignoring cache-down behavior} --- a good design degrades (falls through to DB with a circuit breaker), it doesn\textquotesingle t fail or melt the DB cold.
+\item
+  \textbf{Confusing \texttt{no-cache} with \texttt{no-store}} in HTTP --- one revalidates, the other never stores.
+\item
+  \textbf{Forgetting the cold-start avalanche} after a deploy/restart (0\% hit ratio \(\rightarrow\) DB takes everything) --- pre-warm.
+\item
+  \textbf{Over-\texttt{Vary}ing} HTTP responses (\texttt{Vary:\ User-Agent}) --- fragments the CDN cache, destroying hit ratio.
+\item
+  \textbf{Claiming Redlock gives correctness} --- without mentioning clock drift / GC-pause caveats and fencing tokens.
+\end{enumerate}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2358}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7642}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Connection
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{System Design} & The \#1 read-scaling tool; pairs with read replicas, CDNs, fan-out-on-write. "DB is the bottleneck \(\rightarrow\) add a cache" --- then the details decide your score. \\
+\rowcolor{zebra}
+\textbf{Databases (\hyperlink{section.08}{\textcolor{acc}{§08}})} & Buffer pool \emph{is} a cache; query/result caching; \textbf{CDC/binlog (WAL/logical replication)} drives invalidation; cache-aside complements read replicas. \\
+\textbf{Performance Engineering (\hyperlink{section.09}{\textcolor{acc}{§09}})} & The \textbf{latency ladder} is \emph{why} caching wins; hit-ratio math is Amdahl-style; cache locality (L1/L2/L3) is the hardware analog; stampede = thread-pool/DB saturation. \\
+\rowcolor{zebra}
+\textbf{Networks (\hyperlink{section.03}{\textcolor{acc}{§03}})} & \textbf{HTTP caching} (\texttt{ETag}, \texttt{Cache-Control}, 304), CDNs at the edge, DNS TTL caching. \\
+\textbf{Distributed Systems} & Cache coherence, multi-region invalidation, distributed locks (Redlock + fencing), consistency models (eventual, read-your-own-writes). \\
+\rowcolor{zebra}
+\textbf{Concurrency} & Single-flight/request coalescing = a per-key lock; Redis\textquotesingle s single-threaded atomicity; false sharing in CPU caches. \\
+\textbf{Data Structures} & LRU (hashmap + DLL), LFU (freq lists), Bloom/Cuckoo filters, Count-Min Sketch (W-TinyLFU), skip lists (Redis ZSet), HyperLogLog. \\
+\rowcolor{zebra}
+\textbf{API Design (\hyperlink{section.14}{\textcolor{acc}{§14}})} & \texttt{Cache-Control}/\texttt{ETag}, idempotency keys, conditional requests. \\
+\end{longtable}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{When you say "add a cache," immediately specify pattern + TTL + invalidation.} "Cache-aside on \texttt{product:\{id\}}, 5-min TTL with 10\% jitter, delete-on-write, single-flight on miss" --- that one sentence is the senior signal.
+\item
+  \textbf{Name a failure mode and its fix before being asked} --- stampede\(\rightarrow\)single-flight/SWR, avalanche\(\rightarrow\)jitter, penetration\(\rightarrow\)Bloom/negative-cache, hot-key\(\rightarrow\)L1/key-split.
+\item
+  \textbf{Always estimate the hit ratio} from the access pattern and convert it to \textbf{DB load reduction} ("96\% \(\rightarrow\) DB sees 8K of 200K QPS"). Numbers turn hand-waving into engineering.
+\item
+  \textbf{State the staleness window explicitly} and tie the TTL to business tolerance.
+\item
+  \textbf{Be explicit that the DB stays the source of truth} and the cache \textbf{degrades gracefully} (fall-through + circuit breaker), never causing data loss.
+\item
+  \textbf{Know the LRU O(1) implementation cold} (hashmap + DLL) and name \textbf{W-TinyLFU/Caffeine} as the production-grade answer.
+\item
+  \textbf{For Redis,} mention single-threaded atomicity, 16384 hash slots, RDB/AOF, and the \textbf{Redlock caveat + fencing token}.
+\item
+  \textbf{For the edge,} distinguish \texttt{max-age} vs \texttt{s-maxage}, \texttt{no-cache} vs \texttt{no-store}, and \texttt{ETag}\(\rightarrow\)304; mention purge-by-tag for CDN invalidation.
+\item
+  \textbf{Know when \emph{not} to cache} (strong consistency, low reuse, security-sensitive) --- naming it shows maturity.
+\item
+  \textbf{Use the latency ladder} to justify the cache quantitatively (RAM \textasciitilde100 ns vs DB \textasciitilde20 ms = \textasciitilde200,000\(\times\)).
+\end{enumerate}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+A \textbf{cache} trades freshness for speed, working because of \textbf{locality} (a hot minority of keys serves most traffic). Effectiveness = \textbf{hit ratio}: \texttt{T\_eff\ =\ h·t\_cache\ +\ (1−h)·t\_db}, and DB load = \texttt{(1−h)·QPS}. The 90\(\rightarrow\)99\% range matters most.
+
+\textbf{Patterns:} \textbf{cache-aside} (default --- read fills, write \emph{deletes}; resilient), \textbf{write-through} (sync, always fresh, slower writes), \textbf{write-back} (async, fast, data-loss risk), \textbf{write-around} (skip cache on write), \textbf{read-through} (cache lib loads on miss).
+
+\textbf{Eviction:} \textbf{LRU} (recency; O(1) hashmap+DLL), \textbf{LFU} (frequency; scan-resistant, needs aging), FIFO/MRU/Random, \textbf{ARC} and \textbf{W-TinyLFU} (Caffeine --- production-grade, scan-resistant). Redis eviction is \textbf{sampled/approximate}.
+
+\textbf{Invalidation:} \textbf{TTL + jitter} (backstop), \textbf{delete-on-write} (not update --- avoids writer-ordering race), \textbf{CDC/binlog} (cross-service coherence), \textbf{versioned keys} (cross-region, no timing race), \textbf{stale-while-revalidate} (zero-wait). Mind the cache-aside read-after-write race; bound it with TTL/leases/double-delete.
+
+\textbf{Failure modes (SPAH):} \textbf{Stampede} \(\rightarrow\) single-flight / SWR / probabilistic early expiry / leases; \textbf{Penetration} \(\rightarrow\) negative cache + Bloom filter (\textasciitilde10 bits/elem \(\rightarrow\) 1\% FP); \textbf{Avalanche} \(\rightarrow\) TTL jitter + warmup; \textbf{Hot key} \(\rightarrow\) L1 + key splitting/replication.
+
+\textbf{Redis:} single-threaded atomic commands, pipelining, RDB+AOF (\texttt{everysec}), replication/Sentinel, Cluster with \textbf{16384 hash slots} (\texttt{CRC16\ mod}), rich types (ZSet leaderboards, HLL, bitmaps), Redlock + \textbf{fencing tokens}. Memcached = simpler, multi-threaded, strings-only.
+
+\textbf{Edge/HTTP:} CDN edge caching + purge-by-tag; \texttt{Cache-Control} (\texttt{max-age}/\texttt{s-maxage}/\texttt{no-cache}\(\neq\)\texttt{no-store}/\texttt{private}/\texttt{public}/\texttt{immutable}), \texttt{ETag}+\texttt{If-None-Match}\(\rightarrow\)\textbf{304}, \texttt{Vary} (don\textquotesingle t over-vary), \texttt{Age}.
+
+\subsection{Key Numbers to Know}\label{key-numbers-to-know}
+
+\begin{itemize}
+\tightlist
+\item
+  RAM \textasciitilde100 ns vs Redis/LAN \textasciitilde0.3--0.5 ms vs DB \textasciitilde5--50 ms (cache is 100--1000\(\times\) faster than DB).
+\item
+  Hit ratio \(\rightarrow\) effective latency: 90\% \(\approx\) 8\(\times\) speedup; 99\% \(\approx\) 29\(\times\).
+\item
+  DB load = \texttt{(1−h)·QPS}: at h=0.96, 200K read QPS \(\rightarrow\) 8K DB QPS.
+\item
+  Bloom filter: \textasciitilde10 bits/element \(\rightarrow\) \textasciitilde1\% false positive; 100M IDs \(\approx\) 120 MB.
+\item
+  Redis: 16384 hash slots; \textasciitilde100K--1M ops/sec single thread; \texttt{everysec} AOF loses \(\leq\)1 s.
+\item
+  Cache line: 64 bytes (CPU caches).
+\end{itemize}
+
+\subsection{Cheat-Sheet Table}\label{cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2364}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7636}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-liner
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Cache-aside} & read fills, write \textbf{deletes} key (default, resilient) \\
+\rowcolor{zebra}
+\textbf{Write-through} & write cache+DB sync; always fresh, slower writes \\
+\textbf{Write-back} & write cache, async\(\rightarrow\)DB; fast, \textbf{risks loss} \\
+\rowcolor{zebra}
+\textbf{Write-around} & write DB, skip cache; avoids churn \\
+\textbf{Read-through} & cache library loads on miss \\
+\rowcolor{zebra}
+\textbf{LRU / LFU} & recency / frequency; LFU is scan-resistant \\
+\textbf{W-TinyLFU} & Caffeine; admission filter + windowed LRU (production) \\
+\rowcolor{zebra}
+\textbf{TTL + jitter} & expiry with \(\pm\)10\% randomization (dodge avalanche) \\
+\textbf{Delete \textgreater{} Update} & avoids the concurrent-writer stale race \\
+\rowcolor{zebra}
+\textbf{CDC / binlog} & event-driven invalidation; cross-service coherence \\
+\textbf{Versioned keys} & \texttt{:v7}; stale entries orphaned (cross-region) \\
+\rowcolor{zebra}
+\textbf{Stale-while-revalidate} & serve stale, refresh in background \\
+\textbf{Stampede} & hot-key mass miss \(\rightarrow\) single-flight / SWR / leases \\
+\rowcolor{zebra}
+\textbf{Penetration} & missing-key flood \(\rightarrow\) negative cache + Bloom filter \\
+\textbf{Avalanche} & mass expiry \(\rightarrow\) TTL jitter + warmup \\
+\rowcolor{zebra}
+\textbf{Hot key} & one key/one node \(\rightarrow\) L1 + key splitting \\
+\textbf{Hit ratio} & \texttt{hits/(hits+misses)}; the lever that matters \\
+\rowcolor{zebra}
+\textbf{Redis sharding} & 16384 slots, \texttt{CRC16(key)\ mod\ 16384} \\
+\textbf{Redis persistence} & RDB snapshot + AOF journal; \texttt{everysec} \\
+\rowcolor{zebra}
+\textbf{Redlock} & OK for efficiency; for correctness add \textbf{fencing token} \\
+\textbf{HTTP} & \texttt{no-cache}=revalidate, \texttt{no-store}=never; \texttt{ETag}\(\rightarrow\)304 \\
+\rowcolor{zebra}
+\textbf{Tiers} & browser \(\rightarrow\) CDN \(\rightarrow\) L1 \(\rightarrow\) Redis L2 \(\rightarrow\) DB buffer pool \(\rightarrow\) CPU L1/2/3 \\
+\end{longtable}
+
+\textbf{Golden rule:} Cache the \textbf{hot set} with a clear \textbf{pattern + TTL (jittered)}, \textbf{invalidate by deleting keys} (and CDC/versioning for coherence), \textbf{protect against stampede/penetration/avalanche/hot-key}, keep the \textbf{DB as source of truth}, and always state the \textbf{hit-ratio} and \textbf{staleness window} out loud.
+
+\emph{Last updated: 2026-06-17 \textbar{} Topic: Caching \textbar{} Level: FAANG Senior}
+
+\end{document}

@@ -1,0 +1,2765 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Linux \& the Command Line}
+\newcommand{\ThemeKicker}{Platform Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{334155}{64748b}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} Read top-to-bottom for deep, mechanism-level understanding. Jump to §Common Interview Questions + §Revision Cheat Sheet for last-minute revision. Linux fluency is \emph{assumed} for backend/infra/SRE roles --- "the server is slow, debug it" and "the disk is full" questions test it directly, and there is no faking it. Where this file references OS theory (scheduling, virtual memory, page cache) it points to \hyperlink{section.02}{\textcolor{acc}{§02}} Operating Systems; where it references resource methodology it points to \hyperlink{section.09}{\textcolor{acc}{§09}} Performance Engineering.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+\textbf{Linux} is a Unix-like, open-source operating system \textbf{kernel}. Combined with GNU userland (coreutils, bash, glibc) it forms the OS that powers the overwhelming majority of servers, containers, cloud instances, Android phones, and embedded devices. When an interviewer says "deploy this service" or "debug this box," they mean a Linux box.
+
+The system splits cleanly into two worlds:
+
+\setcodelang{}
+
+\begin{verbatim}
+┌──────────────────────────────────────────────────────────┐
+│                       USERLAND (ring 3)                   │
+│   bash, nginx, your service, ls, grep, python, ...        │
+│   Can only touch hardware by ASKING the kernel.           │
+└───────────────────────────┬──────────────────────────────┘
+                            │ system calls (open/read/write/fork/…)
+                            │ the ONLY legal door into the kernel
+┌───────────────────────────▼──────────────────────────────┐
+│                       KERNEL (ring 0)                     │
+│   scheduler, virtual memory, VFS, TCP/IP stack, drivers   │
+│   Full hardware access. Enforces isolation & permissions. │
+└───────────────────────────┬──────────────────────────────┘
+                            ▼
+              Hardware: CPU cores, RAM, disks, NICs
+\end{verbatim}
+
+The \textbf{shell} (bash, zsh, fish) is your text interface to this machine. Its philosophy, inherited from Unix in 1970:
+
+\begin{quote}
+\textbf{Do one thing well. Make everything text. Compose programs with pipes.}
+\end{quote}
+
+That is why a 10-character pipeline can answer a question that would take a custom program in most languages:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $1\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{sort} \KeywordTok{|} \FunctionTok{uniq} \AttributeTok{{-}c} \KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rn} \KeywordTok{|} \FunctionTok{head}
+\end{Highlighting}
+\end{Shaded}
+
+(top source IPs in a web access log --- five small tools, one line).
+
+\textbf{Two ideas underpin everything else} and you should be able to recite them:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{"Everything is a file."} Regular files, directories, devices (\texttt{/dev/sda}), pipes, sockets, and even kernel/process state (\texttt{/proc}, \texttt{/sys}) are exposed through the same file API (\texttt{open}, \texttt{read}, \texttt{write}, \texttt{close}). This is why \texttt{cat\ /proc/cpuinfo} works, why \texttt{echo\ 1\ \textgreater{}\ /sys/...} tunes the kernel, and why redirection works uniformly across all of them.
+\item
+  \textbf{The kernel/userland split.} Your program runs unprivileged. It cannot touch the disk, the network card, or another process\textquotesingle s memory directly --- it must make a \textbf{system call}, which traps into the kernel (ring 0), does the privileged work, and returns. This boundary is what makes a multi-tenant server safe.
+\end{enumerate}
+
+\section{Why It Exists}\label{why-it-exists}
+
+Hardware is finite and shared; programs are many and untrusting. Without an OS kernel + a usable interface on top:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Every program would speak raw hardware (device registers, interrupt controllers).
+\item
+  One buggy program could corrupt another\textquotesingle s memory or the whole machine.
+\item
+  There would be no way to \emph{script} operations --- no automation, no CI/CD, no reproducibility.
+\end{enumerate}
+
+The \textbf{kernel} solves multiplexing, isolation, abstraction, and protection (the deep theory lives in \hyperlink{section.02}{\textcolor{acc}{§02}} Operating Systems). The \textbf{CLI} exists on top because \textbf{text streams are the most composable, scriptable, automatable interface humans and machines have}. A GUI button does one fixed thing; a command can be:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Piped} into another command.
+\item
+  \textbf{Redirected} to a file or another machine.
+\item
+  \textbf{Looped} over thousands of inputs.
+\item
+  \textbf{Committed to git} as a script, reviewed, and re-run identically a year later.
+\end{itemize}
+
+\setcodelang{}
+
+\begin{verbatim}
+GUI:   click → one action, no record, not repeatable
+CLI:   type → composable, loggable, scriptable, diff-able, automatable
+\end{verbatim}
+
+\textbf{Interview takeaway:} \textbf{The CLI is not "the old way" --- it is the \emph{programmable} way. SRE and backend work is automation, and automation is text in, text out. That is why fluency is non-negotiable for these roles.}
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Everything runs on Linux.} Google\textquotesingle s Borg, Meta\textquotesingle s fleet, AWS EC2/Lambda hosts, Netflix\textquotesingle s Titus --- all Linux. Operating a service \emph{is} operating Linux.
+\item
+  \textbf{On-call is a CLI exercise.} "Latency spiked at 14:00, the box is unhealthy --- find out why" cannot be answered from a dashboard alone; eventually you SSH in and run \texttt{top}, \texttt{ss}, \texttt{dmesg}, \texttt{journalctl}, \texttt{strace}. Interviews simulate exactly this.
+\item
+  \textbf{The disk-full / OOM / D-state class of outages is universal.} These have nothing to do with your application logic and everything to do with understanding inodes, the OOM killer, and process states. They separate people who have operated systems from people who have only written code.
+\item
+  \textbf{Containers are Linux features.} Kubernetes resource limits = cgroups. Container isolation = namespaces. You cannot reason about a throttled or OOMKilled pod without knowing what those are.
+\item
+  \textbf{Automation glue is bash.} Build scripts, deploy hooks, log rotation, cron jobs, entrypoints --- all shell. A subtle \texttt{set\ -e} / quoting bug can take down a deploy.
+\end{itemize}
+
+Company-specific flavor of the same point:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2573}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7427}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What they\textquotesingle ll probe
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Google / SRE} & The USE method, load average meaning, \texttt{/proc}, structured triage, "non-abstract large system design" assumes you know what a process and a syscall cost. \\
+\rowcolor{zebra}
+\textbf{Amazon (AWS)} & EC2/Lambda hosts are Linux; "operational excellence" leadership principle \(\rightarrow\) disk full, OOM, log triage, graceful shutdown. \\
+\textbf{Meta} & Massive fleets; debugging at host level (\texttt{perf}, BPF), cgroup-based isolation, signal handling for clean restarts. \\
+\rowcolor{zebra}
+\textbf{Netflix} & Brendan Gregg literally works(ed) there --- USE method, flame graphs, \texttt{bcc}/BPF tools originate from this culture. \\
+\textbf{Uber / Databricks / infra-heavy} & Kernel tuning (\texttt{sysctl}, swappiness, ulimits), NUMA, epoll, JVM-on-Linux page-cache interactions. \\
+\end{longtable}
+
+\textbf{Interview takeaway:} \textbf{When you say "I\textquotesingle d cache it in memory" or "the service restarts cleanly," the interviewer wants to know you understand page cache, SIGTERM handling, and cgroup limits underneath. Linux is where systems-design abstractions become real.}
+
+\section{Core Concepts}\label{core-concepts}
+
+Quick mental model of the primitives, each expanded in its own section below.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1669}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4766}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3564}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-line definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Where it bites you
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Process} & A running program: PID, address space, file descriptors, credentials. & Leaks, zombies, runaway CPU. \\
+\rowcolor{zebra}
+\textbf{File descriptor (fd)} & Small integer handle to an open file/socket/pipe. \textbf{0=stdin, 1=stdout, 2=stderr}. & "Too many open files", deleted-but-open files. \\
+\textbf{Inode} & On-disk metadata record for a file (NOT its name). & \texttt{rm} is unlinking; disk full with no big files. \\
+\rowcolor{zebra}
+\textbf{Permissions} & rwx for owner/group/other, plus setuid/setgid/sticky. & \texttt{chmod\ 777}, privilege escalation. \\
+\textbf{Signal} & Async kernel-delivered notification (\texttt{SIGTERM}, \texttt{SIGKILL}). & Graceful shutdown, hung processes. \\
+\rowcolor{zebra}
+\textbf{Pipe / redirection} & Wiring fds between processes and files. & Log triage, lost stderr. \\
+\textbf{Environment variable} & \texttt{KEY=value} config inherited by children (\texttt{PATH}, \texttt{HOME}). & "command not found", config bugs. \\
+\rowcolor{zebra}
+\textbf{Exit code} & 0 = success, 1--255 = failure (\texttt{\$?}). & Script reliability, \texttt{\&\&}/` \\
+\textbf{Namespace / cgroup} & Kernel isolation + resource limits = containers. & OOMKilled / throttled pods. \\
+\end{longtable}
+
+\subsection{The system call: the door into the kernel}\label{the-system-call-the-door-into-the-kernel}
+
+When \texttt{bash} runs \texttt{cat\ file.txt}, an enormous amount happens, but the \emph{load-bearing} events are system calls:
+
+\setcodelang{}
+
+\begin{verbatim}
+fork()    → clone bash into a child process
+execve()  → child replaces itself with the `cat` program
+open()    → cat asks kernel for a file descriptor to file.txt
+read()    → cat asks kernel to copy bytes from disk into its buffer
+write()   → cat asks kernel to copy bytes to fd 1 (stdout)
+close()   → release the fd
+exit()    → child terminates; bash wait()s to collect status
+\end{verbatim}
+
+You can watch every one of these:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{strace} \AttributeTok{{-}f} \AttributeTok{{-}e}\NormalTok{ trace=open,openat,read,write,execve cat file.txt}
+\end{Highlighting}
+\end{Shaded}
+
+Each syscall is a \textbf{mode switch} (user\(\rightarrow\)kernel\(\rightarrow\)user), costing \textasciitilde100--1000 ns. This is why batching matters: one \texttt{write()} of 64 KB beats 64,000 \texttt{write()}s of 1 byte. (See \hyperlink{section.02}{\textcolor{acc}{§02}} for the privilege-ring mechanism.)
+
+\textbf{Interview takeaway:} \textbf{A program can do nothing privileged on its own --- every file, network, or memory-management action is a \texttt{syscall} that traps into the kernel. \texttt{strace} lets you see exactly which calls a process is making, which is gold for debugging hangs.}
+
+\section{Filesystem \& Inodes}\label{filesystem--inodes}
+
+\subsection{The Filesystem Hierarchy Standard (FHS)}\label{the-filesystem-hierarchy-standard-fhs}
+
+Linux puts things in predictable places. Know these cold --- they come up constantly in debugging.
+
+\setcodelang{}
+
+\begin{verbatim}
+/                 root of everything
+├── bin   usr/bin essential + general user binaries (ls, cat, bash)
+├── sbin sbin     system binaries (mount, ip, sysctl) — usually root
+├── etc            CONFIGURATION (text). /etc/passwd, /etc/fstab, /etc/nginx/
+├── var            VARIABLE data that changes at runtime:
+│   ├── log        ← /var/log/syslog, nginx/, journal/  (logs fill disks!)
+│   ├── lib        app state/databases
+│   ├── cache      caches
+│   └── spool      mail/print/cron queues
+├── tmp            world-writable scratch (cleared on reboot, sticky bit)
+├── home           user home directories
+├── root           root user's home (NOT /)
+├── proc           VIRTUAL fs: live kernel+process state (/proc/<pid>, /proc/meminfo)
+├── sys            VIRTUAL fs: device & kernel tunables (/sys/...)
+├── dev            device files (/dev/sda, /dev/null, /dev/urandom)
+├── opt            optional/third-party software
+├── mnt /media     mount points for external/temporary filesystems
+└── lib usr/lib    shared libraries (libc.so, etc.)
+\end{verbatim}
+
+\texttt{/proc} and \texttt{/sys} are \textbf{not on disk} --- they are kernel data structures presented as files. \texttt{cat\ /proc/loadavg} reads live numbers; \texttt{echo\ 10\ \textgreater{}\ /proc/sys/vm/swappiness} reconfigures the kernel. This is "everything is a file" taken to its logical extreme.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{ /proc/cpuinfo      }\CommentTok{\# CPU model, cores, flags}
+\FunctionTok{cat}\NormalTok{ /proc/meminfo      }\CommentTok{\# memory breakdown}
+\FunctionTok{cat}\NormalTok{ /proc/loadavg      }\CommentTok{\# 1/5/15{-}min load + running/total procs}
+\FunctionTok{cat}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/status }\CommentTok{\# per{-}process state, memory, threads}
+\FunctionTok{ls}\NormalTok{  /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/fd     }\CommentTok{\# every file descriptor the process holds}
+\FunctionTok{cat}\NormalTok{ /proc/mounts       }\CommentTok{\# what\textquotesingle{}s mounted where}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Inodes --- what a file \emph{really} is}{Inodes --- what a file really is}}\label{inodes--what-a-file-really-is}
+
+A filename is \textbf{not} the file. The file is an \textbf{inode} (index node): a fixed-size on-disk record holding \emph{all} the metadata and pointers to data blocks --- but \textbf{not the name}.
+
+\setcodelang{}
+
+\begin{verbatim}
+Inode #1048593
+┌─────────────────────────────────────────┐
+│ type:        regular file                │
+│ permissions: rw-r--r--  (mode bits)      │
+│ owner:       uid=1000  gid=1000          │
+│ size:        4096 bytes                   │
+│ timestamps:  atime / mtime / ctime        │
+│ LINK COUNT:  2   ← how many names point here
+│ block pointers → [data block, data block, indirect…] │
+└─────────────────────────────────────────┘
+        ▲                ▲
+        │                │  (filename lives in the DIRECTORY, not here)
+   directory entry   directory entry
+   "report.txt"        "backup.txt"
+\end{verbatim}
+
+A \textbf{directory} is just a special file mapping \emph{names \(\rightarrow\) inode numbers}:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ls} \AttributeTok{{-}i}                 \CommentTok{\# show inode number next to each name}
+\FunctionTok{df} \AttributeTok{{-}i}                 \CommentTok{\# show INODE usage per filesystem (separate from bytes!)}
+\FunctionTok{stat}\NormalTok{ report.txt       }\CommentTok{\# dump the full inode metadata}
+\end{Highlighting}
+\end{Shaded}
+
+Why this matters in three concrete ways:
+
+\subsubsection{\texorpdfstring{1. \texttt{rm} does not "delete" --- it \emph{unlinks}}{1. rm does not "delete" --- it unlinks}}\label{1-rm-does-not-delete--it-unlinks}
+
+The syscall behind \texttt{rm} is \texttt{unlink()}. It removes one \emph{name \(\rightarrow\) inode} mapping and decrements the inode\textquotesingle s \textbf{link count}. The data is only reclaimed when \textbf{both} of these reach zero:
+
+\begin{itemize}
+\tightlist
+\item
+  link count = 0 (no directory entry points to it), \textbf{and}
+\item
+  open-fd count = 0 (no running process has it open).
+\end{itemize}
+
+\subsubsection{2. A deleted-but-open file keeps its disk space (the classic gotcha)}\label{2-a-deleted-but-open-file-keeps-its-disk-space-the-classic-gotcha}
+
+\setcodelang{}
+
+\begin{verbatim}
+nginx has /var/log/app.log open (fd 7) and is writing to it.
+You run:  rm /var/log/app.log
+  → unlink removes the NAME. link count → 0.
+  → BUT nginx still holds fd 7. open count = 1.
+  → The inode + its data blocks STAY ALLOCATED.
+
+Result:  `df` still shows the disk 100% full.
+         `du` and `ls` show NO large file — the name is gone!
+\end{verbatim}
+
+This is the single most famous Linux debugging trap. You find it with \texttt{lsof}:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{lsof} \KeywordTok{|} \FunctionTok{grep}\NormalTok{ deleted          }\CommentTok{\# processes holding deleted files}
+\ExtensionTok{lsof} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{grep}\NormalTok{ deleted}
+\end{Highlighting}
+\end{Shaded}
+
+The fix is \textbf{not} another \texttt{rm} (the name is already gone) --- you must make the process release the fd: truncate it in place, signal the process to reopen its log (\texttt{logrotate} sends SIGHUP), or restart it.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{:} \OperatorTok{\textgreater{}}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/fd/7         }\CommentTok{\# truncate the still{-}open file via /proc — space freed instantly}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{\texorpdfstring{3. Disk full but no big files = out of \emph{inodes}}{3. Disk full but no big files = out of inodes}}\label{3-disk-full-but-no-big-files--out-of-inodes}
+
+A filesystem has a fixed number of inodes set at creation. Millions of tiny files (session files, cache fragments, mail) can exhaust inodes while bytes are nearly empty. \texttt{df\ -h} says there\textquotesingle s space; writes still fail with \texttt{No\ space\ left\ on\ device}. \texttt{df\ -i} reveals the truth.
+
+\subsection{Hard links vs soft (symbolic) links}\label{hard-links-vs-soft-symbolic-links}
+
+\setcodelang{}
+
+\begin{verbatim}
+HARD LINK                              SOFT LINK (symlink)
+──────────                             ───────────────────
+two NAMES → SAME inode                 a tiny file whose CONTENT is a PATH
+
+  a.txt ─┐                               link.txt (inode #99)
+         ├─► inode #42 ─► [data]            │ content = "/home/u/a.txt"
+  b.txt ─┘                                  ▼
+                                         a.txt (inode #42) ─► [data]
+
+ln a.txt b.txt        (hard)           ln -s a.txt link.txt   (soft)
+
+• same inode, same data               • different inode, points by NAME
+• link count = 2                      • dangles if target is deleted/moved
+• cannot cross filesystems            • CAN cross filesystems
+• cannot link directories             • CAN link directories
+• delete a.txt → b.txt still works    • delete a.txt → link.txt is broken
+\end{verbatim}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ln}\NormalTok{  target hardlink         }\CommentTok{\# hard link (rare, same fs)}
+\FunctionTok{ln} \AttributeTok{{-}s}\NormalTok{ target symlink        }\CommentTok{\# symbolic link (common: /usr/bin/python → python3)}
+\FunctionTok{ls} \AttributeTok{{-}l}                       \CommentTok{\# symlinks show  link {-}\textgreater{} target ;  hard links look like normal files}
+\FunctionTok{readlink} \AttributeTok{{-}f}\NormalTok{ symlink         }\CommentTok{\# resolve to final real path}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{A filename is a pointer to an inode, not the file itself. \texttt{rm} decrements a link count; data dies only when no name AND no open fd remain. That is why a deleted-but-open log file keeps the disk full --- and why \texttt{lsof\ \textbar{}\ grep\ deleted} is the cure.}
+
+\subsection{\texorpdfstring{Mounting, \texttt{df} vs \texttt{du}}{Mounting, df vs du}}\label{mounting-df-vs-du}
+
+A \textbf{mount} grafts a filesystem (on a device, a network share, or a virtual fs) onto a directory in the single unified tree. There are no drive letters; \texttt{/}, \texttt{/home}, \texttt{/var} may be separate disks.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mount}                       \CommentTok{\# list everything mounted}
+\FunctionTok{mount}\NormalTok{ /dev/sdb1 /mnt/data   }\CommentTok{\# attach a device at /mnt/data}
+\ExtensionTok{findmnt}                     \CommentTok{\# tree view of mounts}
+\FunctionTok{cat}\NormalTok{ /etc/fstab              }\CommentTok{\# mounts applied at boot}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{df} and \texttt{du} answer different questions and often disagree --- knowing why is an interview favorite:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2987}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2987}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4027}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{df} (disk free)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\texttt{du} (disk usage)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Source & Filesystem superblock counters & Walks the directory tree, sums file sizes \\
+\rowcolor{zebra}
+Speed & Instant & Slow on big trees \\
+Sees deleted-but-open files? & \textbf{Yes} (space still allocated) & \textbf{No} (no directory entry to walk) \\
+\rowcolor{zebra}
+Sees files under a mount point & Counts the underlying fs & Stops at mount boundary (\texttt{du\ -x}) \\
+Use for & "Is the disk full?" & "\emph{What} is using the space?" \\
+\end{longtable}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{df} \AttributeTok{{-}h}                       \CommentTok{\# human{-}readable free space per filesystem}
+\FunctionTok{df} \AttributeTok{{-}i}                       \CommentTok{\# INODE usage (the "full but no big files" case)}
+\FunctionTok{du} \AttributeTok{{-}sh}\NormalTok{ /var/}\PreprocessorTok{*} \KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rh}    \CommentTok{\# biggest directories under /var, largest first}
+\FunctionTok{du} \AttributeTok{{-}xh} \AttributeTok{{-}{-}max{-}depth}\OperatorTok{=}\NormalTok{1 / }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rh} \KeywordTok{|} \FunctionTok{head}   \CommentTok{\# top space hogs, staying on one fs}
+\end{Highlighting}
+\end{Shaded}
+
+When \texttt{df} says 100\% but \texttt{du\ -sh\ /*} adds up to far less \(\rightarrow\) suspect a \textbf{deleted-but-open file} (use \texttt{lsof\ \textbar{}\ grep\ deleted}) or a large file \textbf{hidden under a mount point} (something mounted over a directory that already had data).
+
+\section{Permissions \& Ownership}\label{permissions--ownership}
+
+\subsection{The rwx model}\label{the-rwx-model}
+
+Every file/directory has an \textbf{owner (user)}, a \textbf{group}, and a mode for three classes: owner, group, others. Each class gets read (r), write (w), execute (x).
+
+\setcodelang{}
+
+\begin{verbatim}
+$ ls -l report.sh
+-rwxr-xr--  1  alice  devs  812  Jun 17 10:00  report.sh
+│└┬┘└┬┘└┬┘     └─┬─┘  └┬─┘
+│ │  │  │        │     └─ group  = devs
+│ │  │  │        └─────── owner  = alice
+│ │  │  └─ others: r--   (read only)
+│ │  └──── group:  r-x   (read + execute)
+│ └─────── owner:  rwx   (read + write + execute)
+└───────── type:   - file | d dir | l symlink | c/b device | s socket | p fifo
+\end{verbatim}
+
+\textbf{What rwx means for files vs directories is different --- a classic gotcha:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0645}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2903}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6452}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Bit
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+On a \textbf{file}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+On a \textbf{directory}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{r} & read contents & \textbf{list} names inside (\texttt{ls}) \\
+\rowcolor{zebra}
+\texttt{w} & modify contents & \textbf{create/delete/rename} entries inside \\
+\texttt{x} & execute as program & \textbf{enter/traverse} (\texttt{cd}, access files within) \\
+\end{longtable}
+
+Consequence: you can have \texttt{r} on a directory but not \texttt{x} \(\rightarrow\) you can see the names (\texttt{ls}) but not access the files. You can have \texttt{x} but not \texttt{r} \(\rightarrow\) you can \texttt{cd} in and open a file \emph{if you know its exact name}, but \texttt{ls} fails. And \texttt{w} on a directory lets you \textbf{delete a file you don\textquotesingle t own} (deletion is a directory operation, not a file operation) --- the sticky bit exists to stop exactly this.
+
+\subsection{Octal notation}\label{octal-notation}
+
+\texttt{r=4,\ w=2,\ x=1}. Sum per class, three digits for owner/group/other.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rwx }\OperatorTok{=} \DecValTok{4}\OperatorTok{+}\DecValTok{2}\OperatorTok{+}\DecValTok{1} \OperatorTok{=} \DecValTok{7}\NormalTok{      r}\OperatorTok{{-}}\NormalTok{x }\OperatorTok{=} \DecValTok{4}\OperatorTok{+}\DecValTok{0}\OperatorTok{+}\DecValTok{1} \OperatorTok{=} \DecValTok{5}\NormalTok{      r}\OperatorTok{{-}{-}} \OperatorTok{=} \DecValTok{4} \OperatorTok{=} \DecValTok{4}
+\NormalTok{rw}\OperatorTok{{-}} \OperatorTok{=} \DecValTok{4}\OperatorTok{+}\DecValTok{2}   \OperatorTok{=} \DecValTok{6}\NormalTok{      r}\OperatorTok{{-}{-}} \OperatorTok{=} \DecValTok{4}     \OperatorTok{=} \DecValTok{4}      \OperatorTok{{-}{-}{-}} \OperatorTok{=} \DecValTok{0}
+
+\DecValTok{755} \OperatorTok{=}\NormalTok{ rwxr}\OperatorTok{{-}}\NormalTok{xr}\OperatorTok{{-}}\NormalTok{x   directories, executables (everyone can enter}\OperatorTok{/}\NormalTok{run, only owner writes)}
+\DecValTok{644} \OperatorTok{=}\NormalTok{ rw}\OperatorTok{{-}}\NormalTok{r}\OperatorTok{{-}{-}}\NormalTok{r}\OperatorTok{{-}{-}}\NormalTok{   regular files (owner writes, world reads)}
+\DecValTok{600} \OperatorTok{=}\NormalTok{ rw}\OperatorTok{{-}{-}{-}{-}{-}{-}{-}}\NormalTok{   secrets: SSH private keys, }\OperatorTok{\textasciitilde{}/}\NormalTok{.aws}\OperatorTok{/}\NormalTok{credentials (owner}\OperatorTok{{-}}\NormalTok{only)}
+\DecValTok{700} \OperatorTok{=}\NormalTok{ rwx}\OperatorTok{{-}{-}{-}{-}{-}{-}}\NormalTok{   private directories}
+\DecValTok{640} \OperatorTok{=}\NormalTok{ rw}\OperatorTok{{-}}\NormalTok{r}\OperatorTok{{-}{-}{-}{-}{-}}\NormalTok{   readable by owner }\OperatorTok{+}\NormalTok{ group, e.g. a config a service reads}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{chmod}\NormalTok{ 644 file              }\CommentTok{\# set absolute mode (octal)}
+\FunctionTok{chmod}\NormalTok{ u+x script.sh         }\CommentTok{\# symbolic: add execute for user}
+\FunctionTok{chmod}\NormalTok{ go{-}w file             }\CommentTok{\# remove write for group+other}
+\FunctionTok{chmod} \AttributeTok{{-}R}\NormalTok{ 755 dir/           }\CommentTok{\# recursive (careful!)}
+\FunctionTok{chown}\NormalTok{ alice:devs file       }\CommentTok{\# change owner AND group}
+\FunctionTok{chown} \AttributeTok{{-}R}\NormalTok{ www{-}data: /var/www }\CommentTok{\# recursive owner change, keep group}
+\FunctionTok{chgrp}\NormalTok{ devs file             }\CommentTok{\# change group only}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{quote}
+\texttt{ssh} will \textbf{refuse} to use a private key that is group/world-readable (\texttt{Permissions\ 0644\ ...\ are\ too\ open}). The fix is \texttt{chmod\ 600\ \textasciitilde{}/.ssh/id\_ed25519}. This is a real, frequent papercut.
+\end{quote}
+
+\subsection{Special bits: setuid, setgid, sticky}\label{special-bits-setuid-setgid-sticky}
+
+Beyond rwx there are three special bits, shown in the execute position:
+
+\setcodelang{}
+
+\begin{verbatim}
+-rwsr-xr-x   setuid  (s in OWNER  x slot): run as the FILE'S OWNER, not the caller
+-rwxr-sr-x   setgid  (s in GROUP  x slot): run as file's group / dir: new files inherit dir's group
+drwxrwxrwt   sticky  (t in OTHER  x slot): only the OWNER of a file may delete it (dirs)
+\end{verbatim}
+
+\subsubsection{setuid --- controlled privilege escalation}\label{setuid--controlled-privilege-escalation}
+
+The canonical example is \texttt{/usr/bin/passwd}:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{$}\NormalTok{ ls }\AttributeTok{{-}l}\NormalTok{ /usr/bin/passwd}
+\ExtensionTok{{-}rwsr{-}xr{-}x}\NormalTok{ 1 root root 68208 ... /usr/bin/passwd}
+   \ExtensionTok{\^{}}\NormalTok{ the }\StringTok{\textquotesingle{}s\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+A normal user must update \texttt{/etc/shadow} (root-owned, \texttt{600}) to change their password. They obviously can\textquotesingle t write to \texttt{/etc/shadow} directly. \texttt{passwd} is \textbf{owned by root with the setuid bit}, so when \emph{any} user runs it, the process runs with root\textquotesingle s effective UID for the duration --- allowing the controlled, narrow operation of updating the password. setuid is power; a setuid-root binary with a bug is a privilege-escalation hole, which is why they are audited heavily.
+
+\subsubsection{setgid --- shared collaboration directories}\label{setgid--shared-collaboration-directories}
+
+On a \textbf{directory}, setgid makes every new file inside inherit the \emph{directory\textquotesingle s} group rather than the creator\textquotesingle s primary group --- so a team sharing \texttt{/srv/project} (group \texttt{devs}, setgid set) all produce files owned by \texttt{devs}, keeping the directory collaborative.
+
+\subsubsection{\texorpdfstring{sticky bit --- the \texttt{/tmp} problem}{sticky bit --- the /tmp problem}}\label{sticky-bit--the-tmp-problem}
+
+\texttt{/tmp} is world-writable (\texttt{777}) so any user can create temp files. But \texttt{w} on a directory normally lets you delete \emph{anyone\textquotesingle s} files. Without protection, user A could delete user B\textquotesingle s temp files. The \textbf{sticky bit} (\texttt{t}) restricts deletion to the file\textquotesingle s owner:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{$}\NormalTok{ ls }\AttributeTok{{-}ld}\NormalTok{ /tmp}
+\ExtensionTok{drwxrwxrwt}\NormalTok{ 10 root root ... /tmp}
+        \ExtensionTok{\^{}}\NormalTok{ sticky bit: world{-}writable, but you can only delete YOUR OWN files}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{chmod}\NormalTok{ u+s binary    }\CommentTok{\# setuid}
+\FunctionTok{chmod}\NormalTok{ g+s dir       }\CommentTok{\# setgid}
+\FunctionTok{chmod}\NormalTok{ +t dir        }\CommentTok{\# sticky bit}
+\FunctionTok{chmod}\NormalTok{ 4755 binary   }\CommentTok{\# leading 4 = setuid (2 = setgid, 1 = sticky)}
+\FunctionTok{chmod}\NormalTok{ 1777 dir      }\CommentTok{\# leading 1 = sticky (like /tmp)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{umask --- the default-permission mask}\label{umask--the-default-permission-mask}
+
+New files don\textquotesingle t get \texttt{777}/\texttt{666}; the \textbf{umask} \emph{subtracts} permission bits at creation. Default umask \texttt{022} means "remove write for group and other":
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{file}\NormalTok{ base }\DecValTok{666}  \OperatorTok{{-}}\NormalTok{ umask }\DecValTok{0}\ErrorTok{22}  \OperatorTok{=} \DecValTok{644}\NormalTok{  (rw}\OperatorTok{{-}}\NormalTok{r}\OperatorTok{{-}{-}}\NormalTok{r}\OperatorTok{{-}{-}}\NormalTok{)}
+\BuiltInTok{dir}\NormalTok{  base }\DecValTok{777}  \OperatorTok{{-}}\NormalTok{ umask }\DecValTok{0}\ErrorTok{22}  \OperatorTok{=} \DecValTok{755}\NormalTok{  (rwxr}\OperatorTok{{-}}\NormalTok{xr}\OperatorTok{{-}}\NormalTok{x)}
+\end{Highlighting}
+\end{Shaded}
+
+A stricter \texttt{umask\ 077} makes everything owner-only by default (good for sensitive servers). \texttt{umask} is set in shell profiles / PAM and inherited by services.
+
+\subsection{ACLs --- when rwx isn\textquotesingle t enough}\label{acls--when-rwx-isnt-enough}
+
+The owner/group/other model can\textquotesingle t express "user bob and user carol both get write, but no one else." \textbf{POSIX ACLs} add per-user/per-group entries:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{setfacl} \AttributeTok{{-}m}\NormalTok{ u:bob:rw  report.txt    }\CommentTok{\# grant bob read+write}
+\ExtensionTok{getfacl}\NormalTok{ report.txt                 }\CommentTok{\# view all ACL entries}
+\CommentTok{\# ls {-}l shows a trailing \textquotesingle{}+\textquotesingle{} :  {-}rw{-}rw{-}r{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Least privilege \& why \texttt{chmod\ 777} is dangerous}{Least privilege \& why chmod 777 is dangerous}}\label{least-privilege--why-chmod-777-is-dangerous}
+
+\texttt{chmod\ 777} grants \textbf{everyone} read, write, and execute. On a web-served directory it means any user (or any compromised process, or an attacker who got a foothold) can overwrite your files, drop a malicious script, and execute it. It\textquotesingle s the classic "it works now!" fix that opens a barn door.
+
+\setcodelang{}
+
+\begin{verbatim}
+chmod 777 /var/www      ✗  anyone can plant & run code
+                        ✓  chown www-data:www-data /var/www && chmod 755
+                           (give the SERVICE ownership, grant the minimum)
+\end{verbatim}
+
+The principle is \textbf{least privilege}: grant the \emph{smallest} set of permissions that makes the task work. Run services as dedicated unprivileged users (\texttt{www-data}, \texttt{postgres}), \texttt{600} your secrets, avoid \texttt{sudo} for routine work, and never reach for \texttt{777}.
+
+\textbf{Interview takeaway:} \textbf{Octal \texttt{rwx} (755/644/600) plus three special bits: setuid (run as owner --- \texttt{passwd}), setgid (inherit dir group --- shared folders), sticky (\texttt{/tmp}: only delete your own). \texttt{chmod\ 777} is a security hole; the fix is correct \emph{ownership} plus least-privilege modes, not blanket permissions.}
+
+\section{Processes}\label{processes}
+
+\subsection{What a process is}\label{what-a-process-is}
+
+A \textbf{process} is an instance of a running program with: a \textbf{PID}, a \textbf{PPID} (parent\textquotesingle s PID), its own \textbf{virtual address space}, a table of \textbf{open file descriptors}, \textbf{credentials} (UID/GID), \textbf{environment variables}, signal dispositions, and a current working directory. (Address-space internals --- stack/heap/text, page tables --- are in \hyperlink{section.02}{\textcolor{acc}{§02}}.)
+
+\subsection{fork / exec / wait --- how processes are born}\label{fork--exec--wait--how-processes-are-born}
+
+Unix creates processes with a deliberately split pair:
+
+\setcodelang{}
+
+\begin{verbatim}
+fork()  ── duplicate the current process (copy-on-write). Returns:
+            • child:  0
+            • parent: child's PID
+            • -1:     error
+
+execve() ── REPLACE the current process image with a new program.
+            Same PID, but code/heap/stack are wiped and reloaded.
+
+wait()  ── parent blocks until child exits, COLLECTS its exit status
+            (this is "reaping" — prevents zombies).
+\end{verbatim}
+
+A shell running \texttt{ls} does exactly this:
+
+\setcodelang{C}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pid\_t pid }\OperatorTok{=}\NormalTok{ fork}\OperatorTok{();}          \CommentTok{// clone the shell}
+\ControlFlowTok{if} \OperatorTok{(}\NormalTok{pid }\OperatorTok{==} \DecValTok{0}\OperatorTok{)} \OperatorTok{\{}              \CommentTok{// in the child:}
+\NormalTok{    execve}\OperatorTok{(}\StringTok{"/bin/ls"}\OperatorTok{,} \OperatorTok{...);}  \CommentTok{// become \textasciigrave{}ls\textasciigrave{}}
+\OperatorTok{\}} \ControlFlowTok{else} \OperatorTok{\{}                     \CommentTok{// in the parent (the shell):}
+\NormalTok{    waitpid}\OperatorTok{(}\NormalTok{pid}\OperatorTok{,} \OperatorTok{\&}\NormalTok{status}\OperatorTok{,} \DecValTok{0}\OperatorTok{);}\CommentTok{// wait for ls, read its exit code → $?}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{fork()} is cheap because of \textbf{copy-on-write}: parent and child share physical pages marked read-only; a page is only copied when one side writes it. So \texttt{fork()} immediately followed by \texttt{execve()} (which throws the address space away anyway) barely copies anything. (See \hyperlink{section.02}{\textcolor{acc}{§02}} for CoW mechanics.)
+
+\subsection{PID, PPID, and the process tree}\label{pid-ppid-and-the-process-tree}
+
+Every process except \texttt{init}/\texttt{systemd} (PID 1) has a parent. The tree is observable:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pstree} \AttributeTok{{-}p}              \CommentTok{\# visualize the process tree}
+\FunctionTok{ps} \AttributeTok{{-}ef}                 \CommentTok{\# full listing with PPID column}
+\FunctionTok{ps} \AttributeTok{{-}o}\NormalTok{ pid,ppid,stat,comm }\AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+PID 1 (\texttt{systemd} or \texttt{init}) is special: it is the ancestor of everything and the \textbf{reaper of orphans} (below).
+
+\subsection{Process states: R, S, D, Z, T}\label{process-states-r-s-d-z-t}
+
+\texttt{ps}/\texttt{top} show a one-letter state. Knowing what each means --- especially \textbf{D} --- is a senior signal.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1754}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.6347}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1420}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+State
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Killable?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{R} & Running / Runnable & On CPU now, or in the run queue ready to go. & yes \\
+\rowcolor{zebra}
+\textbf{S} & Interruptible sleep & Waiting for an event (I/O, timer, lock); \emph{can} be woken by a signal. \textbf{Most idle processes.} & yes \\
+\textbf{D} & \textbf{Uninterruptible sleep} & Blocked in the kernel on I/O that can\textquotesingle t be interrupted (e.g. disk, NFS). \textbf{Does NOT respond to signals --- not even SIGKILL.} & \textbf{NO} \\
+\rowcolor{zebra}
+\textbf{Z} & Zombie & Exited, but parent hasn\textquotesingle t \texttt{wait()}ed. Holds only a PID-table slot. & already dead \\
+\textbf{T} & Stopped & Suspended by SIGSTOP / Ctrl-Z, or under a debugger. & resume w/ SIGCONT \\
+\end{longtable}
+
+\setcodelang{}
+
+\begin{verbatim}
+  R  ──────► running on a core (or runnable, waiting for a core)
+  S  ──────► "I'm waiting for the network / a timer" (normal, healthy)
+  D  ──────► "I'm stuck in the kernel waiting for disk/NFS" (DANGER if many)
+  Z  ──────► "I'm done but nobody collected my exit code"
+  T  ──────► "I've been paused"
+\end{verbatim}
+
+\textbf{The D-state lesson (huge in interviews):} a process in \texttt{D} is in \textbf{uninterruptible sleep} --- usually blocked on a disk or a hung NFS mount. \texttt{kill\ -9} \textbf{will not work}, because the process isn\textquotesingle t running any code that could receive the signal; it\textquotesingle s parked inside a kernel call. A pile of D-state processes is the classic fingerprint of an \textbf{I/O problem} (a dying disk, a stalled storage backend, an NFS server that went away). The fix is to address the I/O, not to kill harder.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ps} \AttributeTok{{-}eo}\NormalTok{ pid,state,wchan:25,comm }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}$2=="D"\textquotesingle{}}   \CommentTok{\# list D{-}state procs + what kernel fn they\textquotesingle{}re stuck in}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Zombies vs orphans --- and how to avoid them}\label{zombies-vs-orphans--and-how-to-avoid-them}
+
+These two are constantly confused; nail the distinction:
+
+\setcodelang{}
+
+\begin{verbatim}
+ZOMBIE (defunct)                       ORPHAN
+────────────────                       ──────
+child EXITED, parent ALIVE             parent DIED, child ALIVE
+but parent never wait()ed              child gets RE-PARENTED to PID 1
+                                       (systemd), which WILL wait() it
+
+  parent (busy, no wait)                 parent ✗ (gone)
+      │ (ignores)                            ╎ (broken link)
+      ▼                                      ▼
+  child <defunct>  ← stuck                 child → adopted by PID 1 → reaped cleanly
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  A \textbf{zombie} consumes only a process-table slot, but thousands of them can exhaust the PID space. They\textquotesingle re a \textbf{bug in the parent} (it isn\textquotesingle t reaping). Shows as \texttt{Z} / \texttt{\textless{}defunct\textgreater{}} in \texttt{ps}.
+\item
+  An \textbf{orphan} is \emph{not} a problem: PID 1 adopts it and reaps it when it exits.
+\item
+  \textbf{How to avoid zombies:} the parent must \texttt{wait()}/\texttt{waitpid()} on children --- typically by handling \texttt{SIGCHLD}, or in containers by running a proper init/\texttt{tini} as PID 1 (a naive PID-1 process that doesn\textquotesingle t reap leaves zombies piling up --- a real Docker footgun).
+\end{itemize}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ps}\NormalTok{ aux }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}$8 \textasciitilde{} /Z/\textquotesingle{}}     \CommentTok{\# list zombies (STAT column contains Z)}
+\CommentTok{\# You cannot kill a zombie (it\textquotesingle{}s already dead). You fix/kill/signal its PARENT to reap it.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Inspecting and prioritizing processes}\label{inspecting-and-prioritizing-processes}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ps}\NormalTok{ aux                         }\CommentTok{\# BSD{-}style: all processes, user{-}oriented columns}
+\FunctionTok{ps}\NormalTok{ aux }\AttributeTok{{-}{-}sort}\OperatorTok{=}\NormalTok{{-}\%cpu }\KeywordTok{|} \FunctionTok{head}     \CommentTok{\# top CPU consumers}
+\FunctionTok{ps}\NormalTok{ aux }\AttributeTok{{-}{-}sort}\OperatorTok{=}\NormalTok{{-}\%mem }\KeywordTok{|} \FunctionTok{head}     \CommentTok{\# top memory consumers}
+\FunctionTok{ps} \AttributeTok{{-}ef}                         \CommentTok{\# System{-}V style: shows PPID}
+\ExtensionTok{pgrep} \AttributeTok{{-}fl}\NormalTok{ nginx                }\CommentTok{\# find PIDs by name/cmdline}
+\FunctionTok{pidof}\NormalTok{ nginx                    }\CommentTok{\# PIDs of a program}
+\ExtensionTok{top}                            \CommentTok{\# live, interactive (press M=mem, P=cpu, 1=per{-}core)}
+\ExtensionTok{htop}                           \CommentTok{\# nicer top: tree view, scroll, kill by F9}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Niceness \& scheduling priority.} The \texttt{nice} value ranges from \texttt{-20} (highest priority, hoggish) to \texttt{+19} (lowest, "nicest"). It biases the CFS scheduler\textquotesingle s CPU share (see \hyperlink{section.02}{\textcolor{acc}{§02}} CFS):
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nice} \AttributeTok{{-}n}\NormalTok{ 10 ./batch\_job         }\CommentTok{\# start a job at lower priority (+10)}
+\ExtensionTok{renice} \AttributeTok{{-}n}\NormalTok{ 5 }\AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}           \CommentTok{\# change priority of a running process}
+\ExtensionTok{renice} \AttributeTok{{-}n} \AttributeTok{{-}5} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}          \CommentTok{\# raise priority (needs root for negatives)}
+\ExtensionTok{ionice} \AttributeTok{{-}c3} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}            \CommentTok{\# I/O priority: class 3 = idle (only when disk is free)}
+\end{Highlighting}
+\end{Shaded}
+
+Use \texttt{nice}/\texttt{ionice} to keep a heavy batch job (backup, reindex) from starving the latency-sensitive service sharing the box.
+
+\subsection{Process groups \& sessions (why Ctrl-C hits the whole pipeline)}\label{process-groups--sessions-why-ctrl-c-hits-the-whole-pipeline}
+
+Processes are organized into \textbf{process groups} (a pipeline is one group) and \textbf{sessions} (a login/terminal). The terminal has a \textbf{foreground process group}; keyboard signals (Ctrl-C \(\rightarrow\) SIGINT, Ctrl-Z \(\rightarrow\) SIGSTOP) go to \emph{all} members of that group. That is why \texttt{Ctrl-C} on \texttt{grep\ x\ huge.log\ \textbar{}\ sort\ \textbar{}\ uniq} kills the whole pipeline, not just one stage. A \textbf{session leader} owns the controlling terminal; daemons deliberately \texttt{setsid()} to detach from any terminal so they survive logout.
+
+\textbf{Interview takeaway:} \textbf{\texttt{fork}+\texttt{exec}+\texttt{wait} is how Unix spawns programs; CoW makes fork cheap. Memorize the states --- especially \texttt{D} (uninterruptible sleep = stuck on I/O, immune to \texttt{kill\ -9}, a sign of disk/NFS trouble) and \texttt{Z} (zombie = parent failed to reap). Zombies are a parent bug; orphans are harmless (PID 1 adopts them).}
+
+\section{Signals \& Job Control}\label{signals--job-control}
+
+\subsection{What signals are}\label{what-signals-are}
+
+A \textbf{signal} is an asynchronous notification delivered by the kernel to a process. It carries \emph{only a number} (no payload). The process can, for most signals, install a \textbf{handler}, \textbf{ignore} it, or take the \textbf{default action} (often "terminate"). Two signals can never be caught, blocked, or ignored: \texttt{SIGKILL} and \texttt{SIGSTOP}.
+
+\subsection{The signal table you must know}\label{the-signal-table-you-must-know}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1003}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1795}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1282}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.5362}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Signal
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\#
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Default action
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Catchable?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Typical use
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{SIGHUP} & 1 & terminate & & terminal closed; by convention "\textbf{reload config}" for daemons \\
+\rowcolor{zebra}
+\texttt{SIGINT} & 2 & terminate & & \textbf{Ctrl-C} --- interrupt foreground job \\
+\texttt{SIGQUIT} & 3 & term + core dump & & Ctrl-\textbackslash{} \\
+\rowcolor{zebra}
+\texttt{SIGKILL} & 9 & terminate & **** & \textbf{force kill --- uncatchable}, last resort \\
+\texttt{SIGSEGV} & 11 & term + core & & invalid memory access (segfault) \\
+\rowcolor{zebra}
+\texttt{SIGPIPE} & 13 & terminate & & wrote to a pipe with no reader (e.g. `\ldots{} \\
+\texttt{SIGTERM} & 15 & terminate & & \textbf{polite shutdown --- the default \texttt{kill}} \\
+\rowcolor{zebra}
+\texttt{SIGSTOP} & 19 & stop & **** & pause (uncatchable), like Ctrl-Z\textquotesingle s underlying stop \\
+\texttt{SIGCONT} & 18 & continue & & resume a stopped process \\
+\rowcolor{zebra}
+\texttt{SIGCHLD} & 17 & ignore & & sent to parent when a child stops/exits (reaping hook) \\
+\texttt{SIGUSR1/2} & 10/12 & terminate & & app-defined (nginx uses USR1 to reopen logs) \\
+\end{longtable}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{kill} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}             \CommentTok{\# sends SIGTERM (15) by default — graceful}
+\BuiltInTok{kill} \AttributeTok{{-}TERM} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}       \CommentTok{\# explicit graceful}
+\BuiltInTok{kill} \AttributeTok{{-}9} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}          \CommentTok{\# SIGKILL — forceful, no cleanup}
+\BuiltInTok{kill} \AttributeTok{{-}HUP} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}        \CommentTok{\# ask a daemon to reload config}
+\BuiltInTok{kill} \AttributeTok{{-}l}                \CommentTok{\# list all signal names/numbers}
+\ExtensionTok{pkill} \AttributeTok{{-}f} \StringTok{"python app"}  \CommentTok{\# kill by command{-}line pattern}
+\FunctionTok{killall}\NormalTok{ nginx          }\CommentTok{\# kill all processes named nginx}
+\BuiltInTok{kill} \AttributeTok{{-}STOP} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}} \KeywordTok{;} \BuiltInTok{kill} \AttributeTok{{-}CONT} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}   \CommentTok{\# pause then resume}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{SIGTERM vs SIGKILL --- the graceful-shutdown story}\label{sigterm-vs-sigkill--the-graceful-shutdown-story}
+
+This is \emph{the} signals interview question.
+
+\setcodelang{}
+
+\begin{verbatim}
+SIGTERM (15)                          SIGKILL (9)
+────────────                          ───────────
+"Please shut down."                   "Die NOW."
+Process CAN catch it →                Kernel destroys the process.
+  flush buffers                       No handler runs.
+  finish in-flight requests           No cleanup. No flush.
+  close DB connections                Possible data loss / corruption.
+  deregister from load balancer       Use ONLY when TERM is ignored
+  exit(0)                             or the process is wedged.
+\end{verbatim}
+
+The correct shutdown sequence (what \texttt{systemctl\ stop}, Kubernetes pod termination, and \texttt{docker\ stop} all do):
+
+\setcodelang{}
+
+\begin{verbatim}
+1. Send SIGTERM.
+2. Wait a grace period (e.g. 30s; K8s terminationGracePeriodSeconds).
+3. If still alive → send SIGKILL.
+\end{verbatim}
+
+A well-behaved service \textbf{traps SIGTERM}, stops accepting new work, drains in-flight requests, and exits cleanly --- enabling \textbf{zero-downtime deploys}. A service that ignores SIGTERM gets SIGKILLed mid-request \(\rightarrow\) dropped connections, half-written data.
+
+\subsection{\texorpdfstring{Catching signals in shell: \texttt{trap}}{Catching signals in shell: trap}}\label{catching-signals-in-shell-trap}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#!/usr/bin/env bash}
+\FunctionTok{cleanup()} \KeywordTok{\{}
+  \BuiltInTok{echo} \StringTok{"caught signal, cleaning up..."}
+  \FunctionTok{rm} \AttributeTok{{-}f}\NormalTok{ /tmp/work.}\VariableTok{$$}           \CommentTok{\# remove temp files}
+  \BuiltInTok{kill} \StringTok{"}\VariableTok{$child\_pid}\StringTok{"} \DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null}
+  \BuiltInTok{exit}\NormalTok{ 0}
+\KeywordTok{\}}
+\BuiltInTok{trap}\NormalTok{ cleanup SIGTERM SIGINT    }\CommentTok{\# run cleanup() on TERM or Ctrl{-}C}
+\BuiltInTok{trap} \StringTok{\textquotesingle{}echo "done"\textquotesingle{}}\NormalTok{ EXIT        }\CommentTok{\# EXIT pseudo{-}signal: always runs on script exit}
+
+\ExtensionTok{long\_running\_thing} \KeywordTok{\&}
+\VariableTok{child\_pid}\OperatorTok{=}\VariableTok{$!}
+\BuiltInTok{wait} \StringTok{"}\VariableTok{$child\_pid}\StringTok{"}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{trap} is how scripts and services implement graceful shutdown and guaranteed cleanup. You \textbf{cannot} trap \texttt{SIGKILL} or \texttt{SIGSTOP} --- that\textquotesingle s the whole point of them.
+
+\subsection{Graceful shutdown pattern (real services)}\label{graceful-shutdown-pattern-real-services}
+
+\setcodelang{}
+
+\begin{verbatim}
+SIGTERM received
+   │
+   ├─► stop accepting NEW connections (close listen socket / fail readiness probe)
+   ├─► let load balancer notice & route away (drain window)
+   ├─► finish IN-FLIGHT requests (bounded by a deadline)
+   ├─► flush buffers, commit, close DB/queue connections
+   └─► exit(0)
+   (if not done within grace period → orchestrator sends SIGKILL)
+\end{verbatim}
+
+\subsection{Job control (interactive shell)}\label{job-control-interactive-shell}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sleep}\NormalTok{ 1000 }\KeywordTok{\&}        \CommentTok{\# run in background; shell prints [1] 12345 (job\#, PID)}
+\BuiltInTok{jobs}                \CommentTok{\# list this shell\textquotesingle{}s jobs}
+\BuiltInTok{fg}\NormalTok{ \%1               }\CommentTok{\# bring job 1 to foreground}
+\BuiltInTok{bg}\NormalTok{ \%1               }\CommentTok{\# resume a stopped job in the background}
+\ExtensionTok{Ctrl{-}Z}              \CommentTok{\# SIGTSTP: suspend the foreground job (state T)}
+\ExtensionTok{Ctrl{-}C}              \CommentTok{\# SIGINT: interrupt the foreground job}
+\BuiltInTok{disown}\NormalTok{ \%1           }\CommentTok{\# detach job from shell (survives shell exit)}
+\FunctionTok{nohup}\NormalTok{ ./svc }\KeywordTok{\&}       \CommentTok{\# ignore SIGHUP so the job survives terminal close; logs → nohup.out}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{nohup}, \texttt{disown}, and \texttt{setsid} all solve "keep running after I log out." For real services you\textquotesingle d use \texttt{systemd} (next section) rather than \texttt{nohup}, but on a quick remote box \texttt{nohup\ ./script\ \&} is the pragmatic move. \texttt{tmux}/\texttt{screen} are the heavier, more robust answer (persistent sessions you can re-attach to).
+
+\textbf{Interview takeaway:} \textbf{SIGTERM is a catchable "please stop" that lets a process flush and drain --- the foundation of zero-downtime deploys; SIGKILL (\texttt{-9}) is uncatchable and skips all cleanup. Always TERM first, KILL only if it won\textquotesingle t die. \texttt{trap} implements graceful shutdown in scripts; you can never trap KILL or STOP.}
+
+\section{Pipes, Redirection \& File Descriptors}\label{pipes-redirection--file-descriptors}
+
+\subsection{The three standard file descriptors}\label{the-three-standard-file-descriptors}
+
+Every process starts with three open fds wired to the terminal:
+
+\setcodelang{}
+
+\begin{verbatim}
+fd 0  stdin    ◀── keyboard (or < file, or a pipe)
+fd 1  stdout   ──▶ terminal (or > file, or | next command)   ← normal output
+fd 2  stderr   ──▶ terminal (or 2> file)                      ← errors/diagnostics
+\end{verbatim}
+
+Keeping stdout and stderr \textbf{separate} is deliberate: you can pipe real output onward while still seeing (or separately logging) errors. Confusing the two is a top beginner mistake.
+
+\subsection{Redirection operators}\label{redirection-operators}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{cmd} \OperatorTok{\textgreater{}}\NormalTok{ file        }\CommentTok{\# stdout → file (TRUNCATE/overwrite)}
+\ExtensionTok{cmd} \OperatorTok{\textgreater{}\textgreater{}}\NormalTok{ file       }\CommentTok{\# stdout → file (APPEND)}
+\ExtensionTok{cmd} \DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{ err.log    }\CommentTok{\# stderr → file}
+\ExtensionTok{cmd} \OperatorTok{\textgreater{}}\NormalTok{ out }\DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{ err  }\CommentTok{\# stdout and stderr to SEPARATE files}
+\ExtensionTok{cmd} \OperatorTok{\textgreater{}}\NormalTok{ all }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1}    \CommentTok{\# BOTH to one file (order matters! see below)}
+\ExtensionTok{cmd} \OperatorTok{\&\textgreater{}}\NormalTok{ all        }\CommentTok{\# bash shorthand for "\textgreater{} all 2\textgreater{}\&1"}
+\ExtensionTok{cmd} \OperatorTok{\textless{}}\NormalTok{ input.txt   }\CommentTok{\# feed file as stdin}
+\ExtensionTok{cmd} \DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null   }\CommentTok{\# discard errors (the "black hole" device)}
+\ExtensionTok{cmd} \OperatorTok{\textgreater{}}\NormalTok{/dev/null }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1}  \CommentTok{\# discard everything}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{The \texttt{2\textgreater{}\&1} ordering gotcha --- a classic trick question:}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{cmd} \OperatorTok{\textgreater{}}\NormalTok{ file }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1}\NormalTok{      ✓  stdout → file, THEN stderr → }\StringTok{"wherever fd1 points"}\NormalTok{ = file. Both in file.}
+\ExtensionTok{cmd} \DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1} \OperatorTok{\textgreater{}}\NormalTok{ file      ✗  stderr → }\StringTok{"wherever fd1 points"}\NormalTok{ = TERMINAL }\ErrorTok{(}\ExtensionTok{copied}\NormalTok{ first!}\KeywordTok{)}\ExtensionTok{,}
+                        \ExtensionTok{THEN}\NormalTok{ stdout → file. stderr still goes to the terminal!}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{2\textgreater{}\&1} means "make fd 2 a duplicate of \emph{wherever fd 1 currently points}." It captures the target \emph{at that moment}, so the order of redirections matters.
+
+\subsection{Pipes}\label{pipes}
+
+A pipe \texttt{\textbar{}} connects the \textbf{stdout of the left} command to the \textbf{stdin of the right} command via an in-kernel buffer. Stages run \textbf{concurrently}, streaming --- not one-then-the-other:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ps}\NormalTok{ aux }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ nginx }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{print $2\}\textquotesingle{}}
+\CommentTok{\#  └ producer ┘   └ filter ┘   └ transform ┘   (all running at once)}
+\end{Highlighting}
+\end{Shaded}
+
+If a downstream stage exits early (e.g. \texttt{…\ \textbar{}\ head}), the upstream gets a \textbf{SIGPIPE} on its next write --- which is normal and expected.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{cmd} \KeywordTok{|} \FunctionTok{tee}\NormalTok{ out.log            }\CommentTok{\# SPLIT: write to file AND pass to next stage / screen}
+\ExtensionTok{cmd} \KeywordTok{|} \FunctionTok{tee} \AttributeTok{{-}a}\NormalTok{ out.log }\KeywordTok{|} \ExtensionTok{…}     \CommentTok{\# append variant}
+\ExtensionTok{cmd1} \KeywordTok{|} \FunctionTok{tee} \OperatorTok{\textgreater{}(}\ExtensionTok{cmd2}\OperatorTok{)} \KeywordTok{|} \ExtensionTok{cmd3}    \CommentTok{\# tee into a process substitution}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{tee} is the "T-junction": see output live \emph{and} save it.
+
+\subsection{Here-docs and here-strings}\label{here-docs-and-here-strings}
+
+Feed multi-line or inline text to a command\textquotesingle s stdin without a temp file:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat} \OperatorTok{\textless{}\textless{}EOF} \OperatorTok{\textgreater{}}\NormalTok{ config.yml          }\StringTok{\# HERE{-}DOC: everything until EOF becomes stdin}
+\StringTok{server: prod}
+\StringTok{port: 8080}
+\OperatorTok{EOF}
+
+\FunctionTok{cat} \OperatorTok{\textless{}\textless{}\textquotesingle{}EOF\textquotesingle{}}                     \StringTok{\# quoted \textquotesingle{}EOF\textquotesingle{} → NO variable expansion (literal $HOME)}
+\StringTok{literal $HOME stays $HOME}
+\OperatorTok{EOF}
+
+\FunctionTok{grep}\NormalTok{ foo }\OperatorTok{\textless{}\textless{}\textless{}} \StringTok{"}\VariableTok{$some\_variable}\StringTok{"}   \CommentTok{\# HERE{-}STRING: feed one string as stdin}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Process substitution \texttt{\textless{}(\ )} and \texttt{\textgreater{}(\ )}}{Process substitution \textless( ) and \textgreater( )}}\label{process-substitution---and--}
+
+Turns the \textbf{output of a command into a temporary file-like name} (\texttt{/dev/fd/63}), so commands that expect filenames can consume command output directly --- no temp files:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{diff} \OperatorTok{\textless{}(}\FunctionTok{sort}\NormalTok{ a.txt}\OperatorTok{)} \OperatorTok{\textless{}(}\FunctionTok{sort}\NormalTok{ b.txt}\OperatorTok{)}        \CommentTok{\# diff two sorted streams without temp files}
+\FunctionTok{comm} \AttributeTok{{-}13} \OperatorTok{\textless{}(}\FunctionTok{sort}\NormalTok{ old}\OperatorTok{)} \OperatorTok{\textless{}(}\FunctionTok{sort}\NormalTok{ new}\OperatorTok{)}        \CommentTok{\# lines only in \textasciigrave{}new\textasciigrave{}}
+\ControlFlowTok{while} \BuiltInTok{read} \VariableTok{line}\KeywordTok{;} \ControlFlowTok{do} \ExtensionTok{…}\KeywordTok{;} \ControlFlowTok{done} \OperatorTok{\textless{}} \OperatorTok{\textless{}(}\ExtensionTok{generate}\OperatorTok{)}   \CommentTok{\# avoid the subshell{-}loses{-}variables trap}
+\FunctionTok{tar}\NormalTok{ cf }\AttributeTok{{-}}\NormalTok{ dir/ }\KeywordTok{|} \FunctionTok{tee} \OperatorTok{\textgreater{}(}\FunctionTok{sha256sum}\OperatorTok{)}        \CommentTok{\# compute a checksum while streaming}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Named pipes (FIFOs)}\label{named-pipes-fifos}
+
+An \textbf{anonymous pipe} exists only between related processes for the life of the command. A \textbf{named pipe (FIFO)} is a persistent filesystem object that \emph{unrelated} processes can open by path --- the writer blocks until a reader connects, and vice versa.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkfifo}\NormalTok{ /tmp/mypipe}
+\CommentTok{\# terminal A:}
+\FunctionTok{gzip} \AttributeTok{{-}c} \OperatorTok{\textless{}}\NormalTok{ /tmp/mypipe }\OperatorTok{\textgreater{}}\NormalTok{ out.gz     }\CommentTok{\# reader: blocks waiting for data}
+\CommentTok{\# terminal B:}
+\FunctionTok{cat}\NormalTok{ big.log }\OperatorTok{\textgreater{}}\NormalTok{ /tmp/mypipe          }\CommentTok{\# writer: streams into the pipe}
+\FunctionTok{ls} \AttributeTok{{-}l}\NormalTok{ /tmp/mypipe                  }\CommentTok{\# shows type \textquotesingle{}p\textquotesingle{}  (prwxr{-}xr{-}x)}
+\end{Highlighting}
+\end{Shaded}
+
+FIFOs are great for decoupling a producer and consumer on one host without a temp file.
+
+\textbf{Interview takeaway:} \textbf{fd 0/1/2 = stdin/stdout/stderr. \texttt{\textgreater{}} overwrites, \texttt{\textgreater{}\textgreater{}} appends, \texttt{2\textgreater{}} captures errors, and \texttt{2\textgreater{}\&1} duplicates fd2 onto \emph{wherever fd1 currently points} --- so order matters (\texttt{\textgreater{}\ file\ 2\textgreater{}\&1} works, \texttt{2\textgreater{}\&1\ \textgreater{}\ file} doesn\textquotesingle t). Pipes stream concurrently; \texttt{tee} splits; \texttt{\textless{}()} turns command output into a filename; FIFOs let unrelated processes connect.}
+
+\section{Text Processing (grep/sed/awk)}\label{text-processing-grepsedawk}
+
+The Unix text trio plus glue tools. Log triage and ad-hoc data wrangling lean on these constantly.
+
+\subsection{grep --- find lines matching a pattern}\label{grep--find-lines-matching-a-pattern}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{grep} \StringTok{"ERROR"}\NormalTok{ app.log              }\CommentTok{\# lines containing ERROR}
+\FunctionTok{grep} \AttributeTok{{-}i} \StringTok{"error"}\NormalTok{ app.log           }\CommentTok{\# case{-}insensitive}
+\FunctionTok{grep} \AttributeTok{{-}r} \StringTok{"TODO"}\NormalTok{ src/               }\CommentTok{\# recursive through a directory}
+\FunctionTok{grep} \AttributeTok{{-}rn} \StringTok{"TODO"}\NormalTok{ src/              }\CommentTok{\# + line numbers}
+\FunctionTok{grep} \AttributeTok{{-}v} \StringTok{"DEBUG"}\NormalTok{ app.log           }\CommentTok{\# INVERT: lines NOT matching (drop noise)}
+\FunctionTok{grep} \AttributeTok{{-}c} \StringTok{"ERROR"}\NormalTok{ app.log           }\CommentTok{\# COUNT matching lines}
+\FunctionTok{grep} \AttributeTok{{-}o} \StringTok{"[0{-}9]\textbackslash{}\{3\textbackslash{}\}"}\NormalTok{ file         }\CommentTok{\# print only the MATCHED part, not whole line}
+\FunctionTok{grep} \AttributeTok{{-}E} \StringTok{"404|500|503"}\NormalTok{ access.log  }\CommentTok{\# extended regex (alternation without backslashes)}
+\FunctionTok{grep} \AttributeTok{{-}A3} \AttributeTok{{-}B1} \StringTok{"panic"}\NormalTok{ app.log      }\CommentTok{\# 3 lines After, 1 Before each match (context)}
+\FunctionTok{grep} \AttributeTok{{-}w} \StringTok{"id"}\NormalTok{ file                 }\CommentTok{\# whole{-}word match (not "idle", "void")}
+\FunctionTok{grep} \AttributeTok{{-}l} \StringTok{"needle"} \PreprocessorTok{*}\NormalTok{.log            }\CommentTok{\# just the FILENAMES that contain a match}
+\FunctionTok{zgrep} \StringTok{"ERROR"}\NormalTok{ app.log.gz          }\CommentTok{\# grep inside gzipped logs without decompressing}
+\end{Highlighting}
+\end{Shaded}
+
+Regex essentials: \texttt{\^{}} start, \texttt{\$} end, \texttt{.} any char, \texttt{*} zero-or-more, \texttt{{[}abc{]}} class, \texttt{{[}\^{}abc{]}} negated, \texttt{\textbackslash{}d}-ish via \texttt{{[}0-9{]}}, \texttt{-E} enables \texttt{+\ ?\ \textbar{}\ (\ )} without backslashes.
+
+\subsection{sed --- stream editor (substitute, delete, transform)}\label{sed--stream-editor-substitute-delete-transform}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sed} \StringTok{\textquotesingle{}s/foo/bar/\textquotesingle{}}\NormalTok{ file             }\CommentTok{\# replace FIRST foo per line}
+\FunctionTok{sed} \StringTok{\textquotesingle{}s/foo/bar/g\textquotesingle{}}\NormalTok{ file            }\CommentTok{\# replace ALL (global)}
+\FunctionTok{sed} \StringTok{\textquotesingle{}s/foo/bar/gi\textquotesingle{}}\NormalTok{ file           }\CommentTok{\# global + case{-}insensitive}
+\FunctionTok{sed} \AttributeTok{{-}i} \StringTok{\textquotesingle{}s/foo/bar/g\textquotesingle{}}\NormalTok{ file         }\CommentTok{\# EDIT IN PLACE (modifies the file!)}
+\FunctionTok{sed} \AttributeTok{{-}i.bak} \StringTok{\textquotesingle{}s/foo/bar/g\textquotesingle{}}\NormalTok{ file     }\CommentTok{\# in place, keep a .bak backup (safer)}
+\FunctionTok{sed} \AttributeTok{{-}n} \StringTok{\textquotesingle{}10,20p\textquotesingle{}}\NormalTok{ file              }\CommentTok{\# PRINT only lines 10–20 ({-}n suppresses default print)}
+\FunctionTok{sed} \StringTok{\textquotesingle{}/\^{}\#/d\textquotesingle{}}\NormalTok{ file                  }\CommentTok{\# DELETE comment lines}
+\FunctionTok{sed} \StringTok{\textquotesingle{}/\^{}$/d\textquotesingle{}}\NormalTok{ file                  }\CommentTok{\# delete blank lines}
+\FunctionTok{sed} \StringTok{\textquotesingle{}s/[0{-}9]\textbackslash{}+/N/g\textquotesingle{}}\NormalTok{ file          }\CommentTok{\# replace runs of digits with N}
+\FunctionTok{sed} \StringTok{\textquotesingle{}s\#/old/path\#/new/path\#g\textquotesingle{}}\NormalTok{ f   }\CommentTok{\# use \# as delimiter when text has slashes}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{sed\ -i} is destructive --- always test without \texttt{-i} first, or use \texttt{-i.bak}.
+
+\subsection{awk --- field-aware processing \& aggregation}\label{awk--field-aware-processing--aggregation}
+
+\texttt{awk} splits each line into fields (\texttt{\$1}, \texttt{\$2}, \ldots{} \texttt{\$NF} = last field; \texttt{\$0} = whole line) and runs a \texttt{pattern\ \{\ action\ \}} program over every line. It has variables, arrays, arithmetic, and \texttt{BEGIN}/\texttt{END} blocks --- a tiny language.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $1\}\textquotesingle{}}\NormalTok{ access.log               }\CommentTok{\# first field of every line}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $1, $7\}\textquotesingle{}}\NormalTok{ access.log           }\CommentTok{\# IP and URL (default whitespace split)}
+\FunctionTok{awk} \AttributeTok{{-}F:} \StringTok{\textquotesingle{}\{print $1\}\textquotesingle{}}\NormalTok{ /etc/passwd          }\CommentTok{\# field separator = \textquotesingle{}:\textquotesingle{} → usernames}
+\FunctionTok{awk} \StringTok{\textquotesingle{}$9 == 500\textquotesingle{}}\NormalTok{ access.log                }\CommentTok{\# lines where 9th field equals 500}
+\FunctionTok{awk} \StringTok{\textquotesingle{}$9 \textgreater{}= 400 \{print $7\}\textquotesingle{}}\NormalTok{ access.log     }\CommentTok{\# URLs with status \textgreater{}= 400}
+\FunctionTok{awk} \StringTok{\textquotesingle{}NR==1\{next\} \{sum+=$3\} END\{print sum\}\textquotesingle{}}    \CommentTok{\# skip header, sum column 3, print total}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{c[$1]++\} END\{for(k in c) print c[k], k\}\textquotesingle{}}  \CommentTok{\# COUNT occurrences of field 1 (a histogram)}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{s+=$NF; n++\} END\{print s/n\}\textquotesingle{}}        \CommentTok{\# average of the last field}
+\FunctionTok{awk} \StringTok{\textquotesingle{}length($0) \textgreater{} 200\textquotesingle{}}\NormalTok{ file               }\CommentTok{\# lines longer than 200 chars}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{BEGIN\ \{\ \}\ /\ \{\ per-line\ \}\ /\ END\ \{\ \}} structure is the awk superpower: initialize, accumulate per line, report at the end.
+
+\subsection{The glue tools}\label{the-glue-tools}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cut} \AttributeTok{{-}d,} \AttributeTok{{-}f1,3}\NormalTok{ data.csv         }\CommentTok{\# columns 1 and 3, comma{-}delimited}
+\FunctionTok{sort}                           \CommentTok{\# lexical sort}
+\FunctionTok{sort} \AttributeTok{{-}n}                        \CommentTok{\# NUMERIC sort}
+\FunctionTok{sort} \AttributeTok{{-}rn}                       \CommentTok{\# numeric, reverse (largest first)}
+\FunctionTok{sort} \AttributeTok{{-}k2} \AttributeTok{{-}t,}                   \CommentTok{\# sort by 2nd comma{-}separated key}
+\FunctionTok{uniq} \AttributeTok{{-}c}                        \CommentTok{\# collapse ADJACENT duplicates, prefix with count (needs sort first!)}
+\FunctionTok{uniq} \AttributeTok{{-}d}                        \CommentTok{\# only show duplicated lines}
+\FunctionTok{tr} \StringTok{\textquotesingle{}a{-}z\textquotesingle{}} \StringTok{\textquotesingle{}A{-}Z\textquotesingle{}}                 \CommentTok{\# translate/transliterate chars (upcase)}
+\FunctionTok{tr} \AttributeTok{{-}d} \StringTok{\textquotesingle{}\textbackslash{}r\textquotesingle{}}                     \CommentTok{\# delete carriage returns (fix CRLF)}
+\FunctionTok{tr} \AttributeTok{{-}s} \StringTok{\textquotesingle{} \textquotesingle{}}                      \CommentTok{\# squeeze repeated spaces into one}
+\FunctionTok{wc} \AttributeTok{{-}l}                          \CommentTok{\# count lines  ({-}w words, {-}c bytes)}
+\FunctionTok{head} \AttributeTok{{-}n}\NormalTok{ 20  /  tail }\AttributeTok{{-}n}\NormalTok{ 20      }\CommentTok{\# first / last 20 lines}
+\FunctionTok{tail} \AttributeTok{{-}f}\NormalTok{ app.log                }\CommentTok{\# FOLLOW a growing log live}
+\FunctionTok{tail} \AttributeTok{{-}F}\NormalTok{ app.log                }\CommentTok{\# follow even across log rotation}
+\FunctionTok{xargs}                          \CommentTok{\# turn stdin into ARGUMENTS for another command}
+\FunctionTok{find}\NormalTok{ . }\AttributeTok{{-}name} \StringTok{\textquotesingle{}*.log\textquotesingle{}} \AttributeTok{{-}mtime}\NormalTok{ +7 }\CommentTok{\# files matching name, modified \textgreater{}7 days ago}
+\ExtensionTok{jq} \StringTok{\textquotesingle{}.items[].name\textquotesingle{}}             \CommentTok{\# parse/query JSON (essential for API/k8s output)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{uniq} only collapses \textbf{adjacent} duplicates --- that\textquotesingle s why \texttt{sort\ \textbar{}\ uniq\ -c} is the idiom (sort brings duplicates together, \texttt{uniq\ -c} counts them). \texttt{xargs} is the bridge between "list of things" and "command that takes args":
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{find}\NormalTok{ . }\AttributeTok{{-}name} \StringTok{\textquotesingle{}*.tmp\textquotesingle{}} \KeywordTok{|} \FunctionTok{xargs}\NormalTok{ rm          }\CommentTok{\# delete all .tmp files}
+\FunctionTok{find}\NormalTok{ . }\AttributeTok{{-}name} \StringTok{\textquotesingle{}*.tmp\textquotesingle{}} \AttributeTok{{-}print0} \KeywordTok{|} \FunctionTok{xargs} \AttributeTok{{-}0}\NormalTok{ rm   }\CommentTok{\# {-}print0/{-}0: safe with spaces/newlines in names}
+\BuiltInTok{echo} \StringTok{"1 2 3"} \KeywordTok{|} \FunctionTok{xargs} \AttributeTok{{-}n1}\NormalTok{ echo            }\CommentTok{\# one arg per invocation}
+\FunctionTok{cat}\NormalTok{ urls.txt }\KeywordTok{|} \FunctionTok{xargs} \AttributeTok{{-}P8} \AttributeTok{{-}n1}\NormalTok{ curl }\AttributeTok{{-}sO}    \CommentTok{\# 8 PARALLEL downloads}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Real log-analysis one-liners (the money shots)}\label{real-log-analysis-one-liners-the-money-shots}
+
+These are exactly what "analyze this log from the CLI" interview prompts want:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Top 10 source IPs hitting an access log}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $1\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{sort} \KeywordTok{|} \FunctionTok{uniq} \AttributeTok{{-}c} \KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rn} \KeywordTok{|} \FunctionTok{head}
+
+\CommentTok{\# Count requests by HTTP status code (field 9 in combined log format)}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $9\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{sort} \KeywordTok{|} \FunctionTok{uniq} \AttributeTok{{-}n} \KeywordTok{|} \FunctionTok{uniq} \AttributeTok{{-}c} \KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rn}
+
+\CommentTok{\# Just the 5xx errors, newest, with the URL}
+\FunctionTok{awk} \StringTok{\textquotesingle{}$9 \textasciitilde{} /\^{}5/ \{print $4, $7, $9\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}20}
+
+\CommentTok{\# Requests per minute (timestamp in field 4 like [17/Jun/2026:14:23:…])}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print substr($4,2,17)\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{uniq} \AttributeTok{{-}c}
+
+\CommentTok{\# Top 10 URLs by request volume}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $7\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{sort} \KeywordTok{|} \FunctionTok{uniq} \AttributeTok{{-}c} \KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rn} \KeywordTok{|} \FunctionTok{head}
+
+\CommentTok{\# Total bytes transferred (field 10), human number}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{sum+=$10\} END\{print sum/1024/1024 " MB"\}\textquotesingle{}}\NormalTok{ access.log}
+
+\CommentTok{\# Error count in the last hour from a syslog{-}style app log}
+\FunctionTok{grep} \StringTok{"}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +}\StringTok{\textquotesingle{}\%Y{-}\%m{-}\%dT\%H\textquotesingle{}}\VariableTok{)}\StringTok{"}\NormalTok{ app.log }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}c}\NormalTok{ ERROR}
+
+\CommentTok{\# Approximate p99 of a numeric latency column (field $11), in ms}
+\FunctionTok{awk} \StringTok{\textquotesingle{}\{print $11\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}n} \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{a[NR]=$1\} END\{print a[int(NR*0.99)]\}\textquotesingle{}}
+
+\CommentTok{\# Unique users who hit a 500 (dedupe IPs among 500s)}
+\FunctionTok{awk} \StringTok{\textquotesingle{}$9==500 \{print $1\}\textquotesingle{}}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}u} \KeywordTok{|} \FunctionTok{wc} \AttributeTok{{-}l}
+
+\CommentTok{\# Slowest 10 requests (sort by latency field, show URL)}
+\FunctionTok{sort} \AttributeTok{{-}k11} \AttributeTok{{-}rn}\NormalTok{ access.log }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{print $11, $7\}\textquotesingle{}} \KeywordTok{|} \FunctionTok{head}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway:} \textbf{\texttt{grep} filters lines, \texttt{sed} edits streams (\texttt{-i} = in place, destructive), \texttt{awk} does field math and aggregation (\texttt{\{count{[}\$1{]}++\}\ END\{...\}}). The workhorse pipeline \texttt{…\ \textbar{}\ sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn\ \textbar{}\ head} answers "what are the most common X" --- top IPs, top errors, top URLs. Be able to write it without hesitating.}
+
+\section{Performance Debugging (the USE method)}\label{performance-debugging-the-use-method}
+
+When a box is unhealthy, \textbf{don\textquotesingle t guess --- measure, methodically.} The framework is Brendan Gregg\textquotesingle s \textbf{USE method}: for \emph{every resource}, check \textbf{U}tilization, \textbf{S}aturation, \textbf{E}rrors. (\hyperlink{section.09}{\textcolor{acc}{§09}} covers USE/RED theory; this section is the Linux \emph{tooling} layer.)
+
+\setcodelang{}
+
+\begin{verbatim}
+USE = Utilization + Saturation + Errors,  applied to each resource:
+
+Resource │ Utilization        │ Saturation               │ Errors
+─────────┼────────────────────┼──────────────────────────┼──────────────────
+CPU      │ mpstat, top  (%)   │ vmstat 'r' (run-queue)   │ dmesg (MCE)
+Memory   │ free -h            │ vmstat si/so (swapping)  │ dmesg (ECC/OOM)
+Disk     │ iostat %util       │ iostat await/aqu-sz      │ smartctl, dmesg
+Network  │ sar -n DEV (%)     │ ss -s, dropped/overruns  │ netstat -s, ip -s link
+\end{verbatim}
+
+\subsection{Load average --- the most misunderstood number}\label{load-average--the-most-misunderstood-number}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{$}\NormalTok{ uptime}
+ \ExtensionTok{14:23:01}\NormalTok{ up 12 days,  3:42,  2 users,  load average: 4.18, 3.04, 2.91}
+                                                       \ExtensionTok{└1m─┘}\NormalTok{ └5m─┘ └15m┘}
+\end{Highlighting}
+\end{Shaded}
+
+Load average is the \textbf{number of processes in state R (running/runnable) OR D (uninterruptible sleep)}, averaged over 1/5/15 minutes. Two crucial consequences:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Compare to core count.} On an 8-core box, load 4 = \textasciitilde50\% busy (fine); on a 2-core box, load 4 means tasks are queuing (twice the work the CPU can do at once). \texttt{load\ \textgreater{}\ cores} is \emph{not always} a problem and \texttt{load\ \textless{}\ cores} is \emph{not always} healthy.
+\item
+  \textbf{Load counts D-state (I/O wait), not just CPU.} A box can show \textbf{load 20 with the CPU 95\% idle} because 20 processes are all stuck in \texttt{D} waiting on a dying disk. High load \(\neq\) high CPU. This is the single most important load-average insight.
+\end{enumerate}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nproc}                 \CommentTok{\# number of cores (the yardstick for load)}
+\FunctionTok{cat}\NormalTok{ /proc/loadavg     }\CommentTok{\# raw: 4.18 3.04 2.91 5/812 99123  (running/total, last PID)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{The tools, and what each \emph{reveals}}{The tools, and what each reveals}}\label{the-tools-and-what-each-reveals}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# ── CPU ──}
+\ExtensionTok{top}                  \CommentTok{\# live per{-}process CPU/mem; press 1 = per{-}core, look at \%us \%sy \%id \%wa \%st}
+\ExtensionTok{htop}                 \CommentTok{\# friendlier top (tree, scroll, F9 kill)}
+\ExtensionTok{mpstat} \AttributeTok{{-}P}\NormalTok{ ALL 1      }\CommentTok{\# per{-}CORE utilization → spot a single saturated core (single{-}threaded bottleneck)}
+\FunctionTok{vmstat}\NormalTok{ 1             }\CommentTok{\# \textquotesingle{}r\textquotesingle{}=run{-}queue (CPU saturation), \textquotesingle{}us/sy/id/wa\textquotesingle{}, \textquotesingle{}si/so\textquotesingle{} (swap) — one{-}stop}
+\ExtensionTok{pidstat}\NormalTok{ 1            }\CommentTok{\# per{-}process CPU/IO/mem over time}
+
+\CommentTok{\# top\textquotesingle{}s CPU line decoded:}
+\CommentTok{\#   \%us user   \%sy kernel/system   \%id idle   \%wa I/O{-}WAIT (key!)   \%st stolen (noisy neighbor/VM)}
+
+\CommentTok{\# ── Memory ──}
+\FunctionTok{free} \AttributeTok{{-}h}              \CommentTok{\# used / free / available / swap. \textquotesingle{}available\textquotesingle{} is the real headroom number.}
+\FunctionTok{vmstat}\NormalTok{ 1             }\CommentTok{\# si/so columns: nonzero = ACTIVELY SWAPPING = memory pressure → slowness}
+\FunctionTok{cat}\NormalTok{ /proc/meminfo    }\CommentTok{\# detailed breakdown (Buffers, Cached, SwapTotal…)}
+\ExtensionTok{slabtop}              \CommentTok{\# kernel slab cache usage (kernel memory leaks)}
+
+\CommentTok{\# ── Disk I/O ──}
+\ExtensionTok{iostat} \AttributeTok{{-}xz}\NormalTok{ 1         }\CommentTok{\# per{-}device: \%util (busy), await (latency ms), aqu{-}sz (queue depth), r/s w/s}
+\ExtensionTok{iotop}                \CommentTok{\# which PROCESS is doing the I/O}
+\FunctionTok{df} \AttributeTok{{-}h} \KeywordTok{;} \FunctionTok{df} \AttributeTok{{-}i}        \CommentTok{\# space ; inodes}
+
+\CommentTok{\# ── Network ──}
+\ExtensionTok{ss} \AttributeTok{{-}tunap}            \CommentTok{\# sockets: TCP/UDP, numeric, all states, owning process (replaces netstat)}
+\ExtensionTok{ss} \AttributeTok{{-}s}                \CommentTok{\# socket summary counts by state}
+\FunctionTok{netstat} \AttributeTok{{-}s}           \CommentTok{\# protocol stats: retransmits, drops, overruns (errors!)}
+\ExtensionTok{sar} \AttributeTok{{-}n}\NormalTok{ DEV 1         }\CommentTok{\# per{-}interface throughput \& \%util}
+\ExtensionTok{nstat}                \CommentTok{\# delta of kernel net counters}
+
+\CommentTok{\# ── Open files / what a process is touching ──}
+\ExtensionTok{lsof} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}        \CommentTok{\# every file/socket the process has open}
+\ExtensionTok{lsof} \AttributeTok{{-}i}\NormalTok{ :8080        }\CommentTok{\# who is listening on / connected to port 8080}
+\ExtensionTok{lsof}\NormalTok{ +D /var/log     }\CommentTok{\# who has files open under a directory}
+\ExtensionTok{lsof} \KeywordTok{|} \FunctionTok{grep}\NormalTok{ deleted  }\CommentTok{\# deleted{-}but{-}open files (disk{-}full mystery)}
+
+\CommentTok{\# ── Syscall / library tracing (why is it hung?) ──}
+\ExtensionTok{strace} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}      \CommentTok{\# live syscalls of a running process (attach)}
+\ExtensionTok{strace} \AttributeTok{{-}f} \AttributeTok{{-}T} \AttributeTok{{-}tt}\NormalTok{ cmd }\CommentTok{\# follow forks, time each call, timestamps}
+\ExtensionTok{strace} \AttributeTok{{-}c}\NormalTok{ cmd        }\CommentTok{\# SUMMARY: which syscalls dominate, error counts}
+\ExtensionTok{ltrace} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}      \CommentTok{\# library calls instead of syscalls}
+
+\CommentTok{\# ── CPU profiling / flame graphs ──}
+\ExtensionTok{perf}\NormalTok{ top             }\CommentTok{\# live function{-}level CPU hotspots}
+\ExtensionTok{perf}\NormalTok{ record }\AttributeTok{{-}g} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{ {-}{-} sleep 30 }\KeywordTok{;} \ExtensionTok{perf}\NormalTok{ report   }\CommentTok{\# sampled stacks → flame graph input}
+
+\CommentTok{\# ── Kernel ring buffer \& the OOM killer ──}
+\FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{tail}      \CommentTok{\# hardware errors, OOM kills, segfaults ({-}T = human timestamps)}
+\FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \AttributeTok{{-}E} \StringTok{\textquotesingle{}oom|killed process|out of memory\textquotesingle{}}
+\ExtensionTok{journalctl} \AttributeTok{{-}k}        \CommentTok{\# kernel log via systemd}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{The OOM killer}\label{the-oom-killer}
+
+When the kernel runs out of memory (and swap) and a process demands more, it can\textquotesingle t say "no" gracefully to an already-running program --- so the \textbf{Out-Of-Memory killer} picks a victim and SIGKILLs it to reclaim memory. It scores processes by an \texttt{oom\_score} (roughly: memory footprint, adjusted by \texttt{oom\_score\_adj}). The victim dies instantly (SIGKILL \(\rightarrow\) no cleanup), which often looks like a mysterious crash. The fingerprint is in \texttt{dmesg}:
+
+\setcodelang{}
+
+\begin{verbatim}
+$ dmesg -T | grep -i oom
+[Wed Jun 17 14:05:33 2026] Out of memory: Killed process 4823 (java) total-vm:8.2GB...
+\end{verbatim}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/oom\_score         }\CommentTok{\# current OOM score}
+\BuiltInTok{echo} \AttributeTok{{-}1000} \OperatorTok{\textgreater{}}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/oom\_score\_adj   }\CommentTok{\# protect a critical process from the OOM killer}
+\end{Highlighting}
+\end{Shaded}
+
+In containers, an OOM kill driven by a \textbf{cgroup memory limit} is what surfaces as Kubernetes \textbf{\texttt{OOMKilled}} --- the pod hit its memory ceiling, not the host\textquotesingle s.
+
+\textbf{Interview takeaway:} \textbf{Drive triage with USE: per resource, check Utilization, Saturation, Errors. Load average counts R \emph{and} D, so high load with idle CPU means I/O wait, not CPU. \texttt{vmstat}/\texttt{mpstat} for CPU, \texttt{free}/\texttt{vmstat\ si/so} for memory pressure, \texttt{iostat\ -x} (await/\%util) for disk, \texttt{ss}/\texttt{sar} for network, \texttt{lsof}/\texttt{strace} to see what a process is actually doing, and \texttt{dmesg} for OOM kills and hardware errors.}
+
+\section{Systemd, Cron \& Services}\label{systemd-cron--services}
+
+\subsection{systemd --- the modern init \& service manager}\label{systemd--the-modern-init--service-manager}
+
+\texttt{systemd} is PID 1 on most distros. It boots the system, manages \textbf{units} (services, sockets, timers, mounts), tracks dependencies, restarts crashed services, and centralizes logging via the \textbf{journal}.
+
+A service is described by a \textbf{unit file} (\texttt{/etc/systemd/system/myapp.service}):
+
+\setcodelang{INI}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{[Unit]}
+\DataTypeTok{Description}\OtherTok{=}\StringTok{My API service}
+\DataTypeTok{After}\OtherTok{=}\StringTok{network.target               \# start ordering: after network is up}
+\DataTypeTok{Requires}\OtherTok{=}\StringTok{postgresql.service        \# hard dependency}
+
+\KeywordTok{[Service]}
+\DataTypeTok{ExecStart}\OtherTok{=}\StringTok{/usr/bin/myapp {-}{-}port 8080}
+\DataTypeTok{ExecReload}\OtherTok{=}\StringTok{/bin/kill {-}HUP $MAINPID \# how a \textasciigrave{}reload\textasciigrave{} is performed}
+\DataTypeTok{Restart}\OtherTok{=}\StringTok{on{-}failure                 \# auto{-}restart if it crashes}
+\DataTypeTok{RestartSec}\OtherTok{=}\DecValTok{5}
+\DataTypeTok{User}\OtherTok{=}\StringTok{myapp                         \# run as an UNPRIVILEGED user (least privilege)}
+\DataTypeTok{MemoryMax}\OtherTok{=}\StringTok{512M                     \# cgroup memory cap (OOM{-}kills only this service)}
+\DataTypeTok{CPUQuota}\OtherTok{=}\StringTok{50\%                       \# cgroup CPU cap}
+\DataTypeTok{TimeoutStopSec}\OtherTok{=}\StringTok{30                  \# SIGTERM grace before SIGKILL (graceful shutdown!)}
+
+\KeywordTok{[Install]}
+\DataTypeTok{WantedBy}\OtherTok{=}\StringTok{multi{-}user.target         \# enable target → starts at boot}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{systemctl}\NormalTok{ start   myapp            }\CommentTok{\# start now}
+\ExtensionTok{systemctl}\NormalTok{ stop    myapp            }\CommentTok{\# SIGTERM, then SIGKILL after TimeoutStopSec}
+\ExtensionTok{systemctl}\NormalTok{ restart myapp}
+\ExtensionTok{systemctl}\NormalTok{ reload  myapp            }\CommentTok{\# ExecReload (e.g. SIGHUP) — no full restart}
+\ExtensionTok{systemctl}\NormalTok{ enable  myapp            }\CommentTok{\# start at boot}
+\ExtensionTok{systemctl}\NormalTok{ status  myapp            }\CommentTok{\# state, PID, recent log lines, memory/cpu}
+\ExtensionTok{systemctl}\NormalTok{ daemon{-}reload            }\CommentTok{\# re{-}read unit files after editing them}
+\ExtensionTok{systemctl}\NormalTok{ list{-}units }\AttributeTok{{-}{-}failed}      \CommentTok{\# what\textquotesingle{}s broken}
+\end{Highlighting}
+\end{Shaded}
+
+systemd runs each service in its \textbf{own cgroup}, so \texttt{MemoryMax}/\texttt{CPUQuota} are enforced by the kernel, and the service shuts down gracefully (SIGTERM \(\rightarrow\) grace \(\rightarrow\) SIGKILL) for free.
+
+\subsection{journalctl --- the systemd log}\label{journalctl--the-systemd-log}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ myapp                }\CommentTok{\# all logs for one unit}
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ myapp }\AttributeTok{{-}f}             \CommentTok{\# FOLLOW live (like tail {-}f)}
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ myapp }\AttributeTok{{-}{-}since} \StringTok{"10 min ago"}
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ myapp }\AttributeTok{{-}p}\NormalTok{ err         }\CommentTok{\# only error{-}priority and above}
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ myapp }\AttributeTok{{-}b}             \CommentTok{\# since last boot}
+\ExtensionTok{journalctl} \AttributeTok{{-}k}                      \CommentTok{\# kernel messages (dmesg equivalent)}
+\ExtensionTok{journalctl} \AttributeTok{{-}{-}disk{-}usage}            \CommentTok{\# how big the journal is}
+\ExtensionTok{journalctl} \AttributeTok{{-}{-}vacuum{-}time}\OperatorTok{=}\NormalTok{7d        }\CommentTok{\# trim journal older than 7 days (free disk!)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Cron and systemd timers}\label{cron-and-systemd-timers}
+
+Two ways to run scheduled jobs.
+
+\textbf{cron} --- classic, file-based:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{crontab} \AttributeTok{{-}e}        \CommentTok{\# edit YOUR user\textquotesingle{}s cron table}
+\FunctionTok{crontab} \AttributeTok{{-}l}        \CommentTok{\# list}
+
+\CommentTok{\# ┌ min  ┌ hour ┌ day{-}of{-}month ┌ month ┌ day{-}of{-}week    command}
+\CommentTok{\# *      *      *              *       *}
+  \ExtensionTok{0}\NormalTok{      2      }\PreprocessorTok{*}              \PreprocessorTok{*}       \PreprocessorTok{*}\NormalTok{     /usr/local/bin/backup.sh   }\CommentTok{\# daily 02:00}
+  \ExtensionTok{*/15}   \PreprocessorTok{*}      \PreprocessorTok{*}              \PreprocessorTok{*}       \PreprocessorTok{*}\NormalTok{     /usr/local/bin/healthcheck }\CommentTok{\# every 15 min}
+  \ExtensionTok{0}\NormalTok{      0      }\PreprocessorTok{*}              \PreprocessorTok{*}\NormalTok{       0     /usr/local/bin/weekly.sh   }\CommentTok{\# Sun midnight}
+  \ExtensionTok{@reboot}\NormalTok{                                    /usr/local/bin/warmup.sh   }\CommentTok{\# at boot}
+\end{Highlighting}
+\end{Shaded}
+
+Gotchas that bite people: cron runs with a \textbf{minimal environment} (sparse \texttt{PATH}, no shell profile), so use \textbf{absolute paths} and set env explicitly. Cron emails stdout/stderr to the user unless you redirect (\texttt{\textgreater{}\textgreater{}\ /var/log/job.log\ 2\textgreater{}\&1}). System-wide jobs live in \texttt{/etc/cron.d/}, \texttt{/etc/cron.daily/}, etc.
+
+\textbf{systemd timers} --- the modern alternative (better logging via journal, dependency-aware, supports \texttt{Persistent=} to catch up missed runs after downtime):
+
+\setcodelang{INI}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# backup.timer}
+\KeywordTok{[Timer]}
+\DataTypeTok{OnCalendar}\OtherTok{=}\StringTok{*{-}*{-}* 02:00:00}
+\DataTypeTok{Persistent}\OtherTok{=}\StringTok{true            \# run on next boot if the machine was off at 02:00}
+\KeywordTok{[Install]}
+\DataTypeTok{WantedBy}\OtherTok{=}\StringTok{timers.target}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Resource limits: ulimits and sysctl}\label{resource-limits-ulimits-and-sysctl}
+
+\textbf{ulimits} are per-process resource ceilings. The famous one is \textbf{open files}:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{ulimit} \AttributeTok{{-}a}               \CommentTok{\# all current limits}
+\BuiltInTok{ulimit} \AttributeTok{{-}n}               \CommentTok{\# max open file descriptors (default often 1024 — too low for servers!)}
+\BuiltInTok{ulimit} \AttributeTok{{-}n}\NormalTok{ 65536         }\CommentTok{\# raise (soft limit, up to the hard limit)}
+\BuiltInTok{ulimit} \AttributeTok{{-}u}               \CommentTok{\# max user processes (fork{-}bomb protection)}
+\BuiltInTok{ulimit} \AttributeTok{{-}c}\NormalTok{ unlimited     }\CommentTok{\# enable core dumps for debugging crashes}
+\end{Highlighting}
+\end{Shaded}
+
+"\textbf{Too many open files}" (\texttt{EMFILE}) is a very common production error: a high-concurrency server (or one leaking fds) hits the 1024 default. Fix in the systemd unit (\texttt{LimitNOFILE=65536}) or \texttt{/etc/security/limits.conf}.
+
+\textbf{sysctl} tunes kernel parameters (the \texttt{/proc/sys} tree):
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{sysctl}\NormalTok{ vm.swappiness                    }\CommentTok{\# how aggressively to swap (0–100)}
+\ExtensionTok{sysctl} \AttributeTok{{-}w}\NormalTok{ vm.swappiness=10              }\CommentTok{\# lower → keep app pages in RAM, swap less}
+\ExtensionTok{sysctl}\NormalTok{ net.core.somaxconn               }\CommentTok{\# max queued connections (raise for busy servers)}
+\ExtensionTok{sysctl}\NormalTok{ net.ipv4.tcp\_tw\_reuse}
+\ExtensionTok{sysctl} \AttributeTok{{-}p}                               \CommentTok{\# apply /etc/sysctl.conf persistently}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Swappiness} (0--100) controls the kernel\textquotesingle s eagerness to swap anonymous memory to disk to grow the page cache. Latency-sensitive services (databases, JVM apps) set it \textbf{low} (\texttt{1}--\texttt{10}) so their working set stays in RAM instead of being paged to slow disk --- a paged-out heap causes brutal GC pauses (see \hyperlink{section.09}{\textcolor{acc}{§09}}).
+
+\textbf{Interview takeaway:} \textbf{systemd manages services as units in their own cgroups --- \texttt{systemctl} to control, \texttt{journalctl\ -u\ \textless{}svc\textgreater{}\ -f} to tail logs, \texttt{Restart=on-failure} + \texttt{TimeoutStopSec} for resilient graceful shutdown, \texttt{MemoryMax}/\texttt{CPUQuota} for limits. Schedule with cron (mind the bare environment --- use absolute paths) or systemd timers. Raise \texttt{ulimit\ -n} to dodge "too many open files"; lower \texttt{vm.swappiness} to keep hot pages off disk.}
+
+\section{Containers Under the Hood (namespaces \& cgroups)}\label{containers-under-the-hood-namespaces--cgroups}
+
+A container is \textbf{not a VM}. There is no guest kernel --- every container on a host shares the \emph{one} host kernel. "Container" is just a regular Linux process (or process tree) wrapped in two kernel features:
+
+\setcodelang{}
+
+\begin{verbatim}
+        ┌─────────────────────────────────────────────┐
+   ISOLATION = what a process can SEE     →  NAMESPACES
+   LIMITS    = how much it can USE        →  CGROUPS
+        └─────────────────────────────────────────────┘
+  Docker / containerd / Kubernetes are orchestration on top of these.
+\end{verbatim}
+
+\subsection{Namespaces --- isolating what a process can see}\label{namespaces--isolating-what-a-process-can-see}
+
+A \textbf{namespace} virtualizes a global kernel resource so the processes inside it see their own private instance. The kinds:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3480}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.5520}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Namespace
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Isolates
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effect inside the container
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{PID} & Process IDs & Container\textquotesingle s main process is \textbf{PID 1}; can\textquotesingle t see host processes. \\
+\rowcolor{zebra}
+\textbf{NET} & Network stack & Own interfaces, IPs, routing table, ports (own \texttt{eth0}, own port 80). \\
+\textbf{MNT} & Mount points & Own filesystem view / root (\texttt{chroot} on steroids). \\
+\rowcolor{zebra}
+\textbf{UTS} & Hostname \& domain & Own \texttt{hostname} independent of the host. \\
+\textbf{IPC} & SysV IPC, shared mem, message queues & Can\textquotesingle t see host\textquotesingle s IPC objects. \\
+\rowcolor{zebra}
+\textbf{USER} & UID/GID mappings & \textbf{root inside (UID 0)} can map to an \textbf{unprivileged UID outside} --- key security win. \\
+\textbf{CGROUP} & cgroup root view & Container sees its own cgroup hierarchy. \\
+\end{longtable}
+
+You can create them by hand --- proving Docker isn\textquotesingle t magic:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{unshare} \AttributeTok{{-}{-}pid} \AttributeTok{{-}{-}fork} \AttributeTok{{-}{-}mount{-}proc}\NormalTok{ bash   }\CommentTok{\# new PID namespace}
+\FunctionTok{ps}\NormalTok{ aux        }\CommentTok{\# inside: this bash is PID 1 — it can\textquotesingle{}t see host processes!}
+
+\ExtensionTok{unshare} \AttributeTok{{-}{-}uts}\NormalTok{ bash}
+\FunctionTok{hostname}\NormalTok{ container{-}x   }\CommentTok{\# changes hostname only inside; host is unaffected}
+
+\ExtensionTok{lsns}                   \CommentTok{\# list all namespaces on the host}
+\FunctionTok{ls} \AttributeTok{{-}l}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/ns   }\CommentTok{\# a process\textquotesingle{}s namespace memberships (inode per ns)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{cgroups --- limiting how much a process can use}\label{cgroups--limiting-how-much-a-process-can-use}
+
+\textbf{Control groups (cgroups)} account for and \emph{cap} resource usage for a group of processes --- CPU, memory, I/O, PIDs. This is how a container is told "you get 0.5 CPU and 512 MB."
+
+\setcodelang{}
+
+\begin{verbatim}
+cgroup v2 (unified hierarchy under /sys/fs/cgroup):
+  memory.max          → hard memory cap. Exceed it → cgroup OOM kill (K8s "OOMKilled")
+  memory.high         → soft cap (throttle reclaim before the hard kill)
+  cpu.max             → "50000 100000" = 50ms CPU per 100ms = 0.5 cores  (THROTTLING)
+  io.max              → disk I/O bandwidth/IOPS caps
+  pids.max            → cap number of processes (fork-bomb protection)
+\end{verbatim}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{ /sys/fs/cgroup/}\OperatorTok{\textless{}}\NormalTok{...}\OperatorTok{\textgreater{}}\NormalTok{/memory.max        }\CommentTok{\# the memory ceiling}
+\FunctionTok{cat}\NormalTok{ /sys/fs/cgroup/}\OperatorTok{\textless{}}\NormalTok{...}\OperatorTok{\textgreater{}}\NormalTok{/cpu.stat          }\CommentTok{\# nr\_throttled, throttled\_time (CPU throttling!)}
+\ExtensionTok{systemd{-}cgtop}                              \CommentTok{\# live per{-}cgroup resource usage}
+\end{Highlighting}
+\end{Shaded}
+
+Two container behaviors interviewers love, both explained by cgroups:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{CPU throttling:} hit \texttt{cpu.max} and the kernel \emph{pauses} your process until the next period. Your app isn\textquotesingle t crashing --- it\textquotesingle s being \textbf{throttled}, showing as latency spikes with the CPU not pegged. Diagnose via \texttt{nr\_throttled}/\texttt{throttled\_time} in \texttt{cpu.stat}.
+\item
+  \textbf{\texttt{OOMKilled}:} exceed \texttt{memory.max} and the \textbf{cgroup OOM killer} SIGKILLs the offending process \emph{inside that cgroup} (the host has plenty of RAM). The pod restarts; \texttt{dmesg} shows the kill.
+\end{itemize}
+
+\subsection{\texorpdfstring{Putting it together: what \texttt{docker\ run} actually does}{Putting it together: what docker run actually does}}\label{putting-it-together-what-docker-run-actually-does}
+
+\setcodelang{}
+
+\begin{verbatim}
+docker run -m 512m --cpus=0.5 nginx
+        │
+        ├─ create NEW namespaces (PID, NET, MNT, UTS, IPC, [USER])
+        │     → isolated process, own network, own root fs (the image layers)
+        ├─ create a CGROUP with memory.max=512M, cpu.max=0.5 core
+        ├─ pivot_root into the image's filesystem (overlayfs union of layers)
+        ├─ drop capabilities, apply seccomp profile (restrict syscalls)
+        └─ exec the entrypoint as PID 1 inside the namespaces
+\end{verbatim}
+
+The image is a stack of read-only layers unioned by \textbf{overlayfs} with a writable top layer --- that\textquotesingle s why containers start instantly (no copy) and why writes vanish on removal unless you mount a volume.
+
+\begin{quote}
+\textbf{PID 1 pitfall:} the entrypoint becomes PID 1, which by default does \textbf{not} reap orphaned children and has non-standard signal behavior. A long-running container whose PID 1 doesn\textquotesingle t reap will accumulate \textbf{zombies}; one that doesn\textquotesingle t forward SIGTERM won\textquotesingle t shut down gracefully. The fix is a tiny init like \texttt{tini} (\texttt{docker\ run\ -\/-init}) as PID 1.
+\end{quote}
+
+\textbf{Interview takeaway:} \textbf{A container = a normal Linux process isolated by \emph{namespaces} (what it can SEE: PID/NET/MNT/UTS/IPC/USER) and capped by \emph{cgroups} (what it can USE: cpu.max/memory.max). No guest kernel --- the host kernel is shared. Kubernetes \texttt{OOMKilled} = hit cgroup \texttt{memory.max}; mysterious latency with idle CPU in a container = \texttt{cpu.max} \emph{throttling}. Run a proper init as PID 1 to reap zombies and forward SIGTERM.}
+
+\section{Shell Scripting Essentials}\label{shell-scripting-essentials}
+
+Bash is the glue of ops. Reliable scripts come from a handful of disciplines.
+
+\subsection{Variables, quoting, and the \#1 bug}\label{variables-quoting-and-the-1-bug}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{name}\OperatorTok{=}\StringTok{"Alice"}            \CommentTok{\# NO spaces around = (assignment)}
+\BuiltInTok{echo} \StringTok{"}\VariableTok{$name}\StringTok{"}            \CommentTok{\# use → $name or $\{name\}}
+\BuiltInTok{echo} \StringTok{"}\VariableTok{$\{name\}}\StringTok{\_suffix"}   \CommentTok{\# braces disambiguate}
+\VariableTok{count}\OperatorTok{=}\VariableTok{$(}\FunctionTok{ls} \KeywordTok{|} \FunctionTok{wc} \AttributeTok{{-}l}\VariableTok{)}     \CommentTok{\# command substitution → capture output}
+\VariableTok{files}\OperatorTok{=}\VariableTok{(}\PreprocessorTok{*}\NormalTok{.log}\VariableTok{)}           \CommentTok{\# array}
+\BuiltInTok{echo} \StringTok{"}\VariableTok{$\{files}\OperatorTok{[@]}\VariableTok{\}}\StringTok{"}      \CommentTok{\# all elements}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Always quote your variables.} Unquoted \texttt{\$var} undergoes word-splitting and glob expansion --- the cause of countless catastrophic bugs:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{file}\OperatorTok{=}\StringTok{"my report.txt"}
+\FunctionTok{rm} \VariableTok{$file}                \CommentTok{\# ✗ runs: rm my  report.txt   → deletes TWO wrong files}
+\FunctionTok{rm} \StringTok{"}\VariableTok{$file}\StringTok{"}              \CommentTok{\# ✓ runs: rm "my report.txt"  → correct}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Conditionals}\label{conditionals}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if} \KeywordTok{[[} \OtherTok{{-}f} \StringTok{"}\VariableTok{$path}\StringTok{"} \KeywordTok{]];} \ControlFlowTok{then} \BuiltInTok{echo} \StringTok{"file exists"}\KeywordTok{;} \ControlFlowTok{fi}
+\ControlFlowTok{if} \KeywordTok{[[} \OtherTok{{-}d} \StringTok{"}\VariableTok{$dir}\StringTok{"} \KeywordTok{]];}  \ControlFlowTok{then} \BuiltInTok{echo} \StringTok{"directory"}\KeywordTok{;} \ControlFlowTok{fi}
+\ControlFlowTok{if} \KeywordTok{[[} \OtherTok{{-}z} \StringTok{"}\VariableTok{$var}\StringTok{"} \KeywordTok{]];}  \ControlFlowTok{then} \BuiltInTok{echo} \StringTok{"empty/unset"}\KeywordTok{;} \ControlFlowTok{fi}
+\ControlFlowTok{if} \KeywordTok{[[} \OtherTok{{-}n} \StringTok{"}\VariableTok{$var}\StringTok{"} \KeywordTok{]];}  \ControlFlowTok{then} \BuiltInTok{echo} \StringTok{"non{-}empty"}\KeywordTok{;} \ControlFlowTok{fi}
+\ControlFlowTok{if} \KeywordTok{[[} \StringTok{"}\VariableTok{$a}\StringTok{"} \OtherTok{==} \StringTok{"}\VariableTok{$b}\StringTok{"} \KeywordTok{]];} \ControlFlowTok{then} \ExtensionTok{…}\KeywordTok{;} \ControlFlowTok{fi}          \CommentTok{\# string equality}
+\ControlFlowTok{if} \KeywordTok{[[} \StringTok{"}\VariableTok{$n}\StringTok{"} \OtherTok{{-}gt}\NormalTok{ 10 }\KeywordTok{]];}  \ControlFlowTok{then} \ExtensionTok{…}\KeywordTok{;} \ControlFlowTok{fi}          \CommentTok{\# numeric: {-}eq {-}ne {-}lt {-}le {-}gt {-}ge}
+\ControlFlowTok{if} \KeywordTok{[[} \StringTok{"}\VariableTok{$s}\StringTok{"} \OtherTok{=\textasciitilde{}} \PreprocessorTok{\^{}}\OperatorTok{[}\SpecialStringTok{0}\OperatorTok{{-}}\SpecialStringTok{9}\OperatorTok{]}\PreprocessorTok{+}\OperatorTok{$} \KeywordTok{]];} \ControlFlowTok{then} \ExtensionTok{…}\KeywordTok{;} \ControlFlowTok{fi}      \CommentTok{\# regex match}
+\ControlFlowTok{if} \FunctionTok{grep} \AttributeTok{{-}q}\NormalTok{ ERROR log}\KeywordTok{;} \ControlFlowTok{then} \ExtensionTok{…}\KeywordTok{;} \ControlFlowTok{fi}           \CommentTok{\# branch on a command\textquotesingle{}s EXIT CODE}
+\end{Highlighting}
+\end{Shaded}
+
+Prefer \texttt{{[}{[}\ ...\ {]}{]}} (bash conditional) over \texttt{{[}\ ...\ {]}} (the older \texttt{test}) --- it\textquotesingle s safer with empty vars and supports \texttt{=\textasciitilde{}}, \texttt{\&\&}, \texttt{\textbar{}\textbar{}}.
+
+\subsection{Loops}\label{loops}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ f }\KeywordTok{in} \PreprocessorTok{*}\NormalTok{.log}\KeywordTok{;} \ControlFlowTok{do} \BuiltInTok{echo} \StringTok{"}\VariableTok{$f}\StringTok{"}\KeywordTok{;} \ControlFlowTok{done}
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \DataTypeTok{\{}\DecValTok{1}\DataTypeTok{..}\DecValTok{5}\DataTypeTok{\}}\KeywordTok{;} \ControlFlowTok{do} \BuiltInTok{echo} \StringTok{"}\VariableTok{$i}\StringTok{"}\KeywordTok{;} \ControlFlowTok{done}
+\ControlFlowTok{for} \KeywordTok{((}\VariableTok{i}\OperatorTok{=}\DecValTok{0}\KeywordTok{;} \VariableTok{i}\OperatorTok{\textless{}}\DecValTok{5}\KeywordTok{;} \VariableTok{i}\OperatorTok{++}\KeywordTok{));} \ControlFlowTok{do} \BuiltInTok{echo} \StringTok{"}\VariableTok{$i}\StringTok{"}\KeywordTok{;} \ControlFlowTok{done}
+
+\ControlFlowTok{while} \BuiltInTok{read} \AttributeTok{{-}r} \VariableTok{line}\KeywordTok{;} \ControlFlowTok{do}            \CommentTok{\# read a file/stream line by line ({-}r: don\textquotesingle{}t mangle backslashes)}
+  \BuiltInTok{echo} \StringTok{"got: }\VariableTok{$line}\StringTok{"}
+\ControlFlowTok{done} \OperatorTok{\textless{}}\NormalTok{ input.txt}
+
+\ControlFlowTok{while} \VariableTok{IFS}\OperatorTok{=}\NormalTok{, }\BuiltInTok{read} \AttributeTok{{-}r} \VariableTok{col1} \VariableTok{col2}\KeywordTok{;} \ControlFlowTok{do}  \CommentTok{\# parse CSV}
+  \BuiltInTok{echo} \StringTok{"}\VariableTok{$col1}\StringTok{ {-}\textgreater{} }\VariableTok{$col2}\StringTok{"}
+\ControlFlowTok{done} \OperatorTok{\textless{}}\NormalTok{ data.csv}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Functions and exit codes}\label{functions-and-exit-codes}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{log()} \KeywordTok{\{} \BuiltInTok{echo} \StringTok{"[}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%T}\VariableTok{)}\StringTok{] }\VariableTok{$*}\StringTok{"} \OperatorTok{\textgreater{}\&}\DecValTok{2}\KeywordTok{;} \KeywordTok{\}}     \CommentTok{\# helper that logs to stderr}
+
+\FunctionTok{deploy()} \KeywordTok{\{}
+  \BuiltInTok{local} \VariableTok{target}\OperatorTok{=}\StringTok{"}\VariableTok{$1}\StringTok{"}                         \CommentTok{\# \textquotesingle{}local\textquotesingle{} keeps scope clean}
+  \ExtensionTok{build} \KeywordTok{||} \ControlFlowTok{return} \DecValTok{1}                         \CommentTok{\# propagate failure}
+  \ExtensionTok{push} \StringTok{"}\VariableTok{$target}\StringTok{"}
+\KeywordTok{\}}
+
+\ExtensionTok{deploy}\NormalTok{ prod}
+\BuiltInTok{echo} \StringTok{"exit code: }\VariableTok{$?}\StringTok{"}        \CommentTok{\# $? = exit status of last command (0 = success)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{\$?} is 0 on success, non-zero on failure. Chain on it:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{make} \KeywordTok{\&\&} \ExtensionTok{./run}                 \CommentTok{\# run ONLY if make succeeded}
+\ExtensionTok{backup} \KeywordTok{||} \ExtensionTok{alert} \StringTok{"backup failed"}   \CommentTok{\# alert ONLY if backup failed}
+\ExtensionTok{cmd1}\KeywordTok{;} \ExtensionTok{cmd2}                    \CommentTok{\# run sequentially regardless}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{The safety preamble: \texttt{set\ -euo\ pipefail}}{The safety preamble: set -euo pipefail}}\label{the-safety-preamble-set--euo-pipefail}
+
+Put this at the top of every serious script:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#!/usr/bin/env bash}
+\BuiltInTok{set} \AttributeTok{{-}euo}\NormalTok{ pipefail}
+\VariableTok{IFS}\OperatorTok{=}\StringTok{$\textquotesingle{}}\DataTypeTok{\textbackslash{}n\textbackslash{}t}\StringTok{\textquotesingle{}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1442}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3889}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4668}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Flag
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{set\ -e} & Exit immediately on any command failure & Don\textquotesingle t barrel past errors corrupting state \\
+\rowcolor{zebra}
+\texttt{set\ -u} & Error on use of an \textbf{unset} variable & Catches typos like \texttt{rm\ -rf\ "\$PREFXI/"} (\(\rightarrow\) \texttt{rm\ -rf\ /}) \\
+\texttt{set\ -o\ pipefail} & A pipeline fails if \textbf{any} stage fails & Without it, `false \\
+\rowcolor{zebra}
+\texttt{set\ -x} & Print each command before running (debug) & Trace what actually executed \\
+\end{longtable}
+
+Without \texttt{set\ -u}, a typo\textquotesingle d variable expands to empty and \texttt{rm\ -rf\ "\$DIR/"} becomes \texttt{rm\ -rf\ /} --- a legendary disaster. \texttt{set\ -e} + \texttt{pipefail} make scripts fail loud and early instead of silently doing the wrong thing.
+
+\subsection{A small, real script (with traps and safety)}\label{a-small-real-script-with-traps-and-safety}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#!/usr/bin/env bash}
+\CommentTok{\# rotate\_and\_backup.sh — compress yesterday\textquotesingle{}s logs, upload, clean up. Safely.}
+\BuiltInTok{set} \AttributeTok{{-}euo}\NormalTok{ pipefail}
+
+\VariableTok{LOG\_DIR}\OperatorTok{=}\StringTok{"/var/log/myapp"}
+\VariableTok{DEST}\OperatorTok{=}\StringTok{"s3://backups/myapp"}
+\VariableTok{WORK}\OperatorTok{=}\StringTok{"}\VariableTok{$(}\FunctionTok{mktemp} \AttributeTok{{-}d}\VariableTok{)}\StringTok{"}                         \CommentTok{\# private temp dir}
+\BuiltInTok{trap} \StringTok{\textquotesingle{}rm {-}rf "$WORK"\textquotesingle{}}\NormalTok{ EXIT                  }\CommentTok{\# guaranteed cleanup on ANY exit}
+\BuiltInTok{trap} \StringTok{\textquotesingle{}echo "interrupted, aborting" \textgreater{}\&2; exit 130\textquotesingle{}}\NormalTok{ INT TERM}
+
+\FunctionTok{log()} \KeywordTok{\{} \BuiltInTok{echo} \StringTok{"[}\VariableTok{$(}\FunctionTok{date} \AttributeTok{{-}Is}\VariableTok{)}\StringTok{] }\VariableTok{$*}\StringTok{"} \OperatorTok{\textgreater{}\&}\DecValTok{2}\KeywordTok{;} \KeywordTok{\}}
+
+\VariableTok{yesterday}\OperatorTok{=}\StringTok{"}\VariableTok{$(}\FunctionTok{date} \AttributeTok{{-}d} \StringTok{\textquotesingle{}yesterday\textquotesingle{}}\NormalTok{ +\%Y{-}\%m{-}\%d}\VariableTok{)}\StringTok{"}
+\BuiltInTok{shopt} \AttributeTok{{-}s}\NormalTok{ nullglob                           }\CommentTok{\# empty glob → no match, not literal \textquotesingle{}*\textquotesingle{}}
+\VariableTok{files}\OperatorTok{=}\VariableTok{(}\StringTok{"}\VariableTok{$LOG\_DIR}\StringTok{"}\NormalTok{/}\PreprocessorTok{*}\StringTok{"}\VariableTok{$yesterday}\StringTok{"}\PreprocessorTok{*}\NormalTok{.log}\VariableTok{)}
+
+\ControlFlowTok{if} \KeywordTok{((} \VariableTok{$\{}\OperatorTok{\#}\VariableTok{files}\OperatorTok{[@]}\VariableTok{\}} \OperatorTok{==} \DecValTok{0} \KeywordTok{));} \ControlFlowTok{then}
+  \ExtensionTok{log} \StringTok{"no logs for }\VariableTok{$yesterday}\StringTok{, nothing to do"}
+  \BuiltInTok{exit}\NormalTok{ 0}
+\ControlFlowTok{fi}
+
+\ExtensionTok{log} \StringTok{"compressing }\VariableTok{$\{}\OperatorTok{\#}\VariableTok{files}\OperatorTok{[@]}\VariableTok{\}}\StringTok{ files"}
+\ControlFlowTok{for}\NormalTok{ f }\KeywordTok{in} \StringTok{"}\VariableTok{$\{files}\OperatorTok{[@]}\VariableTok{\}}\StringTok{"}\KeywordTok{;} \ControlFlowTok{do}
+  \FunctionTok{gzip} \AttributeTok{{-}c} \StringTok{"}\VariableTok{$f}\StringTok{"} \OperatorTok{\textgreater{}} \StringTok{"}\VariableTok{$WORK}\StringTok{/}\VariableTok{$(}\FunctionTok{basename} \StringTok{"}\VariableTok{$f}\StringTok{"}\VariableTok{)}\StringTok{.gz"}
+\ControlFlowTok{done}
+
+\ExtensionTok{log} \StringTok{"uploading to }\VariableTok{$DEST}\StringTok{"}
+\ControlFlowTok{if} \ExtensionTok{aws}\NormalTok{ s3 cp }\StringTok{"}\VariableTok{$WORK}\StringTok{"} \StringTok{"}\VariableTok{$DEST}\StringTok{/}\VariableTok{$yesterday}\StringTok{/"} \AttributeTok{{-}{-}recursive}\KeywordTok{;} \ControlFlowTok{then}
+  \ExtensionTok{log} \StringTok{"upload ok; removing local originals"}
+  \FunctionTok{rm} \AttributeTok{{-}f} \StringTok{"}\VariableTok{$\{files}\OperatorTok{[@]}\VariableTok{\}}\StringTok{"}
+\ControlFlowTok{else}
+  \ExtensionTok{log} \StringTok{"upload FAILED; keeping local logs"} \OperatorTok{\textgreater{}\&}\DecValTok{2}
+  \BuiltInTok{exit}\NormalTok{ 1}
+\ControlFlowTok{fi}
+\ExtensionTok{log} \StringTok{"done"}
+\end{Highlighting}
+\end{Shaded}
+
+This shows every essential: \texttt{set\ -euo\ pipefail}, \texttt{trap\ …\ EXIT} for cleanup, \texttt{trap\ …\ INT\ TERM} for graceful interruption, quoted variables, arrays, \texttt{mktemp}, exit codes, logging to stderr.
+
+\textbf{Interview takeaway:} \textbf{Quote every variable (\texttt{"\$var"}) to avoid word-splitting disasters; start scripts with \texttt{set\ -euo\ pipefail} so they fail fast instead of silently corrupting state; use \texttt{trap\ \textquotesingle{}…\textquotesingle{}\ EXIT} for guaranteed cleanup and \texttt{trap\ …\ TERM\ INT} for graceful shutdown; \texttt{\$?} carries the exit code (0 = success) for \texttt{\&\&}/\texttt{\textbar{}\textbar{}} chaining.}
+
+\section{Networking from the CLI}\label{networking-from-the-cli}
+
+The triage toolkit for "is it the network?" (TCP/IP theory lives in \hyperlink{section.03}{\textcolor{acc}{§03}}).
+
+\subsection{\texorpdfstring{Interfaces, addresses, routes --- \texttt{ip}}{Interfaces, addresses, routes --- ip}}\label{interfaces-addresses-routes--ip}
+
+The modern replacement for \texttt{ifconfig}/\texttt{route}:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{ip}\NormalTok{ a                    }\CommentTok{\# all interfaces and their IP addresses (ip addr)}
+\ExtensionTok{ip}\NormalTok{ link                 }\CommentTok{\# link{-}layer state (up/down, MAC, MTU)}
+\ExtensionTok{ip}\NormalTok{ route                }\CommentTok{\# the routing table — where does traffic go?}
+\ExtensionTok{ip}\NormalTok{ route get 8.8.8.8    }\CommentTok{\# which route/interface a destination would use}
+\ExtensionTok{ip} \AttributeTok{{-}s}\NormalTok{ link              }\CommentTok{\# per{-}interface stats: errors, drops, overruns (the \textquotesingle{}E\textquotesingle{} in USE)}
+\ExtensionTok{ip}\NormalTok{ neigh                }\CommentTok{\# ARP table (neighbor cache)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Sockets \& ports --- \texttt{ss}}{Sockets \& ports --- ss}}\label{sockets--ports--ss}
+
+\texttt{ss} (replaces \texttt{netstat}) shows who\textquotesingle s listening and who\textquotesingle s connected:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{ss} \AttributeTok{{-}tlnp}                \CommentTok{\# TCP, Listening, Numeric, with Process → "what\textquotesingle{}s listening on what port"}
+\ExtensionTok{ss} \AttributeTok{{-}tunap}               \CommentTok{\# TCP+UDP, all states, numeric, process}
+\ExtensionTok{ss} \AttributeTok{{-}s}                   \CommentTok{\# summary counts by state}
+\ExtensionTok{ss} \AttributeTok{{-}t}\NormalTok{ state established }\CommentTok{\# only established TCP connections}
+\ExtensionTok{ss}\NormalTok{ dst :443             }\CommentTok{\# connections to port 443}
+\end{Highlighting}
+\end{Shaded}
+
+This answers "\textbf{address already in use}": \texttt{ss\ -tlnp\ \textbar{}\ grep\ :8080} shows the PID already bound to 8080. (Often a TIME\_WAIT socket from a prior crash, or a stale instance still running.)
+
+\subsection{\texorpdfstring{DNS --- \texttt{dig}}{DNS --- dig}}\label{dns--dig}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{dig}\NormalTok{ example.com                 }\CommentTok{\# full DNS answer}
+\ExtensionTok{dig}\NormalTok{ +short example.com          }\CommentTok{\# just the IP(s)}
+\ExtensionTok{dig}\NormalTok{ example.com MX              }\CommentTok{\# mail records}
+\ExtensionTok{dig}\NormalTok{ @8.8.8.8 example.com        }\CommentTok{\# query a SPECIFIC resolver (bypass local)}
+\ExtensionTok{dig}\NormalTok{ +trace example.com          }\CommentTok{\# follow delegation from the root (debug resolution)}
+\ExtensionTok{nslookup}\NormalTok{ example.com            }\CommentTok{\# simpler/legacy}
+\FunctionTok{getent}\NormalTok{ hosts example.com        }\CommentTok{\# resolution the way the SYSTEM sees it (respects /etc/hosts, nsswitch)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{dig\ +short} vs \texttt{getent} matters: \texttt{dig} talks DNS directly; \texttt{getent}/the app go through \texttt{/etc/hosts} + \texttt{nsswitch.conf} first --- so they can disagree, which explains "works with dig but the app can\textquotesingle t resolve it."
+
+\subsection{\texorpdfstring{HTTP \& timing --- \texttt{curl}}{HTTP \& timing --- curl}}\label{http--timing--curl}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}I}\NormalTok{ https://example.com               }\CommentTok{\# headers only (HEAD)}
+\ExtensionTok{curl} \AttributeTok{{-}v}\NormalTok{ https://example.com               }\CommentTok{\# verbose: TLS handshake, request/response}
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \StringTok{"\%\{http\_code\}\textbackslash{}n"}\NormalTok{ URL   }\CommentTok{\# just the status code}
+\ExtensionTok{curl} \AttributeTok{{-}L}\NormalTok{ URL                               }\CommentTok{\# follow redirects}
+\ExtensionTok{curl} \AttributeTok{{-}X}\NormalTok{ POST }\AttributeTok{{-}d} \StringTok{\textquotesingle{}\{"k":"v"\}\textquotesingle{}} \AttributeTok{{-}H} \StringTok{\textquotesingle{}Content{-}Type: application/json\textquotesingle{}}\NormalTok{ URL}
+
+\CommentTok{\# Latency breakdown — WHERE the time goes (DNS vs connect vs TLS vs server):}
+\ExtensionTok{curl} \AttributeTok{{-}s} \AttributeTok{{-}o}\NormalTok{ /dev/null }\AttributeTok{{-}w} \DataTypeTok{\textbackslash{}}
+ \StringTok{\textquotesingle{}dns:\%\{time\_namelookup\} connect:\%\{time\_connect\} tls:\%\{time\_appconnect\} ttfb:\%\{time\_starttransfer\} total:\%\{time\_total\}\textbackslash{}n\textquotesingle{}} \DataTypeTok{\textbackslash{}}
+\NormalTok{ https://example.com}
+\end{Highlighting}
+\end{Shaded}
+
+That \texttt{-w} timing string is a senior move: it tells you whether slowness is \textbf{DNS}, \textbf{TCP connect}, \textbf{TLS handshake}, or \textbf{server processing (TTFB)} --- without a packet capture.
+
+\subsection{\texorpdfstring{Connectivity \& path --- \texttt{ping}, \texttt{traceroute}, \texttt{nc}, \texttt{mtr}}{Connectivity \& path --- ping, traceroute, nc, mtr}}\label{connectivity--path--ping-traceroute-nc-mtr}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ping} \AttributeTok{{-}c4}\NormalTok{ 8.8.8.8            }\CommentTok{\# reachability + RTT (ICMP)}
+\ExtensionTok{traceroute}\NormalTok{ example.com     }\CommentTok{\# the hop{-}by{-}hop path; where latency/loss appears}
+\ExtensionTok{mtr}\NormalTok{ example.com            }\CommentTok{\# ping + traceroute combined, live — best for intermittent loss}
+\ExtensionTok{nc} \AttributeTok{{-}zv}\NormalTok{ host 5432           }\CommentTok{\# is the TCP PORT open? ({-}z scan, {-}v verbose) — no app protocol needed}
+\ExtensionTok{nc} \AttributeTok{{-}l}\NormalTok{ 9000                 }\CommentTok{\# listen on a port (quick test server)}
+\BuiltInTok{echo} \StringTok{"ping"} \KeywordTok{|} \ExtensionTok{nc}\NormalTok{ host 9000 }\CommentTok{\# send raw bytes to a service}
+\ExtensionTok{telnet}\NormalTok{ host 80             }\CommentTok{\# crude TCP probe (then type an HTTP request)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{nc\ -zv\ host\ port} is the fastest "can I even reach the port?" check --- distinguishing a network/firewall problem (port unreachable) from an application problem (port open but app broken).
+
+\subsection{\texorpdfstring{Packet capture --- \texttt{tcpdump}}{Packet capture --- tcpdump}}\label{packet-capture--tcpdump}
+
+The ground truth when nothing else explains it:
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{tcpdump} \AttributeTok{{-}i}\NormalTok{ any }\AttributeTok{{-}n}\NormalTok{ port 443                 }\CommentTok{\# all traffic on 443, numeric (no DNS)}
+\ExtensionTok{tcpdump} \AttributeTok{{-}i}\NormalTok{ eth0 host 10.0.0.5 }\AttributeTok{{-}c}\NormalTok{ 100       }\CommentTok{\# 100 packets to/from a host}
+\ExtensionTok{tcpdump} \AttributeTok{{-}i}\NormalTok{ any }\StringTok{\textquotesingle{}tcp[tcpflags] \& tcp{-}syn != 0\textquotesingle{}}  \CommentTok{\# SYNs only (connection attempts)}
+\ExtensionTok{tcpdump} \AttributeTok{{-}i}\NormalTok{ any }\AttributeTok{{-}w}\NormalTok{ capture.pcap             }\CommentTok{\# write to file → open in Wireshark}
+\end{Highlighting}
+\end{Shaded}
+
+Use it to confirm packets actually arrive (firewall? routing?), to see TCP resets, retransmits, or to prove the request never left the box.
+
+\textbf{Interview takeaway:} \textbf{\texttt{ip\ a}/\texttt{ip\ route} for interfaces \& routing, \texttt{ss\ -tlnp} for "what\textquotesingle s listening / port already in use", \texttt{dig\ +short}/\texttt{getent} for DNS (and they can disagree --- DNS vs \texttt{/etc/hosts}), \texttt{curl\ -w} to localize latency (DNS vs connect vs TLS vs TTFB), \texttt{nc\ -zv\ host\ port} to test a port without the app, and \texttt{tcpdump} for ground-truth packets.}
+
+\section{Worked Debugging Scenarios}\label{worked-debugging-scenarios}
+
+These are the on-call narratives interviews simulate. Each shows the \emph{reasoning} and the \emph{exact} commands, in order.
+
+\subsection{Scenario 1 --- "The server is slow." (systematic sweep)}\label{scenario-1--the-server-is-slow-systematic-sweep}
+
+Narrate a structured USE sweep; never start randomly.
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 0. Frame it: what\textquotesingle{}s slow, since when, what changed?}
+\FunctionTok{uptime}                         \CommentTok{\# load avg vs nproc — is it CPU or queueing?}
+\FunctionTok{nproc}
+
+\CommentTok{\# 1. CPU}
+\ExtensionTok{top}                            \CommentTok{\# \%us vs \%sy vs \%wa vs \%st ; which process is hot?}
+\ExtensionTok{mpstat} \AttributeTok{{-}P}\NormalTok{ ALL 1                }\CommentTok{\# is ONE core pegged (single{-}threaded bottleneck)?}
+\CommentTok{\#   → high \%us  → app CPU{-}bound (profile it: perf top / flame graph)}
+\CommentTok{\#   → high \%sy  → syscall/kernel heavy (strace {-}c the hot pid)}
+\CommentTok{\#   → high \%wa  → NOT cpu — jump to disk (step 3)}
+\CommentTok{\#   → high \%st  → noisy VM neighbor / throttling (cloud)}
+
+\CommentTok{\# 2. Memory}
+\FunctionTok{free} \AttributeTok{{-}h}                        \CommentTok{\# is \textquotesingle{}available\textquotesingle{} tiny? is swap used?}
+\FunctionTok{vmstat}\NormalTok{ 1                       }\CommentTok{\# si/so nonzero → ACTIVELY swapping → slowness}
+\FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ oom         }\CommentTok{\# did the OOM killer fire?}
+
+\CommentTok{\# 3. Disk}
+\ExtensionTok{iostat} \AttributeTok{{-}xz}\NormalTok{ 1                   }\CommentTok{\# \%util \textasciitilde{}100\%? await high (ms)? aqu{-}sz growing?}
+\ExtensionTok{iotop}                          \CommentTok{\# which process is hammering the disk?}
+
+\CommentTok{\# 4. Network}
+\ExtensionTok{ss} \AttributeTok{{-}s}                          \CommentTok{\# socket counts; TIME\_WAIT/SYN{-}RECV pileups?}
+\ExtensionTok{sar} \AttributeTok{{-}n}\NormalTok{ DEV 1                   }\CommentTok{\# NIC saturated? errors/drops?}
+\FunctionTok{netstat} \AttributeTok{{-}s} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ retrans   }\CommentTok{\# TCP retransmits → packet loss}
+
+\CommentTok{\# 5. The hot process}
+\FunctionTok{ps}\NormalTok{ aux }\AttributeTok{{-}{-}sort}\OperatorTok{=}\NormalTok{{-}\%cpu }\KeywordTok{|} \FunctionTok{head}
+\ExtensionTok{strace} \AttributeTok{{-}c} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}             \CommentTok{\# what syscalls dominate? errors?}
+
+\CommentTok{\# 6. Logs}
+\ExtensionTok{journalctl} \AttributeTok{{-}u}\NormalTok{ myapp }\AttributeTok{{-}{-}since} \StringTok{"15 min ago"} \AttributeTok{{-}p}\NormalTok{ warning}
+\FunctionTok{tail} \AttributeTok{{-}n}\NormalTok{ 200 /var/log/myapp/error.log}
+\FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{tail}
+\end{Highlighting}
+\end{Shaded}
+
+The discipline (CPU \(\rightarrow\) mem \(\rightarrow\) disk \(\rightarrow\) net \(\rightarrow\) process \(\rightarrow\) logs) is what\textquotesingle s being graded, more than any single command.
+
+\subsection{Scenario 2 --- "Disk is at 100\%." (and the deleted-open-file trap)}\label{scenario-2--disk-is-at-100-and-the-deleted-open-file-trap}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{df} \AttributeTok{{-}h}                          \CommentTok{\# confirm WHICH filesystem is full (/ ? /var ?)}
+\FunctionTok{df} \AttributeTok{{-}i}                          \CommentTok{\# is it INODES, not bytes? (millions of tiny files)}
+
+\CommentTok{\# Find the space hogs, staying on one filesystem:}
+\FunctionTok{du} \AttributeTok{{-}xh} \AttributeTok{{-}{-}max{-}depth}\OperatorTok{=}\NormalTok{1 / }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rh} \KeywordTok{|} \FunctionTok{head}
+\FunctionTok{du} \AttributeTok{{-}xh}\NormalTok{ /var/log }\KeywordTok{|} \FunctionTok{sort} \AttributeTok{{-}rh} \KeywordTok{|} \FunctionTok{head}        \CommentTok{\# logs are the usual culprit}
+
+\CommentTok{\# If df says 100\% but du finds nothing big → DELETED{-}BUT{-}OPEN file:}
+\ExtensionTok{lsof} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i}\NormalTok{ deleted                   }\CommentTok{\# process still holding a removed file}
+\CommentTok{\#   COMMAND  PID  USER  FD  ...  SIZE  ...  NAME}
+\CommentTok{\#   java     812  app   7w  ...  9.0G  ...  /var/log/app.log (deleted)}
+
+\CommentTok{\# Fix WITHOUT another rm (the name is gone). Options:}
+\BuiltInTok{:} \OperatorTok{\textgreater{}}\NormalTok{ /proc/812/fd/7             }\CommentTok{\# truncate the still{-}open fd → space freed instantly}
+\CommentTok{\# or signal the process to reopen its log:}
+\BuiltInTok{kill} \AttributeTok{{-}HUP}\NormalTok{ 812                  }\CommentTok{\# many daemons reopen logs on SIGHUP (logrotate uses this)}
+\CommentTok{\# or restart the service.}
+\end{Highlighting}
+\end{Shaded}
+
+Bonus root cause: a missing/broken \textbf{logrotate} config let a log grow unbounded, or an app logs at DEBUG in prod.
+
+\subsection{Scenario 3 --- "High load, but the CPU is idle." (I/O wait / D-state)}\label{scenario-3--high-load-but-the-cpu-is-idle-io-wait--d-state}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{uptime}                         \CommentTok{\# load average 25.0 ...}
+\ExtensionTok{mpstat}\NormalTok{ 1                       }\CommentTok{\# but \%idle is 90\%! CPU isn\textquotesingle{}t the problem.}
+                               \CommentTok{\# look at \%iowait — high → blocked on disk}
+
+\CommentTok{\# Load counts R *and* D. Find the D{-}state (uninterruptible) processes:}
+\FunctionTok{ps} \AttributeTok{{-}eo}\NormalTok{ pid,state,wchan:25,comm }\KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}$2=="D"\textquotesingle{}}
+\CommentTok{\#   PID  S  WCHAN              COMMAND}
+\CommentTok{\#   913  D  io\_schedule        postgres   ← stuck waiting on disk I/O}
+
+\ExtensionTok{iostat} \AttributeTok{{-}xz}\NormalTok{ 1                   }\CommentTok{\# \%util pinned at 100, await = hundreds of ms → dying/slow disk}
+\FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \AttributeTok{{-}E} \StringTok{\textquotesingle{}i/o error|ata|nfs|timeout\textquotesingle{}}   \CommentTok{\# disk/NFS errors?}
+\end{Highlighting}
+\end{Shaded}
+
+Diagnosis: the disk (or an NFS mount) is the bottleneck; processes pile up in \texttt{D}, inflating load while the CPU sits idle. \texttt{kill\ -9} won\textquotesingle t free a D-state process --- you must fix the I/O (failing disk, stalled storage, dead NFS server).
+
+\subsection{Scenario 4 --- "Memory leak / OOM kill."}\label{scenario-4--memory-leak--oom-kill}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{free} \AttributeTok{{-}h}                        \CommentTok{\# available shrinking over time}
+\FunctionTok{dmesg} \AttributeTok{{-}T} \KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}i} \AttributeTok{{-}E} \StringTok{\textquotesingle{}oom|killed process\textquotesingle{}}   \CommentTok{\# confirm an OOM kill happened}
+\CommentTok{\#   Out of memory: Killed process 4823 (java) total{-}vm:8.2GB, anon{-}rss:7.9GB...}
+
+\CommentTok{\# Watch the suspect grow:}
+\FunctionTok{ps} \AttributeTok{{-}o}\NormalTok{ pid,rss,vsz,comm }\AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}     \CommentTok{\# RSS climbing monotonically = leak signature}
+\ExtensionTok{watch} \AttributeTok{{-}n5} \StringTok{\textquotesingle{}ps {-}o rss= {-}p \textless{}pid\textgreater{}\textquotesingle{}}
+
+\CommentTok{\# Per{-}process detail:}
+\FunctionTok{cat}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/status }\KeywordTok{|} \FunctionTok{grep} \AttributeTok{{-}E} \StringTok{\textquotesingle{}VmRSS|VmSwap|Threads\textquotesingle{}}
+\ExtensionTok{pmap} \AttributeTok{{-}x} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}} \KeywordTok{|} \FunctionTok{tail}            \CommentTok{\# memory map breakdown}
+
+\CommentTok{\# In a container: is it a cgroup limit, not host RAM?}
+\FunctionTok{cat}\NormalTok{ /sys/fs/cgroup/}\OperatorTok{\textless{}}\NormalTok{...}\OperatorTok{\textgreater{}}\NormalTok{/memory.max}
+\FunctionTok{cat}\NormalTok{ /sys/fs/cgroup/}\OperatorTok{\textless{}}\NormalTok{...}\OperatorTok{\textgreater{}}\NormalTok{/memory.events   }\CommentTok{\# \textquotesingle{}oom\_kill\textquotesingle{} counter}
+\end{Highlighting}
+\end{Shaded}
+
+For a JVM/managed runtime, "leak" means retained references; take a heap dump and analyze (see \hyperlink{section.09}{\textcolor{acc}{§09}}). For native code, RSS climbing without bound points to unfreed allocations. Mitigation while you fix: raise the limit, lower \texttt{oom\_score\_adj} for critical processes, or set a \texttt{MemoryMax} so only the offender dies.
+
+\subsection{Scenario 5 --- "A process is hung." (strace / lsof)}\label{scenario-5--a-process-is-hung-strace--lsof}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ps} \AttributeTok{{-}o}\NormalTok{ pid,state,wchan,comm }\AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}    \CommentTok{\# state R? S? D? what\textquotesingle{}s it waiting on (wchan)?}
+
+\ExtensionTok{strace} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}                \CommentTok{\# attach: what syscall is it stuck in RIGHT NOW?}
+\CommentTok{\#   read(8,  \textless{}stuck here\textgreater{}      → blocked reading fd 8 (a slow/dead peer?)}
+\CommentTok{\#   futex(0x..., FUTEX\_WAIT…)  → waiting on a lock (deadlock/contention)}
+\CommentTok{\#   \textless{}no output at all\textgreater{}         → not making syscalls (busy{-}looping in userspace → perf top)}
+
+\ExtensionTok{lsof} \AttributeTok{{-}p} \OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}                  \CommentTok{\# what is fd 8? a socket? a file? a pipe?}
+\CommentTok{\#   → if it\textquotesingle{}s a TCP socket: who\textquotesingle{}s the peer? is it ESTABLISHED but silent?}
+\FunctionTok{ls} \AttributeTok{{-}l}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/fd/8         }\CommentTok{\# resolve the fd to its target}
+
+\CommentTok{\# If it\textquotesingle{}s a deadlock (futex), get all thread stacks:}
+\FunctionTok{cat}\NormalTok{ /proc/}\OperatorTok{\textless{}}\NormalTok{pid}\OperatorTok{\textgreater{}}\NormalTok{/task/}\PreprocessorTok{*}\NormalTok{/stack   }\CommentTok{\# kernel stacks per thread}
+\CommentTok{\# (for the JVM: jstack \textless{}pid\textgreater{}; for Go: SIGQUIT dumps goroutine stacks)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{strace} showing a blocking \texttt{read}/\texttt{recvfrom}/\texttt{futex} tells you \emph{exactly} what the process is waiting for; \texttt{lsof}/\texttt{/proc/\textless{}pid\textgreater{}/fd} tells you \emph{what} that fd is. A silent \texttt{strace} (no syscalls) means it\textquotesingle s spinning in userspace --- switch to \texttt{perf\ top\ -p\ \textless{}pid\textgreater{}}.
+
+\subsection{Scenario 6 --- "Port already in use" / connection issues.}\label{scenario-6--port-already-in-use--connection-issues}
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# "bind: address already in use" when starting on :8080}
+\ExtensionTok{ss} \AttributeTok{{-}tlnp} \KeywordTok{|} \FunctionTok{grep}\NormalTok{ :8080          }\CommentTok{\# WHO is bound? → PID + program}
+\CommentTok{\#   LISTEN 0 128 *:8080 *:* users:(("old\_app",pid=4501,fd=6))}
+\BuiltInTok{kill}\NormalTok{ 4501                      }\CommentTok{\# stop the stale holder (graceful first)}
+\CommentTok{\# or it\textquotesingle{}s a lingering TIME\_WAIT: enable SO\_REUSEADDR in the app, or wait it out.}
+
+\CommentTok{\# "connection refused" reaching another service}
+\ExtensionTok{nc} \AttributeTok{{-}zv}\NormalTok{ db.internal 5432        }\CommentTok{\# is the PORT even open? refused = nothing listening / firewall}
+\ExtensionTok{ss} \AttributeTok{{-}tlnp} \KeywordTok{|} \FunctionTok{grep}\NormalTok{ 5432           }\CommentTok{\# (on the server) is the service actually listening on that interface?}
+\CommentTok{\#   bound to 127.0.0.1:5432 instead of 0.0.0.0 → only local connects work!}
+\ExtensionTok{dig}\NormalTok{ +short db.internal         }\CommentTok{\# does the name resolve? to the right IP?}
+\ExtensionTok{ip}\NormalTok{ route get }\OperatorTok{\textless{}}\NormalTok{ip}\OperatorTok{\textgreater{}}              \CommentTok{\# is there a route to it?}
+\ExtensionTok{curl} \AttributeTok{{-}v}\NormalTok{ http://api.internal/health   }\CommentTok{\# if HTTP: see TLS/headers/timeouts}
+\ExtensionTok{tcpdump} \AttributeTok{{-}i}\NormalTok{ any }\AttributeTok{{-}n}\NormalTok{ host }\OperatorTok{\textless{}}\NormalTok{ip}\OperatorTok{\textgreater{}}\NormalTok{ and port 5432   }\CommentTok{\# do packets actually flow? SYN with no SYN{-}ACK = firewall/down}
+\end{Highlighting}
+\end{Shaded}
+
+The decision tree: \textbf{resolve} (dig) \(\rightarrow\) \textbf{route} (ip route get) \(\rightarrow\) \textbf{reach the port} (nc) \(\rightarrow\) \textbf{app responds} (curl) \(\rightarrow\) \textbf{packets flow} (tcpdump). A common gotcha: a service bound to \texttt{127.0.0.1} instead of \texttt{0.0.0.0} accepts only local connections, so remote clients get "connection refused" while local curl works.
+
+\textbf{Interview takeaway:} \textbf{Every scenario rewards a \emph{narrated, structured} approach: frame the symptom, sweep resources in order (CPU\(\rightarrow\)mem\(\rightarrow\)disk\(\rightarrow\)net), and reach for the right probe (\texttt{lsof} for deleted-open files and fds, \texttt{D}-state + \texttt{iostat} for I/O-bound load, \texttt{dmesg} for OOM, \texttt{ss} for port conflicts, \texttt{strace} for hangs). Knowing the deleted-but-open-file and bound-to-127.0.0.1 gotchas signals real operational experience.}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{The user/kernel boundary and a syscall}\label{the-userkernel-boundary-and-a-syscall}
+
+\setcodelang{}
+
+\begin{verbatim}
+USERLAND                                   KERNEL
+────────                                   ──────
+  your process
+     │  read(fd, buf, n)        glibc wrapper
+     │ ───────────────────────► sets up registers, executes `syscall`
+     │                                │  trap → ring 0
+     │                                ▼
+     │                          sys_read():
+     │                            check fd, permissions
+     │                            copy data from page cache (or block on disk → state D)
+     │                            return byte count
+     │  ◄───────────────────────────  return to ring 3
+     ▼
+  continue with data in buf
+\end{verbatim}
+
+\subsection{A pipeline\textquotesingle s data flow}\label{a-pipelines-data-flow}
+
+\setcodelang{}
+
+\begin{verbatim}
+[ access.log ]
+     │ cat
+     ▼ stdout
+   ──┤ grep ERROR │── stdout
+                  ▼ stdin
+                ──┤ awk '{print $7}' │── stdout
+                                     ▼ stdin
+                                   ──┤ sort │──┤ uniq -c │──┤ sort -rn │──┤ head │──▶ terminal
+
+Each '|' = an in-kernel buffer wiring left.stdout → right.stdin.
+All stages run CONCURRENTLY, streaming. Downstream exit → upstream gets SIGPIPE.
+\end{verbatim}
+
+\subsection{File descriptors \& redirection}\label{file-descriptors--redirection}
+
+\setcodelang{}
+
+\begin{verbatim}
+            ┌──────────── process ────────────┐
+keyboard ──▶│ fd0 stdin                        │
+            │ fd1 stdout ──▶ terminal          │──▶  > file   (overwrite)
+            │ fd2 stderr ──▶ terminal          │──▶  >> file  (append)
+            └──────────────────────────────────┘──▶  2> err   (errors aside)
+                                                 └─▶  2>&1     (fd2 := wherever fd1 points NOW)
+< file feeds fd0.   | wires fd1 → next process's fd0.
+\end{verbatim}
+
+\subsection{Inode, directory entry, links}\label{inode-directory-entry-links}
+
+\setcodelang{}
+
+\begin{verbatim}
+DIRECTORY /home/u (itself an inode, type d)
+  ┌──────────────────────────┐
+  │ "report.txt"  → inode 42 │──┐
+  │ "backup.txt"  → inode 42 │──┤   (hard link: 2 names, 1 inode, link_count=2)
+  │ "shortcut"    → inode 77 │  │
+  └──────────────────────────┘  │
+                                ▼
+                         INODE 42  (link_count=2)
+                          mode/owner/size/times
+                          block ptrs → [data blocks on disk]
+
+  inode 77 (a symlink): its DATA is the text "/home/u/report.txt"
+       → resolved by NAME at access time; dangles if target removed.
+
+rm "backup.txt"  → unlink → link_count 2→1, data UNTOUCHED.
+rm "report.txt"  → link_count 1→0; if also no open fd → blocks freed.
+\end{verbatim}
+
+\subsection{Container = namespaces + cgroups}\label{container--namespaces--cgroups}
+
+\setcodelang{}
+
+\begin{verbatim}
+            HOST KERNEL (single, shared)
+   ┌───────────────────────────────────────────────┐
+   │  Container A            Container B            │
+   │  ┌──────────────┐       ┌──────────────┐       │
+   │  │ ns: pid/net/ │       │ ns: pid/net/ │  ← SEE (isolation)
+   │  │     mnt/uts… │       │     mnt/uts… │       │
+   │  │ PID 1 = app  │       │ PID 1 = app  │       │
+   │  └──────────────┘       └──────────────┘       │
+   │  cgroup: mem.max=512M   cgroup: cpu.max=0.5  ← USE (limits)
+   └───────────────────────────────────────────────┘
+   No guest kernels. Just isolated, capped processes.
+\end{verbatim}
+
+\subsection{Triage decision tree}\label{triage-decision-tree}
+
+\setcodelang{}
+
+\begin{verbatim}
+                    "Server is slow"
+                          │
+              ┌───────────┴───────────┐
+        load > nproc?              load ≈ low?
+              │                        │
+        is CPU busy? ───── no ──► high %wa? ──► DISK (iostat, iotop, D-state)
+              │ yes                    │
+        %us high → app CPU-bound       └─ swap si/so? ──► MEMORY (free, OOM in dmesg)
+        %sy high → syscall-heavy
+        %st high → VM steal/throttle
+              │
+        none of the above + many sockets ──► NETWORK (ss, sar, retrans)
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\begin{itemize}
+\item
+  \textbf{logrotate + SIGHUP.} Production logging relies on \texttt{logrotate}: it renames \texttt{app.log} \(\rightarrow\) \texttt{app.log.1}, then sends the daemon \texttt{SIGHUP} (or \texttt{USR1}) so it \textbf{reopens} its log file. Without that reopen, the daemon keeps writing to the now-renamed inode (the deleted-open-file problem in slow motion) and the new \texttt{app.log} stays empty.
+\item
+  \textbf{Graceful deploys (Kubernetes).} A rolling update sends each pod \textbf{SIGTERM}, waits \texttt{terminationGracePeriodSeconds}, then \textbf{SIGKILL}. A service that traps SIGTERM, fails its readiness probe (so the load balancer drains it), finishes in-flight requests, and exits \(\rightarrow\) zero dropped connections. One that ignores SIGTERM \(\rightarrow\) connections reset mid-request on every deploy.
+\item
+  \textbf{\texttt{OOMKilled} pods.} A Java service with \texttt{-Xmx} set higher than the pod\textquotesingle s cgroup \texttt{memory.max} gets the \textbf{cgroup OOM killer} --- \texttt{kubectl\ describe\ pod} shows \texttt{Reason:\ OOMKilled}, \texttt{dmesg} shows the SIGKILL. The fix is aligning JVM heap + overhead to the limit, not "give it more memory" reflexively.
+\item
+  \textbf{CPU throttling latency.} A latency-sensitive container with \texttt{-\/-cpus=0.5} shows periodic p99 spikes while host CPU sits idle. \texttt{cpu.stat} reveals \texttt{nr\_throttled} climbing --- the kernel is \emph{pausing} it each period. Raising the CPU limit (or removing it for latency-critical workloads) fixes the spikes.
+\item
+  \textbf{"Too many open files."} A high-throughput proxy hits the default \texttt{ulimit\ -n\ 1024} under load \(\rightarrow\) \texttt{accept:\ too\ many\ open\ files}, connections rejected. Raising \texttt{LimitNOFILE=1048576} in the systemd unit resolves it. A \emph{leaking} fd count (not closing sockets) presents identically --- \texttt{ls\ /proc/\textless{}pid\textgreater{}/fd\ \textbar{}\ wc\ -l} climbing distinguishes the two.
+\item
+  \textbf{Log triage during an incident.} \texttt{awk\ \textquotesingle{}\$9\ \textasciitilde{}\ /\^{}5/\ \{print\ \$7\}\textquotesingle{}\ access.log\ \textbar{}\ sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn\ \textbar{}\ head} instantly shows \emph{which endpoints} are throwing 5xx --- turning "the site is erroring" into "the \texttt{/checkout} endpoint is failing 3000\(\times\)/min."
+\item
+  \textbf{Cron\textquotesingle s bare environment.} A backup script that works by hand but silently fails under cron --- because cron\textquotesingle s \texttt{PATH} lacks \texttt{/usr/local/bin}, so \texttt{aws} isn\textquotesingle t found. Absolute paths + redirected output (\texttt{\textgreater{}\textgreater{}\ /var/log/backup.log\ 2\textgreater{}\&1}) surface and fix it.
+\end{itemize}
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One office building with a facilities team --- every Linux concept is a room, a key, or a routine.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2052}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7948}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Linux concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Real-life analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Kernel / userland split} & The building\textquotesingle s locked utility core (power, water, security) vs the tenant offices. Tenants can\textquotesingle t touch the wiring directly; they file a request at the service desk (syscall), and facilities does the privileged work. \\
+\rowcolor{zebra}
+\textbf{"Everything is a file"} & Every room, vending machine, and notice board has the same kind of labelled door you open the same way --- so one master key (the file API) works on all of them. \\
+\textbf{Inode vs filename} & The filename is a label on a mailbox; the inode is the actual mailbox with the mail inside. Peel off the label and stick it on another mailbox (hard link) --- same mail, two labels. \\
+\rowcolor{zebra}
+\textbf{rm = unlink} & Removing a label from a mailbox. The mail stays until the \emph{last} label is gone \textbf{and} no one is still standing there reading it (open fd). \\
+\textbf{Deleted-but-open file} & You peel off the only label while the night-shift clerk is mid-letter, reading from that mailbox. The mailbox (and its space) stays reserved until the clerk finishes and walks away. \\
+\rowcolor{zebra}
+\textbf{Hard vs soft link} & Hard link: a second label on the same mailbox. Soft link: a sticky note saying "see mailbox 42 down the hall" --- useless if mailbox 42 is later removed. \\
+\textbf{Permissions (rwx)} & Door access tiers: the owner has a full key, their team has a swipe card, everyone else can only read the nameplate. \texttt{chmod\ 777} props every door open with a doorstop. \\
+\rowcolor{zebra}
+\textbf{setuid (passwd)} & A locked records room only HR may enter. You can\textquotesingle t go in, but there\textquotesingle s a sanctioned intercom (a setuid tool) that lets you make \emph{one specific} change ("reset my badge PIN") under HR\textquotesingle s authority, nothing more. \\
+\textbf{Sticky bit (/tmp)} & A shared coat closet anyone may hang coats in, but a rule that you can only take \emph{your own} coat --- not your neighbor\textquotesingle s. \\
+\rowcolor{zebra}
+\textbf{Process / fork / exec} & Hiring: \texttt{fork} clones an existing employee with all their context; \texttt{exec} then hands that clone a completely new job description and they become a different worker (same badge number/PID). \\
+\textbf{Zombie process} & An employee who has left, but HR never filed the exit paperwork --- their badge still sits in the system roster doing nothing, cluttering it. \\
+\rowcolor{zebra}
+\textbf{Orphan process} & An employee whose manager quit; HR (PID 1) automatically reassigns them and will file their paperwork properly when they leave. \\
+\textbf{D-state (uninterruptible sleep)} & A worker who walked into the bank vault (kernel I/O) and the time-locked door shut. You can shout "you\textquotesingle re fired!" (SIGKILL) all you want --- they literally cannot hear or respond until the vault opens. \\
+\rowcolor{zebra}
+\textbf{SIGTERM vs SIGKILL} & "Please wrap up and head home" (grab your coat, save your work) versus security physically carrying you out mid-sentence, papers scattering. \\
+\textbf{Pipe} & An assembly line: each station does one small transform and slides the product to the next, all working simultaneously. \\
+\rowcolor{zebra}
+\textbf{stdout vs stderr} & Two out-trays on each desk: one for finished work that flows down the line, one for "problems" notes routed to the supervisor --- kept separate on purpose. \\
+\textbf{Load average} & The number of people either working or stuck waiting at the one printer, averaged over time. Twenty people "in the system" with the CPU idle means nineteen are jammed at the broken printer (disk), not actually working. \\
+\rowcolor{zebra}
+\textbf{OOM killer} & The fire marshal: when the building exceeds capacity, they forcibly remove the largest occupant to keep the whole building from collapsing --- no warning, no goodbye. \\
+\textbf{Namespaces} & Soundproofed, one-way-mirrored offices: each tenant sees only their own rooms and believes they have the whole floor. \\
+\rowcolor{zebra}
+\textbf{cgroups} & The metered utilities cap per office: "this tenant gets at most 0.5 kW and 512 sq ft" --- exceed the power cap and you\textquotesingle re throttled; exceed the space cap and the fire marshal evicts you. \\
+\textbf{cron} & The night cleaning crew with a fixed schedule taped to the door --- but they arrive to a stripped-down building (bare environment), so you must spell out every supply location (absolute paths). \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{fd 0/1/2} = \textbf{i}n, \textbf{o}ut, \textbf{e}rror \(\rightarrow\) "\textbf{0 In, 1 Out, 2 Errors}."
+\item
+  \textbf{chmod octal:} r=\textbf{4}, w=\textbf{2}, x=\textbf{1} \(\rightarrow\) 7=rwx, 6=rw-, 5=r-x, 4=r-\/-. Common: \textbf{755} dirs/bins, \textbf{644} files, \textbf{600} secrets.
+\item
+  \textbf{Special-bit leading digit:} \textbf{4}=setuid, \textbf{2}=setgid, \textbf{1}=sticky \(\rightarrow\) \texttt{4755}, \texttt{2775}, \texttt{1777}.
+\item
+  \textbf{Process states "Really Sleepy Dogs Zzz Tired":} \textbf{R}unning, \textbf{S}leep (interruptible), \textbf{D} (uninterruptible --- disk, \textbf{D}eaf to KILL), \textbf{Z}ombie, \textbf{T} (stopped).
+\item
+  \textbf{\texttt{D} = Disk = Deaf} (immune to \texttt{kill\ -9}, waiting on I/O).
+\item
+  \textbf{TERM before KILL} --- "knock, then break the door." \texttt{-9} is the last resort.
+\item
+  \textbf{\texttt{2\textgreater{}\&1} must come AFTER \texttt{\textgreater{}}} --- "redirect the \emph{output} first, \emph{then} glue errors onto it."
+\item
+  \textbf{\texttt{sort\ \textbar{}\ uniq\ -c}} --- "\textbf{sort to group, uniq to count.}" uniq only sees \emph{adjacent} dupes.
+\item
+  \textbf{USE = "Uncle Sam\textquotesingle s Equipment"} --- Utilization, Saturation, Errors, per resource.
+\item
+  \textbf{Slow-server sweep:} \textbf{"CPU, Mem, Disk, Net, Logs"} \(\rightarrow\) "\textbf{C}an \textbf{M}y \textbf{D}isk \textbf{N}ot \textbf{L}ag?"
+\item
+  \textbf{Load \textgreater{} cores isn\textquotesingle t always bad; load counts R \emph{and} D} \(\rightarrow\) "Load = busy \textbf{or} blocked."
+\item
+  \textbf{Container = "See vs Use":} namespaces = what you \textbf{See}, cgroups = what you \textbf{Use}.
+\item
+  \textbf{Script safety:} \textbf{\texttt{set\ -euo\ pipefail}} \(\rightarrow\) "\textbf{e}rrors \textbf{u}nset \textbf{pipe}: fail fast."
+\item
+  \textbf{\texttt{df} vs \texttt{du}:} d\textbf{f} = \textbf{F}ree (filesystem view, sees deleted-open); d\textbf{u} = \textbf{U}sage (walks names).
+\end{itemize}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: A production server is slow --- walk me through debugging it.}\label{q1-a-production-server-is-slow--walk-me-through-debugging-it}
+
+\textbf{Model answer:} First I frame the symptom: what\textquotesingle s slow (latency? throughput?), since when, and what changed (deploy, traffic, config). Then I do a structured \textbf{USE sweep} rather than random commands. \textbf{CPU:} \texttt{uptime} (load vs \texttt{nproc}), \texttt{top}/\texttt{mpstat\ -P\ ALL\ 1} --- check \texttt{\%us} (app CPU-bound), \texttt{\%sy} (syscall-heavy), \texttt{\%wa} (I/O wait, \emph{not} CPU), \texttt{\%st} (VM steal). \textbf{Memory:} \texttt{free\ -h} and \texttt{vmstat\ 1} --- \texttt{si/so} nonzero means active swapping; \texttt{dmesg} for OOM kills. \textbf{Disk:} \texttt{iostat\ -xz\ 1} for \texttt{\%util}/\texttt{await}, \texttt{iotop} for the culprit process. \textbf{Network:} \texttt{ss\ -s}, \texttt{sar\ -n\ DEV\ 1}, retransmits via \texttt{netstat\ -s}. Then I drill into the hottest process with \texttt{ps\ -\/-sort=-\%cpu}, \texttt{strace\ -c\ -p\ \textless{}pid\textgreater{}}, and finally the logs (\texttt{journalctl\ -u\ svc}, \texttt{dmesg}). The key reasoning: high load with idle CPU means I/O wait or D-state processes, and a full disk masquerades as many problems --- so I check those early.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Load is 30 but CPU is 90\% idle --- what\textquotesingle s happening?} \(\rightarrow\) Load counts R \textbf{and} D (uninterruptible sleep). Processes are stuck in \texttt{D} on disk/NFS I/O; check \texttt{iostat} and list D-state procs. \texttt{kill\ -9} won\textquotesingle t help.
+\item
+  \emph{How do you find which process is using the disk?} \(\rightarrow\) \texttt{iotop}, or \texttt{pidstat\ -d\ 1}.
+\item
+  \emph{What if it only happens under load?} \(\rightarrow\) Resource saturation: thread/connection pool, fd limits (\texttt{ulimit\ -n}), cgroup throttling. Load-test at realistic concurrency.
+\end{itemize}
+
+\subsection{Q2: SIGTERM vs SIGKILL --- and why does it matter for deploys?}\label{q2-sigterm-vs-sigkill--and-why-does-it-matter-for-deploys}
+
+\textbf{Model answer:} \textbf{SIGTERM (15)} is a polite, \emph{catchable} "please shut down." A process can install a handler to flush buffers, finish in-flight requests, close DB connections, deregister from the load balancer, then exit cleanly. \textbf{SIGKILL (9)} is \emph{uncatchable and unblockable} --- the kernel destroys the process with no chance to clean up, risking data loss or corruption. The correct sequence (what \texttt{systemctl\ stop}, \texttt{docker\ stop}, and Kubernetes all do) is: send SIGTERM, wait a grace period, then SIGKILL only if it\textquotesingle s still alive. This is the foundation of \textbf{zero-downtime deploys} --- a service that traps SIGTERM and drains gracefully drops no connections; one that ignores it gets KILLed mid-request.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Which signals can\textquotesingle t be caught?} \(\rightarrow\) SIGKILL (9) and SIGSTOP (19).
+\item
+  \emph{How do you implement graceful shutdown in a script?} \(\rightarrow\) \texttt{trap\ cleanup\ SIGTERM\ SIGINT}.
+\item
+  \emph{You sent SIGKILL and the process won\textquotesingle t die --- why?} \(\rightarrow\) It\textquotesingle s in \texttt{D} state (uninterruptible sleep on I/O); the signal can\textquotesingle t be delivered until the I/O completes. Fix the I/O.
+\end{itemize}
+
+\subsection{\texorpdfstring{Q3: The disk is 100\% full but \texttt{du} shows almost nothing. Why?}{Q3: The disk is 100\% full but du shows almost nothing. Why?}}\label{q3-the-disk-is-100-full-but-du-shows-almost-nothing-why}
+
+\textbf{Model answer:} Two classic causes. \textbf{(1) Deleted-but-open file:} a process (say a logger) still holds an open fd to a file that was \texttt{rm}\textquotesingle d. \texttt{rm} only \emph{unlinks} the name; because the inode still has an open fd, its data blocks stay allocated. \texttt{df} (filesystem counters) sees the space; \texttt{du}/\texttt{ls} (which walk directory names) don\textquotesingle t, because the name is gone. Find it with \texttt{lsof\ \textbar{}\ grep\ deleted}, then truncate the fd (\texttt{:\ \textgreater{}\ /proc/\textless{}pid\textgreater{}/fd/N}) or signal/restart the process to reopen --- \emph{not} another \texttt{rm}. \textbf{(2) Inode exhaustion:} millions of tiny files used up all inodes; \texttt{df\ -h} shows free bytes but writes fail with \texttt{No\ space\ left\ on\ device}. \texttt{df\ -i} reveals it. A third possibility is a large file hidden under a mount point.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why doesn\textquotesingle t another \texttt{rm} help?} \(\rightarrow\) The name is already gone; the fd is what\textquotesingle s holding the space.
+\item
+  \emph{How do you prevent the logger case?} \(\rightarrow\) logrotate sends SIGHUP so the daemon reopens its log instead of writing to the deleted inode.
+\end{itemize}
+
+\subsection{Q4: Explain Unix permissions, octal, and the special bits.}\label{q4-explain-unix-permissions-octal-and-the-special-bits}
+
+\textbf{Model answer:} Each file has an owner, a group, and rwx bits for owner/group/other, shown as \texttt{rwxr-xr-x}. In octal r=4, w=2, x=1: \textbf{755} = owner rwx, group/other r-x (dirs, executables); \textbf{644} = owner rw, world read (regular files); \textbf{600} = owner-only (secrets like SSH keys). On \emph{directories}, the bits mean differently: \texttt{r}=list names, \texttt{w}=create/delete entries, \texttt{x}=enter/traverse. The three \textbf{special bits}: \textbf{setuid} (run as the file\textquotesingle s owner --- e.g. \texttt{/usr/bin/passwd} runs as root so users can update root-owned \texttt{/etc/shadow}), \textbf{setgid} (new files inherit the directory\textquotesingle s group --- shared team folders), and the \textbf{sticky bit} (on \texttt{/tmp}: world-writable but you can only delete your \emph{own} files). \texttt{umask} subtracts default bits at creation. \texttt{chmod\ 777} is dangerous because it lets anyone write and execute --- the fix is correct ownership plus least privilege.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why can\textquotesingle t a normal user write to \texttt{/etc/shadow} but \texttt{passwd} can?} \(\rightarrow\) \texttt{passwd} is setuid-root.
+\item
+  \emph{You have \texttt{x} but not \texttt{r} on a directory --- what can you do?} \(\rightarrow\) \texttt{cd} in and open a file \emph{if you know its exact name}, but not \texttt{ls} it.
+\end{itemize}
+
+\subsection{\texorpdfstring{Q5: What do \texttt{2\textgreater{}\&1}, \texttt{\textgreater{}}, \texttt{\textgreater{}\textgreater{}}, and pipes do --- and why does order matter?}{Q5: What do 2\textgreater\&1, \textgreater, \textgreater\textgreater, and pipes do --- and why does order matter?}}\label{q5-what-do-21---and-pipes-do--and-why-does-order-matter}
+
+\textbf{Model answer:} fd 0/1/2 are stdin/stdout/stderr. \texttt{\textgreater{}\ file} redirects stdout (overwriting), \texttt{\textgreater{}\textgreater{}} appends, \texttt{2\textgreater{}\ file} redirects stderr, and \texttt{2\textgreater{}\&1} makes fd 2 point to \emph{wherever fd 1 currently points}. Order matters: \texttt{cmd\ \textgreater{}\ file\ 2\textgreater{}\&1} sends stdout to the file, then duplicates stderr onto the same target --- both land in the file. But \texttt{cmd\ 2\textgreater{}\&1\ \textgreater{}\ file} first points stderr at the \emph{terminal} (where fd 1 still is), \emph{then} redirects stdout to the file --- so stderr keeps going to the terminal. A \textbf{pipe} wires one command\textquotesingle s stdout to the next\textquotesingle s stdin via a kernel buffer, and stages run concurrently --- that\textquotesingle s the heart of the Unix compose-small-tools philosophy.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{How do you discard all output?} \(\rightarrow\) \texttt{cmd\ \textgreater{}\ /dev/null\ 2\textgreater{}\&1} (or \texttt{\&\textgreater{}/dev/null}).
+\item
+  \emph{How do you see output live and save it?} \(\rightarrow\) \texttt{cmd\ \textbar{}\ tee\ file}.
+\end{itemize}
+
+\subsection{Q6: Write a one-liner for the top 10 IPs in an access log, and explain it.}\label{q6-write-a-one-liner-for-the-top-10-ips-in-an-access-log-and-explain-it}
+
+\textbf{Model answer:} \texttt{awk\ \textquotesingle{}\{print\ \$1\}\textquotesingle{}\ access.log\ \textbar{}\ sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn\ \textbar{}\ head} --- \texttt{awk} extracts the first field (the IP) from each line; \texttt{sort} groups identical IPs adjacently (required because \texttt{uniq} only collapses \emph{adjacent} duplicates); \texttt{uniq\ -c} collapses each group and prefixes the count; \texttt{sort\ -rn} sorts numerically descending by that count; \texttt{head} takes the top 10. The \texttt{sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn} idiom answers any "most common X" question --- top URLs, top error codes, top users. To filter to errors first, prepend \texttt{awk\ \textquotesingle{}\$9\ \textasciitilde{}\ /\^{}5/\textquotesingle{}} or a \texttt{grep}.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Only count 500s?} \(\rightarrow\) \texttt{awk\ \textquotesingle{}\$9==500\ \{print\ \$1\}\textquotesingle{}\ …}.
+\item
+  \emph{Requests per minute?} \(\rightarrow\) extract the timestamp substring and \texttt{uniq\ -c}.
+\item
+  \emph{Follow it live?} \(\rightarrow\) \texttt{tail\ -f} the log into the pipeline.
+\end{itemize}
+
+\subsection{Q7: What\textquotesingle s a zombie process, and how is it different from an orphan?}\label{q7-whats-a-zombie-process-and-how-is-it-different-from-an-orphan}
+
+\textbf{Model answer:} A \textbf{zombie} is a child that has \emph{exited} but whose exit status the parent hasn\textquotesingle t collected via \texttt{wait()}. It holds only a process-table slot (shows as \texttt{Z}/\texttt{\textless{}defunct\textgreater{}}). It\textquotesingle s harmless individually but signals a parent bug --- the parent isn\textquotesingle t reaping, usually by failing to handle \texttt{SIGCHLD}. You can\textquotesingle t kill a zombie (it\textquotesingle s already dead); you fix or signal the \emph{parent} to reap, or the parent\textquotesingle s death re-parents it. An \textbf{orphan} is the opposite: the \emph{parent} died while the child lives. The child is re-parented to PID 1 (\texttt{systemd}/\texttt{init}), which dutifully reaps it --- so orphans are harmless. In containers, a naive PID 1 that doesn\textquotesingle t reap leaves zombies piling up; the fix is a proper init like \texttt{tini}.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{How do you prevent zombies?} \(\rightarrow\) Parent handles \texttt{SIGCHLD} and \texttt{wait()}s; or run \texttt{tini}/\texttt{-\/-init} as PID 1.
+\item
+  \emph{Can a zombie consume real resources?} \(\rightarrow\) Only a PID slot, but enough of them exhaust the PID space.
+\end{itemize}
+
+\subsection{Q8: How do containers isolate processes? What actually is a container?}\label{q8-how-do-containers-isolate-processes-what-actually-is-a-container}
+
+\textbf{Model answer:} A container is just a normal Linux process (tree) wrapped in two kernel features. \textbf{Namespaces} isolate what it can \emph{see} --- PID (it\textquotesingle s PID 1, can\textquotesingle t see host processes), NET (own interfaces, IPs, ports), MNT (own root filesystem), UTS (own hostname), IPC, and USER (root inside maps to unprivileged outside). \textbf{cgroups} limit what it can \emph{use} --- \texttt{memory.max}, \texttt{cpu.max}, I/O, PID count. There\textquotesingle s no guest kernel --- every container shares the host kernel, which is why they start instantly and are lighter than VMs. Docker just orchestrates: create namespaces, set up a cgroup, \texttt{pivot\_root} into the image\textquotesingle s overlayfs layers, drop capabilities, and exec the entrypoint. You can build one by hand with \texttt{unshare}.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{What\textquotesingle s \texttt{OOMKilled} in Kubernetes?} \(\rightarrow\) The container hit its cgroup \texttt{memory.max}; the cgroup OOM killer SIGKILLed it (host RAM was fine).
+\item
+  \emph{Container latency spikes but host CPU is idle?} \(\rightarrow\) CPU \textbf{throttling} at \texttt{cpu.max}; check \texttt{nr\_throttled} in \texttt{cpu.stat}.
+\item
+  \emph{VM vs container?} \(\rightarrow\) VM virtualizes hardware with a full guest kernel (stronger isolation, heavier); a container shares the host kernel (lighter, weaker isolation).
+\end{itemize}
+
+\subsection{Q9: A process is hung. How do you find out what it\textquotesingle s doing?}\label{q9-a-process-is-hung-how-do-you-find-out-what-its-doing}
+
+\textbf{Model answer:} First \texttt{ps\ -o\ state,wchan\ -p\ \textless{}pid\textgreater{}} --- the state tells me a lot: \texttt{S} waiting on an event, \texttt{D} stuck in uninterruptible I/O, \texttt{R} actually running (possibly busy-looping). Then \texttt{strace\ -p\ \textless{}pid\textgreater{}} to attach and see the exact syscall it\textquotesingle s blocked in: a stuck \texttt{read}/\texttt{recvfrom} means it\textquotesingle s waiting on a slow or dead peer; a \texttt{futex(...\ WAIT)} means lock contention or deadlock; \emph{no output at all} means it isn\textquotesingle t making syscalls --- it\textquotesingle s spinning in userspace, so I switch to \texttt{perf\ top\ -p\ \textless{}pid\textgreater{}}. \texttt{lsof\ -p\ \textless{}pid\textgreater{}} (or \texttt{/proc/\textless{}pid\textgreater{}/fd}) resolves which file/socket an fd refers to, so I learn \emph{what} it\textquotesingle s waiting on. For threaded apps I dump all thread stacks (\texttt{/proc/\textless{}pid\textgreater{}/task/*/stack}, or \texttt{jstack} for the JVM).
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{strace shows nothing --- what now?} \(\rightarrow\) It\textquotesingle s CPU-bound in userspace; profile with \texttt{perf}.
+\item
+  \emph{It\textquotesingle s stuck in \texttt{D} --- can you kill it?} \(\rightarrow\) No; SIGKILL can\textquotesingle t be delivered until the I/O completes. Fix the underlying I/O.
+\end{itemize}
+
+\subsection{Q10: What does load average mean, and is load 8 on an 8-core box a problem?}\label{q10-what-does-load-average-mean-and-is-load-8-on-an-8-core-box-a-problem}
+
+\textbf{Model answer:} Load average is the number of processes in state \textbf{R (runnable)} or \textbf{D (uninterruptible sleep)}, averaged over 1/5/15 minutes --- so it\textquotesingle s \emph{not} a pure CPU metric. Load 8 on 8 cores means, on average, exactly as many runnable/blocked tasks as cores --- roughly fully utilized but not necessarily \emph{over}loaded; whether it\textquotesingle s a problem depends on whether those are CPU-runnable (work getting done) or D-state (blocked on a slow disk, doing nothing). The critical insight: a box can show load 30 with the CPU 90\% idle because 30 processes are stuck in \texttt{D} waiting on failing storage. So I always compare load to \texttt{nproc} \emph{and} check \texttt{\%iowait}/D-state before concluding it\textquotesingle s a CPU problem.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{How do you tell CPU-bound from I/O-bound load?} \(\rightarrow\) \texttt{mpstat}/\texttt{top} \texttt{\%us} vs \texttt{\%wa}; list D-state processes.
+\item
+  \emph{Why are there three numbers?} \(\rightarrow\) 1/5/15-minute averages --- rising 1-min above 15-min means the load is \emph{growing}.
+\end{itemize}
+
+\subsection{Q11: How do you make a script reliable and safe?}\label{q11-how-do-you-make-a-script-reliable-and-safe}
+
+\textbf{Model answer:} Start with \texttt{set\ -euo\ pipefail}: \texttt{-e} exits on any error (don\textquotesingle t barrel past failures), \texttt{-u} errors on unset variables (catches typos that would otherwise expand to empty --- turning \texttt{rm\ -rf\ "\$DIR/"} into \texttt{rm\ -rf\ /}), and \texttt{pipefail} makes a pipeline fail if any stage fails. \textbf{Always quote variables} (\texttt{"\$var"}) to prevent word-splitting and glob disasters on filenames with spaces. Use \texttt{trap\ \textquotesingle{}cleanup\textquotesingle{}\ EXIT} for guaranteed cleanup (temp files) and \texttt{trap\ …\ TERM\ INT} for graceful interruption. Check exit codes with \texttt{\$?} and chain logic with \texttt{\&\&}/\texttt{\textbar{}\textbar{}}. Use \texttt{mktemp} for temp files, \texttt{local} in functions, and log to stderr so stdout stays usable in a pipeline.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why quote variables?} \(\rightarrow\) Unquoted \texttt{\$file} with a space becomes two arguments --- \texttt{rm\ \$file} could delete the wrong things.
+\item
+  \emph{What does \texttt{trap\ …\ EXIT} give you?} \(\rightarrow\) Cleanup runs no matter how the script exits (success, error, or signal).
+\end{itemize}
+
+\subsection{Q12: A service won\textquotesingle t start --- "bind: address already in use." How do you fix it?}\label{q12-a-service-wont-start--bind-address-already-in-use-how-do-you-fix-it}
+
+\textbf{Model answer:} Something is already bound to the port. \texttt{ss\ -tlnp\ \textbar{}\ grep\ :\textless{}port\textgreater{}} shows the owning PID and program. If it\textquotesingle s a stale instance of my own service, I stop it gracefully (SIGTERM) and restart. If it\textquotesingle s a lingering \texttt{TIME\_WAIT} socket from a previous crash, I either enable \texttt{SO\_REUSEADDR} in the app (so it can rebind immediately) or wait the TIME\_WAIT out. A related gotcha: if the service starts but remote clients get "connection refused," check that it bound to \texttt{0.0.0.0} (all interfaces) rather than \texttt{127.0.0.1} (localhost only) --- \texttt{ss\ -tlnp} shows the bind address.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Difference between "connection refused" and "connection timed out"?} \(\rightarrow\) Refused = reached the host but nothing\textquotesingle s listening (or firewall RST); timed out = packets dropped silently (firewall DROP, host down, routing).
+\item
+  \emph{How to test a port without the app?} \(\rightarrow\) \texttt{nc\ -zv\ host\ port}.
+\end{itemize}
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\begin{itemize}
+\item
+  \textbf{"Everything is a file" is an architecture, not a slogan.} Because devices, sockets, pipes, and kernel state all share the file API, \emph{one} set of tools (\texttt{cat}, redirection, \texttt{lsof}, \texttt{epoll}) works across all of them, and observability comes nearly for free via \texttt{/proc} and \texttt{/sys}. This uniformity is why the Unix model has survived 50 years.
+\item
+  \textbf{Graceful shutdown is a correctness property, not a nicety.} For stateful services, ignoring SIGTERM means SIGKILL mid-write \(\rightarrow\) torn data, lost in-flight requests, connection resets on every deploy. Senior engineers wire SIGTERM \(\rightarrow\) drain \(\rightarrow\) flush \(\rightarrow\) exit, and set the orchestrator\textquotesingle s grace period to match the real drain time.
+\item
+  \textbf{Containers demystified prevent whole classes of incidents.} Knowing that \texttt{OOMKilled} = cgroup \texttt{memory.max} (not host RAM) and that latency-with-idle-CPU = \texttt{cpu.max} throttling lets you fix the \emph{right} knob. Knowing PID 1 doesn\textquotesingle t reap by default explains zombie pileups and stuck shutdowns.
+\item
+  \textbf{Load average is a trap for the unwary.} It conflates CPU-runnable and I/O-blocked (D-state) tasks. Reasoning about it correctly --- compare to core count, then split CPU vs I/O wait --- separates people who\textquotesingle ve operated systems from people who memorized that "high load = bad."
+\item
+  \textbf{Least privilege end to end.} Services run as dedicated unprivileged users, secrets are \texttt{600}, capabilities are dropped in containers, setuid binaries are minimized and audited, and \texttt{sudo}/\texttt{chmod\ 777} are smells. Security posture is largely a permissions-and-ownership discipline.
+\item
+  \textbf{The kernel/userland boundary has a cost.} Syscalls are mode switches (\textasciitilde hundreds of ns); chatty syscall patterns dominate \texttt{\%sy} time. \texttt{strace\ -c} quantifies it, and the fix is batching (bigger reads/writes, \texttt{sendfile}, \texttt{io\_uring}) --- directly connecting CLI debugging to performance engineering (\hyperlink{section.09}{\textcolor{acc}{§09}}).
+\item
+  \textbf{\texttt{/proc} and \texttt{/sys} are the live source of truth.} When tools disagree or aren\textquotesingle t installed, \texttt{/proc/\textless{}pid\textgreater{}/\{status,fd,stack,maps\}}, \texttt{/proc/loadavg}, \texttt{/proc/meminfo}, and the cgroup files under \texttt{/sys/fs/cgroup} give you ground truth straight from the kernel.
+\end{itemize}
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Reaching for \texttt{kill\ -9} first.} Always SIGTERM (graceful) before SIGKILL. \texttt{-9} mid-write corrupts data and skips cleanup; it\textquotesingle s the last resort, not the default.
+\item
+  \textbf{\texttt{chmod\ 777} as a "fix."} A security hole. The real fix is correct \emph{ownership} + least-privilege modes (\texttt{chown} the service user, \texttt{755}/\texttt{600}).
+\item
+  \textbf{Forgetting to check the disk.} A full filesystem (or inode exhaustion) masquerades as a dozen unrelated failures. \texttt{df\ -h} and \texttt{df\ -i} belong near the start of any triage.
+\item
+  \textbf{Not knowing the deleted-but-open-file trap.} Trying another \texttt{rm} when \texttt{df} is full but \texttt{du} is empty, instead of \texttt{lsof\ \textbar{}\ grep\ deleted}.
+\item
+  \textbf{Confusing stdout and stderr}, or getting \texttt{2\textgreater{}\&1} ordering wrong (\texttt{2\textgreater{}\&1\ \textgreater{}\ file} doesn\textquotesingle t capture stderr to the file).
+\item
+  \textbf{Misreading load average} as a pure CPU metric, ignoring D-state/I/O wait.
+\item
+  \textbf{\texttt{sort\ \textbar{}\ uniq\ -c} without the \texttt{sort}} --- \texttt{uniq} only collapses adjacent duplicates, so unsorted input gives wrong counts.
+\item
+  \textbf{Unquoted shell variables} \(\rightarrow\) word-splitting/glob disasters on filenames with spaces; and no \texttt{set\ -euo\ pipefail}, so scripts silently barrel past errors.
+\item
+  \textbf{\texttt{kill\ -9} on a \texttt{D}-state process} and being surprised it doesn\textquotesingle t die --- the signal can\textquotesingle t be delivered until the I/O completes.
+\item
+  \textbf{Treating a container as a VM} --- not realizing \texttt{OOMKilled}/throttling come from cgroup limits, and that there\textquotesingle s no guest kernel.
+\item
+  \textbf{Running cron jobs assuming a login shell} --- absolute paths and explicit env are required; bare \texttt{PATH} breaks "works by hand" scripts.
+\item
+  \textbf{Editing files as root with no backup}, or \texttt{sed\ -i} without testing first / \texttt{-i.bak}.
+\end{itemize}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2197}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7803}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Topic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Connection
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Operating Systems (\hyperlink{section.02}{\textcolor{acc}{§02}})} & The theory beneath these commands: process states \& \texttt{fork}/CoW, CFS scheduling (\texttt{nice}), virtual memory \& page cache (\texttt{free}/\texttt{vmstat}), inodes \& journaling, syscalls \& the privilege rings. \\
+\rowcolor{zebra}
+\textbf{Performance Engineering (\hyperlink{section.09}{\textcolor{acc}{§09}})} & USE method, load average, flame graphs (\texttt{perf}), bottleneck isolation (CPU vs I/O vs net), GC-vs-swap interactions --- this file is the \emph{tooling} layer for that methodology. \\
+\textbf{Networking (\hyperlink{section.03}{\textcolor{acc}{§03}})} & \texttt{ip}/\texttt{ss}/\texttt{dig}/\texttt{curl}/\texttt{tcpdump} map to TCP/IP, DNS, TLS, sockets; \texttt{ss} states (TIME\_WAIT, SYN-RECV) reflect the TCP state machine. \\
+\rowcolor{zebra}
+\textbf{Cloud / Containers (\hyperlink{section.04}{\textcolor{acc}{§04}})} & Docker/Kubernetes = namespaces + cgroups + overlayfs; \texttt{OOMKilled}, CPU throttling, and limits are cgroup mechanics. \\
+\textbf{Observability (\hyperlink{section.18}{\textcolor{acc}{§18}})} & \texttt{journalctl}, structured logs, \texttt{/proc} metrics, and \texttt{dmesg} are the raw inputs that feed Prometheus/Grafana/Datadog dashboards. \\
+\rowcolor{zebra}
+\textbf{Security (\hyperlink{section.19}{\textcolor{acc}{§19}})} & Permissions, setuid, least privilege, capabilities, and user namespaces are the host-level security primitives. \\
+\textbf{System Design} & "Deploy", "scale", "cache in memory", "graceful restart" all bottom out in Linux primitives --- page cache, cgroup limits, SIGTERM handling, fd/connection limits. \\
+\end{longtable}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Narrate a structured sweep} for "debug the slow server" --- CPU \(\rightarrow\) mem \(\rightarrow\) disk \(\rightarrow\) net \(\rightarrow\) process \(\rightarrow\) logs (USE method). The \emph{method} impresses more than any single command.
+\item
+  \textbf{Name the right probe for the symptom:} \texttt{lsof} for deleted-open files and fds, \texttt{iostat}/D-state for I/O-bound load, \texttt{dmesg} for OOM/hardware, \texttt{ss} for port conflicts, \texttt{strace} for hangs, \texttt{perf} for userspace spins.
+\item
+  \textbf{Volunteer the gotchas} --- deleted-but-open file, load counts D-state, \texttt{kill\ -9} can\textquotesingle t touch \texttt{D}, bound-to-127.0.0.1, cron\textquotesingle s bare environment. These signal real operational scars.
+\item
+  \textbf{Always SIGTERM before SIGKILL}, and tie it to zero-downtime deploys and data integrity.
+\item
+  \textbf{Mention least privilege} (\texttt{chown} + \texttt{755}/\texttt{600}, no \texttt{chmod\ 777}, run as a service user) whenever permissions come up.
+\item
+  \textbf{Write the log one-liner without hesitating:} \texttt{…\ \textbar{}\ sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn\ \textbar{}\ head}. Explain \emph{why} the \texttt{sort} before \texttt{uniq\ -c} is necessary.
+\item
+  \textbf{Demystify containers} as namespaces (see) + cgroups (use), no guest kernel --- and connect \texttt{OOMKilled}/throttling to cgroup limits.
+\item
+  \textbf{Tie commands back to OS theory} --- \texttt{\%wa} = I/O wait, swapping = page cache pressure, \texttt{nice} = CFS weight --- to show depth, not memorization.
+\item
+  \textbf{Start scripts with \texttt{set\ -euo\ pipefail} and quote variables} when asked to write shell --- it signals you\textquotesingle ve been burned before.
+\item
+  \textbf{Use \texttt{/proc} and \texttt{/sys}} as the ground-truth fallback when a tool is missing or two tools disagree.
+\end{enumerate}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+Linux is a kernel + GNU userland; the \textbf{shell} composes small text tools with \textbf{pipes} (Unix philosophy). Two anchors: \textbf{"everything is a file"} (devices, sockets, \texttt{/proc} all share the file API) and the \textbf{kernel/userland split} (programs do privileged work only via \textbf{syscalls}).
+
+A \textbf{filename points to an inode}, not the file. \texttt{rm} \emph{unlinks} (drops a name, decrements link count); data dies only when no name \textbf{and} no open fd remain --- hence the \textbf{deleted-but-open file} keeping a disk 100\% full (\texttt{lsof\ \textbar{}\ grep\ deleted}). \texttt{df} (filesystem view) and \texttt{du} (walks names) disagree exactly there, and \texttt{df\ -i} catches inode exhaustion.
+
+\textbf{Permissions:} octal r=4/w=2/x=1 \(\rightarrow\) \textbf{755} dirs/bins, \textbf{644} files, \textbf{600} secrets; special bits \textbf{setuid} (\texttt{passwd} runs as root), \textbf{setgid} (inherit dir group), \textbf{sticky} (\texttt{/tmp}). \texttt{chmod\ 777} is a hole; fix with ownership + least privilege.
+
+\textbf{Processes:} \texttt{fork}+\texttt{exec}+\texttt{wait}; states \textbf{R/S/D/Z/T} --- \texttt{D} = uninterruptible I/O sleep (immune to \texttt{kill\ -9}), \texttt{Z} = zombie (parent didn\textquotesingle t reap). \textbf{Signals:} \textbf{SIGTERM} (15, catchable, graceful) before \textbf{SIGKILL} (9, uncatchable) --- the basis of zero-downtime deploys; \texttt{trap} handles them in scripts.
+
+\textbf{Redirection:} fd 0/1/2; \texttt{\textgreater{}}/\texttt{\textgreater{}\textgreater{}}/\texttt{2\textgreater{}}/\texttt{2\textgreater{}\&1} (order matters); pipes stream concurrently. \textbf{Text:} \texttt{grep}/\texttt{sed}/\texttt{awk} + \texttt{…\ \textbar{}\ sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn\ \textbar{}\ head} for "most common X."
+
+\textbf{Performance:} \textbf{USE} per resource. \textbf{Load average} counts R \textbf{and} D --- high load + idle CPU = I/O wait. \texttt{vmstat}/\texttt{mpstat} (CPU), \texttt{free}/\texttt{vmstat\ si/so} (memory/swap), \texttt{iostat\ -x} (disk await/\%util), \texttt{ss}/\texttt{sar} (net), \texttt{lsof}/\texttt{strace} (what a process touches), \texttt{dmesg} (OOM).
+
+\textbf{Containers} = namespaces (see) + cgroups (use), no guest kernel; \texttt{OOMKilled} = cgroup \texttt{memory.max}, latency-with-idle-CPU = \texttt{cpu.max} throttling. \textbf{systemd} manages services (\texttt{systemctl}, \texttt{journalctl\ -u\ -f}); \textbf{scripts} start with \texttt{set\ -euo\ pipefail} and quote variables.
+
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2617}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7383}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One-liner
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{fd 0/1/2} & stdin / stdout / stderr \\
+\rowcolor{zebra}
+\textbf{Pipe \texttt{\textbar{}}} & left.stdout \(\rightarrow\) right.stdin, concurrent \\
+\textbf{Redirect} & \texttt{\textgreater{}} overwrite, \texttt{\textgreater{}\textgreater{}} append, \texttt{2\textgreater{}} errors, \texttt{2\textgreater{}\&1} merge (after \texttt{\textgreater{}}) \\
+\rowcolor{zebra}
+\textbf{chmod octal} & r=4 w=2 x=1 \(\rightarrow\) 755 dirs, 644 files, 600 secrets \\
+\textbf{Special bits} & 4=setuid (passwd), 2=setgid (group inherit), 1=sticky (/tmp) \\
+\rowcolor{zebra}
+\textbf{inode / rm} & name \(\rightarrow\) inode; \texttt{rm} = unlink; data freed at link=0 AND no open fd \\
+\textbf{deleted-open file} & \texttt{df} full, \texttt{du} empty \(\rightarrow\) \texttt{lsof\ \textbar{}\ grep\ deleted} \\
+\rowcolor{zebra}
+\textbf{df vs du} & df=filesystem free (sees deleted-open); du=walks names; \texttt{df\ -i}=inodes \\
+\textbf{Hard vs soft link} & hard = 2nd name, same inode; soft = path pointer, can dangle \\
+\rowcolor{zebra}
+\textbf{States R/S/D/Z/T} & run / sleep / \textbf{uninterruptible I/O} / zombie / stopped \\
+\textbf{D-state} & stuck on disk/NFS; \texttt{kill\ -9} can\textquotesingle t touch it; fix the I/O \\
+\rowcolor{zebra}
+\textbf{Zombie vs orphan} & zombie = unreaped child (parent bug); orphan \(\rightarrow\) PID 1 adopts (fine) \\
+\textbf{SIGTERM (15)} & graceful, catchable --- default \texttt{kill}; drain then exit \\
+\rowcolor{zebra}
+\textbf{SIGKILL (9)} & forceful, uncatchable --- last resort \\
+\textbf{trap} & \texttt{trap\ cleanup\ EXIT\ TERM\ INT} --- graceful shutdown / cleanup \\
+\rowcolor{zebra}
+\textbf{Load average} & count of R + D tasks; compare to \texttt{nproc}; counts I/O wait \\
+\textbf{USE method} & Utilization, Saturation, Errors --- per resource \\
+\rowcolor{zebra}
+\textbf{CPU / mem / disk / net} & mpstat,vmstat / free,vmstat si/so / iostat -x / ss,sar \\
+\textbf{lsof / strace} & open files \& fds / live syscalls of a process \\
+\rowcolor{zebra}
+\textbf{OOM killer} & out of RAM \(\rightarrow\) SIGKILL a victim; \texttt{dmesg\ \textbar{}\ grep\ -i\ oom} \\
+\textbf{Container} & namespaces (see) + cgroups (use); no guest kernel \\
+\rowcolor{zebra}
+\textbf{OOMKilled / throttle} & hit cgroup memory.max / cpu.max (idle host CPU) \\
+\textbf{systemd} & \texttt{systemctl\ start/stop/status}, \texttt{journalctl\ -u\ svc\ -f} \\
+\rowcolor{zebra}
+\textbf{ulimit -n / swappiness} & raise fd limit; lower swap eagerness for hot apps \\
+\textbf{Script safety} & \texttt{set\ -euo\ pipefail}, quote \texttt{"\$var"}, \texttt{trap}, \texttt{\$?} \\
+\rowcolor{zebra}
+\textbf{Net triage} & \texttt{ss\ -tlnp}, \texttt{dig\ +short}, \texttt{curl\ -w}, \texttt{nc\ -zv\ host\ port}, \texttt{tcpdump} \\
+\textbf{Log one-liner} & \texttt{awk\ \textquotesingle{}\{print\ \$1\}\textquotesingle{}\ \textbar{}\ sort\ \textbar{}\ uniq\ -c\ \textbar{}\ sort\ -rn\ \textbar{}\ head} \\
+\rowcolor{zebra}
+\textbf{Debug order} & CPU \(\rightarrow\) Mem \(\rightarrow\) Disk \(\rightarrow\) Net \(\rightarrow\) Process \(\rightarrow\) Logs \\
+\end{longtable}
+
+\textbf{Golden rule:} Compose small text tools with pipes; a filename is just a pointer to an inode; prefer graceful SIGTERM over \texttt{kill\ -9}; check the disk (and inodes) early; reason about resource saturation with USE --- and remember that high load with an idle CPU means I/O wait, not a CPU problem.
+
+\emph{Last updated: 2026-06-17 \textbar{} Topic: Linux \& the Command Line \textbar{} Level: FAANG Backend / SRE / Infra}
+
+\end{document}

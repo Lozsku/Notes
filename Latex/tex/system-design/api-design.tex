@@ -1,0 +1,2478 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{API Design}
+\newcommand{\ThemeKicker}{Design Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{4f46e5}{818cf8}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} API design shows up in two places --- as a dedicated "design the API for X" round, and as a 5-minute sub-step inside every system-design interview ("sketch the endpoints"). This guide builds the topic from first principles: the \emph{mechanisms} behind REST semantics, idempotency, pagination, auth, and rate limiting --- not just the vocabulary. Read top-to-bottom once for understanding, then drill the \texttt{Common\ Interview\ Questions} and \texttt{Revision\ Cheat\ Sheet} before a loop. Every section has a \emph{why}, a concrete example (HTTP/JSON/SQL/proto), and an interview-grade trade-off.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+An \textbf{API (Application Programming Interface)} is the contract that lets one piece of software talk to another. In the context of this guide, "API design" means the discipline of defining the \textbf{surface area} of a network service: which operations exist, how they are addressed, what they accept and return, how errors are reported, how the contract evolves, and how it stays reliable, secure, and performant under load.
+
+A well-designed API is \textbf{a product}. Its users are developers --- internal teams, mobile clients, third-party partners. Like any product, the quality bar is: \emph{can a competent developer integrate without reading your source code, and will their integration keep working a year from now?}
+
+\textbf{The contract has several layers:}
+
+\setcodelang{}
+
+\begin{verbatim}
+┌──────────────────────────────────────────────────────────────┐
+│  Semantic layer   "POST /orders creates an order, charges     │
+│                    the card, returns 201 with a Location."    │
+├──────────────────────────────────────────────────────────────┤
+│  Schema layer     request/response shapes, field types,       │
+│                    required vs optional, enums                │
+├──────────────────────────────────────────────────────────────┤
+│  Protocol layer   HTTP verbs, status codes, headers /         │
+│                    gRPC methods / GraphQL operations          │
+├──────────────────────────────────────────────────────────────┤
+│  Transport layer  HTTP/1.1, HTTP/2, TLS, TCP                  │
+└──────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\textbf{Properties of a good API:}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2068}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7932}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Property
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What it means
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Predictable} & Consistent naming, verbs, and error shapes --- once you learn one endpoint, you can guess the next \\
+\rowcolor{zebra}
+\textbf{Hard to misuse} & Required fields enforced, sensible defaults, idempotency for retries \\
+\textbf{Evolvable} & New fields/endpoints can be added without breaking existing clients \\
+\rowcolor{zebra}
+\textbf{Documented} & Machine-readable spec (OpenAPI / .proto / GraphQL SDL) plus prose \\
+\textbf{Observable} & Stable error codes, request IDs, rate-limit headers \\
+\rowcolor{zebra}
+\textbf{Secure by default} & AuthN/AuthZ on every endpoint, least-privilege scopes, TLS everywhere \\
+\end{longtable}
+
+\textbf{First-principles mental model:}
+
+\setcodelang{}
+
+\begin{verbatim}
+Use cases → Resources & operations → Contract → Evolution & operability
+\end{verbatim}
+
+You start from \emph{what clients need to do}, model the \emph{nouns and verbs}, freeze a \emph{contract}, and then spend most of your engineering effort keeping that contract stable while the implementation underneath changes constantly.
+
+\section{Why It Exists}\label{why-it-exists}
+
+In a monolith, modules call each other via in-process function calls: the compiler checks types, calls are instant and reliable, and refactoring is a single atomic commit. The moment two modules live in \textbf{different processes, machines, or organizations}, that comfort disappears:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Calls cross a network} \(\rightarrow\) they can be slow, fail, or be delivered twice. The API must define behavior under partial failure (timeouts, retries, idempotency).
+\item
+  \textbf{Caller and callee deploy independently} \(\rightarrow\) you can no longer change both sides atomically. The API must be a \emph{stable, versioned contract} that tolerates skew.
+\item
+  \textbf{The caller might be a stranger} \(\rightarrow\) a third-party developer or untrusted mobile client. The API must authenticate, authorize, validate input, and rate-limit.
+\item
+  \textbf{There is no shared type system} \(\rightarrow\) JSON/Protobuf/SDL schemas replace the compiler as the source of truth.
+\item
+  \textbf{Many clients, diverse needs} \(\rightarrow\) a TV app, a watch app, and a partner batch job all hit the same backend. The API must serve them without a custom endpoint per client (or it must, deliberately, via BFFs).
+\end{enumerate}
+
+Each of these pains birthed a pattern in this guide: idempotency keys (pain \#1), versioning (\#2), OAuth/JWT/scopes (\#3), schemas/OpenAPI (\#4), GraphQL and BFFs (\#5). Understanding \emph{which pain} a feature solves is what lets you defend it in an interview.
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1084}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4830}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4086}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What they\textquotesingle re really testing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Specific signals
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Amazon} & Service-oriented architecture is literally Bezos\textquotesingle s 2002 API Mandate ("all teams expose data via service interfaces, no exceptions"). API design \emph{is} the culture. & Idempotency for payments, backward compatibility, fine-grained ownership, designing for partners (AWS APIs are public products) \\
+\rowcolor{zebra}
+\textbf{Google} & Has a famous internal \emph{API Design Guide} (AIP --- API Improvement Proposals). gRPC and Protobuf are theirs. & Resource-oriented design, standard methods (List/Get/Create/Update/Delete), proto evolution rules, field masks \\
+\textbf{Meta} & Invented GraphQL to solve mobile over/under-fetching across a huge product surface. & GraphQL schema design, N+1 / DataLoader, query cost limiting, versionless evolution \\
+\rowcolor{zebra}
+\textbf{Microsoft} & Publishes the \emph{REST API Guidelines}; Azure and Graph API are massive public surfaces. & OData-style query params, consistent error envelope, long-running operations (202 + polling), throttling headers \\
+\textbf{Netflix} & Pioneered the BFF pattern and edge API gateways (Zuul) for hundreds of device types. & Gateway design, per-device aggregation, resilience (timeouts, fallbacks, circuit breakers) \\
+\rowcolor{zebra}
+\textbf{Apple} & Privacy-first, App Store APIs, APNs push. & Scoped tokens, minimal data exposure, signed requests, deprecation discipline \\
+\textbf{Stripe/payments-style} & The gold standard for developer-facing API design --- every interviewer has read their docs. & Idempotency keys, cursor pagination, versioned via date, rich error objects, expandable resources \\
+\end{longtable}
+
+\textbf{Universal signal:} Can you design a contract that is \emph{correct under retries}, \emph{safe under concurrency}, \emph{evolvable without breaking clients}, and \emph{defensible on every trade-off}? Junior candidates list verbs; senior candidates reason about idempotency, pagination stability, and deprecation.
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Resource vs RPC vs Query paradigms}\label{resource-vs-rpc-vs-query-paradigms}
+
+There are three dominant API styles. They are not "REST is best" --- they solve different problems.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1171}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2613}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3063}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3153}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{REST (resource-oriented)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{RPC (e.g. gRPC)}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Query (GraphQL)}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Mental model & Nouns + standard verbs & Functions you call & A typed graph you query \\
+\rowcolor{zebra}
+Addressing & URLs (\texttt{/orders/42}) & Methods (\texttt{OrderService.Get}) & Single endpoint (\texttt{/graphql}) \\
+Shape of data & Server decides representation & Server decides & Client picks fields \\
+\rowcolor{zebra}
+Best for & Public CRUD-ish APIs, caching & Internal low-latency microservices & Mobile/diverse clients, aggregation \\
+Transport & HTTP/1.1 or 2, JSON & HTTP/2, Protobuf & HTTP, JSON \\
+\end{longtable}
+
+\textbf{Interview takeaway:} Lead with \emph{who the client is}. Public partner API \(\rightarrow\) REST. Internal service-to-service \(\rightarrow\) gRPC. Many heterogeneous front-ends fetching nested data \(\rightarrow\) GraphQL. Saying "it depends on the consumer" earns more points than dogma.
+
+\subsection{Statelessness}\label{statelessness}
+
+Each request must carry \textbf{all context needed to process it} (auth token, parameters). The server holds no per-client session in memory between requests. This is a REST constraint and a scaling necessity: any server instance can handle any request, so you can add/remove instances freely behind a load balancer. State lives in tokens (client-side) or shared stores (Redis/DB), never in app-server memory.
+
+\subsection{Contract-first vs code-first}\label{contract-first-vs-code-first}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Contract-first:} Write the OpenAPI / \texttt{.proto} / GraphQL SDL first, generate stubs and clients from it. The schema is the source of truth; reviewers review the \emph{contract}. Preferred at scale (Google, Amazon).
+\item
+  \textbf{Code-first:} Write handlers, generate the spec from annotations. Faster for small teams but the contract drifts from intent.
+\end{itemize}
+
+\subsection{Idempotency, safety, cacheability (preview)}\label{idempotency-safety-cacheability-preview}
+
+Three orthogonal properties that drive most REST decisions:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Safe} = no observable side effects (read-only). GET, HEAD.
+\item
+  \textbf{Idempotent} = N identical calls have the same effect as one. GET, PUT, DELETE.
+\item
+  \textbf{Cacheable} = the response can be stored and reused. GET responses with appropriate headers.
+\end{itemize}
+
+These are covered in depth below --- they are the single most-tested API-design concept.
+
+\section{REST In Depth}\label{rest-in-depth}
+
+REST (\textbf{Representational State Transfer}, Roy Fielding, 2000) is an \emph{architectural style}, not a protocol. A system is "RESTful" if it obeys six constraints:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Client--Server} --- separate UI from storage; they evolve independently.
+\item
+  \textbf{Stateless} --- no server-side session; every request self-contained.
+\item
+  \textbf{Cacheable} --- responses explicitly mark themselves cacheable or not.
+\item
+  \textbf{Uniform Interface} --- resources are identified by URIs and manipulated via a small, standard set of verbs; representations are self-descriptive; hypermedia drives state (HATEOAS).
+\item
+  \textbf{Layered System} --- client can\textquotesingle t tell if it\textquotesingle s talking to the origin or a proxy/CDN/gateway.
+\item
+  \textbf{Code on Demand} (optional) --- server may ship executable code (rarely used).
+\end{enumerate}
+
+In practice "REST" colloquially means "JSON over HTTP using verbs and status codes sensibly." The constraints above are the ideal; the Richardson Maturity Model (below) measures how close you are.
+
+\subsection{HTTP Methods --- Full Semantics}\label{http-methods--full-semantics}
+
+The verb is \emph{the operation}; the URL is \emph{the resource}. Never put verbs in URLs (\texttt{POST\ /createUser} is wrong --- use \texttt{POST\ /users}).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0763}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1253}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1128}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1308}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.5046}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Safe
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Idempotent
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cacheable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Has body
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Purpose
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{GET} & Yes & Yes & Yes & No (ideally) & Retrieve a resource/collection \\
+\rowcolor{zebra}
+\textbf{HEAD} & Yes & Yes & Yes & No & Like GET, headers only (size, ETag, existence) \\
+\textbf{OPTIONS} & Yes & Yes & No & No & Discover allowed methods; CORS preflight \\
+\rowcolor{zebra}
+\textbf{POST} & No & \textbf{No} & Rarely & Yes & Create a subordinate resource, or non-CRUD action \\
+\textbf{PUT} & No & \textbf{Yes} & No & Yes & Replace a resource entirely (or create at a known URI) \\
+\rowcolor{zebra}
+\textbf{PATCH} & No & \textbf{No*} & No & Yes & Partially update a resource \\
+\textbf{DELETE} & No & \textbf{Yes} & No & No & Remove a resource \\
+\end{longtable}
+
+\textbf{Why each idempotency value --- this is the most-asked sub-question:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GET is safe \& idempotent} because reads don\textquotesingle t mutate state. Caches, prefetchers, and retries can fire GET freely. \emph{Never} hide a mutation behind GET (e.g. \texttt{GET\ /users/42/delete}) --- a crawler or browser prefetch will trigger it.
+\item
+  \textbf{PUT is idempotent} because it \emph{sets} the resource to a fully-specified state: \texttt{PUT\ /users/42\ \{name:"Alice",\ email:"a@x.com"\}} ten times leaves the user identical to once. The result depends only on the payload, not on the current state.
+\item
+  \textbf{DELETE is idempotent} because the \emph{end state} (resource gone) is the same after one or ten calls. Subtlety: the \emph{first} call returns \texttt{200/204}, later calls may return \texttt{404} --- but the \emph{resource state} is unchanged, which is the definition of idempotent. Some APIs return \texttt{204} every time to make retries simpler.
+\item
+  \textbf{POST is NOT idempotent} because it creates a \emph{new} subordinate resource each time. Two identical \texttt{POST\ /orders} calls create two orders \(\rightarrow\) the classic double-charge bug on retry. This is exactly why idempotency keys exist (see below).
+\item
+  \textbf{PATCH is NOT idempotent in general} (\texttt{*}). A JSON Merge Patch that \emph{sets} fields can be idempotent, but a PATCH expressing a delta --- e.g. \texttt{\{"op":"increment","path":"/balance","value":10\}} --- is not: applying it twice adds 20. Treat PATCH as non-idempotent unless you prove otherwise.
+\end{itemize}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET    /users/42            → fetch user 42}
+\NormalTok{PUT    /users/42            → replace user 42 (full representation in body)}
+\NormalTok{PATCH  /users/42            → partial update (only changed fields in body)}
+\NormalTok{DELETE /users/42            → delete user 42}
+\NormalTok{POST   /users              → create a new user (server assigns id)}
+\NormalTok{HEAD   /files/big.zip       → check size/existence without downloading}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Scenario --- retry storm:} A mobile client times out after \texttt{POST\ /payments} but the server actually processed it. The client retries. Without protection, the user is charged twice. With GET/PUT/DELETE this never happens (idempotent by construction); with POST you \emph{must} add an idempotency key. This single scenario justifies most of this guide.
+
+\subsection{HTTP Status Codes --- When To Use Each}\label{http-status-codes--when-to-use-each}
+
+Status codes are part of your contract. Clients branch on them. Use the \emph{most specific} code that\textquotesingle s correct.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1723}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.7899}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Code
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use it when\ldots{}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{200} & OK & Successful GET/PUT/PATCH; or POST that returns data without creating an addressable resource \\
+\rowcolor{zebra}
+\textbf{201} & Created & POST/PUT created a new resource. \textbf{Include a \texttt{Location} header} pointing to it, and usually the body \\
+\textbf{202} & Accepted & Request accepted for \textbf{async} processing; work not done yet. Return a status URL to poll \\
+\rowcolor{zebra}
+\textbf{204} & No Content & Success, nothing to return (e.g. DELETE, or PUT with no echo body) \\
+\textbf{301} & Moved Permanently & Resource permanently at a new URL; clients/caches should update. Used for API URL migrations \\
+\rowcolor{zebra}
+\textbf{304} & Not Modified & Conditional GET matched \texttt{If-None-Match}/\texttt{If-Modified-Since} \(\rightarrow\) client\textquotesingle s cache is still valid, no body sent \\
+\textbf{400} & Bad Request & Malformed syntax --- unparseable JSON, missing required param, wrong type \\
+\rowcolor{zebra}
+\textbf{401} & Unauthorized & \textbf{Not authenticated} --- no/invalid credentials. Send \texttt{WWW-Authenticate}. (Misnamed: means \emph{unauthenticated}) \\
+\textbf{403} & Forbidden & Authenticated but \textbf{not allowed} --- valid token, insufficient scope/permission \\
+\rowcolor{zebra}
+\textbf{404} & Not Found & Resource doesn\textquotesingle t exist (or you\textquotesingle re hiding its existence from this caller --- sometimes preferred over 403 to avoid leaking) \\
+\textbf{405} & Method Not Allowed & URL exists but verb isn\textquotesingle t supported (\texttt{DELETE\ /reports} where reports are read-only). Include \texttt{Allow} header \\
+\rowcolor{zebra}
+\textbf{409} & Conflict & Request conflicts with current state --- duplicate unique key, edit conflict (optimistic concurrency via ETag), already-processed idempotency key with a different body \\
+\textbf{410} & Gone & Resource \emph{deliberately} removed and won\textquotesingle t come back --- used for deprecated/sunset API versions \\
+\rowcolor{zebra}
+\textbf{422} & Unprocessable Entity & Syntactically valid but \textbf{semantically invalid} --- JSON parsed fine, but \texttt{email} isn\textquotesingle t a valid email, or \texttt{quantity} is negative \\
+\textbf{429} & Too Many Requests & Rate limit exceeded. \textbf{Include \texttt{Retry-After}} and \texttt{X-RateLimit-*} \\
+\rowcolor{zebra}
+\textbf{500} & Internal Server Error & Unexpected server bug. Never leak stack traces; return a request ID \\
+\textbf{503} & Service Unavailable & Server temporarily down/overloaded/in maintenance. Include \texttt{Retry-After}. Signals "retry later," distinct from a permanent error \\
+\end{longtable}
+
+\textbf{400 vs 422 (frequent follow-up):} 400 = "I can\textquotesingle t even parse this." 422 = "I parsed it, but the \emph{content} breaks a business rule." Example: \texttt{\{"age":\ "-5"\}} where age must be a positive integer \(\rightarrow\) JSON is valid, value isn\textquotesingle t \(\rightarrow\) 422. A truncated JSON body \(\rightarrow\) 400. Many teams use 400 for both to keep it simple --- but knowing the distinction signals depth.
+
+\textbf{401 vs 403 (the classic trap):} 401 = \emph{who are you?} (authenticate). 403 = \emph{I know who you are, you still can\textquotesingle t.} If a user with a read-only token tries \texttt{DELETE}, that\textquotesingle s \textbf{403}, not 401.
+
+\textbf{409 in practice --- optimistic concurrency:}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /docs/7}
+\NormalTok{→ 200 OK}
+\NormalTok{  ETag: "v12"}
+
+\NormalTok{PUT /docs/7}
+\NormalTok{If{-}Match: "v12"}
+\NormalTok{\{ "title": "New" \}}
+
+\NormalTok{\# If someone else saved v13 in between:}
+\NormalTok{→ 409 Conflict   (your edit is based on a stale version)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Scenario --- async export:} \texttt{POST\ /reports/export} kicks off a 5-minute job. Returning 200 with the data would force a 5-minute hung connection. Instead return \textbf{202 Accepted} with \texttt{Location:\ /reports/export/job-abc}; the client polls that URL (200 with status \texttt{pending}/\texttt{done}, eventually a download link). This is the standard \emph{long-running operation} pattern.
+
+\subsection{Key HTTP Headers}\label{key-http-headers}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Request}
+\NormalTok{Content{-}Type: application/json          \# format of the body you\textquotesingle{}re sending}
+\NormalTok{Accept: application/json                \# formats you can handle in the response}
+\NormalTok{Authorization: Bearer eyJhbGci...       \# credentials}
+\NormalTok{If{-}None{-}Match: "abc123"                 \# conditional GET — only send body if ETag changed}
+\NormalTok{If{-}Match: "abc123"                      \# conditional write — fail if resource changed}
+\NormalTok{Idempotency{-}Key: 8f3c...               \# dedup key for unsafe retries (POST)}
+
+\NormalTok{\# Response}
+\NormalTok{Content{-}Type: application/json; charset=utf{-}8}
+\NormalTok{Location: /orders/42                     \# where the newly created resource lives (201)}
+\NormalTok{ETag: "abc123"                          \# version tag of this representation}
+\NormalTok{Cache{-}Control: max{-}age=3600, private    \# how long/where this may be cached}
+\NormalTok{Retry{-}After: 30                          \# seconds to wait (429/503)}
+\NormalTok{X{-}RateLimit{-}Limit: 1000}
+\NormalTok{X{-}RateLimit{-}Remaining: 42}
+\NormalTok{X{-}RateLimit{-}Reset: 1718500000            \# epoch when the window resets}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{ETag + If-None-Match (conditional GET) --- saves bandwidth:}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# First request}
+\NormalTok{GET /products/9}
+\NormalTok{→ 200 OK}
+\NormalTok{  ETag: "p9{-}v4"}
+\NormalTok{  \{ ...big payload... \}}
+
+\NormalTok{\# Later — client revalidates}
+\NormalTok{GET /products/9}
+\NormalTok{If{-}None{-}Match: "p9{-}v4"}
+\NormalTok{→ 304 Not Modified      \# empty body; client reuses its cache}
+\end{Highlighting}
+\end{Shaded}
+
+The ETag is a content fingerprint (hash or version number). \texttt{If-None-Match} lets the server answer "nothing changed, keep your copy" with a tiny 304 instead of re-sending the whole resource. \texttt{Cache-Control:\ max-age=3600} says "you may reuse without even asking for 3600s"; after that, the client \emph{revalidates} with the ETag.
+
+\subsection{Content Negotiation}\label{content-negotiation}
+
+The client states preferences; the server picks the best representation it supports.
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /reports/9}
+\NormalTok{Accept: application/json, application/xml;q=0.8, */*;q=0.1}
+\NormalTok{Accept{-}Language: en{-}US, en;q=0.9}
+\NormalTok{Accept{-}Encoding: gzip, br}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{q} values are quality weights (0--1). The server responds with \texttt{Content-Type:\ application/json} (its best match) and may \texttt{406\ Not\ Acceptable} if it can\textquotesingle t satisfy any. Same URL, multiple representations --- this is the "Representational" in REST.
+
+\subsection{Richardson Maturity Model}\label{richardson-maturity-model}
+
+A four-level ladder measuring how "RESTful" an API is:
+
+\setcodelang{}
+
+\begin{verbatim}
+Level 0 — The Swamp of POX (Plain Old XML)
+          One URL, one verb (POST), RPC-over-HTTP.
+          e.g. POST /api with {"method":"getUser","id":42}
+
+Level 1 — Resources
+          Many URLs, still one verb.
+          POST /users/42, POST /users/42/delete
+
+Level 2 — HTTP Verbs + Status Codes   ← where ~95% of "REST" APIs live
+          GET/POST/PUT/DELETE used correctly, proper status codes.
+          GET /users/42 → 200, DELETE /users/42 → 204
+
+Level 3 — Hypermedia Controls (HATEOAS)
+          Responses include links telling the client what it can do next.
+\end{verbatim}
+
+\textbf{HATEOAS} (Hypermedia As The Engine Of Application State): the server returns not just data but the \emph{links/actions} available from the current state, so the client doesn\textquotesingle t hard-code URLs.
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"id"}\FunctionTok{:} \StringTok{"order\_42"}\FunctionTok{,}
+  \DataTypeTok{"status"}\FunctionTok{:} \StringTok{"pending\_payment"}\FunctionTok{,}
+  \DataTypeTok{"total"}\FunctionTok{:} \DecValTok{4999}\FunctionTok{,}
+  \DataTypeTok{"currency"}\FunctionTok{:} \StringTok{"usd"}\FunctionTok{,}
+  \DataTypeTok{"\_links"}\FunctionTok{:} \FunctionTok{\{}
+    \DataTypeTok{"self"}\FunctionTok{:}   \FunctionTok{\{} \DataTypeTok{"href"}\FunctionTok{:} \StringTok{"/orders/42"} \FunctionTok{\},}
+    \DataTypeTok{"pay"}\FunctionTok{:}    \FunctionTok{\{} \DataTypeTok{"href"}\FunctionTok{:} \StringTok{"/orders/42/payment"}\FunctionTok{,} \DataTypeTok{"method"}\FunctionTok{:} \StringTok{"POST"} \FunctionTok{\},}
+    \DataTypeTok{"cancel"}\FunctionTok{:} \FunctionTok{\{} \DataTypeTok{"href"}\FunctionTok{:} \StringTok{"/orders/42"}\FunctionTok{,} \DataTypeTok{"method"}\FunctionTok{:} \StringTok{"DELETE"} \FunctionTok{\}}
+  \FunctionTok{\}}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+When the order becomes \texttt{shipped}, the \texttt{pay} and \texttt{cancel} links disappear and a \texttt{track} link appears --- the client navigates by \emph{following links}, not by constructing URLs. \textbf{Reality check:} full HATEOAS is rare (it\textquotesingle s verbose and most clients hard-code paths anyway), but interviewers love to ask about it. Know what it is, give the example, and note honestly that most production "REST" APIs stop at Level 2. Hypermedia \emph{pagination links} (\texttt{next}/\texttt{prev}) are the one HATEOAS idea that\textquotesingle s genuinely common.
+
+\subsection{Statelessness in REST}\label{statelessness-in-rest}
+
+No \texttt{login\ →\ server\ stores\ session\ →\ subsequent\ requests\ assume\ session}. Instead each request carries a token. Benefits: any server handles any request (horizontal scaling), failures are trivial to recover (no lost session), and caching/proxying work because requests are self-describing. The cost: tokens must be re-validated each request (cheap with stateless JWTs) and the client carries more per-request weight.
+
+\section{Resource Modeling \& URL Design}\label{resource-modeling--url-design}
+
+The art of REST is choosing the right \textbf{nouns}. Get the resource model right and the verbs fall out automatically.
+
+\subsection{Nouns, not verbs}\label{nouns-not-verbs}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4335}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5665}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Bad (verb in URL)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Good (noun + verb method)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{POST\ /createOrder} & \texttt{POST\ /orders} \\
+\rowcolor{zebra}
+\texttt{GET\ /getUserById?id=42} & \texttt{GET\ /users/42} \\
+\texttt{POST\ /users/42/setName} & \texttt{PATCH\ /users/42} \\
+\rowcolor{zebra}
+\texttt{GET\ /listActiveUsers} & \texttt{GET\ /users?status=active} \\
+\end{longtable}
+
+Rules of thumb: \textbf{plural nouns} for collections (\texttt{/users} not \texttt{/user}), \textbf{lowercase kebab-case} paths, \textbf{IDs in the path} (\texttt{/users/42}), \textbf{no file extensions} (use \texttt{Accept} for format), \textbf{no trailing verbs}.
+
+\subsection{Collections and sub-resources}\label{collections-and-sub-resources}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{/users                      collection}
+\NormalTok{/users/42                   single resource}
+\NormalTok{/users/42/orders            sub{-}collection (orders belonging to user 42)}
+\NormalTok{/users/42/orders/7          a specific order of that user}
+\NormalTok{/orders/7                   the same order, addressed globally (often also provided)}
+\end{Highlighting}
+\end{Shaded}
+
+Nest only \textbf{one level deep} in general. \texttt{/users/42/orders/7/items/3/reviews} is a pain to build, document, and authorize --- instead expose \texttt{/items/3/reviews} directly and let \texttt{/orders/7} link to its items. Deep nesting also couples resources that should be independently addressable.
+
+\subsection{Actions --- the exception to nouns}\label{actions--the-exception-to-nouns}
+
+Some operations don\textquotesingle t map cleanly to CRUD on a resource: \emph{send} an email, \emph{cancel} an order, \emph{retry} a job, \emph{publish} a post. Two accepted patterns:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Action as a sub-resource (POST):} \texttt{POST\ /orders/42/cancellation} or \texttt{POST\ /orders/42:cancel} (Google\textquotesingle s custom-method colon syntax). Treat the action as creating an event.
+\item
+  \textbf{State transition via PATCH:} \texttt{PATCH\ /orders/42\ \{"status":"cancelled"\}} --- cleaner when the action is "set a field," but you lose the ability to attach action-specific parameters cleanly.
+\end{enumerate}
+
+Prefer modeling the \emph{result} as a resource where possible (\texttt{POST\ /transfers} instead of \texttt{POST\ /accounts/1/sendMoney}). When you genuinely need an RPC-style action, document it and don\textquotesingle t pretend it\textquotesingle s pure REST.
+
+\subsection{Filtering, sorting, field selection --- query params}\label{filtering-sorting-field-selection--query-params}
+
+Query params modify a \emph{collection read}; they never identify the resource.
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /products?category=books\&price\_gte=10\&price\_lte=50      \# filtering}
+\NormalTok{GET /products?sort={-}price,name                               \# sort by price desc, then name asc}
+\NormalTok{GET /products?fields=id,name,price                           \# sparse fieldset (reduce payload)}
+\NormalTok{GET /products?q=harry+potter                                 \# full{-}text search}
+\NormalTok{GET /products?category=books\&page\_size=20\&cursor=eyJ...      \# filter + paginate}
+\end{Highlighting}
+\end{Shaded}
+
+Conventions worth knowing: \texttt{-} prefix for descending sort; \texttt{\_gte}/\texttt{\_lte}/\texttt{\_ne} suffix operators (or OData \texttt{\$filter}); \texttt{fields=} (sparse fieldsets, the REST answer to GraphQL over-fetching). \textbf{Filters narrow a collection; field selection narrows each item.} Keep these orthogonal.
+
+\subsection{Bulk operations}\label{bulk-operations}
+
+Single-resource endpoints don\textquotesingle t scale when a client must create/update 10,000 rows (10,000 round trips). Options:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Batch endpoint:} \texttt{POST\ /products/batch} with an array body, returning a \textbf{per-item status array} (some succeed, some fail \(\rightarrow\) typically \texttt{200} overall with individual results, or \texttt{207\ Multi-Status}):
+\end{itemize}
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"results"}\FunctionTok{:} \OtherTok{[}
+    \FunctionTok{\{} \DataTypeTok{"index"}\FunctionTok{:} \DecValTok{0}\FunctionTok{,} \DataTypeTok{"status"}\FunctionTok{:} \DecValTok{201}\FunctionTok{,} \DataTypeTok{"id"}\FunctionTok{:} \StringTok{"p\_1"} \FunctionTok{\}}\OtherTok{,}
+    \FunctionTok{\{} \DataTypeTok{"index"}\FunctionTok{:} \DecValTok{1}\FunctionTok{,} \DataTypeTok{"status"}\FunctionTok{:} \DecValTok{422}\FunctionTok{,} \DataTypeTok{"error"}\FunctionTok{:} \FunctionTok{\{} \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"invalid\_price"} \FunctionTok{\}} \FunctionTok{\}}
+  \OtherTok{]}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Async bulk import:} for huge volumes, \texttt{POST\ /imports} returns \texttt{202} + a job URL; the client uploads a file and polls.
+\end{itemize}
+
+\textbf{Interview takeaway:} mention that bulk endpoints need a \emph{partial-failure} contract --- what happens when item 7 of 100 fails? Returning a single 400 for the whole batch is usually wrong; clients need to know \emph{which} items failed so they can retry just those.
+
+\section{Idempotency \& Reliability}\label{idempotency--reliability}
+
+\begin{quote}
+This is, with pagination, the highest-value API-design topic. Master the mechanism, not just the word.
+\end{quote}
+
+\textbf{Definition:} an operation is idempotent if performing it N times produces the same \emph{server state} as performing it once. It\textquotesingle s the property that makes \textbf{safe retries} possible --- and networks \emph{force} retries (timeouts, dropped ACKs, load-balancer hiccups).
+
+\subsection{The problem}\label{the-problem}
+
+\setcodelang{}
+
+\begin{verbatim}
+Client                         Server
+  │── POST /payments ─────────────►│  charges $50 ✔  writes row
+  │                                │── 200 OK ──X  (response lost in network)
+  │  (timeout, no response)        │
+  │── POST /payments (retry) ─────►│  charges $50 AGAIN ✘  duplicate!
+\end{verbatim}
+
+GET/PUT/DELETE are idempotent by construction. \textbf{POST is not} --- and POST is exactly what you use for "create order," "charge card," "send message." So we add idempotency \emph{manually}.
+
+\subsection{Idempotency keys --- the mechanism}\label{idempotency-keys--the-mechanism}
+
+The client generates a unique key (UUID) per \emph{logical} operation and sends it with every retry of that operation:
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{POST /payments}
+\NormalTok{Idempotency{-}Key: 9f1c2e7a{-}3b6d{-}4e8f{-}a1c2{-}7d9e0f1a2b3c}
+\NormalTok{Content{-}Type: application/json}
+
+\NormalTok{\{ "amount": 5000, "currency": "usd", "source": "card\_xyz" \}}
+\end{Highlighting}
+\end{Shaded}
+
+The server keeps a \textbf{dedup table} keyed by \texttt{(api\_key,\ idempotency\_key)}:
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ idempotency\_keys (}
+\NormalTok{  api\_key          TEXT        }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  idempotency\_key  TEXT        }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  request\_hash     TEXT        }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,   }\CommentTok{{-}{-} hash of the request body}
+\NormalTok{  response\_status  }\DataTypeTok{INT}\NormalTok{,                    }\CommentTok{{-}{-} cached response (NULL until done)}
+\NormalTok{  response\_body    JSONB,}
+\NormalTok{  state            TEXT        }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,    }\CommentTok{{-}{-} \textquotesingle{}in\_progress\textquotesingle{} | \textquotesingle{}completed\textquotesingle{}}
+\NormalTok{  created\_at       TIMESTAMPTZ }\KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{DEFAULT}\NormalTok{ now(),}
+  \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{ (api\_key, idempotency\_key)}
+\NormalTok{);}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Server algorithm:}
+
+\setcodelang{}
+
+\begin{verbatim}
+1. Atomically INSERT (api_key, key, request_hash, state='in_progress').
+   - On primary-key conflict → this key was seen before:
+       a. If stored request_hash ≠ this request's hash → 422/409
+          ("key reused with a different body" — client bug, refuse).
+       b. If state='completed'   → return the stored response verbatim.
+       c. If state='in_progress' → original request is still running →
+          return 409 Conflict (or block briefly and retry).
+2. (We won the insert → first time.) Execute the real work (charge card)
+   inside the SAME transaction or with careful ordering.
+3. UPDATE the row: state='completed', store response_status + response_body.
+4. Return the response.
+\end{verbatim}
+
+The \texttt{INSERT\ ...\ ON\ CONFLICT} (or a unique constraint catch) is the atomic gate that guarantees \emph{exactly one} execution even under concurrent retries. The stored response makes retries return the \emph{identical} result (same order ID, same charge), which is what "exactly-once \emph{effects}" means in practice: the network may deliver the request many times (at-least-once delivery), but the \emph{effect} happens once.
+
+\textbf{Key design choices:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Scope the key per client} (\texttt{api\_key\ +\ idempotency\_key}) so two customers can\textquotesingle t collide.
+\item
+  \textbf{Expire keys} (e.g. 24h TTL) --- they\textquotesingle re only needed during the retry window; storing forever is wasteful.
+\item
+  \textbf{Hash the body} so a client reusing a key for a \emph{different} request is caught (that\textquotesingle s a bug, not a retry).
+\item
+  \textbf{What\textquotesingle s idempotent is the \emph{effect}, not the response code} --- a retry of a successful create may legitimately return \texttt{200} instead of the original \texttt{201}.
+\end{itemize}
+
+\subsection{Idempotent PUT vs non-idempotent PATCH}\label{idempotent-put-vs-non-idempotent-patch}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PUT /users/42  \{ "name":"Alice", "tier":"gold" \}     \# idempotent: sets full state}
+\NormalTok{PATCH /users/42  \{ "op":"add", "path":"/credits", "value":10 \}   \# NOT idempotent: +10 each call}
+\end{Highlighting}
+\end{Shaded}
+
+Prefer \textbf{absolute} updates (\texttt{set\ credits\ =\ 100}) over \textbf{relative} ones (\texttt{add\ 10\ credits}) when you want idempotency for free. If you must express a delta, protect it with an idempotency key or an ETag (\texttt{If-Match}) so a retried delta isn\textquotesingle t applied twice.
+
+\subsection{Reliability checklist (mention in interviews)}\label{reliability-checklist-mention-in-interviews}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Idempotency keys} for all unsafe creates/charges.
+\item
+  \textbf{Retries with exponential backoff + jitter} on the client; honor \texttt{Retry-After}.
+\item
+  \textbf{Timeouts} on every call (no infinite hangs).
+\item
+  \textbf{Circuit breakers} to stop hammering a failing dependency.
+\item
+  \textbf{Outbox pattern} when an API call must atomically also publish an event (write the event to a DB outbox in the same transaction, relay it asynchronously).
+\end{itemize}
+
+\textbf{Interview takeaway:} "Networks give you \emph{at-least-once} delivery; idempotency turns that into \emph{exactly-once effects}." Sketch the dedup table and the atomic insert --- that concrete mechanism is what separates a strong answer.
+
+\section{Pagination}\label{pagination}
+
+Returning a 50-million-row collection in one response is impossible. Pagination splits it into pages. The choice of \emph{scheme} has deep consequences for correctness and performance.
+
+\subsection{Offset / Limit}\label{offset--limit}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /events?limit=20\&offset=40        \# "skip 40, take 20" → page 3}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \OperatorTok{*} \KeywordTok{FROM} \KeywordTok{events}
+\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ created\_at }\KeywordTok{DESC}
+\KeywordTok{LIMIT} \DecValTok{20}\NormalTok{ OFFSET }\DecValTok{40}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Why it degrades at large offsets:} \texttt{OFFSET\ 1000000} forces the database to \emph{scan and discard} the first million rows before returning 20. Cost is \textbf{O(offset)} --- page 1 is instant, page 50,000 times out. There\textquotesingle s no index trick that fixes a pure offset scan.
+
+\textbf{Why it\textquotesingle s unstable under writes:} offset addresses a \emph{position}, not an \emph{item}. If a new event is inserted at the top while a user pages, every subsequent page \textbf{shifts by one} \(\rightarrow\) the user sees a duplicate row, or skips one entirely.
+
+\setcodelang{}
+
+\begin{verbatim}
+t0: [A B C D E]   user reads page1 = [A B]   (offset 0, limit 2)
+t1: insert Z at top → [Z A B C D E]
+t2: user reads page2 (offset 2, limit 2) = [B C]   ← B seen twice, A's neighbor skipped
+\end{verbatim}
+
+Offset is fine for \emph{small, bounded, mostly-static} datasets and admin UIs that need "jump to page 7." It\textquotesingle s wrong for large, fast-changing feeds.
+
+\subsection{Cursor / Keyset Pagination}\label{cursor--keyset-pagination}
+
+Instead of "skip N," remember the \emph{last item you saw} and ask for "items after this one." The cursor encodes the sort key of the last row.
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} Page 1}
+\KeywordTok{SELECT} \OperatorTok{*} \KeywordTok{FROM} \KeywordTok{events}
+\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ created\_at }\KeywordTok{DESC}\NormalTok{, }\KeywordTok{id} \KeywordTok{DESC}
+\KeywordTok{LIMIT} \DecValTok{20}\NormalTok{;}
+
+\CommentTok{{-}{-} Next page: pass the (created\_at, id) of the last row as a cursor.}
+\CommentTok{{-}{-} "Give me rows strictly before that point" — a row comparison, index{-}friendly:}
+\KeywordTok{SELECT} \OperatorTok{*} \KeywordTok{FROM} \KeywordTok{events}
+\KeywordTok{WHERE}\NormalTok{ (created\_at, }\KeywordTok{id}\NormalTok{) }\OperatorTok{\textless{}}\NormalTok{ (}\StringTok{\textquotesingle{}2026{-}06{-}15T10:00:00Z\textquotesingle{}}\NormalTok{, }\DecValTok{91234}\NormalTok{)}
+\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ created\_at }\KeywordTok{DESC}\NormalTok{, }\KeywordTok{id} \KeywordTok{DESC}
+\KeywordTok{LIMIT} \DecValTok{20}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{WHERE\ (created\_at,\ id)\ \textless{}\ (...)} uses the index to \textbf{seek directly} to the boundary --- cost is \textbf{O(limit)}, \emph{independent of how deep you are}. Page 50,000 is as fast as page 1. Including \texttt{id} as a tiebreaker makes the order \textbf{total} (no ambiguity when two rows share \texttt{created\_at}), which is essential for correctness.
+
+\textbf{The cursor is opaque} --- base64-encode it so clients treat it as a black box and you can change its internals later:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cursor }\OperatorTok{=}\NormalTok{ base64(\{}\StringTok{"created\_at"}\NormalTok{:}\StringTok{"2026{-}06{-}15T10:00:00Z"}\NormalTok{,}\StringTok{"id"}\NormalTok{:}\DecValTok{91234}\NormalTok{\})}
+       \OperatorTok{=} \StringTok{"eyJjcmVhdGVkX2F0IjoiMjAyNi0wNi0xNVQxMDowMDowMFoiLCJpZCI6OTEyMzR9"}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /events?limit=20}
+\NormalTok{→ 200 OK}
+\NormalTok{\{}
+\NormalTok{  "data": [ ... ],}
+\NormalTok{  "page": \{}
+\NormalTok{    "next\_cursor": "eyJjcmVhdGVk...",}
+\NormalTok{    "has\_more": true}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{GET /events?limit=20\&cursor=eyJjcmVhdGVk...}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Stable under writes:} new rows inserted at the top don\textquotesingle t shift the cursor\textquotesingle s anchor, so no duplicates or skips while paging forward. The trade-off: \textbf{no random access} --- you can\textquotesingle t "jump to page 500," only walk next/prev. For infinite-scroll feeds (the common case at scale) that\textquotesingle s exactly what you want.
+
+\subsection{Page tokens (Google-style)}\label{page-tokens-google-style}
+
+A generalization of cursors: the server returns an opaque \texttt{next\_page\_token}; the client passes it back. The token can encode a cursor, an offset, or even a server-side scroll/snapshot ID (e.g. Elasticsearch \texttt{search\_after}/scroll). Clients never parse it. This is the most flexible scheme and what most large APIs converge on.
+
+\subsection{Comparison}\label{comparison}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2308}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2596}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2692}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2404}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Offset/Limit}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Cursor/Keyset}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Page token}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Deep-page performance & O(offset) --- degrades badly & O(limit) --- constant & O(limit) (impl-dependent) \\
+\rowcolor{zebra}
+Stable under inserts & No (dup/skip) & Yes & Yes \\
+Random access ("page 7") & Yes & No & No \\
+\rowcolor{zebra}
+Total count available & Easy & Hard/expensive & Hard \\
+Client simplicity & Simplest & Medium (opaque cursor) & Medium \\
+\rowcolor{zebra}
+Best for & Small, static, admin tables & Large feeds, infinite scroll & Public APIs at scale \\
+\end{longtable}
+
+\textbf{Interview takeaway:} "For a feed at scale I\textquotesingle d use \textbf{cursor (keyset) pagination} --- it\textquotesingle s O(page size) regardless of depth and stable under concurrent writes, unlike offset which scans-and-discards and shifts pages when rows are inserted." Then write the \texttt{WHERE\ (created\_at,\ id)\ \textless{}\ (...)} query. That sentence + that query is a near-guaranteed signal.
+
+\section{Versioning \& Evolution}\label{versioning--evolution}
+
+APIs are \emph{forever} once a client depends on them. The goal: \textbf{add capability without breaking existing integrations}, and when you must break, do it loudly and slowly.
+
+\subsection{Where to put the version}\label{where-to-put-the-version}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1872}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2106}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2893}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3130}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Pros
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cons
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{URL path} & \texttt{GET\ /v2/users/42} & Obvious, easy to route/cache, trivially testable in a browser & "Version" pollutes every URL; encourages big-bang v2 \\
+\rowcolor{zebra}
+\textbf{Custom header} & \texttt{X-API-Version:\ 2} & Clean URLs; resource identity unchanged across versions & Invisible in logs/browser; easy to forget; caching by header is fiddly \\
+\textbf{Media type (content negotiation)} & \texttt{Accept:\ application/vnd.acme.v2+json} & Most "RESTful" (versions the \emph{representation}) & Verbose, poor tooling support, confuses many developers \\
+\rowcolor{zebra}
+\textbf{Date-based} (Stripe) & \texttt{Stripe-Version:\ 2024-04-10} & Fine-grained, pin clients to a snapshot of behavior & Server must maintain transformation layers per date \\
+\end{longtable}
+
+\textbf{URL path versioning is the pragmatic default} --- it\textquotesingle s the easiest to understand, route, and debug. Reserve a real \texttt{/v2} for \emph{breaking} changes only; do everything else additively within \texttt{/v1}.
+
+\subsection{Additive (non-breaking) vs breaking changes}\label{additive-non-breaking-vs-breaking-changes}
+
+\textbf{Non-breaking --- safe to ship to existing clients (no version bump):}
+
+\begin{itemize}
+\tightlist
+\item
+  Adding a \textbf{new optional} field to a response (clients ignore unknown fields).
+\item
+  Adding a \textbf{new endpoint} or a new optional query parameter.
+\item
+  Adding a new value to an enum \textbf{only if} clients are documented to tolerate unknowns.
+\item
+  Relaxing a validation rule (accepting more inputs).
+\end{itemize}
+
+\textbf{Breaking --- requires a new version (or never do it):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Removing or renaming} a field (\texttt{fullName} \(\rightarrow\) \texttt{name}).
+\item
+  \textbf{Changing a type} (\texttt{amount:\ "5.00"} string \(\rightarrow\) \texttt{5.00} number, or cents vs dollars).
+\item
+  Making an \textbf{optional field required}, or adding a new required request field.
+\item
+  Changing \textbf{default behavior}, error codes, or the meaning of an existing field.
+\item
+  Tightening validation so previously-valid requests now fail.
+\end{itemize}
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ErrorTok{//} \ErrorTok{v1} \ErrorTok{response}
+\FunctionTok{\{} \DataTypeTok{"id"}\FunctionTok{:} \DecValTok{42}\FunctionTok{,} \DataTypeTok{"name"}\FunctionTok{:} \StringTok{"Alice"} \FunctionTok{\}}
+
+\ErrorTok{//} \ErrorTok{SAFE} \ErrorTok{evolution} \ErrorTok{—} \ErrorTok{added} \ErrorTok{optional} \ErrorTok{field,} \ErrorTok{old} \ErrorTok{clients} \ErrorTok{ignore} \ErrorTok{it}
+\FunctionTok{\{} \DataTypeTok{"id"}\FunctionTok{:} \DecValTok{42}\FunctionTok{,} \DataTypeTok{"name"}\FunctionTok{:} \StringTok{"Alice"}\FunctionTok{,} \DataTypeTok{"avatar\_url"}\FunctionTok{:} \StringTok{"https://..."} \FunctionTok{\}}
+
+\ErrorTok{//} \ErrorTok{BREAKING} \ErrorTok{—} \ErrorTok{renamed} \ErrorTok{field;} \ErrorTok{v1} \ErrorTok{clients} \ErrorTok{reading} \ErrorTok{\textasciigrave{}name\textasciigrave{}} \ErrorTok{now} \ErrorTok{get} \ErrorTok{null} \ErrorTok{→} \ErrorTok{needs} \ErrorTok{/v2}
+\FunctionTok{\{} \DataTypeTok{"id"}\FunctionTok{:} \DecValTok{42}\FunctionTok{,} \DataTypeTok{"full\_name"}\FunctionTok{:} \StringTok{"Alice"} \FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{The robustness principle (Postel\textquotesingle s Law):} \emph{be conservative in what you send, liberal in what you accept.} Concretely: clients must \textbf{ignore unknown fields} (so the server can add them freely), and servers should accept extra/unknown request fields gracefully where reasonable. This is what makes additive evolution possible.
+
+\subsection{Deprecation process}\label{deprecation-process}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Announce} in docs + changelog + email to API consumers; set a sunset date (e.g. 6--12 months out).
+\item
+  \textbf{Signal in responses:} \texttt{Deprecation:\ true} and \texttt{Sunset:\ Wed,\ 01\ Jul\ 2026\ 00:00:00\ GMT} headers, plus a \texttt{Warning} header.
+\item
+  \textbf{Monitor} which clients still call the old version (by API key) and reach out to laggards.
+\item
+  \textbf{Sunset:} after the date, return \texttt{410\ Gone} (deliberately removed) rather than 404.
+\end{enumerate}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /v1/users/42}
+\NormalTok{→ 200 OK}
+\NormalTok{  Deprecation: true}
+\NormalTok{  Sunset: Wed, 01 Jul 2026 00:00:00 GMT}
+\NormalTok{  Link: \textless{}https://docs.acme.com/migrate{-}v2\textgreater{}; rel="deprecation"}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Migration scenario}\label{migration-scenario}
+
+You ship \texttt{amount} as \textbf{dollars (float)} in v1 and realize floats cause rounding bugs; you want \textbf{cents (integer)}.
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Wrong:} silently change v1\textquotesingle s \texttt{amount} to integer cents \(\rightarrow\) every existing client now displays \texttt{\$5000} instead of \texttt{\$50}. Catastrophic.
+\item
+  \emph{Right:} add \texttt{amount\_cents} (integer) as a \textbf{new optional field} in v1 alongside the old \texttt{amount}. Document \texttt{amount} as deprecated. Move all-new clients to \texttt{amount\_cents}. In \texttt{/v2}, drop \texttt{amount} entirely. Existing v1 clients keep working untouched.
+\end{itemize}
+
+\textbf{Interview takeaway:} "I version only on \emph{breaking} changes and ship everything else additively, relying on clients ignoring unknown fields. URL versioning by default, with a real deprecation policy: \texttt{Deprecation}/\texttt{Sunset} headers, a 6-month window, then \texttt{410\ Gone}." That shows you understand evolution is a \emph{process}, not a header.
+
+\section{Authentication \& Authorization}\label{authentication--authorization}
+
+\textbf{AuthN} = \emph{who are you?} \textbf{AuthZ} = \emph{what are you allowed to do?} Two distinct steps; conflating them (\texttt{401} vs \texttt{403}) is a classic mistake.
+
+\subsection{API Keys}\label{api-keys}
+
+A long random secret string identifying the \emph{application} (not a user).
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{GET /data}
+\NormalTok{Authorization: Bearer sk\_live\_4eC39Hq...    \# or:  X{-}API{-}Key: sk\_live\_...}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pros:} dead simple, great for server-to-server and getting started.
+\item
+  \textbf{Cons:} static, long-lived, no built-in user identity or granular scopes, hard to rotate, disastrous if leaked (treat like a password --- never in URLs/logs/client-side code). Mitigate with key prefixes (\texttt{sk\_live\_} vs \texttt{pk\_test\_}), hashing at rest, per-key rate limits, and rotation.
+\end{itemize}
+
+\subsection{OAuth 2.0}\label{oauth-20}
+
+The standard for \textbf{delegated} authorization: let app A act on a user\textquotesingle s behalf at service B \emph{without} A ever seeing the user\textquotesingle s password. Four roles: \textbf{Resource Owner} (user), \textbf{Client} (the app), \textbf{Authorization Server} (issues tokens), \textbf{Resource Server} (the API).
+
+\textbf{Authorization Code flow + PKCE} (for web/mobile/SPA --- the modern default):
+
+\setcodelang{}
+
+\begin{verbatim}
+User    Client App         Auth Server          Resource Server (API)
+ │          │                   │                       │
+ │ click "Login with X"         │                       │
+ │─────────►│                   │                       │
+ │          │ generate code_verifier (random),          │
+ │          │ code_challenge = SHA256(verifier)         │
+ │          │── /authorize?client_id&redirect_uri       │
+ │          │     &code_challenge&scope=read ──────────►│
+ │◄─────────────────── login + consent screen ──────────│
+ │ approve  │                   │                       │
+ │          │◄── 302 redirect ?code=AUTH_CODE ──────────│
+ │          │── POST /token  code=AUTH_CODE             │
+ │          │     + code_verifier ─────────────────────►│
+ │          │       (AS checks SHA256(verifier)==challenge)
+ │          │◄── { access_token, refresh_token } ───────│
+ │          │── GET /data  Authorization: Bearer AT ───────────────────►│
+ │          │◄────────────────── 200 OK ─────────────────────────────────│
+\end{verbatim}
+
+\textbf{Why PKCE?} Without it, an attacker who intercepts the redirect (\texttt{?code=...}) on a mobile device could exchange the code for a token. PKCE binds the code to a one-time secret (\texttt{code\_verifier}) that only the legitimate client knows --- the stolen code is useless without it. PKCE is now recommended for \emph{all} clients, not just public ones.
+
+\textbf{Client Credentials flow} (machine-to-machine, no user):
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{POST /oauth/token}
+\NormalTok{Content{-}Type: application/x{-}www{-}form{-}urlencoded}
+
+\NormalTok{grant\_type=client\_credentials}
+\NormalTok{\&client\_id=svc\_orders}
+\NormalTok{\&client\_secret=...}
+\NormalTok{\&scope=inventory.read inventory.write}
+\NormalTok{→ \{ "access\_token": "...", "expires\_in": 3600, "token\_type": "Bearer" \}}
+\end{Highlighting}
+\end{Shaded}
+
+Used for service-to-service: there\textquotesingle s no user, the \emph{service itself} is the principal. Other flows you should be able to name: \textbf{Refresh Token} (swap a long-lived refresh token for a fresh short-lived access token without re-login), and the \textbf{deprecated} Implicit and Resource Owner Password flows (don\textquotesingle t recommend them --- Implicit leaks tokens in URLs; Password requires giving the app your credentials).
+
+\subsection{JWT (JSON Web Token)}\label{jwt-json-web-token}
+
+A \textbf{self-contained, signed} token. The resource server can validate it \emph{without} a database lookup --- that\textquotesingle s what makes it great for stateless, horizontally-scaled APIs.
+
+\setcodelang{}
+
+\begin{verbatim}
+header.payload.signature   (three base64url parts joined by dots)
+
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9 . eyJzdWIiOiJ1c2VyXzQyIiwiZXhwIjoxNzE4NX0 . SflKxw...
+\end{verbatim}
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ErrorTok{//} \ErrorTok{header}
+\FunctionTok{\{} \DataTypeTok{"alg"}\FunctionTok{:} \StringTok{"RS256"}\FunctionTok{,} \DataTypeTok{"typ"}\FunctionTok{:} \StringTok{"JWT"} \FunctionTok{\}}
+\ErrorTok{//} \ErrorTok{payload} \ErrorTok{(claims)}
+\FunctionTok{\{}
+  \DataTypeTok{"iss"}\FunctionTok{:} \StringTok{"https://auth.acme.com"}\FunctionTok{,}   \ErrorTok{//} \ErrorTok{issuer}
+  \DataTypeTok{"sub"}\FunctionTok{:} \StringTok{"user\_42"}\FunctionTok{,}                  \ErrorTok{//} \ErrorTok{subject} \ErrorTok{(who)}
+  \DataTypeTok{"aud"}\FunctionTok{:} \StringTok{"api.acme.com"}\FunctionTok{,}             \ErrorTok{//} \ErrorTok{audience} \ErrorTok{(who} \ErrorTok{it\textquotesingle{}s} \ErrorTok{for)}
+  \DataTypeTok{"exp"}\FunctionTok{:} \DecValTok{1718500000}\FunctionTok{,}                 \ErrorTok{//} \ErrorTok{expiry} \ErrorTok{(epoch)} \ErrorTok{—} \ErrorTok{REQUIRED}\FunctionTok{,} \ErrorTok{keep} \ErrorTok{short}
+  \DataTypeTok{"iat"}\FunctionTok{:} \DecValTok{1718496400}\FunctionTok{,}                 \ErrorTok{//} \ErrorTok{issued{-}at}
+  \DataTypeTok{"scope"}\FunctionTok{:} \StringTok{"orders.read orders.write"}
+\FunctionTok{\}}
+\ErrorTok{//} \ErrorTok{signature} \ErrorTok{=} \ErrorTok{RS256(base64(header)} \ErrorTok{+} \ErrorTok{"."} \ErrorTok{+} \ErrorTok{base64(payload),} \ErrorTok{private\_key)}
+\end{Highlighting}
+\end{Shaded}
+
+The server verifies the signature with the issuer\textquotesingle s \textbf{public key} (RS256/asymmetric) --- so any service can validate without holding a secret. \textbf{Critical: the payload is base64, not encrypted --- anyone can read it. Never put secrets in a JWT.}
+
+\textbf{JWT pitfalls (high-value follow-ups):}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Revocation is hard.} A JWT is valid until \texttt{exp} no matter what --- you can\textquotesingle t "log out" a stateless token server-side. Mitigations: \textbf{short expiry} (5--15 min) + refresh tokens; a \textbf{denylist} of revoked token IDs (\texttt{jti}) in Redis (reintroduces a lookup, partially defeating the point); or token versioning per user.
+\item
+  \textbf{\texttt{alg:\ none} attack} --- early libraries accepted a token claiming \texttt{"alg":"none"} (unsigned). Always pin the expected algorithm server-side; never trust the header\textquotesingle s \texttt{alg}.
+\item
+  \textbf{Key confusion (RS256\(\rightarrow\)HS256)} --- attacker switches algorithm so your RSA \emph{public} key is used as an HMAC \emph{secret}. Pin the algorithm.
+\item
+  \textbf{Clock skew} --- validate \texttt{exp}/\texttt{nbf} with a small leeway; ensure servers sync time (NTP).
+\item
+  \textbf{Size} --- JWTs ride in every request header; fat claims bloat every call.
+\end{itemize}
+
+\textbf{Session tokens vs JWTs:} an opaque session ID + server-side store gives instant revocation but needs a lookup per request (or a shared cache). JWTs give stateless validation but weak revocation. Many systems use \textbf{short-lived JWTs + a refresh token} to get most of both.
+
+\subsection{mTLS (mutual TLS)}\label{mtls-mutual-tls}
+
+Both client \emph{and} server present certificates; each verifies the other. Used for \textbf{service-to-service} auth inside a mesh (Istio/Linkerd, SPIFFE/SPIRE issuing short-lived certs). Stronger than bearer tokens (the credential is bound to the TLS connection and can\textquotesingle t be replayed elsewhere), but heavier to operate (cert issuance/rotation).
+
+\subsection{Scopes}\label{scopes}
+
+Scopes are \textbf{coarse-grained permissions} attached to a token, limiting what it can do (\texttt{read:orders}, \texttt{write:payments}). They implement \textbf{least privilege}: a read-only dashboard gets a token with only \texttt{read:*} scopes, so even if leaked it can\textquotesingle t mutate. The resource server checks the required scope per endpoint \(\rightarrow\) returns \textbf{403} if missing. Scopes \(\neq\) roles: scopes bound the \emph{token}; roles/RBAC/ABAC decide the \emph{user\textquotesingle s} permissions. Real systems combine both.
+
+\textbf{Interview takeaway:} "AuthN before AuthZ. For users, OAuth2 Authorization-Code + PKCE issuing short-lived JWTs; for services, client-credentials or mTLS. JWTs are stateless and fast to validate but hard to revoke --- so I keep \texttt{exp} short and pair with refresh tokens. Scopes enforce least privilege; missing scope is 403, not 401."
+
+\section{Rate Limiting \& Throttling}\label{rate-limiting--throttling}
+
+Rate limiting protects the API from \textbf{abuse, accidental floods, and noisy neighbors}, and enforces fair use / pricing tiers. It\textquotesingle s both a reliability and a business mechanism.
+
+\subsection{Algorithms}\label{algorithms}
+
+\textbf{Token Bucket} --- a bucket holds up to \texttt{B} tokens; tokens refill at rate \texttt{r}/sec; each request spends one. Empty bucket \(\rightarrow\) reject (429).
+
+\setcodelang{}
+
+\begin{verbatim}
+refill r=10/sec, capacity B=20
+A burst of 20 requests passes instantly (drains the bucket),
+then throughput is capped at the steady 10/sec refill.
+→ allows bursts up to B, smooths the average to r.
+\end{verbatim}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Redis{-}backed token bucket (atomic via Lua in practice)}
+\CommentTok{\# stored per key: tokens, last\_refill\_ts}
+\NormalTok{now }\OperatorTok{=}\NormalTok{ time.time()}
+\NormalTok{elapsed }\OperatorTok{=}\NormalTok{ now }\OperatorTok{{-}}\NormalTok{ last\_refill}
+\NormalTok{tokens }\OperatorTok{=} \BuiltInTok{min}\NormalTok{(B, tokens }\OperatorTok{+}\NormalTok{ elapsed }\OperatorTok{*}\NormalTok{ r)     }\CommentTok{\# refill}
+\ControlFlowTok{if}\NormalTok{ tokens }\OperatorTok{\textgreater{}=} \DecValTok{1}\NormalTok{:}
+\NormalTok{    tokens }\OperatorTok{{-}=} \DecValTok{1}
+\NormalTok{    allow()                                }\CommentTok{\# 200}
+\ControlFlowTok{else}\NormalTok{:}
+\NormalTok{    reject()                               }\CommentTok{\# 429, Retry{-}After = (1 {-} tokens)/r}
+\NormalTok{last\_refill }\OperatorTok{=}\NormalTok{ now}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Leaky Bucket} --- requests queue and \emph{drain at a fixed rate}. Overflow is dropped. Output is perfectly smooth (constant rate), but it allows \textbf{no bursts} --- even a momentary spike past the drain rate is shaped or dropped. Good for protecting a downstream that needs steady input.
+
+\textbf{Fixed Window Counter} --- count requests per fixed clock window (e.g. per minute), reset at the boundary.
+
+\setcodelang{}
+
+\begin{verbatim}
+INCR ratelimit:user42:minute_1718500   # atomic counter
+EXPIRE ratelimit:user42:minute_1718500 60
+if count > limit: reject (429)
+\end{verbatim}
+
+Simple and cheap, but the \textbf{boundary burst problem}: with a limit of 100/min, a client can send 100 at \texttt{12:00:59} and 100 more at \texttt{12:01:00} \(\rightarrow\) \textbf{200 requests in 2 seconds}, double the intended rate, because the counter reset at the window edge.
+
+\textbf{Sliding Window Log} --- store a timestamp per request in a sorted set; count entries in the trailing window. Exact, no boundary burst, but \textbf{O(requests) memory}.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ZREMRANGEBYSCORE key }\DecValTok{0}\NormalTok{ (now }\OperatorTok{{-}} \DecValTok{60000}\NormalTok{)   }\CommentTok{\# evict entries older than 60s}
+\NormalTok{ZADD key now now                        }\CommentTok{\# record this request}
+\NormalTok{count }\OperatorTok{=}\NormalTok{ ZCARD key}
+\ControlFlowTok{if}\NormalTok{ count }\OperatorTok{\textgreater{}}\NormalTok{ limit: reject}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Sliding Window Counter} --- the production sweet spot: approximate the sliding window by weighting the previous fixed window\textquotesingle s count by how much of it overlaps the current sliding window.
+
+\setcodelang{}
+
+\begin{verbatim}
+limit = 100/min
+prev_window_count = 80, curr_window_count = 30
+elapsed_in_current = 15s  → 25% into the current minute → 75% of prev window still in view
+estimate = prev*0.75 + curr = 80*0.75 + 30 = 90  →  under 100, allow
+\end{verbatim}
+
+O(1) memory, smooths the boundary burst, accurate enough for almost everyone.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1525}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1729}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1220}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1322}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.4204}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Algorithm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Bursts
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Memory
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Accuracy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Notes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Token bucket & Allowed (up to B) & O(1) & Good & Most common; natural "burst + steady rate" \\
+\rowcolor{zebra}
+Leaky bucket & None (shaped) & O(1) + queue & Good & Smooth output; protects fragile downstreams \\
+Fixed window & 2\(\times\) at edges & O(1) & Poor at edges & Simplest \\
+\rowcolor{zebra}
+Sliding log & None & O(n) & Exact & Memory-heavy \\
+Sliding counter & Minimal & O(1) & Very good & Best general default \\
+\end{longtable}
+
+\subsection{The 429 response}\label{the-429-response}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HTTP/1.1 429 Too Many Requests}
+\NormalTok{Retry{-}After: 30}
+\NormalTok{X{-}RateLimit{-}Limit: 1000}
+\NormalTok{X{-}RateLimit{-}Remaining: 0}
+\NormalTok{X{-}RateLimit{-}Reset: 1718500060}
+\NormalTok{Content{-}Type: application/json}
+
+\NormalTok{\{ "error": \{ "code": "rate\_limited", "message": "Too many requests, retry in 30s." \} \}}
+\end{Highlighting}
+\end{Shaded}
+
+Always return \textbf{\texttt{Retry-After}} (seconds or HTTP-date) so well-behaved clients back off correctly, plus \texttt{X-RateLimit-*} so clients can \emph{self-throttle} before hitting the wall. A good API makes the limits \emph{visible}, not just enforced.
+
+\subsection{Dimensions \& tiers}\label{dimensions--tiers}
+
+Rate-limit by \textbf{API key}, \textbf{user ID}, \textbf{IP} (for anonymous/abuse), or \textbf{endpoint} (expensive endpoints get tighter limits). Offer \textbf{tiered limits} by plan (free: 100/min, pro: 10k/min) --- this is how usage-based pricing is enforced. In a distributed deployment, the counter must be \textbf{shared} (Redis) so limits hold across all gateway instances; a per-instance counter lets a client get \texttt{N\ ×\ instances}.
+
+\textbf{Interview takeaway:} "Token bucket for burst-tolerant user APIs, leaky bucket to protect a fragile downstream, sliding-window-counter as a memory-efficient accurate default. Counters live in Redis so they\textquotesingle re global across gateway nodes. Always emit \texttt{Retry-After} + \texttt{X-RateLimit-*}."
+
+\section{Error Handling}\label{error-handling}
+
+Errors are part of the contract. Inconsistent or vague errors are the \#1 complaint about real APIs. Three rules: \textbf{a consistent envelope}, \textbf{a stable machine-readable code}, and \textbf{enough detail to act} without leaking internals.
+
+\subsection{Consistent error envelope}\label{consistent-error-envelope}
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"error"}\FunctionTok{:} \FunctionTok{\{}
+    \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"insufficient\_funds"}\FunctionTok{,}          \ErrorTok{//} \ErrorTok{stable}\FunctionTok{,} \ErrorTok{machine{-}readable} \ErrorTok{—} \ErrorTok{clients} \ErrorTok{branch} \ErrorTok{on} \ErrorTok{this}
+    \DataTypeTok{"message"}\FunctionTok{:} \StringTok{"Your card has insufficient funds."}\FunctionTok{,}   \ErrorTok{//} \ErrorTok{human{-}readable}\FunctionTok{,} \ErrorTok{safe} \ErrorTok{to} \ErrorTok{surface}
+    \DataTypeTok{"request\_id"}\FunctionTok{:} \StringTok{"req\_8f3c2e7a"}\FunctionTok{,}           \ErrorTok{//} \ErrorTok{for} \ErrorTok{support} \ErrorTok{/} \ErrorTok{log} \ErrorTok{correlation}
+    \DataTypeTok{"doc\_url"}\FunctionTok{:} \StringTok{"https://docs.acme.com/errors/insufficient\_funds"}\FunctionTok{,}
+    \DataTypeTok{"details"}\FunctionTok{:} \OtherTok{[}
+      \FunctionTok{\{} \DataTypeTok{"field"}\FunctionTok{:} \StringTok{"amount"}\FunctionTok{,} \DataTypeTok{"issue"}\FunctionTok{:} \StringTok{"exceeds\_balance"} \FunctionTok{\}}
+    \OtherTok{]}
+  \FunctionTok{\}}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The \textbf{\texttt{code}} is what clients switch on --- never make clients parse the human \texttt{message} (it changes, gets localized). The HTTP status gives the \emph{category} (4xx client, 5xx server); the \texttt{code} gives the \emph{specifics}. Always include a \textbf{\texttt{request\_id}} that also appears in your logs so a developer can paste it into a support ticket and you can find the exact failure.
+
+\subsection{RFC 7807 --- Problem Details for HTTP APIs}\label{rfc-7807--problem-details-for-http-apis}
+
+A standardized error format (\texttt{Content-Type:\ application/problem+json}):
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HTTP/1.1 422 Unprocessable Entity}
+\NormalTok{Content{-}Type: application/problem+json}
+
+\NormalTok{\{}
+\NormalTok{  "type": "https://acme.com/probs/validation",   // URI identifying the problem type}
+\NormalTok{  "title": "Validation failed",                    // short human summary}
+\NormalTok{  "status": 422,}
+\NormalTok{  "detail": "The \textquotesingle{}email\textquotesingle{} field is not a valid email address.",}
+\NormalTok{  "instance": "/users",                            // the specific occurrence}
+\NormalTok{  "errors": [ \{ "field": "email", "code": "invalid\_format" \} ]}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Worth knowing by name --- Microsoft/Azure and Spring use it by default. Even if you roll your own envelope, mention RFC 7807 to show awareness of the standard.
+
+\subsection{Validation errors --- report them all at once}\label{validation-errors--report-them-all-at-once}
+
+Don\textquotesingle t fail on the first bad field; collect and return all violations so the user fixes them in one round trip:
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"error"}\FunctionTok{:} \FunctionTok{\{}
+    \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"validation\_error"}\FunctionTok{,}
+    \DataTypeTok{"message"}\FunctionTok{:} \StringTok{"Request validation failed."}\FunctionTok{,}
+    \DataTypeTok{"details"}\FunctionTok{:} \OtherTok{[}
+      \FunctionTok{\{} \DataTypeTok{"field"}\FunctionTok{:} \StringTok{"email"}\FunctionTok{,}    \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"invalid\_format"} \FunctionTok{\}}\OtherTok{,}
+      \FunctionTok{\{} \DataTypeTok{"field"}\FunctionTok{:} \StringTok{"age"}\FunctionTok{,}      \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"must\_be\_positive"} \FunctionTok{\}}\OtherTok{,}
+      \FunctionTok{\{} \DataTypeTok{"field"}\FunctionTok{:} \StringTok{"country"}\FunctionTok{,}  \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"required"} \FunctionTok{\}}
+    \OtherTok{]}
+  \FunctionTok{\}}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Partial failures}\label{partial-failures}
+
+For batch endpoints and aggregations, a single status can\textquotesingle t describe "3 of 100 failed." Return per-item results (or \texttt{207\ Multi-Status}) so the client knows exactly what to retry:
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"results"}\FunctionTok{:} \OtherTok{[}
+    \FunctionTok{\{} \DataTypeTok{"id"}\FunctionTok{:} \StringTok{"a"}\FunctionTok{,} \DataTypeTok{"status"}\FunctionTok{:} \StringTok{"ok"} \FunctionTok{\}}\OtherTok{,}
+    \FunctionTok{\{} \DataTypeTok{"id"}\FunctionTok{:} \StringTok{"b"}\FunctionTok{,} \DataTypeTok{"status"}\FunctionTok{:} \StringTok{"error"}\FunctionTok{,} \DataTypeTok{"error"}\FunctionTok{:} \FunctionTok{\{} \DataTypeTok{"code"}\FunctionTok{:} \StringTok{"not\_found"} \FunctionTok{\}} \FunctionTok{\}}
+  \OtherTok{]}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Don\textquotesingle t leak internals}\label{dont-leak-internals}
+
+\texttt{500} must \textbf{never} return a stack trace, SQL, or internal hostnames --- that\textquotesingle s an information-disclosure vulnerability. Log the detail server-side keyed by \texttt{request\_id}; return a generic message + that ID to the client.
+
+\textbf{Interview takeaway:} consistent envelope + stable \texttt{code} + \texttt{request\_id}, status for category and code for specifics, all validation errors at once, never leak internals, and name-drop RFC 7807.
+
+\section{gRPC In Depth}\label{grpc-in-depth}
+
+\textbf{gRPC} is Google\textquotesingle s high-performance RPC framework: \textbf{Protocol Buffers} for the schema/serialization, \textbf{HTTP/2} for transport. You define a service in a \texttt{.proto} file, generate strongly-typed client + server code in any language, and call remote methods as if they were local functions.
+
+\subsection{Protobuf schema}\label{protobuf-schema}
+
+\setcodelang{Protobuf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{syntax = }\StringTok{"proto3"}\NormalTok{;}
+\KeywordTok{package}\NormalTok{ orders.v1;}
+
+\NormalTok{service OrderService \{}
+\NormalTok{  rpc GetOrder   (GetOrderRequest)  returns (Order);                 }\CommentTok{// unary}
+\NormalTok{  rpc ListOrders (ListOrdersRequest) returns (stream Order);        }\CommentTok{// server stream}
+\NormalTok{  rpc UploadEvents (stream Event)   returns (UploadSummary);         }\CommentTok{// client stream}
+\NormalTok{  rpc Chat       (stream Message)   returns (stream Message);        }\CommentTok{// bidirectional}
+\NormalTok{\}}
+
+\KeywordTok{message}\NormalTok{ GetOrderRequest \{}
+  \DataTypeTok{string}\NormalTok{ order\_id = }\DecValTok{1}\NormalTok{;            }\CommentTok{// field NUMBERS (not names) are the wire identity}
+\NormalTok{\}}
+
+\KeywordTok{message}\NormalTok{ Order \{}
+  \DataTypeTok{string}\NormalTok{ order\_id    = }\DecValTok{1}\NormalTok{;}
+  \DataTypeTok{string}\NormalTok{ customer\_id = }\DecValTok{2}\NormalTok{;}
+  \DataTypeTok{int64}\NormalTok{  amount\_cents = }\DecValTok{3}\NormalTok{;}
+\NormalTok{  Status status      = }\DecValTok{4}\NormalTok{;}
+  \CommentTok{// field 5 reserved for future use — add new fields with NEW numbers, never reuse}
+\NormalTok{\}}
+
+\KeywordTok{enum}\NormalTok{ Status \{}
+\NormalTok{  STATUS\_UNSPECIFIED = }\DecValTok{0}\NormalTok{;   }\CommentTok{// proto3 requires a zero default}
+\NormalTok{  PENDING = }\DecValTok{1}\NormalTok{;}
+\NormalTok{  SHIPPED = }\DecValTok{2}\NormalTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Why field numbers matter:} Protobuf encodes \texttt{field\_number\ +\ type} on the wire, not field \emph{names}. So you can \textbf{rename} a field freely (names are local) and \textbf{add} fields (new numbers) without breaking old clients --- they ignore unknown numbers. The rules: never change a field\textquotesingle s number, never reuse a deleted field\textquotesingle s number (mark it \texttt{reserved}), and only widen types compatibly. This gives Protobuf its famous backward/forward compatibility --- the gRPC equivalent of "ignore unknown JSON fields."
+
+\subsection{The four RPC types}\label{the-four-rpc-types}
+
+\setcodelang{}
+
+\begin{verbatim}
+Unary:          client ──req──►  ◄──resp── server     (like REST)
+Server stream:  client ──req──►  ◄─r─r─r─r─ server     (download feed, large list)
+Client stream:  client ─m─m─m─►  ◄──resp── server     (upload, telemetry batch)
+Bidirectional:  client ◄─m─m─m─► server                (chat, live collaboration)
+\end{verbatim}
+
+All four ride over a \textbf{single HTTP/2 connection}, multiplexed as independent streams.
+
+\subsection{Why HTTP/2 + Protobuf wins for internal services}\label{why-http2--protobuf-wins-for-internal-services}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Multiplexing:} many concurrent RPCs over one TCP connection (no connection-per-call, no HTTP/1.1 head-of-line blocking at the HTTP layer).
+\item
+  \textbf{Binary Protobuf} is \textasciitilde3--10\(\times\) smaller than JSON and \textasciitilde5--10\(\times\) faster to (de)serialize --- meaningful when service A calls service B millions of times/sec.
+\item
+  \textbf{Streaming} is first-class (REST needs SSE/WebSocket bolt-ons).
+\item
+  \textbf{Strong typing + codegen:} the \texttt{.proto} is the contract; clients/servers can\textquotesingle t disagree on shape; refactors are compiler-checked.
+\item
+  \textbf{Header compression (HPACK)} and persistent connections cut per-call overhead.
+\end{itemize}
+
+\subsection{Code generation}\label{code-generation}
+
+\texttt{protoc} (+ language plugins) turns the \texttt{.proto} into: a \textbf{client stub} (you call \texttt{client.GetOrder(req)}), a \textbf{server interface} to implement, and all the serialization glue. The schema is the single source of truth shared across teams and languages.
+
+\subsection{When to use gRPC --- and the grpc-web limitation}\label{when-to-use-grpc--and-the-grpc-web-limitation}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4800}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5200}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Use gRPC when\ldots{}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use REST when\ldots{}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Internal \textbf{service-to-service} calls & \textbf{Public/partner} APIs (universal tooling) \\
+\rowcolor{zebra}
+Latency/throughput critical & Human-debuggable JSON matters \\
+You need streaming & Browsers are first-class clients \\
+\rowcolor{zebra}
+Polyglot services sharing a contract & Caching via HTTP infra is important \\
+\end{longtable}
+
+\textbf{The browser limitation:} browsers can\textquotesingle t speak raw gRPC (no access to HTTP/2 framing / trailers from JS). You need \textbf{grpc-web} + a proxy (Envoy) that translates between the browser and the gRPC backend, and even then bidirectional streaming is limited. This is the single biggest reason gRPC stays \emph{internal} and REST/GraphQL faces the public web.
+
+\textbf{Interview takeaway:} "gRPC = Protobuf + HTTP/2: typed, binary, streaming, fast --- ideal for internal microservices. It doesn\textquotesingle t work natively in browsers (needs grpc-web + Envoy), so public-facing surfaces stay REST/GraphQL. Protobuf field numbers give backward compatibility the way \textquotesingle ignore unknown JSON fields\textquotesingle{} does for REST."
+
+\section{GraphQL In Depth}\label{graphql-in-depth}
+
+\textbf{GraphQL} (Meta, 2015) is a query language for APIs: the client sends a query specifying \textbf{exactly which fields it wants}, across multiple "resources," and gets back \textbf{exactly that shape} in one round trip. It solves REST\textquotesingle s \textbf{over-fetching} (getting fields you don\textquotesingle t need) and \textbf{under-fetching} (the N+1 round-trip problem where a screen needs data from many endpoints).
+
+\subsection{Schema + query}\label{schema--query}
+
+\setcodelang{GraphQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Schema (SDL) — the typed contract}
+\KeywordTok{type}\NormalTok{ User \{}
+\NormalTok{  id: }\DataTypeTok{ID}\NormalTok{!}
+\NormalTok{  name: }\DataTypeTok{String}\NormalTok{!}
+\NormalTok{  orders(first: }\DataTypeTok{Int}\NormalTok{): [Order!]!}
+\NormalTok{\}}
+\KeywordTok{type}\NormalTok{ Order \{}
+\NormalTok{  id: }\DataTypeTok{ID}\NormalTok{!}
+\NormalTok{  total: }\DataTypeTok{Int}\NormalTok{!}
+\NormalTok{  items: [Item!]!}
+\NormalTok{\}}
+\KeywordTok{type}\NormalTok{ Query \{}
+\NormalTok{  user(id: }\DataTypeTok{ID}\NormalTok{!): User}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{GraphQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Client query — one request, picks exactly what it needs}
+\KeywordTok{query}\NormalTok{ \{}
+\NormalTok{  user(id: }\StringTok{"42"}\NormalTok{) \{}
+\NormalTok{    name}
+\NormalTok{    orders(first: }\DecValTok{5}\NormalTok{) \{}
+\NormalTok{      total}
+\NormalTok{      items \{ name \}}
+\NormalTok{    \}}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{JSON}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ErrorTok{//} \ErrorTok{Response} \ErrorTok{mirrors} \ErrorTok{the} \ErrorTok{query} \ErrorTok{shape} \ErrorTok{exactly}
+\FunctionTok{\{} \DataTypeTok{"data"}\FunctionTok{:} \FunctionTok{\{} \DataTypeTok{"user"}\FunctionTok{:} \FunctionTok{\{} \DataTypeTok{"name"}\FunctionTok{:} \StringTok{"Alice"}\FunctionTok{,}
+  \DataTypeTok{"orders"}\FunctionTok{:} \OtherTok{[} \FunctionTok{\{} \DataTypeTok{"total"}\FunctionTok{:} \DecValTok{4999}\FunctionTok{,} \DataTypeTok{"items"}\FunctionTok{:} \OtherTok{[} \FunctionTok{\{} \DataTypeTok{"name"}\FunctionTok{:} \StringTok{"Book"} \FunctionTok{\}} \OtherTok{]} \FunctionTok{\}} \OtherTok{]} \FunctionTok{\}} \FunctionTok{\}} \FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+One endpoint (\texttt{POST\ /graphql}), one round trip, no over/under-fetching. A mobile screen that needs a user, their last 5 orders, and each order\textquotesingle s items would be 1 GraphQL call vs several REST calls.
+
+\subsection{Resolvers}\label{resolvers}
+
+Each field has a \textbf{resolver} --- a function that fetches its data. \texttt{Query.user} resolves the user; \texttt{User.orders} resolves that user\textquotesingle s orders; \texttt{Order.items} resolves each order\textquotesingle s items. The engine walks the query tree, calling resolvers. This composition is the power \emph{and} the danger.
+
+\subsection{The N+1 problem + DataLoader}\label{the-n1-problem--dataloader}
+
+Naive resolvers cause \textbf{N+1 queries}: resolving \texttt{user.orders} (1 query) then calling \texttt{Order.items} \emph{once per order} (N queries) \(\rightarrow\) 1 + N database hits.
+
+\setcodelang{}
+
+\begin{verbatim}
+Query 1:  SELECT * FROM orders WHERE user_id = 42        -- gets 5 orders
+Query 2:  SELECT * FROM items WHERE order_id = 101        -- per order!
+Query 3:  SELECT * FROM items WHERE order_id = 102
+...       (5 separate item queries → N+1)
+\end{verbatim}
+
+\textbf{DataLoader} fixes this by \textbf{batching + caching within a request}. Instead of firing a query per item-fetch, it collects all the keys requested in one tick of the event loop and issues a single batched query:
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{const}\NormalTok{ itemLoader }\OperatorTok{=} \KeywordTok{new} \FunctionTok{DataLoader}\NormalTok{(}\KeywordTok{async}\NormalTok{ (orderIds) }\KeywordTok{=\textgreater{}}\NormalTok{ \{}
+  \CommentTok{// orderIds = [101, 102, 103, 104, 105]  — collected in one tick}
+  \KeywordTok{const}\NormalTok{ rows }\OperatorTok{=} \ControlFlowTok{await}\NormalTok{ db}\OperatorTok{.}\FunctionTok{query}\NormalTok{(}
+    \StringTok{\textquotesingle{}SELECT * FROM items WHERE order\_id = ANY($1)\textquotesingle{}}\OperatorTok{,}\NormalTok{ [orderIds]   }\CommentTok{// ONE query}
+\NormalTok{  )}\OperatorTok{;}
+  \CommentTok{// return items grouped per orderId, in the same order as the keys}
+  \ControlFlowTok{return}\NormalTok{ orderIds}\OperatorTok{.}\FunctionTok{map}\NormalTok{(id }\KeywordTok{=\textgreater{}}\NormalTok{ rows}\OperatorTok{.}\FunctionTok{filter}\NormalTok{(r }\KeywordTok{=\textgreater{}}\NormalTok{ r}\OperatorTok{.}\AttributeTok{order\_id} \OperatorTok{===}\NormalTok{ id))}\OperatorTok{;}
+\NormalTok{\})}\OperatorTok{;}
+
+\CommentTok{// resolver:}
+\NormalTok{Order}\OperatorTok{.}\AttributeTok{items} \OperatorTok{=}\NormalTok{ (order) }\KeywordTok{=\textgreater{}}\NormalTok{ itemLoader}\OperatorTok{.}\FunctionTok{load}\NormalTok{(order}\OperatorTok{.}\AttributeTok{id}\NormalTok{)}\OperatorTok{;}   \CommentTok{// batched behind the scenes}
+\end{Highlighting}
+\end{Shaded}
+
+Result: 1 query for orders + \textbf{1} batched query for all items = 2 queries instead of 6. DataLoader also \textbf{dedupes} repeated keys within the request. This is \emph{the} GraphQL interview question.
+
+\subsection{Query depth / complexity limiting}\label{query-depth--complexity-limiting}
+
+Because clients control the query shape, a malicious or careless query can be ruinously expensive:
+
+\setcodelang{GraphQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{query}\NormalTok{ \{ user(id:}\StringTok{"1"}\NormalTok{)\{ orders\{ items\{ order\{ user\{ orders\{ items\{ ... \}\}\}\}\}\}\}\}}
+\end{Highlighting}
+\end{Shaded}
+
+Defenses (all worth naming):
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Max depth limiting} --- reject queries nested beyond, say, 10 levels.
+\item
+  \textbf{Complexity scoring} --- assign each field a cost, multiply by list sizes (\texttt{first:\ 1000}), reject above a budget.
+\item
+  \textbf{Persisted queries} --- clients register approved queries ahead of time and send only a hash at runtime; the server runs only known-good queries (also shrinks the request and enables CDN caching). Used by Meta/Apollo in production.
+\item
+  \textbf{Pagination caps} + timeouts + per-client rate limits.
+\end{itemize}
+
+\subsection{Caching is harder than REST}\label{caching-is-harder-than-rest}
+
+REST caches beautifully: every GET URL is a cache key, HTTP infra (CDNs, browsers, \texttt{Cache-Control}/\texttt{ETag}) just works. GraphQL uses \textbf{one POST endpoint}, so HTTP-level caching doesn\textquotesingle t apply out of the box. You cache \emph{client-side} by object identity (Apollo/Relay normalized cache) and \emph{server-side} per-resolver --- more work. Persisted queries (with \texttt{GET}) restore some CDN cacheability.
+
+\subsection{When GraphQL vs REST}\label{when-graphql-vs-rest}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5518}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4482}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Prefer GraphQL
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Prefer REST
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Many diverse clients (mobile/web/TV) with different field needs & Simple CRUD, uniform clients \\
+\rowcolor{zebra}
+Deeply nested/related data fetched in one trip & HTTP caching / CDN is a priority \\
+Rapidly evolving front-ends; want versionless evolution & Public API with broad tooling expectations \\
+\rowcolor{zebra}
+Want to avoid endpoint sprawl & File up/downloads, streaming \\
+\end{longtable}
+
+\textbf{Interview takeaway:} "GraphQL lets the client pick fields \(\rightarrow\) kills over/under-fetching, great for mobile and diverse clients. The catch: the \textbf{N+1 problem} (fix with \textbf{DataLoader} batching), \textbf{query-cost} abuse (depth/complexity limits + persisted queries), and \textbf{caching} is harder than REST because it\textquotesingle s one POST endpoint. REST stays better when HTTP caching and simplicity matter."
+
+\section{Webhooks \& Async APIs}\label{webhooks--async-apis}
+
+A webhook \textbf{inverts the direction}: instead of the client polling your API for changes, \emph{you} call the client\textquotesingle s URL when an event happens (\texttt{payment.succeeded}, \texttt{order.shipped}). It\textquotesingle s "don\textquotesingle t call us, we\textquotesingle ll call you" --- push instead of poll.
+
+\subsection{Delivery}\label{delivery}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{POST https://customer.com/webhooks/acme    \# the URL the customer registered}
+\NormalTok{Content{-}Type: application/json}
+\NormalTok{X{-}Acme{-}Signature: t=1718500000,v1=5257a869e7...}
+\NormalTok{X{-}Acme{-}Event{-}Id: evt\_8f3c2e7a}
+
+\NormalTok{\{ "id": "evt\_8f3c2e7a", "type": "payment.succeeded",}
+\NormalTok{  "data": \{ "payment\_id": "pay\_42", "amount": 5000 \} \}}
+\end{Highlighting}
+\end{Shaded}
+
+The consumer must respond \textbf{2xx quickly} (ideally just enqueue the event and return --- do the heavy work async). A slow consumer causes the sender\textquotesingle s delivery workers to back up.
+
+\subsection{HMAC signature verification}\label{hmac-signature-verification}
+
+Webhooks arrive at a \emph{public} URL --- anyone could POST a fake \texttt{payment.succeeded}. So the sender signs each payload with a \textbf{shared secret} using HMAC; the consumer recomputes and compares:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Consumer side}
+\ImportTok{import}\NormalTok{ hmac, hashlib, time}
+
+\KeywordTok{def}\NormalTok{ verify(payload\_bytes, header, secret):}
+    \CommentTok{\# header: "t=1718500000,v1=5257a869e7..."}
+\NormalTok{    parts }\OperatorTok{=} \BuiltInTok{dict}\NormalTok{(p.split(}\StringTok{"="}\NormalTok{) }\ControlFlowTok{for}\NormalTok{ p }\KeywordTok{in}\NormalTok{ header.split(}\StringTok{","}\NormalTok{))}
+\NormalTok{    timestamp, sig }\OperatorTok{=}\NormalTok{ parts[}\StringTok{"t"}\NormalTok{], parts[}\StringTok{"v1"}\NormalTok{]}
+\NormalTok{    signed }\OperatorTok{=} \SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{timestamp}\SpecialCharTok{\}}\SpecialStringTok{."}\NormalTok{.encode() }\OperatorTok{+}\NormalTok{ payload\_bytes}
+\NormalTok{    expected }\OperatorTok{=}\NormalTok{ hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ hmac.compare\_digest(expected, sig):     }\CommentTok{\# constant{-}time compare!}
+        \ControlFlowTok{raise} \PreprocessorTok{Exception}\NormalTok{(}\StringTok{"invalid signature"}\NormalTok{)        }\CommentTok{\# forged or tampered}
+    \ControlFlowTok{if}\NormalTok{ time.time() }\OperatorTok{{-}} \BuiltInTok{int}\NormalTok{(timestamp) }\OperatorTok{\textgreater{}} \DecValTok{300}\NormalTok{:          }\CommentTok{\# reject old → replay defense}
+        \ControlFlowTok{raise} \PreprocessorTok{Exception}\NormalTok{(}\StringTok{"timestamp too old"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Key points: include the \textbf{timestamp in the signed string} (so an attacker can\textquotesingle t replay an old captured-but-valid payload forever), use a \textbf{constant-time} comparison (avoid timing attacks), and verify against the \textbf{raw body} (re-serializing JSON changes bytes and breaks the signature).
+
+\subsection{Retries}\label{retries}
+
+Networks fail and consumers go down, so senders \textbf{retry with exponential backoff} (e.g. immediately, then 1m, 5m, 30m, 2h\ldots{} over \textasciitilde24h). A webhook is delivered \textbf{at-least-once} --- which means duplicates \emph{will} happen.
+
+\subsection{Idempotent consumers}\label{idempotent-consumers}
+
+Because of retries, the consumer \textbf{must} dedupe by event ID:
+
+\setcodelang{SQL}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{INSERT} \KeywordTok{INTO}\NormalTok{ processed\_events (event\_id) }\KeywordTok{VALUES}\NormalTok{ (}\StringTok{\textquotesingle{}evt\_8f3c2e7a\textquotesingle{}}\NormalTok{)}
+\KeywordTok{ON}\NormalTok{ CONFLICT (event\_id) DO }\KeywordTok{NOTHING}\NormalTok{;     }\CommentTok{{-}{-} if it inserted 0 rows, we\textquotesingle{}ve seen it → skip}
+\end{Highlighting}
+\end{Shaded}
+
+Same idea as idempotency keys, now on the \emph{receiving} side. Without this, a retried \texttt{payment.succeeded} could ship the order twice.
+
+\subsection{The thundering herd}\label{the-thundering-herd}
+
+A spike of events (e.g. a flash sale \(\rightarrow\) 100k \texttt{order.created} at once) can \textbf{overwhelm consumer endpoints} all at once, or --- when many consumers all retry on a synchronized schedule after an outage --- hammer the recovering service simultaneously. Mitigations: \textbf{jitter} the retry/backoff schedule (randomize so retries spread out), rate-limit outbound deliveries per consumer, and queue + smooth the firehose. (Same root cause as cache-stampede thundering herd --- synchronized clients.)
+
+\subsection{Webhooks vs polling vs other async patterns}\label{webhooks-vs-polling-vs-other-async-patterns}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1129}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1290}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2177}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2339}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3065}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Polling
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Webhooks
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Message queue (Kafka/SQS)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+SSE/WebSocket
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Direction & Client pulls & Server pushes (HTTP) & Pub/sub broker & Server\(\rightarrow\)client over open conn \\
+\rowcolor{zebra}
+Latency & Poll interval & Near-real-time & Near-real-time & Real-time \\
+Consumer infra & None (just call) & Must host a public endpoint & Must run a consumer & Persistent connection \\
+\rowcolor{zebra}
+Best for & Simple, low-freq & 3rd-party integrations & Internal event-driven systems & Live UIs \\
+\end{longtable}
+
+\textbf{Interview takeaway:} "Webhooks push events to a consumer URL. Three must-haves: \textbf{HMAC signature} (with timestamp, constant-time compare) so forged events are rejected; \textbf{retries with backoff + jitter} since delivery is at-least-once; and an \textbf{idempotent consumer} (dedupe by event ID) so retries don\textquotesingle t double-process. Watch for thundering herds on spikes/recovery --- jitter the retries."
+
+\section{API Gateway \& BFF}\label{api-gateway--bff}
+
+\subsection{API Gateway}\label{api-gateway}
+
+A single entry point in front of many backend services that handles \textbf{cross-cutting concerns} so each service doesn\textquotesingle t reimplement them.
+
+\setcodelang{}
+
+\begin{verbatim}
+Mobile ─┐
+Web  ───┤──►  API Gateway  ──►  ┌── User Service
+Partner─┘     ┌──────────────┐   ├── Order Service
+              │ TLS terminate│   ├── Payment Service
+              │ AuthN/AuthZ  │   └── Inventory Service
+              │ Rate limit   │
+              │ Routing      │
+              │ Logging/trace│
+              │ Caching      │
+              └──────────────┘
+\end{verbatim}
+
+Responsibilities: TLS termination, authentication/JWT validation, rate limiting, request routing, request/response transformation, response aggregation, caching, logging/metrics/tracing, and API versioning/canary routing. Examples: AWS API Gateway, Kong, Apigee, Envoy, NGINX. \textbf{Trade-off:} the gateway centralizes policy (great) but is a potential bottleneck and single point of failure --- run it HA, keep per-request logic thin.
+
+\subsection{BFF (Backend For Frontend)}\label{bff-backend-for-frontend}
+
+One gateway-shaped service \textbf{per client type} --- a web BFF, a mobile BFF, a TV BFF --- each tailoring/aggregating backend calls for \emph{that} client\textquotesingle s exact needs.
+
+\setcodelang{}
+
+\begin{verbatim}
+Web App   ─► Web BFF   ─┐
+Mobile    ─► Mobile BFF ─┼─► User / Order / Catalog services
+TV App    ─► TV BFF     ─┘
+\end{verbatim}
+
+\textbf{Why:} a generic API forces every client to over-fetch or make many calls; a mobile client on a slow network wants \emph{one} lean, pre-aggregated response. The BFF (popularized by Netflix/SoundCloud) lets the mobile team own its own aggregation layer and ship without coordinating with the web team. \textbf{Trade-off:} more services to maintain and some duplicated logic across BFFs. GraphQL is often used to \emph{implement} a single BFF (clients pick fields instead of needing one BFF per platform) --- a common senior talking point: "BFF and GraphQL solve the same over/under-fetching problem differently."
+
+\textbf{Interview takeaway:} Gateway = shared cross-cutting concerns for all clients. BFF = a tailored aggregation layer per client type. GraphQL can replace a fleet of BFFs with one field-selectable endpoint.
+
+\section{Designing an API (Worked Example)}\label{designing-an-api-worked-example}
+
+\begin{quote}
+\textbf{Brief:} Design the public API for an \textbf{Orders / Payments} service (think a small Stripe-like checkout). This exercises every concept above end-to-end. A short URL-shortener example follows.
+\end{quote}
+
+\subsection{Step 1 --- Requirements \& consumers}\label{step-1--requirements--consumers}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Consumers:} partner merchants\textquotesingle{} \emph{servers} (server-to-server) + their web/mobile front-ends.
+\item
+  \textbf{Functional:} create/read/list/cancel orders; charge a payment for an order; list a customer\textquotesingle s orders.
+\item
+  \textbf{Non-functional:} \textbf{never double-charge} (idempotency); strong auth; pagination for order history; evolvable; clear errors; rate-limited per merchant.
+\item
+  \textbf{Decision:} REST/JSON over HTTPS (public, partner-facing \(\rightarrow\) universal tooling, cacheable reads). gRPC internally between order-service and payment-service.
+\end{itemize}
+
+\subsection{Step 2 --- Resource model}\label{step-2--resource-model}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{orders                    collection of orders}
+\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{orders}\OperatorTok{/}\NormalTok{\{}\BuiltInTok{id}\NormalTok{\}               a single order}
+\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{orders}\OperatorTok{/}\NormalTok{\{}\BuiltInTok{id}\NormalTok{\}}\OperatorTok{/}\NormalTok{payment       the payment }\ControlFlowTok{for}\NormalTok{ an order (action}\OperatorTok{{-}}\ImportTok{as}\OperatorTok{{-}}\NormalTok{resource)}
+\OperatorTok{/}\NormalTok{v1}\OperatorTok{/}\NormalTok{customers}\OperatorTok{/}\NormalTok{\{}\BuiltInTok{id}\NormalTok{\}}\OperatorTok{/}\NormalTok{orders     a customer}\StringTok{\textquotesingle{}s order history}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Step 3 --- Endpoints \& schemas}\label{step-3--endpoints--schemas}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Create an order — idempotent via key}
+\NormalTok{POST /v1/orders}
+\NormalTok{Authorization: Bearer \textless{}merchant{-}jwt\textgreater{}}
+\NormalTok{Idempotency{-}Key: 9f1c2e7a{-}...}
+\NormalTok{Content{-}Type: application/json}
+
+\NormalTok{\{ "customer\_id": "cus\_88", "currency": "usd",}
+\NormalTok{  "items": [ \{ "sku": "BOOK{-}1", "qty": 2, "unit\_amount": 1500 \} ] \}}
+
+\NormalTok{→ 201 Created}
+\NormalTok{  Location: /v1/orders/ord\_42}
+\NormalTok{  ETag: "ord\_42{-}v1"}
+\NormalTok{\{ "id": "ord\_42", "status": "pending\_payment", "amount": 3000,}
+\NormalTok{  "currency": "usd", "created\_at": "2026{-}06{-}15T10:00:00Z",}
+\NormalTok{  "\_links": \{ "pay": \{ "href": "/v1/orders/ord\_42/payment", "method": "POST" \} \} \}}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Charge the order — also idempotent (this MOVES MONEY)}
+\NormalTok{POST /v1/orders/ord\_42/payment}
+\NormalTok{Idempotency{-}Key: 4b2a...}
+\NormalTok{\{ "source": "card\_xyz" \}}
+
+\NormalTok{→ 202 Accepted              \# charge is async at the PSP}
+\NormalTok{  Location: /v1/orders/ord\_42/payment}
+\NormalTok{\{ "status": "processing" \}}
+
+\NormalTok{\# Insufficient funds:}
+\NormalTok{→ 422 Unprocessable Entity}
+\NormalTok{\{ "error": \{ "code": "insufficient\_funds", "request\_id": "req\_8f3c",}
+\NormalTok{             "message": "Card has insufficient funds." \} \}}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Read with conditional GET (cache{-}friendly)}
+\NormalTok{GET /v1/orders/ord\_42}
+\NormalTok{If{-}None{-}Match: "ord\_42{-}v1"}
+\NormalTok{→ 304 Not Modified          \# unchanged → no body}
+
+\NormalTok{\# Cancel — state transition, optimistic concurrency}
+\NormalTok{PATCH /v1/orders/ord\_42}
+\NormalTok{If{-}Match: "ord\_42{-}v1"}
+\NormalTok{\{ "status": "cancelled" \}}
+\NormalTok{→ 200 OK    (or 409 Conflict if someone changed it first)}
+
+\NormalTok{\# List customer orders — cursor pagination, filtering, sorting}
+\NormalTok{GET /v1/customers/cus\_88/orders?status=paid\&sort={-}created\_at\&limit=20}
+\NormalTok{→ 200 OK}
+\NormalTok{\{ "data": [ ... ],}
+\NormalTok{  "page": \{ "next\_cursor": "eyJjcmVhdGVk...", "has\_more": true \} \}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Step 4 --- Idempotency (the crux)}\label{step-4--idempotency-the-crux}
+
+\texttt{POST\ /orders} and \texttt{POST\ .../payment} carry an \texttt{Idempotency-Key}. The server\textquotesingle s dedup table (\texttt{(merchant\_id,\ idempotency\_key)\ →\ cached\ response}) guarantees a retried create returns the \emph{same} \texttt{ord\_42} and a retried charge charges \emph{once}. (Mechanism + SQL in the \hyperref[idempotency--reliability]{Idempotency} section.) This is the single most important property of a payments API.
+
+\subsection{Step 5 --- Auth}\label{step-5--auth}
+
+\begin{itemize}
+\tightlist
+\item
+  Merchant \textbf{servers} authenticate with OAuth2 \textbf{client-credentials} \(\rightarrow\) short-lived \textbf{JWT} with scopes (\texttt{orders.write}, \texttt{payments.write}).
+\item
+  Merchant \textbf{front-ends} use Authorization-Code + PKCE.
+\item
+  Gateway validates the JWT signature (issuer\textquotesingle s public key), checks scope per endpoint \(\rightarrow\) \textbf{403} if the token lacks \texttt{payments.write}. All over TLS.
+\end{itemize}
+
+\subsection{Step 6 --- Errors}\label{step-6--errors}
+
+Consistent envelope with stable \texttt{code} + \texttt{request\_id} (\texttt{insufficient\_funds}, \texttt{card\_declined}, \texttt{order\_already\_paid}). HTTP status for category (\texttt{402/422} payment issues, \texttt{409} already-paid conflict, \texttt{429} throttled). Validation returns all bad fields at once.
+
+\subsection{Step 7 --- Rate limiting}\label{step-7--rate-limiting}
+
+Per-merchant token bucket in Redis (e.g. 100 writes/sec burst, steady 50/sec). \texttt{429} + \texttt{Retry-After} + \texttt{X-RateLimit-*} on exceed. Payment endpoints get tighter limits than reads.
+
+\subsection{Step 8 --- Versioning}\label{step-8--versioning}
+
+\texttt{/v1} in the path; everything additive within v1 (new optional fields, clients ignore unknowns). A breaking change (e.g. \texttt{amount} float \(\rightarrow\) \texttt{amount\_cents} int) ships as a \emph{new field} in v1, then drops the old one only in \texttt{/v2}, with \texttt{Deprecation}/\texttt{Sunset} headers and a 6-month window.
+
+\subsection{Step 9 --- Async + webhooks}\label{step-9--async--webhooks}
+
+The charge is async (\texttt{202} + poll, or better, a \textbf{webhook}): when the PSP settles, we POST \texttt{payment.succeeded} to the merchant\textquotesingle s URL, HMAC-signed, with retries + at-least-once delivery \(\rightarrow\) merchant consumer dedupes by event ID.
+
+\subsection{Mini-example --- URL Shortener API}\label{mini-example--url-shortener-api}
+
+\setcodelang{Http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{POST /v1/links}
+\NormalTok{Idempotency{-}Key: ...}
+\NormalTok{\{ "long\_url": "https://example.com/very/long", "custom\_alias": "promo" \}}
+\NormalTok{→ 201 Created}
+\NormalTok{  Location: /v1/links/abc123}
+\NormalTok{\{ "code": "abc123", "short\_url": "https://acme.co/abc123",}
+\NormalTok{  "long\_url": "https://example.com/very/long", "created\_at": "..." \}}
+
+\NormalTok{GET /abc123          → 301 Moved Permanently   Location: https://example.com/very/long}
+\NormalTok{                      (301 is cacheable → CDN absorbs hot links; use 302 if you need}
+\NormalTok{                       per{-}click analytics so the browser re{-}hits you each time)}
+
+\NormalTok{GET /v1/links?limit=20\&cursor=...     → cursor{-}paginated list of the user\textquotesingle{}s links}
+\NormalTok{DELETE /v1/links/abc123               → 204 No Content (idempotent)}
+\end{Highlighting}
+\end{Shaded}
+
+Note the deliberate status choice: \textbf{301 vs 302} for the redirect is a real trade-off --- 301 lets browsers/CDNs cache the redirect (fast, but you lose per-click tracking); 302 forces a round trip every click (slower, but enables analytics). Calling that out wins points.
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{Request lifecycle through the stack}\label{request-lifecycle-through-the-stack}
+
+\setcodelang{}
+
+\begin{verbatim}
+Client
+  │  HTTPS  (TLS terminates at edge)
+  ▼
+┌─────────────┐
+│     CDN      │  caches GET responses (Cache-Control/ETag), absorbs hot reads
+└──────┬───────┘
+       │ (cache miss / writes)
+┌──────▼───────┐
+│ API Gateway  │  AuthN (JWT verify) · AuthZ (scopes) · Rate limit (Redis) ·
+│              │  Routing · Request-ID injection · Logging/Tracing
+└──────┬───────┘
+       │
+┌──────▼───────────────────────────────┐
+│         Service mesh (mTLS)           │   internal calls = gRPC
+│  Order Svc ──► Payment Svc ──► PSP    │
+│      │             │                   │
+│      ▼             ▼                   │
+│  Idempotency   Outbox → Kafka ──► Webhook dispatcher ──► Merchant URL
+│   table (SQL)                                              (HMAC, retries)
+└───────────────────────────────────────┘
+\end{verbatim}
+
+\subsection{Idempotent POST flow}\label{idempotent-post-flow}
+
+\setcodelang{}
+
+\begin{verbatim}
+Client ──POST /payments, Idempotency-Key:K──►  Gateway ──► Payment Svc
+                                                              │
+                          INSERT (merchant,K) ON CONFLICT ────┤
+                            ├─ inserted (first time) ──► charge card ──► store resp ──► 201
+                            ├─ conflict, completed ─────► return STORED response (no charge)
+                            └─ conflict, in_progress ──► 409 Conflict (retry later)
+\end{verbatim}
+
+\subsection{Cursor pagination walk}\label{cursor-pagination-walk}
+
+\setcodelang{}
+
+\begin{verbatim}
+page 1:  GET /events?limit=3
+         rows = [E9, E8, E7]   next_cursor = enc(E7.created_at, E7.id)
+page 2:  GET /events?limit=3&cursor=enc(E7...)
+         WHERE (created_at,id) < (E7...)  →  [E6, E5, E4]
+         (new row E10 inserted at top between calls → does NOT shift this walk)
+\end{verbatim}
+
+\subsection{OAuth2 Authorization-Code + PKCE (compact)}\label{oauth2-authorization-code--pkce-compact}
+
+\setcodelang{}
+
+\begin{verbatim}
+User → App: login
+App: verifier=rand; challenge=SHA256(verifier)
+App → AuthServer: /authorize?...&code_challenge=challenge
+AuthServer → User: consent → redirect ?code=CODE
+App → AuthServer: /token  code=CODE & code_verifier=verifier
+AuthServer: assert SHA256(verifier)==challenge → {access_token, refresh_token}
+App → API: Bearer access_token
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\textbf{Stripe} --- the canonical well-designed API. Idempotency keys on every POST (\texttt{Idempotency-Key} header), \textbf{cursor} pagination (\texttt{starting\_after}/\texttt{ending\_before}), \textbf{date-based} versioning (\texttt{Stripe-Version:\ 2024-04-10} pins a behavior snapshot), rich error objects with stable \texttt{type}/\texttt{code}/\texttt{decline\_code}, and HMAC-signed webhooks. If you cite one API in an interview, cite Stripe.
+
+\textbf{GitHub} --- REST (v3) \emph{and} GraphQL (v4) side by side; they added GraphQL to fix over/under-fetching of the deeply nested issue/PR/repo graph. Cursor pagination via \texttt{Link} headers (\texttt{rel="next"}), conditional requests with ETags (304s don\textquotesingle t count against rate limits), and \texttt{X-RateLimit-*} headers.
+
+\textbf{AWS} --- Amazon\textquotesingle s 2002 internal mandate ("all functionality exposed \emph{only} via service interfaces") is why AWS exists as a product. APIs are signed (SigV4 --- request signing, not just bearer tokens), strongly versioned, and designed for partners from day one.
+
+\textbf{Google APIs (Maps, Cloud)} --- follow the public AIP/API Design Guide: resource-oriented, standard methods (\texttt{List}/\texttt{Get}/\texttt{Create}/\texttt{Update}/\texttt{Delete}), \texttt{pageToken}/\texttt{pageSize} pagination, field masks for partial reads/updates, gRPC + REST transcoding from one \texttt{.proto}.
+
+\textbf{Slack/Meta} --- Meta runs GraphQL at massive scale with persisted queries and DataLoader-style batching; Slack\textquotesingle s webhooks (Events API) require URL verification + signature checks, a textbook webhook security setup.
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\emph{One restaurant --- every API concept is part of how the kitchen serves diners.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1738}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8262}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{API contract} & The \textbf{menu}: it tells you exactly what you can order and what you\textquotesingle ll get, without you ever entering the kitchen \\
+\rowcolor{zebra}
+\textbf{REST resources/verbs} & Menu items are \textbf{nouns} (a "steak"); you act on them with standard verbs --- order, modify, cancel --- not with a different word per dish \\
+\textbf{Idempotency key} & Writing your \textbf{order number} on the ticket: if the waiter loses it and you re-hand it, the kitchen sees the same number and makes your meal \textbf{once}, not twice \\
+\rowcolor{zebra}
+\textbf{GET (safe)} & \textbf{Reading the menu} --- you can do it a hundred times and nothing in the kitchen changes \\
+\textbf{PUT (idempotent)} & Telling the chef "make the table\textquotesingle s order \emph{exactly} this" --- repeating it leaves the same final order \\
+\rowcolor{zebra}
+\textbf{POST (not idempotent)} & Placing a \textbf{new order} --- say it twice and two meals come out \\
+\textbf{Pagination (cursor)} & "Bring the next 5 dishes \textbf{after} the one I just got" --- even if new dishes are added to the kitchen, your sequence never repeats or skips \\
+\rowcolor{zebra}
+\textbf{Pagination (offset)} & "Bring dishes 41--45" --- if a dish is inserted at the front, the numbering shifts and you get one twice \\
+\textbf{Versioning} & Printing a \textbf{new menu} for breaking changes, while keeping today\textquotesingle s menu valid for guests already mid-meal \\
+\rowcolor{zebra}
+\textbf{Auth (OAuth/scopes)} & A \textbf{valet ticket}: it lets the valet fetch \emph{your} car only, not drive off in anyone else\textquotesingle s --- least privilege \\
+\textbf{JWT} & A \textbf{wristband} at a festival --- staff read it to know your access tier without phoning the box office; but you can\textquotesingle t un-issue a wristband already on a wrist (revocation is hard) \\
+\rowcolor{zebra}
+\textbf{Rate limiting} & The \textbf{"two drinks per round" rule} at the bar --- protects the bartender from one guest monopolizing service \\
+\textbf{429 + Retry-After} & "We\textquotesingle re slammed --- come back in 5 minutes" instead of just ignoring you \\
+\rowcolor{zebra}
+\textbf{Error envelope} & A clear \textbf{"dish unavailable: out of salmon"} note, with a ticket number, instead of a blank stare \\
+\textbf{gRPC} & The \textbf{kitchen\textquotesingle s internal shorthand} --- terse, fast, only the line cooks understand it; never handed to a diner \\
+\rowcolor{zebra}
+\textbf{GraphQL} & A \textbf{build-your-own plate} counter --- you point at exactly the items you want and get one plate, no more, no less \\
+\textbf{Webhook} & The \textbf{buzzer they hand you} --- instead of you asking "ready yet?" every minute, it buzzes when your order is done \\
+\rowcolor{zebra}
+\textbf{API Gateway} & The \textbf{maître d\textquotesingle{}} at the door --- checks reservations (auth), seats you (routing), enforces the dress code (rate limits) before you reach any table \\
+\textbf{BFF} & Separate \textbf{kids\textquotesingle{} / vegan / tasting menus} --- each guest type gets a tailored menu instead of one giant generic one \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\textbf{Safe vs Idempotent (the table you must recall):}
+
+\begin{quote}
+"\textbf{G}ET is \textbf{g}entle (safe + idempotent), \textbf{P}UT/\textbf{D}ELETE are \textbf{p}owerful but \textbf{r}epeatable (idempotent, not safe), \textbf{P}OST/\textbf{P}ATCH are \textbf{p}erilous (neither)."
+\end{quote}
+
+\textbf{Status code families:} "\textbf{1} Info, \textbf{2} Yes, \textbf{3} Go elsewhere, \textbf{4} Your fault, \textbf{5} My fault."
+
+\textbf{401 vs 403:} "\textbf{401} = \emph{who} are you? (un-authenticated). \textbf{403} = I know you, \textbf{for}bidden anyway."
+
+\textbf{400 vs 422:} "\textbf{400} = can\textquotesingle t \textbf{read} it. \textbf{422} = read it, \textbf{don\textquotesingle t like} it."
+
+\textbf{Idempotency keys:} "\textbf{K}ey makes retries \textbf{K}osher --- at-least-once delivery \(\rightarrow\) exactly-once effect."
+
+\textbf{Pagination choice:} "\textbf{O}ffset is \textbf{O}ld and \textbf{O}(n); \textbf{C}ursor is \textbf{C}onstant and \textbf{C}orrect under writes."
+
+\textbf{Versioning rule:} "\textbf{A}dd, don\textquotesingle t \textbf{A}lter" --- additive = safe, altering = breaking.
+
+\textbf{REST maturity (Richardson):} "\textbf{P}OX \(\rightarrow\) \textbf{R}esources \(\rightarrow\) \textbf{V}erbs \(\rightarrow\) \textbf{H}ypermedia" = "\textbf{P}lease \textbf{R}est \textbf{V}ery \textbf{H}ard." (Most APIs stop at V = Level 2.)
+
+\textbf{gRPC RPC types:} "\textbf{U}nary, \textbf{S}erver-stream, \textbf{C}lient-stream, \textbf{B}idi" = "\textbf{U}ncle \textbf{S}am \textbf{C}ooks \textbf{B}reakfast."
+
+\textbf{Rate-limit algorithms:} "\textbf{T}oken bursts, \textbf{L}eaky smooths, \textbf{F}ixed edges-double, \textbf{S}liding fixes it."
+
+\textbf{Webhook must-haves:} "\textbf{S}ign it (HMAC), \textbf{R}etry it (backoff), \textbf{D}edupe it (idempotent consumer)" = \textbf{SRD}.
+
+\textbf{OAuth in one line:} "\textbf{Authorize \(\rightarrow\) Code \(\rightarrow\) Token \(\rightarrow\) Access}" (and PKCE = \emph{Prove} you started the flow).
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: What\textquotesingle s the difference between idempotent and safe HTTP methods, and why does it matter?}\label{q1-whats-the-difference-between-idempotent-and-safe-http-methods-and-why-does-it-matter}
+
+\textbf{Model answer:} \emph{Safe} = no observable side effects (read-only): GET, HEAD, OPTIONS. \emph{Idempotent} = N identical calls leave the same server state as one: GET, PUT, DELETE (and HEAD/OPTIONS). POST and PATCH are neither in general. It matters because networks force \textbf{retries} --- a client times out and resends. Idempotent operations can be retried safely; POST cannot, which is the double-charge bug. PUT is idempotent because it \emph{sets} full state; DELETE because the end state (gone) is unchanged; POST isn\textquotesingle t because it \emph{creates a new} resource each time. PATCH depends --- a "set field" patch is idempotent, a "+10" delta isn\textquotesingle t.
+
+\textbf{Follow-ups:} \emph{How do you make POST idempotent?} \(\rightarrow\) idempotency keys + dedup table. \emph{Is DELETE returning 404 on the second call a violation?} \(\rightarrow\) No; idempotency is about \emph{state}, not status code.
+
+\subsection{Q2: Walk me through how you\textquotesingle d add an idempotency key to a payment endpoint.}\label{q2-walk-me-through-how-youd-add-an-idempotency-key-to-a-payment-endpoint}
+
+\textbf{Model answer:} Client generates a UUID per logical payment and sends \texttt{Idempotency-Key} with every retry. Server keeps a table keyed \texttt{(api\_key,\ idempotency\_key)} storing a request-body hash, state, and cached response. On each request: atomically \texttt{INSERT\ ...\ ON\ CONFLICT}. If it inserts, this is the first time \(\rightarrow\) execute the charge, store the response, return it. If it conflicts and state=\texttt{completed}, return the \emph{stored} response verbatim (no second charge). If conflict and the stored body hash differs, reject 422 (key reused for a different request). If conflict and state=\texttt{in\_progress}, return 409. Keys get a TTL (\textasciitilde24h). This turns at-least-once delivery into exactly-once \emph{effects}.
+
+\textbf{Follow-ups:} \emph{Why hash the body?} \(\rightarrow\) catch a client reusing a key for a different request. \emph{Where\textquotesingle s the race?} \(\rightarrow\) the atomic insert is the gate; two concurrent retries can\textquotesingle t both win it. \emph{DB vs Redis for the table?} \(\rightarrow\) DB for durability of the result; the unique constraint must be transactional.
+
+\subsection{Q3: Offset vs cursor pagination --- which and why?}\label{q3-offset-vs-cursor-pagination--which-and-why}
+
+\textbf{Model answer:} Offset (\texttt{LIMIT\ 20\ OFFSET\ 40}) is simple and allows random access ("page 7"), but at large offsets the DB scans-and-discards O(offset) rows (page 50k times out), and it\textquotesingle s \emph{unstable} under writes --- a row inserted at the top shifts every page, causing duplicates/skips. Cursor/keyset pagination remembers the last item\textquotesingle s sort key and queries \texttt{WHERE\ (created\_at,\ id)\ \textless{}\ (...)}, which \textbf{seeks via index} in O(page size) regardless of depth and is stable under inserts. The cursor is base64-opaque so I can change its internals. The cost: no random access and total counts are expensive. For a feed at scale, cursor wins.
+
+\textbf{Follow-ups:} \emph{Why include \texttt{id} in the cursor?} \(\rightarrow\) tiebreaker for a total order when \texttt{created\_at} collides. \emph{How do you paginate backwards?} \(\rightarrow\) reverse the comparison and ordering. \emph{Total count?} \(\rightarrow\) expensive; often approximate or omit.
+
+\subsection{Q4: How do you version an API and handle breaking changes?}\label{q4-how-do-you-version-an-api-and-handle-breaking-changes}
+
+\textbf{Model answer:} Version only on \emph{breaking} changes; ship everything else additively, relying on clients ignoring unknown fields (Postel\textquotesingle s Law). URL path versioning (\texttt{/v1}) by default --- most debuggable. Non-breaking: new optional fields, new endpoints, new optional params. Breaking: removing/renaming fields, changing types/semantics, making optional fields required. For a breaking change I add a \emph{new} field in v1 alongside the old, deprecate the old, and only drop it in v2 --- with \texttt{Deprecation}/\texttt{Sunset} headers, a 6-month window, client monitoring by API key, and finally \texttt{410\ Gone}.
+
+\textbf{Follow-ups:} \emph{URL vs header vs media-type versioning trade-offs?} \(\rightarrow\) table. \emph{Stripe\textquotesingle s date versioning?} \(\rightarrow\) pins a behavior snapshot per client. \emph{How do you know who\textquotesingle s still on v1?} \(\rightarrow\) log by API key.
+
+\subsection{Q5: 401 vs 403 vs 422 vs 400 --- when do you return each?}\label{q5-401-vs-403-vs-422-vs-400--when-do-you-return-each}
+
+\textbf{Model answer:} \textbf{400} = unparseable/malformed request (truncated JSON, missing required param). \textbf{422} = syntactically valid but semantically invalid (negative age, bad email format) --- I parsed it, the \emph{content} breaks a rule. \textbf{401} = not authenticated (no/invalid credentials) --- \emph{who are you?} \textbf{403} = authenticated but not authorized (valid token, wrong scope/permission). The HTTP status gives the category; a stable \texttt{code} in the body gives specifics clients branch on.
+
+\textbf{Follow-ups:} \emph{Read-only token tries DELETE?} \(\rightarrow\) 403. \emph{Should 404 ever be used instead of 403?} \(\rightarrow\) yes, to avoid leaking that a resource exists to an unauthorized caller. \emph{Where does 409 fit?} \(\rightarrow\) conflict with current state (duplicate key, stale ETag write).
+
+\subsection{Q6: REST vs gRPC vs GraphQL --- when each?}\label{q6-rest-vs-grpc-vs-graphql--when-each}
+
+\textbf{Model answer:} REST/JSON for \textbf{public/partner} APIs --- universal tooling, HTTP caching, human-debuggable. gRPC (Protobuf + HTTP/2) for \textbf{internal service-to-service} --- binary, typed, streaming, fast, but no native browser support (needs grpc-web + Envoy). GraphQL when you have \textbf{many diverse clients} fetching nested data and want to kill over/under-fetching --- at the cost of harder caching and the N+1 problem. Lead with \emph{who the consumer is}.
+
+\textbf{Follow-ups:} \emph{Why can\textquotesingle t browsers do gRPC?} \(\rightarrow\) no access to HTTP/2 framing/trailers from JS. \emph{GraphQL caching?} \(\rightarrow\) one POST endpoint defeats HTTP caching; use client-side normalized cache + persisted queries. \emph{Protobuf compatibility?} \(\rightarrow\) field numbers, not names, are the wire identity.
+
+\subsection{Q7: What\textquotesingle s the N+1 problem in GraphQL and how do you fix it?}\label{q7-whats-the-n1-problem-in-graphql-and-how-do-you-fix-it}
+
+\textbf{Model answer:} Resolving a list field then a nested field per item fires 1 + N queries --- e.g. fetch 5 orders (1 query), then items per order (5 queries). \textbf{DataLoader} fixes it by batching: it collects all the keys requested within one event-loop tick and issues a single \texttt{WHERE\ order\_id\ =\ ANY(...)} query, then maps results back per key, and dedupes repeated keys. So 1 + 1 instead of 1 + N.
+
+\textbf{Follow-ups:} \emph{Does this apply to REST?} \(\rightarrow\) yes, the same batching idea (the under-fetching problem GraphQL was built to solve). \emph{Protecting against expensive queries?} \(\rightarrow\) depth limiting, complexity scoring, persisted queries, pagination caps.
+
+\subsection{Q8: How do you rate-limit an API? Compare the algorithms.}\label{q8-how-do-you-rate-limit-an-api-compare-the-algorithms}
+
+\textbf{Model answer:} Token bucket (refill rate r, capacity B) allows bursts up to B then steadies to r --- the common default. Leaky bucket drains at a fixed rate, perfectly smooth but no bursts --- good to protect a fragile downstream. Fixed-window counter is simplest (\texttt{INCR}+\texttt{EXPIRE}) but has the boundary-burst flaw (2\(\times\) at the window edge). Sliding-window log is exact but O(n) memory. Sliding-window counter approximates the window in O(1) and fixes the boundary burst --- best general default. Counters live in \textbf{Redis} so limits are global across gateway nodes. On exceed: 429 + \texttt{Retry-After} + \texttt{X-RateLimit-*}.
+
+\textbf{Follow-ups:} \emph{Per what dimension?} \(\rightarrow\) API key, user, IP, endpoint; tiered by plan. \emph{Why Redis not in-memory?} \(\rightarrow\) otherwise a client gets N\(\times\)instances. \emph{Distributed correctness?} \(\rightarrow\) atomic Lua scripts for the token-bucket update.
+
+\subsection{Q9: How do you design a secure webhook system?}\label{q9-how-do-you-design-a-secure-webhook-system}
+
+\textbf{Model answer:} Sender POSTs the event to the consumer\textquotesingle s registered URL. Three must-haves: (1) \textbf{HMAC signature} over the raw body + a timestamp, sent in a header; the consumer recomputes with the shared secret using a constant-time compare and rejects forged/old payloads --- defeats forgery and replay. (2) \textbf{Retries with exponential backoff + jitter} since delivery is at-least-once and consumers go down. (3) \textbf{Idempotent consumer} --- dedupe by event ID (\texttt{INSERT\ ...\ ON\ CONFLICT\ DO\ NOTHING}) so retries don\textquotesingle t double-process. Consumers should 2xx fast and process async. Watch for thundering herds on spikes/recovery --- jitter the retries.
+
+\textbf{Follow-ups:} \emph{Why sign over the raw body?} \(\rightarrow\) re-serializing JSON changes bytes. \emph{Why include the timestamp in the signature?} \(\rightarrow\) otherwise a captured valid payload replays forever. \emph{At-least-once vs exactly-once?} \(\rightarrow\) can\textquotesingle t guarantee exactly-once delivery; you achieve exactly-once \emph{effects} via consumer idempotency.
+
+\subsection{Q10: What is a JWT, and what are its security pitfalls?}\label{q10-what-is-a-jwt-and-what-are-its-security-pitfalls}
+
+\textbf{Model answer:} A JWT is a signed, self-contained token: \texttt{header.payload.signature}, base64url-joined. Claims (\texttt{sub}, \texttt{exp}, \texttt{aud}, \texttt{scope}) sit in the payload; the resource server verifies the signature with the issuer\textquotesingle s public key (RS256) --- \emph{no DB lookup}, ideal for stateless scaling. Pitfalls: the payload is \textbf{not encrypted} (don\textquotesingle t put secrets in it); \textbf{revocation is hard} (valid until \texttt{exp} --- mitigate with short expiry + refresh tokens or a \texttt{jti} denylist); the \textbf{\texttt{alg:none}} and \textbf{RS256\(\rightarrow\)HS256 key-confusion} attacks (always pin the expected algorithm server-side); clock skew; and header bloat since it rides every request.
+
+\textbf{Follow-ups:} \emph{Stateless JWT vs server session?} \(\rightarrow\) JWT = fast stateless validation, weak revocation; session = instant revocation, needs a lookup. \emph{How to log a user out?} \(\rightarrow\) short expiry + revoke the refresh token; denylist the \texttt{jti}.
+
+\subsection{Q11: Design the API for a URL shortener.}\label{q11-design-the-api-for-a-url-shortener}
+
+\textbf{Model answer:} \texttt{POST\ /v1/links\ \{long\_url,\ custom\_alias?\}} \(\rightarrow\) 201 with \texttt{code} + \texttt{short\_url}, idempotency-keyed so a retry doesn\textquotesingle t mint two codes. \texttt{GET\ /\{code\}} \(\rightarrow\) 301 (cacheable, CDN-friendly) or 302 (forces a round trip \(\rightarrow\) enables per-click analytics). \texttt{GET\ /v1/links?limit\&cursor} cursor-paginated. \texttt{DELETE\ /v1/links/\{code\}} \(\rightarrow\) 204, idempotent. Auth via bearer token; rate-limit creation per user. The interesting trade-offs: 301 vs 302 (caching vs analytics), code generation (counter+base62 vs hash vs pre-generated pool), and idempotency on create.
+
+\textbf{Follow-ups:} \emph{301 vs 302 trade-off?} \(\rightarrow\) caching vs tracking. \emph{How to avoid code collisions?} \(\rightarrow\) pre-generated pool or base62(counter). \emph{Custom alias conflict?} \(\rightarrow\) 409.
+
+\subsection{Q12: How do you report errors consistently across an API?}\label{q12-how-do-you-report-errors-consistently-across-an-api}
+
+\textbf{Model answer:} A single envelope on every error: a stable machine-readable \texttt{code} (clients branch on it), a human \texttt{message}, a \texttt{request\_id} that also appears in logs, optional \texttt{details{[}{]}} for field-level validation. HTTP status gives the category, \texttt{code} the specifics. Return \emph{all} validation errors at once, use per-item results (or 207) for batch partial failures, and \textbf{never leak stack traces/SQL} in 500s. Optionally adopt RFC 7807 (\texttt{application/problem+json}).
+
+\textbf{Follow-ups:} \emph{Why a \texttt{code} if you have the status?} \(\rightarrow\) status is too coarse (many 422s with different causes). \emph{RFC 7807?} \(\rightarrow\) standardized \texttt{type/title/status/detail/instance}. \emph{Partial failure?} \(\rightarrow\) per-item status array.
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\textbf{1. Idempotency keys vs natural idempotency.} The cleanest design avoids keys entirely by modeling operations as idempotent: prefer \texttt{PUT} with a client-supplied ID over \texttt{POST} with a server-assigned one, prefer absolute state (\texttt{set\ balance=100}) over deltas (\texttt{add\ 10}). Idempotency keys are the fallback when the operation is inherently a non-idempotent create. Senior signal: \emph{reach for natural idempotency first, keys second}.
+
+\textbf{2. Exactly-once is a lie at the delivery layer.} You cannot guarantee exactly-once \emph{delivery} over an unreliable network (it\textquotesingle s provably impossible without coordination). What you achieve is at-least-once delivery + idempotent processing = exactly-once \emph{effects}. Saying "exactly-once delivery" unqualified is a red flag; "exactly-once effects via idempotency" is the correct framing.
+
+\textbf{3. Pagination + total counts at scale.} Cursor pagination gives O(1) pages but \texttt{COUNT(*)} over a huge filtered set is O(n) and kills the DB. At scale you either omit totals, return approximate counts (e.g. from stats/\texttt{reltuples}), or maintain a counter. Interviewers probe this when you claim cursor pagination "scales."
+
+\textbf{4. Versioning is an org problem, not a syntax problem.} The hard part isn\textquotesingle t \texttt{/v1} vs a header --- it\textquotesingle s the \emph{transformation layer} that lets one backend serve multiple contract versions, plus the discipline to deprecate. Stripe\textquotesingle s per-date versioning means maintaining a chain of request/response transformers. Mention the maintenance cost.
+
+\textbf{5. JWT revocation and the stateless paradox.} JWTs are loved for being stateless, but real systems need logout/ban/key-rotation \(\rightarrow\) revocation \(\rightarrow\) a lookup \(\rightarrow\) no longer stateless. The honest answer is a hybrid: short-lived access JWTs (stateless validation) + a stateful refresh-token / denylist for revocation. Acknowledging this tension is senior-level.
+
+\textbf{6. Rate limiting in a distributed gateway.} A naive per-instance counter lets a client get \texttt{limit\ ×\ N} across N gateway nodes. Correct designs centralize the counter (Redis with atomic Lua) or use a quota-distribution scheme (each node gets a slice of the global budget). Also: rate-limit \emph{cost}, not just request count --- one expensive query may equal 100 cheap ones.
+
+\textbf{7. Backward/forward compatibility as a contract.} Protobuf field numbers and "ignore unknown JSON fields" are the \emph{same idea}: decouple wire identity from names and tolerate unknowns so producers and consumers can deploy independently. This is what makes zero-downtime rolling deploys of API changes possible.
+
+\textbf{8. The gateway as a coupling/SPOF risk.} Centralizing auth, rate limiting, and routing in a gateway is powerful but creates a single dependency every request flows through. Keep gateway logic thin and stateless, run it HA, and resist putting business logic there (it becomes a distributed-monolith chokepoint).
+
+\textbf{9. HATEOAS in reality.} Full hypermedia is rarely worth it (verbose, most clients hard-code paths). But the \emph{idea} survives in \texttt{next}/\texttt{prev} pagination links and in returning available state-transition actions. Know when the cost is justified (long-lived, loosely-coupled clients) vs not.
+
+\textbf{10. GraphQL\textquotesingle s security surface.} Giving clients query power means giving them a DoS vector. Depth limiting, complexity budgets, persisted queries (allowlisting), and disabling introspection in production are mandatory --- "GraphQL is flexible" must be paired with "and here\textquotesingle s how I stop it melting the DB."
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Putting verbs in URLs.} \texttt{POST\ /createOrder}, \texttt{GET\ /getUser}. The verb is the HTTP method; the URL is a noun. \texttt{POST\ /orders}, \texttt{GET\ /users/42}.
+\item
+  \textbf{Confusing 401 and 403.} 401 = unauthenticated (send credentials); 403 = authenticated but forbidden. The single most common status-code mistake.
+\item
+  \textbf{Forgetting idempotency on POST/payments.} Claiming "the client just retries" without addressing the double-charge. Always raise idempotency keys for unsafe creates.
+\item
+  \textbf{Defaulting to offset pagination at scale.} Not knowing why \texttt{OFFSET\ 1000000} is slow (scan-and-discard) or that it\textquotesingle s unstable under writes. Reach for cursor/keyset and write the \texttt{WHERE\ (created\_at,\ id)\ \textless{}\ (...)} query.
+\item
+  \textbf{Saying "exactly-once delivery."} Impossible over an unreliable network. The correct phrase is "at-least-once delivery + idempotent consumer = exactly-once effects."
+\item
+  \textbf{Treating PATCH as idempotent.} A delta PATCH (\texttt{+10}) applied twice is wrong. Only "set field" patches are idempotent.
+\item
+  \textbf{Putting secrets in a JWT.} The payload is base64, not encrypted --- anyone can decode it. Also forgetting that JWTs can\textquotesingle t be easily revoked.
+\item
+  \textbf{Versioning everything.} Bumping to \texttt{/v2} for an additive change. Additive changes need no version if clients ignore unknown fields.
+\item
+  \textbf{Inconsistent / leaky errors.} Different error shapes per endpoint, no stable \texttt{code}, no \texttt{request\_id} --- or worse, returning stack traces in 500s.
+\item
+  \textbf{No rate-limit headers.} Returning 429 with no \texttt{Retry-After}/\texttt{X-RateLimit-*}, so clients can\textquotesingle t back off intelligently.
+\item
+  \textbf{Webhook without signature verification or idempotency.} Trusting a public POST endpoint, or double-processing retried events. Always HMAC-verify and dedupe by event ID.
+\item
+  \textbf{Recommending gRPC for a browser/public API.} Forgetting browsers can\textquotesingle t speak native gRPC (need grpc-web + a proxy). gRPC is for internal services.
+\item
+  \textbf{Deep nesting in URLs.} \texttt{/users/1/orders/2/items/3/reviews/4} --- hard to authorize and build. Nest one level, then address sub-resources directly.
+\item
+  \textbf{N+1 in GraphQL/resolvers} with no DataLoader, and exposing GraphQL with no depth/complexity limits.
+\end{enumerate}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\subsection{Computer Networks (03)}\label{computer-networks-03}
+
+\begin{itemize}
+\tightlist
+\item
+  HTTP methods, status codes, headers, content negotiation, caching (ETag/Cache-Control), CORS, HTTP/2 vs /3, and TLS are the \emph{transport} this API layer sits on. gRPC\textquotesingle s advantages are HTTP/2\textquotesingle s advantages.
+\end{itemize}
+
+\subsection{System Design (05)}\label{system-design-05}
+
+\begin{itemize}
+\tightlist
+\item
+  "Define the API" is Step 3 of every design interview. Rate limiting, API gateway, idempotency, and caching all appear there. The endpoints you sketch surface the data model.
+\end{itemize}
+
+\subsection{Distributed Systems (07)}\label{distributed-systems-07}
+
+\begin{itemize}
+\tightlist
+\item
+  Idempotency, at-least-once delivery, exactly-once effects, the outbox pattern, and webhook retries are distributed-systems reliability patterns expressed at the API boundary.
+\end{itemize}
+
+\subsection{Databases (08)}\label{databases-08}
+
+\begin{itemize}
+\tightlist
+\item
+  Pagination is a \emph{query} problem (offset scan vs index seek). Idempotency tables, optimistic concurrency via ETags (\(\approx\) row versions), and unique constraints for dedup are DB mechanisms.
+\end{itemize}
+
+\subsection{Caching (15)}\label{caching-15}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{Cache-Control}/\texttt{ETag}/\texttt{304} are the HTTP cache protocol. CDNs cache GET responses; 301 redirects are cacheable. GraphQL\textquotesingle s caching difficulty is a direct consequence of using one POST endpoint.
+\end{itemize}
+
+\subsection{Message Queues (16)}\label{message-queues-16}
+
+\begin{itemize}
+\tightlist
+\item
+  Webhooks, async \texttt{202}-then-poll, and event-driven APIs sit on queues (Kafka/SQS). The outbox pattern bridges a DB write and an event publish atomically.
+\end{itemize}
+
+\subsection{Security (10)}\label{security-10}
+
+\begin{itemize}
+\tightlist
+\item
+  OAuth2, JWT, mTLS, scopes, HMAC signing, and "never leak internals in errors" are the API security surface. AuthN/AuthZ on every endpoint; TLS everywhere.
+\end{itemize}
+
+\subsection{Observability (18)}\label{observability-18}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{request\_id} correlation, rate-limit metrics, error-code dashboards, and tracing through the gateway are how you operate an API in production.
+\end{itemize}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\textbf{1. Always start from the consumer.} "Who calls this --- a partner server, a browser, an internal service?" That single question chooses REST vs gRPC vs GraphQL and frames everything else.
+
+\textbf{2. Volunteer idempotency unprompted.} For any create/charge, say "I\textquotesingle ll make this idempotent with a key so retries don\textquotesingle t double-process" and sketch the dedup table. It\textquotesingle s the strongest single signal in an API round.
+
+\textbf{3. Write a real query for pagination.} Don\textquotesingle t just say "cursor pagination" --- write \texttt{WHERE\ (created\_at,\ id)\ \textless{}\ (...)\ ORDER\ BY\ created\_at\ DESC,\ id\ DESC\ LIMIT\ n} and explain the O(1) index seek and write-stability. This separates you instantly.
+
+\textbf{4. Name status codes precisely.} 201+Location for creates, 202 for async, 204 for deletes, 401 vs 403, 409 for conflicts, 422 for validation, 429 for limits, 410 for sunset versions. Precision reads as experience.
+
+\textbf{5. Treat evolution as a process.} "Additive by default, version only on breaking changes, \texttt{Deprecation}/\texttt{Sunset} headers, 6-month window, then 410." Shows you\textquotesingle ve operated an API, not just designed one.
+
+\textbf{6. Pair every choice with its cost.} "GraphQL kills over-fetching \emph{but} caching is harder and you must limit query cost." "JWTs are stateless \emph{but} hard to revoke." Trade-offs are the currency of senior interviews.
+
+\textbf{7. Security is reflexive.} "AuthN before AuthZ, scopes for least privilege, TLS everywhere, HMAC-signed webhooks, never leak internals in 500s." Say it without being asked.
+
+\textbf{8. Know the canonical APIs.} Cite Stripe (idempotency keys, cursor pagination, date versioning, rich errors) and GitHub (REST+GraphQL, ETag/304, \texttt{Link} pagination). Concrete references beat abstractions.
+
+\textbf{9. For Amazon:} invoke the API mandate and service ownership; emphasize idempotency, backward compatibility, and designing for external partners.
+
+\textbf{10. For Meta/Google:} be fluent in GraphQL (N+1/DataLoader, persisted queries) and resource-oriented design / Protobuf evolution respectively --- these are \emph{their} technologies and interviewers know them deeply.
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+\textbf{Methods (safe/idempotent):} GET (safe+idem), HEAD/OPTIONS (safe+idem), PUT (idem), DELETE (idem), POST (neither), PATCH (neither). Idempotency = safe retries.
+
+\textbf{Status codes:} 200 OK \(\cdot\) 201 Created (+Location) \(\cdot\) 202 Accepted (async) \(\cdot\) 204 No Content \(\cdot\) 301 moved \(\cdot\) 304 Not Modified (ETag) \(\cdot\) 400 malformed \(\cdot\) 401 unauthenticated \(\cdot\) 403 forbidden \(\cdot\) 404 not found \(\cdot\) 409 conflict \(\cdot\) 410 gone \(\cdot\) 422 semantic-invalid \(\cdot\) 429 rate-limited (+Retry-After) \(\cdot\) 500/503.
+
+\textbf{Idempotency:} \texttt{Idempotency-Key} \(\rightarrow\) dedup table \texttt{(api\_key,key)} \(\rightarrow\) atomic INSERT ON CONFLICT \(\rightarrow\) cached response on retry. At-least-once delivery + idempotency = exactly-once effects.
+
+\textbf{Pagination:} offset = O(offset), unstable under writes, random access. Cursor/keyset = \texttt{WHERE\ (created\_at,id)\ \textless{}\ (...)}, O(page size), stable, opaque base64 cursor, no random access. Cursor for feeds at scale.
+
+\textbf{Versioning:} additive by default (clients ignore unknown fields); version only on breaking changes; URL path default; \texttt{Deprecation}/\texttt{Sunset} headers \(\rightarrow\) 410 Gone.
+
+\textbf{Auth:} API keys (server-to-server), OAuth2 (auth-code+PKCE for users, client-credentials for services), JWT (header.payload.signature, stateless, hard to revoke --- short exp + refresh), mTLS (service mesh), scopes (least privilege \(\rightarrow\) 403 on missing).
+
+\textbf{Rate limiting:} token bucket (bursts), leaky bucket (smooth), fixed window (edge-double), sliding-window-counter (best default). Redis-shared counters. 429 + Retry-After + X-RateLimit-*.
+
+\textbf{Errors:} consistent envelope, stable \texttt{code}, \texttt{request\_id}, all validation errors at once, never leak internals, RFC 7807 (\texttt{problem+json}).
+
+\textbf{gRPC:} Protobuf + HTTP/2, 4 RPC types (unary/server-stream/client-stream/bidi), binary+typed+streaming, internal services, no native browser (grpc-web+Envoy). Field \emph{numbers} = wire identity.
+
+\textbf{GraphQL:} client picks fields (no over/under-fetch), resolvers, \textbf{N+1 \(\rightarrow\) DataLoader batching}, limit depth/complexity + persisted queries, caching harder (one POST endpoint).
+
+\textbf{Webhooks:} push events, HMAC-sign (timestamp + constant-time compare), retry w/ backoff+jitter (at-least-once), idempotent consumer (dedupe by event ID).
+
+\subsection{Quick-Reference Tables}\label{quick-reference-tables}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1765}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1176}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2941}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.4118}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Safe
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Idempotent
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Typical status
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GET & & & 200 / 304 \\
+\rowcolor{zebra}
+POST & & & 201 / 202 \\
+PUT & & & 200 / 204 \\
+\rowcolor{zebra}
+PATCH & & & 200 \\
+DELETE & & & 204 / 404 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1312}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1940}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.5248}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Style
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Transport
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Format
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Best for
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+REST & HTTP/1.1-2 & JSON & Public/partner CRUD \\
+\rowcolor{zebra}
+gRPC & HTTP/2 & Protobuf & Internal microservices \\
+GraphQL & HTTP & JSON & Diverse clients, nested data \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2326}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3256}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1395}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3023}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pagination
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Deep-page cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Random access
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Offset & O(offset) & No & Yes \\
+\rowcolor{zebra}
+Cursor & O(page) & Yes & No \\
+\end{longtable}
+
+\subsection{Key Numbers / Defaults to Cite}\label{key-numbers--defaults-to-cite}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3453}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6547}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Item
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Idempotency key TTL & \textasciitilde24h \\
+\rowcolor{zebra}
+JWT access token expiry & 5--15 min (+ refresh token) \\
+Deprecation window & 6--12 months \(\rightarrow\) 410 Gone \\
+\rowcolor{zebra}
+Rate-limit headers & \texttt{Retry-After}, \texttt{X-RateLimit-\{Limit,Remaining,Reset\}} \\
+Conditional GET & \texttt{ETag} + \texttt{If-None-Match} \(\rightarrow\) 304 \\
+\rowcolor{zebra}
+Async pattern & 202 Accepted + status URL to poll \\
+\end{longtable}
+
+\subsection{FAANG Top-10 (most likely to appear)}\label{faang-top-10-most-likely-to-appear}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Safe vs idempotent methods + why retries need them
+\item
+  Idempotency keys + dedup table mechanism (payments)
+\item
+  Offset vs cursor pagination (+ the SQL)
+\item
+  Versioning \& breaking-change handling
+\item
+  401/403/422/409 status-code precision
+\item
+  REST vs gRPC vs GraphQL trade-offs
+\item
+  GraphQL N+1 + DataLoader
+\item
+  Rate-limiting algorithms + 429/Retry-After
+\item
+  OAuth2 + JWT + scopes (and JWT revocation)
+\item
+  Webhook security (HMAC + retries + idempotent consumer)
+\end{enumerate}
+
+\end{document}

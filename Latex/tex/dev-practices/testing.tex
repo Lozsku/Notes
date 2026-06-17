@@ -1,0 +1,2508 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Testing \& Code Quality}
+\newcommand{\ThemeKicker}{Quality Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{16a34a}{4ade80}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{35,38,41}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.58,0.85,0.30}{\textbf{\colorbox[rgb]{0.30,0.12,0.14}{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.25,0.50,0.35}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.48,0.49,0.49}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.50,0.55,0.55}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{\textbf{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.99,0.74,0.29}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.64,0.20,0.25}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{\underline{#1}}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.60,1.00}{\textbf{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.96,0.45,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.56,0.27,0.68}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.77,0.36,0.00}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.81,0.76}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.15,0.68,0.38}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.16,0.50,0.73}{\colorbox[rgb]{0.08,0.19,0.26}{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.24,0.68,0.91}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.96,0.31,0.31}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.15,0.68,0.68}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.85,0.27,0.33}{#1}}
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+\textbf{How to use this file:} Read top-to-bottom for deep understanding of how to build, structure, and reason about test suites. Jump to §Common Interview Questions + §Revision Cheat Sheet for last-minute revision. \emph{How} you test is a direct code-quality signal in coding rounds and a constant on the job --- interviewers read your tests as carefully as your implementation.
+\end{quote}
+
+\section{Overview --- What It Is}\label{overview--what-it-is}
+
+\textbf{Testing} is the disciplined practice of executing code with known inputs and asserting that the observed behavior matches the expected behavior. \textbf{Code quality} is the broader engineering hygiene --- static analysis, type checking, linting, code review, and CI --- that keeps a codebase changeable over years.
+
+Testing is fundamentally about \textbf{confidence under change}. A test suite is not a quality stamp you apply once; it is a \emph{safety net} that lets you refactor, add features, and upgrade dependencies without fear. The real question a test answers is not "does this code work?" but "if I change this code six months from now, will I find out before my users do?"
+
+The discipline spans several layers:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Unit tests} --- verify a single function/class in isolation, microsecond-to-millisecond fast.
+\item
+  \textbf{Integration tests} --- verify that two or more components collaborate correctly (your code + a real database, a real message broker).
+\item
+  \textbf{Contract tests} --- verify that two services agree on their API shape \emph{without} spinning up both.
+\item
+  \textbf{End-to-end (E2E) tests} --- drive the whole system as a user would, through the UI or public API.
+\item
+  \textbf{Property-based / mutation / fuzz / load / chaos} --- advanced techniques that attack the suite\textquotesingle s blind spots.
+\end{itemize}
+
+And the surrounding code-quality machinery:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Coverage} --- what fraction of code your tests execute (a floor, not a goal).
+\item
+  \textbf{Static analysis \& linters} --- find bugs and style violations \emph{without running} the code.
+\item
+  \textbf{Type checking} --- catch whole categories of errors at compile/check time.
+\item
+  \textbf{CI pipelines} --- run all of the above automatically on every change, fail fast.
+\item
+  \textbf{Code review} --- a human safety net for design, intent, and readability.
+\end{itemize}
+
+The central discipline mirrors performance engineering: \textbf{understand the behavior you want, encode it as an executable expectation, run it continuously.} A test you do not run is documentation that rots. A test you cannot trust is worse than no test at all.
+
+\section{Why It Exists}\label{why-it-exists}
+
+Software is the only engineering discipline where the cost of a change is theoretically zero (just edit text) but the \emph{risk} of a change is enormous. Without tests:
+
+\begin{itemize}
+\tightlist
+\item
+  A one-line change to a date-formatting helper silently breaks invoice generation in three other modules (\textbf{no regression net}).
+\item
+  Nobody dares touch the 4,000-line \texttt{OrderService} because "it works and we don\textquotesingle t know why" (\textbf{fear of change \(\rightarrow\) ossification}).
+\item
+  A bug shipped to production is found by a customer, escalated, hot-fixed at 2 a.m., and costs 100\(\times\) what it would have cost to catch in a unit test (\textbf{late detection}).
+\item
+  A refactor that should take an afternoon takes two weeks of manual clicking through the app to make sure nothing broke (\textbf{no automated verification}).
+\end{itemize}
+
+Tests exist to convert \emph{implicit, tribal, fragile} knowledge ("this is how the discount engine is supposed to behave") into \emph{explicit, executable, permanent} specifications. They produce code that is:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1220}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8780}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Goal
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What Tests Give You
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Changeable} & Refactor freely; the suite tells you the moment behavior drifts. \\
+\rowcolor{zebra}
+\textbf{Documented} & A well-named test is the most accurate documentation that exists --- it cannot lie, because CI runs it. \\
+\textbf{Designable} & Hard-to-test code is almost always badly-designed code; the pain of testing is a design smell detector. \\
+\rowcolor{zebra}
+\textbf{Debuggable} & A failing test localizes a bug to a few lines; a production incident localizes it to "somewhere in the system." \\
+\textbf{Shippable} & Continuous deployment is \emph{only} possible with a trustworthy automated suite. \\
+\end{longtable}
+
+\subsection{The cost-of-a-bug-by-stage curve}\label{the-cost-of-a-bug-by-stage-curve}
+
+The single most important economic fact about testing: \textbf{the cost of fixing a defect grows roughly an order of magnitude per stage it escapes.} The numbers below are the canonical figures cited from IBM Systems Sciences Institute / NIST-style studies --- interviewers expect you to know the \emph{shape} and the \emph{order of magnitude}, not exact constants.
+
+\setcodelang{}
+
+\begin{verbatim}
+Cost to fix a single bug (relative units)
+
+Production  |                                         ##########  ~100×
+            |
+QA / E2E    |                          ######  ~15×
+            |
+Integration |                  ####  ~6×
+            |
+Code review |            ##  ~3×
+            |
+Unit test   |       #  ~1.5×
+            |
+Design/type |   .  ~1×  (caught before code even runs)
+            +----------------------------------------------------
+              cheapest                                  most expensive
+\end{verbatim}
+
+The lesson is not "test more." It is \textbf{"shift left"} --- push detection as early (leftward) as possible. A type checker catches the bug before the code runs; a unit test catches it in milliseconds on your laptop; a production incident catches it after it has cost revenue, on-call sleep, and customer trust.
+
+\textbf{Interview takeaway: The justification for testing is economic, not moral. Every stage a bug survives multiplies its cost \textasciitilde10\(\times\). Tests are a leverage instrument for shifting detection left.}
+
+\section{Why FAANG Cares}\label{why-faang-cares}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6959}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2603}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Company
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evidence
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Lesson
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Google} & Authored \emph{Software Engineering at Google} (the "test certified" program, the test pyramid, the "Beyoncé Rule" --- \emph{if you liked it you shoulda put a test on it}). Code cannot merge without tests. The monorepo runs millions of tests per commit via the Blaze/Bazel build graph. & Tests are the entry fee for changing shared code. \\
+\rowcolor{zebra}
+\textbf{Amazon} & "Operational excellence" LP. Every service owns its tests; deployment pipelines (CodePipeline) gate on automated test stages. Bar raisers probe whether you\textquotesingle d write tests for the code you just wrote in the interview. & If it\textquotesingle s not tested, it\textquotesingle s not done. \\
+\textbf{Meta} & Built \textbf{Sapienz} (automated test-input generation) and \textbf{Infer} (static analysis for null/leak bugs) and runs them on every diff in Phabricator. Continuous deployment of web at scale demands automated confidence. & Static analysis + tests enable "move fast" \emph{without} breaking things. \\
+\rowcolor{zebra}
+\textbf{Netflix} & Invented \textbf{Chaos Engineering} (Chaos Monkey, the Simian Army). They test resilience in \emph{production} by injecting failure. & Testing isn\textquotesingle t just correctness; it\textquotesingle s verifying behavior under failure. \\
+\textbf{Microsoft} & Strong TDD/unit-test culture; the .NET and TypeScript ecosystems were built with testability as a first-class concern. & Type systems + tests are complementary, not competing. \\
+\end{longtable}
+
+\textbf{FAANG interview reality:} In a coding round, after you write a solution, expect \emph{"how would you test this?"} A senior candidate doesn\textquotesingle t say "I\textquotesingle d write some tests" --- they enumerate equivalence classes, boundary conditions, the empty/null/overflow cases, and explain which deserve a unit test vs. an integration test. In system design, when you propose a microservice split, the follow-up is often \emph{"how do you stop service A\textquotesingle s deploy from breaking service B?"} --- the expected answer involves \textbf{contract testing}. Testing knowledge is a \emph{seniority signal}: juniors test happy paths; seniors test the boundaries, the failures, and the contracts.
+
+\section{Core Concepts}\label{core-concepts}
+
+\subsection{Verification vs. Validation}\label{verification-vs-validation}
+
+Two words interviewers use interchangeably but that mean different things:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Verification} --- "Are we building the product \emph{right}?" Does the code meet its spec? (Unit/integration tests answer this.)
+\item
+  \textbf{Validation} --- "Are we building the \emph{right} product?" Does the spec meet the user\textquotesingle s actual need? (Acceptance/E2E/user testing answer this.)
+\end{itemize}
+
+A function can be perfectly verified (passes every unit test) and completely invalid (computes the wrong thing because the requirement was misunderstood). This is why E2E and acceptance tests, written in the language of the business, matter even when unit coverage is high.
+
+\subsection{The four properties every test asserts about}\label{the-four-properties-every-test-asserts-about}
+
+Every test, regardless of level, is checking one of these:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Correctness} --- right output for given input.
+\item
+  \textbf{Behavior on the boundaries} --- empty, null, zero, max-int, off-by-one.
+\item
+  \textbf{Error handling} --- does it fail the way it\textquotesingle s supposed to (throw, return error, retry)?
+\item
+  \textbf{Side effects / interactions} --- did it write the row, send the message, call the gateway exactly once?
+\end{enumerate}
+
+\subsection{System Under Test (SUT) and Collaborators}\label{system-under-test-sut-and-collaborators}
+
+\setcodelang{}
+
+\begin{verbatim}
+            +-------------------------------------------+
+            |              TEST                          |
+            |                                            |
+            |   Arrange: build inputs & doubles          |
+            |   Act:     call the SUT                    |
+            |   Assert:  check output / interactions     |
+            +--------------------+----------------------+
+                                 |
+                                 v
+        +------------------------------------------------+
+        |          System Under Test (SUT)               |
+        |   the one unit of behavior you are testing     |
+        +-----+----------------+-----------------+-------+
+              |                |                 |
+              v                v                 v
+        +-----------+   +-------------+   +------------+
+        |Collaborator|  |Collaborator |   |Collaborator|
+        |  (real)   |   |  (DOUBLE)   |   |  (real)    |
+        +-----------+   +-------------+   +------------+
+
+   A "test double" replaces a real collaborator to make the test
+   fast, deterministic, and focused on the SUT.
+\end{verbatim}
+
+The key vocabulary: the \textbf{SUT} is the thing you\textquotesingle re testing; its \textbf{collaborators} are everything it talks to. The art of unit testing is deciding which collaborators to use \emph{for real} and which to replace with \textbf{test doubles}.
+
+\subsection{Determinism: the non-negotiable}\label{determinism-the-non-negotiable}
+
+A test must produce the same result every time it runs, anywhere, in any order. The four enemies of determinism --- memorize these, they are the root cause of nearly every flaky test:
+
+\setcodelang{}
+
+\begin{verbatim}
+   T - Time      (wall clock, timezones, "now()")
+   O - Order     (test A leaves state that test B depends on)
+   R - Random    (unseeded RNG, UUIDs, hash iteration order)
+   N - Network/  (real HTTP, DNS, shared DB, message brokers,
+       Concurrency thread scheduling / races)
+\end{verbatim}
+
+(Mnemonic: \textbf{TORN} --- a test that depends on Time, Order, Random, or Network/concurrency will eventually be \emph{torn} apart by flakiness.)
+
+\textbf{Interview takeaway: A non-deterministic test is a liability. It trains the team to ignore red builds ("just re-run it"), which destroys the entire value of the suite. Fixing flakiness is a first-class engineering task, not a nuisance.}
+
+\section{The Test Pyramid}\label{the-test-pyramid}
+
+The \textbf{Test Pyramid} (Mike Cohn, 2009) is the canonical model for \emph{how many} of each kind of test to write. It is a shape, a cost model, and an anti-pattern detector all at once.
+
+\setcodelang{}
+
+\begin{verbatim}
+                       /\
+                      /  \         E2E / UI tests
+                     / E2E\        - few (5-10%)
+                    /------\       - slow (seconds-minutes)
+                   /        \      - flaky, expensive
+                  / Integr.  \     Integration tests
+                 /------------\    - some (15-30%)
+                /              \   - medium speed (10ms-1s)
+               /     Unit       \  Unit tests
+              /------------------\ - many (60-80%)
+             /____________________\- fast (<10ms), cheap, stable
+
+    As you go UP:  slower, more brittle, more realistic, fewer
+    As you go DOWN: faster, more stable, less realistic, more
+\end{verbatim}
+
+\subsection{Why a pyramid and not a rectangle?}\label{why-a-pyramid-and-not-a-rectangle}
+
+The proportions follow directly from a cost/value trade-off:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1253}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1708}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1253}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1595}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.3144}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1048}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Layer
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Speed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stability
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Realism
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost to write \& maintain
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Target \%
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Unit} & µs--ms & Very high & Low (isolated) & Low & 60--80\% \\
+\rowcolor{zebra}
+\textbf{Integration} & 10ms--1s & Medium & Medium-high & Medium & 15--30\% \\
+\textbf{E2E} & seconds--minutes & Low (flaky) & Highest & High & 5--10\% \\
+\end{longtable}
+
+You want \textbf{many cheap, fast, stable tests} at the bottom that pinpoint \emph{exactly} which function broke, and \textbf{few expensive, slow, realistic tests} at the top that verify the whole thing hangs together. A unit test failure says "function \texttt{applyDiscount} is wrong." An E2E failure says "checkout is broken somewhere" --- you still have to debug.
+
+\subsection{What each layer actually catches}\label{what-each-layer-actually-catches}
+
+\setcodelang{}
+
+\begin{verbatim}
+Unit:        logic bugs, off-by-one, bad conditionals, wrong formula
+Integration: serialization mismatches, SQL/schema errors, wrong API
+             usage, transaction boundary bugs, config wiring
+E2E:         broken user journeys, routing, auth flows, the "all the
+             pieces are individually fine but together they don't work"
+\end{verbatim}
+
+A bug in your discount \emph{formula} is best caught by a unit test (fast, precise). A bug where your ORM generates the wrong SQL is invisible to unit tests (you mocked the DB) --- only an integration test against a \emph{real} database catches it. A bug where the login button\textquotesingle s POST goes to the wrong route is invisible to both --- only E2E catches it.
+
+\subsection{Anti-pattern: the Ice-Cream Cone}\label{anti-pattern-the-ice-cream-cone}
+
+The most common pathology in real codebases is the \textbf{inverted pyramid}, a.k.a. the \textbf{Ice-Cream Cone}:
+
+\setcodelang{}
+
+\begin{verbatim}
+
+            \    Manual QA       /   <- huge, all clicking by hand
+             \__________________/
+              \    E2E / UI     /     <- many, slow, flaky
+               \______________/
+                \  Integration /      <- some
+                 \____________/
+                  \   Unit    /        <- few, neglected
+                   \________/
+                    \______/
+                       \/   <- "automation" as an afterthought
+
+    Symptoms: builds take 45 min, half the E2E suite is red and
+    ignored, every release needs a 2-day manual regression pass.
+\end{verbatim}
+
+Teams arrive here because E2E tests \emph{feel} more valuable ("they test the real thing!") and unit tests \emph{feel} like busywork. But the inverted pyramid is slow, flaky, and expensive: a 1-line change forces a 40-minute E2E run, and a third of those runs fail for unrelated infra reasons. The team learns to ignore red, and the suite dies.
+
+\subsection{Alternative: the Testing Trophy (Kent Dodds)}\label{alternative-the-testing-trophy-kent-dodds}
+
+For front-end and many service codebases, Kent Dodds popularized the \textbf{Testing Trophy}, arguing the \emph{integration} layer (in the front-end sense: a component + its real children, with only the network mocked) gives the best confidence-per-effort:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{           (   E2E     )      few}
+
+        \OperatorTok{/}                 \OperatorTok{\textbackslash{}}
+\NormalTok{       (   Integration     )  MOST — the fat middle, best ROI}
+\NormalTok{        \textbackslash{}                 }\OperatorTok{/}
+
+\NormalTok{        (      Unit        )  some}
+
+\NormalTok{        [  Static (types,  ]  the base — lint }\OperatorTok{+}\NormalTok{ TypeScript catch}
+\NormalTok{        [  lint) — free    ]  a whole }\KeywordTok{class}\NormalTok{ of bugs }\ControlFlowTok{for} \OperatorTok{\textasciitilde{}}\NormalTok{free}
+\end{Highlighting}
+\end{Shaded}
+
+His thesis: \emph{"Write tests. Not too many. Mostly integration."} The reasoning: heavily-mocked unit tests on the front end pass while the app is broken (because you mocked the thing that was wrong). Tests that render a real component tree and assert on what the user sees give more confidence. The \textbf{static} layer (TypeScript + ESLint) is the foundation because it catches typos and type errors with zero test-writing effort.
+
+\textbf{Pyramid vs. Trophy is not a contradiction} --- they\textquotesingle re tuned for different domains. Backend logic-heavy services lean pyramid (lots of pure-function unit tests). UI/glue-heavy code leans trophy (integration-heavy). The shared truth: \textbf{few E2E, and a solid static base.}
+
+\textbf{Interview takeaway: Know the pyramid, name the ice-cream-cone anti-pattern, and be able to argue the testing-trophy nuance for front-end / glue code. Senior signal: "the right shape depends on where your bugs come from --- logic-heavy code wants more unit tests, integration-heavy code wants more integration tests."}
+
+\section{Unit Testing \& Test Doubles}\label{unit-testing--test-doubles}
+
+\subsection{What a unit test is (and isn\textquotesingle t)}\label{what-a-unit-test-is-and-isnt}
+
+A \textbf{unit test} exercises one \emph{unit of behavior} in isolation --- usually one public method or one small class --- with all slow/non-deterministic collaborators replaced by doubles. "Unit" means \emph{isolated and fast}, not literally "one class." Two schools:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Solitary (London/mockist):} mock \emph{every} collaborator; test the SUT alone.
+\item
+  \textbf{Sociable (Detroit/classicist):} use real collaborators when they\textquotesingle re fast and deterministic; only double the slow/external ones.
+\end{itemize}
+
+Most experienced engineers are sociable by default and reach for mocks only when a collaborator is slow, non-deterministic, or has side effects.
+
+\subsection{The AAA structure}\label{the-aaa-structure}
+
+Every unit test should have three visually distinct phases --- \textbf{Arrange, Act, Assert} (a.k.a. Given-When-Then):
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ test\_apply\_percentage\_discount():}
+    \CommentTok{\# Arrange — set up inputs and the SUT}
+\NormalTok{    cart }\OperatorTok{=}\NormalTok{ Cart(items}\OperatorTok{=}\NormalTok{[Item(}\StringTok{"book"}\NormalTok{, price}\OperatorTok{=}\NormalTok{Money(}\StringTok{"20.00"}\NormalTok{))])}
+\NormalTok{    discount }\OperatorTok{=}\NormalTok{ PercentageDiscount(percent}\OperatorTok{=}\DecValTok{10}\NormalTok{)}
+
+    \CommentTok{\# Act — exercise ONE behavior}
+\NormalTok{    total }\OperatorTok{=}\NormalTok{ discount.}\BuiltInTok{apply}\NormalTok{(cart)}
+
+    \CommentTok{\# Assert — one logical assertion}
+    \ControlFlowTok{assert}\NormalTok{ total }\OperatorTok{==}\NormalTok{ Money(}\StringTok{"18.00"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+One Act per test. If you find yourself with two Acts, you have two tests.
+
+\subsection{FIRST --- the properties of a good unit test}\label{first--the-properties-of-a-good-unit-test}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   F }\OperatorTok{{-}}\NormalTok{ Fast        milliseconds}\OperatorTok{;}\NormalTok{ a }\DecValTok{10}\ErrorTok{k}\OperatorTok{{-}}\NormalTok{test suite must finish }\KeywordTok{in}\NormalTok{ seconds}
+\NormalTok{   I }\OperatorTok{{-}}\NormalTok{ Isolated    no dependence on other tests }\KeywordTok{or}\NormalTok{ shared state}
+\NormalTok{   R }\OperatorTok{{-}}\NormalTok{ Repeatable  same result every run, every machine (deterministic)}
+\NormalTok{   S }\OperatorTok{{-}}\NormalTok{ Self}\OperatorTok{{-}}\NormalTok{validating  }\ControlFlowTok{pass}\OperatorTok{/}\NormalTok{fail }\KeywordTok{is}\NormalTok{ automatic}\OperatorTok{;}\NormalTok{ no human eyeballing logs}
+\NormalTok{   T }\OperatorTok{{-}}\NormalTok{ Timely       written }\ControlFlowTok{with}\NormalTok{ (ideally before) the code, }\KeywordTok{not} \StringTok{"later"}
+\end{Highlighting}
+\end{Shaded}
+
+If a test violates FIRST it will eventually be deleted or ignored. Slow tests get skipped locally; order-dependent tests fail randomly; tests that need a human to read output get rubber-stamped.
+
+\subsection{The taxonomy of test doubles}\label{the-taxonomy-of-test-doubles}
+
+Gerard Meszaros\textquotesingle{} \emph{xUnit Test Patterns} gives the precise vocabulary. Interviewers love this because most candidates blur "mock" and "stub" together. There are \textbf{five} distinct doubles:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2113}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2527}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1321}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3511}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Double
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Provides canned answers?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Records calls?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Has real logic?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Use it to...
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Dummy} & no & no & no & fill a required parameter you never use \\
+\rowcolor{zebra}
+\textbf{Stub} & yes (fixed) & no & no & feed the SUT a specific input from a collaborator \\
+\textbf{Spy} & yes & \textbf{yes} & no & verify the SUT \emph{called} a collaborator (after the fact) \\
+\rowcolor{zebra}
+\textbf{Mock} & yes & \textbf{yes (pre-programmed expectations)} & no & assert interactions \emph{as a specification} \\
+\textbf{Fake} & n/a & n/a & \textbf{yes (lightweight)} & a working but simplified impl (in-memory DB) \\
+\end{longtable}
+
+\subsubsection{Dummy --- a placeholder you never use}\label{dummy--a-placeholder-you-never-use}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// The constructor needs a Logger, but this test never logs.}
+\BuiltInTok{Logger}\NormalTok{ dummyLogger }\OperatorTok{=} \KeywordTok{null}\OperatorTok{;}          \CommentTok{// or Mockito.mock(Logger.class)}
+\NormalTok{OrderService svc }\OperatorTok{=} \KeywordTok{new} \FunctionTok{OrderService}\OperatorTok{(}\NormalTok{realRepo}\OperatorTok{,}\NormalTok{ dummyLogger}\OperatorTok{);}
+\CommentTok{// We only care about repo behavior; the logger is a dummy.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Stub --- canned return values to drive a code path}\label{stub--canned-return-values-to-drive-a-code-path}
+
+A stub \emph{answers} but doesn\textquotesingle t \emph{assert}. Use it to put the SUT into the state you want.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# pytest — stub the clock so "expired?" is deterministic}
+\KeywordTok{class}\NormalTok{ StubClock:}
+    \KeywordTok{def}\NormalTok{ now(}\VariableTok{self}\NormalTok{):}
+        \ControlFlowTok{return}\NormalTok{ datetime(}\DecValTok{2026}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+
+\KeywordTok{def}\NormalTok{ test\_token\_is\_expired():}
+\NormalTok{    token }\OperatorTok{=}\NormalTok{ Token(expires\_at}\OperatorTok{=}\NormalTok{datetime(}\DecValTok{2026}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{11}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+    \ControlFlowTok{assert}\NormalTok{ token.is\_expired(clock}\OperatorTok{=}\NormalTok{StubClock()) }\KeywordTok{is} \VariableTok{True}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Spy --- record calls, assert afterwards}\label{spy--record-calls-assert-afterwards}
+
+A spy is a stub that \emph{also remembers} how it was called.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ EmailSpy:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.sent }\OperatorTok{=}\NormalTok{ []}
+    \KeywordTok{def}\NormalTok{ send(}\VariableTok{self}\NormalTok{, to, subject, body):}
+        \VariableTok{self}\NormalTok{.sent.append((to, subject))   }\CommentTok{\# record}
+
+\KeywordTok{def}\NormalTok{ test\_welcome\_email\_sent\_on\_signup():}
+\NormalTok{    spy }\OperatorTok{=}\NormalTok{ EmailSpy()}
+\NormalTok{    service }\OperatorTok{=}\NormalTok{ SignupService(emailer}\OperatorTok{=}\NormalTok{spy)}
+
+\NormalTok{    service.register(}\StringTok{"ada@x.com"}\NormalTok{, }\StringTok{"pw"}\NormalTok{)}
+
+    \ControlFlowTok{assert} \BuiltInTok{len}\NormalTok{(spy.sent) }\OperatorTok{==} \DecValTok{1}
+    \ControlFlowTok{assert}\NormalTok{ spy.sent[}\DecValTok{0}\NormalTok{][}\DecValTok{0}\NormalTok{] }\OperatorTok{==} \StringTok{"ada@x.com"}   \CommentTok{\# assert AFTER the fact}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{\texorpdfstring{Mock --- interaction expectations set \emph{before} the act}{Mock --- interaction expectations set before the act}}\label{mock--interaction-expectations-set-before-the-act}
+
+A mock is pre-programmed with the calls it \emph{expects} and fails if they don\textquotesingle t happen exactly. This is \textbf{interaction testing} as a specification.
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Mockito — verify the SUT charged the gateway exactly once}
+\AttributeTok{@Test}
+\DataTypeTok{void} \FunctionTok{chargesGatewayExactlyOnce}\OperatorTok{()} \OperatorTok{\{}
+\NormalTok{    PaymentGateway gateway }\OperatorTok{=} \FunctionTok{mock}\OperatorTok{(}\NormalTok{PaymentGateway}\OperatorTok{.}\FunctionTok{class}\OperatorTok{);}
+    \FunctionTok{when}\OperatorTok{(}\NormalTok{gateway}\OperatorTok{.}\FunctionTok{charge}\OperatorTok{(}\FunctionTok{any}\OperatorTok{(),} \FunctionTok{eq}\OperatorTok{(}\DecValTok{1000}\OperatorTok{)))}
+        \OperatorTok{.}\FunctionTok{thenReturn}\OperatorTok{(}\NormalTok{ChargeResult}\OperatorTok{.}\FunctionTok{success}\OperatorTok{(}\StringTok{"ch\_123"}\OperatorTok{));}
+
+\NormalTok{    CheckoutService svc }\OperatorTok{=} \KeywordTok{new} \FunctionTok{CheckoutService}\OperatorTok{(}\NormalTok{gateway}\OperatorTok{);}
+\NormalTok{    svc}\OperatorTok{.}\FunctionTok{checkout}\OperatorTok{(}\FunctionTok{cartWith}\OperatorTok{(}\DecValTok{1000}\OperatorTok{));}
+
+    \FunctionTok{verify}\OperatorTok{(}\NormalTok{gateway}\OperatorTok{,} \FunctionTok{times}\OperatorTok{(}\DecValTok{1}\OperatorTok{)).}\FunctionTok{charge}\OperatorTok{(}\FunctionTok{any}\OperatorTok{(),} \FunctionTok{eq}\OperatorTok{(}\DecValTok{1000}\OperatorTok{));} \CommentTok{// interaction assertion}
+    \FunctionTok{verifyNoMoreInteractions}\OperatorTok{(}\NormalTok{gateway}\OperatorTok{);}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Fake --- a real but lightweight implementation}\label{fake--a-real-but-lightweight-implementation}
+
+A fake has \emph{working logic} but cuts corners unsuitable for production (in-memory instead of on-disk, no durability).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ InMemoryUserRepo:           }\CommentTok{\# a FAKE of a real DB{-}backed repo}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{):}
+        \VariableTok{self}\NormalTok{.\_db }\OperatorTok{=}\NormalTok{ \{\}}
+    \KeywordTok{def}\NormalTok{ save(}\VariableTok{self}\NormalTok{, user):}
+        \VariableTok{self}\NormalTok{.\_db[user.}\BuiltInTok{id}\NormalTok{] }\OperatorTok{=}\NormalTok{ user}
+    \KeywordTok{def}\NormalTok{ find(}\VariableTok{self}\NormalTok{, user\_id):}
+        \ControlFlowTok{return} \VariableTok{self}\NormalTok{.\_db.get(user\_id)}
+
+\KeywordTok{def}\NormalTok{ test\_signup\_then\_login():}
+\NormalTok{    repo }\OperatorTok{=}\NormalTok{ InMemoryUserRepo()      }\CommentTok{\# fast, deterministic, real behavior}
+\NormalTok{    svc }\OperatorTok{=}\NormalTok{ AccountService(repo)}
+\NormalTok{    svc.signup(}\StringTok{"ada"}\NormalTok{, }\StringTok{"pw"}\NormalTok{)}
+    \ControlFlowTok{assert}\NormalTok{ svc.login(}\StringTok{"ada"}\NormalTok{, }\StringTok{"pw"}\NormalTok{) }\KeywordTok{is} \VariableTok{True}
+\end{Highlighting}
+\end{Shaded}
+
+Fakes are underrated. A well-built in-memory fake of your repository gives you near-integration realism at unit-test speed, and (unlike mocks) it doesn\textquotesingle t couple your tests to the exact call sequence.
+
+\subsection{State testing vs. interaction testing}\label{state-testing-vs-interaction-testing}
+
+This is \emph{the} conceptual fork:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State (classicist) testing} --- exercise the SUT, then assert on the \emph{resulting state} / return value. "After I deposit \$50, the balance is \$50." Robust to refactoring because it asserts \emph{what}, not \emph{how}.
+\item
+  \textbf{Interaction (mockist) testing} --- assert that the SUT \emph{made the right calls} to its collaborators. "When I withdraw, it calls \texttt{auditLog.record()}." Necessary when the \emph{side effect itself} is the behavior (sending an email, charging a card) --- there\textquotesingle s no return value to inspect.
+\end{itemize}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# STATE testing — assert outcome}
+\KeywordTok{def}\NormalTok{ test\_deposit\_increases\_balance():}
+\NormalTok{    acct }\OperatorTok{=}\NormalTok{ Account(balance}\OperatorTok{=}\DecValTok{0}\NormalTok{)}
+\NormalTok{    acct.deposit(}\DecValTok{50}\NormalTok{)}
+    \ControlFlowTok{assert}\NormalTok{ acct.balance }\OperatorTok{==} \DecValTok{50}          \CommentTok{\# WHAT happened}
+
+\CommentTok{\# INTERACTION testing — assert the call happened}
+\KeywordTok{def}\NormalTok{ test\_withdrawal\_is\_audited(mocker):}
+\NormalTok{    audit }\OperatorTok{=}\NormalTok{ mocker.Mock()}
+\NormalTok{    acct }\OperatorTok{=}\NormalTok{ Account(balance}\OperatorTok{=}\DecValTok{100}\NormalTok{, audit}\OperatorTok{=}\NormalTok{audit)}
+\NormalTok{    acct.withdraw(}\DecValTok{30}\NormalTok{)}
+\NormalTok{    audit.record.assert\_called\_once\_with(}\StringTok{"withdraw"}\NormalTok{, }\DecValTok{30}\NormalTok{)  }\CommentTok{\# HOW it happened}
+\end{Highlighting}
+\end{Shaded}
+
+Prefer \textbf{state testing} by default. Reach for interaction testing only when the side effect \emph{is} the point (you cannot observe "an email was sent" via return value).
+
+\subsection{The over-mocking trap}\label{the-over-mocking-trap}
+
+The most damaging anti-pattern in unit testing:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# BAD — over{-}mocked, tests the mock not the code}
+\KeywordTok{def}\NormalTok{ test\_total(mocker):}
+\NormalTok{    cart }\OperatorTok{=}\NormalTok{ mocker.Mock()}
+\NormalTok{    cart.subtotal.return\_value }\OperatorTok{=} \DecValTok{100}
+\NormalTok{    cart.tax.return\_value }\OperatorTok{=} \DecValTok{10}
+\NormalTok{    cart.shipping.return\_value }\OperatorTok{=} \DecValTok{5}
+    \CommentTok{\# we mocked everything; if total() is "return 999" this still}
+    \CommentTok{\# passes against our mock expectations {-}\textgreater{} we tested nothing real}
+\end{Highlighting}
+\end{Shaded}
+
+Over-mocking produces tests that are:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Tautological} --- they assert the SUT calls the methods you decided it calls; they pass even when the real collaborators are broken or the wiring is wrong.
+\item
+  \textbf{Brittle to refactoring} --- change \emph{how} the code computes a result (without changing the result) and every interaction assertion breaks. The test fights the refactor instead of protecting it.
+\item
+  \textbf{False confidence} --- green tests, broken integration. The classic "all unit tests pass, production is down" because the mock didn\textquotesingle t match reality.
+\end{enumerate}
+
+Rule of thumb: \textbf{mock across architectural boundaries (network, DB, clock, randomness), not within your own domain logic.} If you\textquotesingle re mocking your own value objects, stop --- use the real ones.
+
+\subsection{Parametrized tests}\label{parametrized-tests}
+
+When the \emph{same logic} must hold across many inputs, don\textquotesingle t copy-paste --- parametrize. This turns a table of cases into a test each, with individual pass/fail reporting.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ pytest}
+
+\AttributeTok{@pytest.mark.parametrize}\NormalTok{(}\StringTok{"n, expected"}\NormalTok{, [}
+\NormalTok{    (}\DecValTok{1}\NormalTok{,  }\StringTok{"1"}\NormalTok{),}
+\NormalTok{    (}\DecValTok{3}\NormalTok{,  }\StringTok{"Fizz"}\NormalTok{),}
+\NormalTok{    (}\DecValTok{5}\NormalTok{,  }\StringTok{"Buzz"}\NormalTok{),}
+\NormalTok{    (}\DecValTok{15}\NormalTok{, }\StringTok{"FizzBuzz"}\NormalTok{),}
+\NormalTok{    (}\DecValTok{0}\NormalTok{,  }\StringTok{"FizzBuzz"}\NormalTok{),   }\CommentTok{\# boundary: 0 is divisible by everything}
+\NormalTok{])}
+\KeywordTok{def}\NormalTok{ test\_fizzbuzz(n, expected):}
+    \ControlFlowTok{assert}\NormalTok{ fizzbuzz(n) }\OperatorTok{==}\NormalTok{ expected}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// JUnit 5 parametrized}
+\AttributeTok{@ParameterizedTest}
+\AttributeTok{@CsvSource}\OperatorTok{(\{}\StringTok{"1, 1"}\OperatorTok{,} \StringTok{"3, Fizz"}\OperatorTok{,} \StringTok{"5, Buzz"}\OperatorTok{,} \StringTok{"15, FizzBuzz"}\OperatorTok{\})}
+\DataTypeTok{void} \FunctionTok{fizzBuzz}\OperatorTok{(}\DataTypeTok{int}\NormalTok{ n}\OperatorTok{,} \BuiltInTok{String}\NormalTok{ expected}\OperatorTok{)} \OperatorTok{\{}
+    \FunctionTok{assertEquals}\OperatorTok{(}\NormalTok{expected}\OperatorTok{,}\NormalTok{ FizzBuzz}\OperatorTok{.}\FunctionTok{of}\OperatorTok{(}\NormalTok{n}\OperatorTok{));}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Fixtures \& setup/teardown}\label{fixtures--setupteardown}
+
+Tests need consistent starting state. \textbf{Fixtures} build it; \textbf{teardown} cleans it. The danger is \emph{shared} fixtures leaking state between tests (an Order/Isolation violation).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ pytest}
+
+\AttributeTok{@pytest.fixture}
+\KeywordTok{def}\NormalTok{ empty\_account():}
+\NormalTok{    acct }\OperatorTok{=}\NormalTok{ Account(balance}\OperatorTok{=}\DecValTok{0}\NormalTok{)        }\CommentTok{\# fresh instance per test (good!)}
+    \ControlFlowTok{yield}\NormalTok{ acct                       }\CommentTok{\# test runs here}
+    \CommentTok{\# teardown after yield (close files, drop temp data) if needed}
+
+\KeywordTok{def}\NormalTok{ test\_a(empty\_account):}
+\NormalTok{    empty\_account.deposit(}\DecValTok{10}\NormalTok{)}
+    \ControlFlowTok{assert}\NormalTok{ empty\_account.balance }\OperatorTok{==} \DecValTok{10}
+
+\KeywordTok{def}\NormalTok{ test\_b(empty\_account):}
+    \CommentTok{\# gets its OWN fresh account — no leakage from test\_a}
+    \ControlFlowTok{assert}\NormalTok{ empty\_account.balance }\OperatorTok{==} \DecValTok{0}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// JUnit 5 lifecycle}
+\AttributeTok{@BeforeEach} \DataTypeTok{void} \FunctionTok{setUp}\OperatorTok{()}  \OperatorTok{\{}\NormalTok{ account }\OperatorTok{=} \KeywordTok{new} \FunctionTok{Account}\OperatorTok{(}\DecValTok{0}\OperatorTok{);} \OperatorTok{\}}  \CommentTok{// per{-}test fresh}
+\AttributeTok{@AfterEach}  \DataTypeTok{void} \FunctionTok{tearDown}\OperatorTok{()\{} \CommentTok{/* close resources */} \OperatorTok{\}}
+\AttributeTok{@BeforeAll} \DataTypeTok{static} \DataTypeTok{void} \FunctionTok{once}\OperatorTok{()} \OperatorTok{\{} \CommentTok{/* expensive shared setup, e.g. start container */} \OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Prefer \textbf{function-scoped} fixtures (fresh per test) for isolation; use \textbf{class/module-scoped} only for genuinely expensive, \emph{read-only} setup (e.g., a started Testcontainer).
+
+\textbf{Interview takeaway: Know all five doubles by name, prefer state over interaction testing, and be loud about the over-mocking trap. The senior insight is "mock at the boundary, not inside your domain" --- it shows you\textquotesingle ve felt the pain of brittle, tautological tests.}
+
+\section{TDD \& BDD}\label{tdd--bdd}
+
+\subsection{Test-Driven Development: the Red-Green-Refactor loop}\label{test-driven-development-the-red-green-refactor-loop}
+
+TDD inverts the usual order: you write a \emph{failing} test first, make it pass with the simplest code, then clean up. The cycle:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+        \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+        \OperatorTok{|}                                         \OperatorTok{|}
+\NormalTok{        v                                         }\OperatorTok{|}
+\NormalTok{   [ RED ] write a small failing test  }\OperatorTok{{-}{-}\textgreater{}}\NormalTok{  [ GREEN ] write the}
+\NormalTok{   (it fails because the code            minimal code to make it}
+\NormalTok{    doesn}\StringTok{\textquotesingle{}t exist yet)                   pass (even if ugly)}
+\ErrorTok{                                              |}
+\NormalTok{                                              v}
+\NormalTok{                                        [ REFACTOR ] clean up}
+                                        \ControlFlowTok{with}\NormalTok{ the test }\ImportTok{as}\NormalTok{ a net}\OperatorTok{;}
+\NormalTok{                                        tests stay green}
+                                              \OperatorTok{|}
+                                              \OperatorTok{+{-}{-}\textgreater{}}\NormalTok{ back to RED}
+\end{Highlighting}
+\end{Shaded}
+
+The three rules (Uncle Bob\textquotesingle s strict TDD):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Write no production code except to make a failing test pass.
+\item
+  Write only enough of a test to fail (a compile error counts).
+\item
+  Write only enough production code to pass the one failing test.
+\end{enumerate}
+
+\subsection{A full worked example: the Roman Numeral kata}\label{a-full-worked-example-the-roman-numeral-kata}
+
+Let\textquotesingle s build \texttt{int\_to\_roman(n)} the TDD way, several iterations, watching the design \emph{emerge}.
+
+\textbf{Iteration 1 --- RED:} the simplest possible test.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ test\_one\_is\_I():}
+    \ControlFlowTok{assert}\NormalTok{ int\_to\_roman(}\DecValTok{1}\NormalTok{) }\OperatorTok{==} \StringTok{"I"}
+\end{Highlighting}
+\end{Shaded}
+
+Run it: \texttt{NameError:\ int\_to\_roman\ is\ not\ defined}. Red.
+
+\textbf{Iteration 1 --- GREEN:} the \emph{simplest} thing that passes. Yes, hard-code it.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ int\_to\_roman(n):}
+    \ControlFlowTok{return} \StringTok{"I"}
+\end{Highlighting}
+\end{Shaded}
+
+Green. This feels absurd --- but it proves the test harness works and resists over-engineering.
+
+\textbf{Iteration 2 --- RED:} force generality.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ test\_two\_is\_II():}
+    \ControlFlowTok{assert}\NormalTok{ int\_to\_roman(}\DecValTok{2}\NormalTok{) }\OperatorTok{==} \StringTok{"II"}
+\end{Highlighting}
+\end{Shaded}
+
+Red (\texttt{"I"\ !=\ "II"}).
+
+\textbf{Iteration 2 --- GREEN:}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ int\_to\_roman(n):}
+    \ControlFlowTok{return} \StringTok{"I"} \OperatorTok{*}\NormalTok{ n}
+\end{Highlighting}
+\end{Shaded}
+
+Both tests green. (Works for 1, 2, 3.)
+
+\textbf{Iteration 3 --- RED:} introduce a new symbol.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ test\_five\_is\_V():}
+    \ControlFlowTok{assert}\NormalTok{ int\_to\_roman(}\DecValTok{5}\NormalTok{) }\OperatorTok{==} \StringTok{"V"}
+\end{Highlighting}
+\end{Shaded}
+
+Red (\texttt{"IIIII"\ !=\ "V"}).
+
+\textbf{Iteration 3 --- GREEN:} the simplest pass --- a lookup-and-subtract loop. The general structure now \emph{emerges} from the pressure of the tests:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ int\_to\_roman(n):}
+\NormalTok{    numerals }\OperatorTok{=}\NormalTok{ [(}\DecValTok{5}\NormalTok{, }\StringTok{"V"}\NormalTok{), (}\DecValTok{1}\NormalTok{, }\StringTok{"I"}\NormalTok{)]}
+\NormalTok{    result }\OperatorTok{=} \StringTok{""}
+    \ControlFlowTok{for}\NormalTok{ value, symbol }\KeywordTok{in}\NormalTok{ numerals:}
+        \ControlFlowTok{while}\NormalTok{ n }\OperatorTok{\textgreater{}=}\NormalTok{ value:}
+\NormalTok{            result }\OperatorTok{+=}\NormalTok{ symbol}
+\NormalTok{            n }\OperatorTok{{-}=}\NormalTok{ value}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+All green (1,2,3,5). Note 4 would give \texttt{"IIII"} --- but no test demands \texttt{"IV"} yet, so we don\textquotesingle t write it (rule 3).
+
+\textbf{Iteration 4 --- RED:} the subtractive case.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ test\_four\_is\_IV():}
+    \ControlFlowTok{assert}\NormalTok{ int\_to\_roman(}\DecValTok{4}\NormalTok{) }\OperatorTok{==} \StringTok{"IV"}
+\end{Highlighting}
+\end{Shaded}
+
+Red (\texttt{"IIII"\ !=\ "IV"}).
+
+\textbf{Iteration 4 --- GREEN:} add the subtractive pair to the table. The \emph{same algorithm} handles it --- beautiful.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ int\_to\_roman(n):}
+\NormalTok{    numerals }\OperatorTok{=}\NormalTok{ [(}\DecValTok{5}\NormalTok{, }\StringTok{"V"}\NormalTok{), (}\DecValTok{4}\NormalTok{, }\StringTok{"IV"}\NormalTok{), (}\DecValTok{1}\NormalTok{, }\StringTok{"I"}\NormalTok{)]   }\CommentTok{\# order matters: high{-}\textgreater{}low}
+\NormalTok{    result }\OperatorTok{=} \StringTok{""}
+    \ControlFlowTok{for}\NormalTok{ value, symbol }\KeywordTok{in}\NormalTok{ numerals:}
+        \ControlFlowTok{while}\NormalTok{ n }\OperatorTok{\textgreater{}=}\NormalTok{ value:}
+\NormalTok{            result }\OperatorTok{+=}\NormalTok{ symbol}
+\NormalTok{            n }\OperatorTok{{-}=}\NormalTok{ value}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+All green.
+
+\textbf{Iteration 5 --- RED + GREEN:} scale up with a parametrized test; just extend the table.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@pytest.mark.parametrize}\NormalTok{(}\StringTok{"n, roman"}\NormalTok{, [}
+\NormalTok{    (}\DecValTok{9}\NormalTok{, }\StringTok{"IX"}\NormalTok{), (}\DecValTok{40}\NormalTok{, }\StringTok{"XL"}\NormalTok{), (}\DecValTok{90}\NormalTok{, }\StringTok{"XC"}\NormalTok{),}
+\NormalTok{    (}\DecValTok{400}\NormalTok{, }\StringTok{"CD"}\NormalTok{), (}\DecValTok{900}\NormalTok{, }\StringTok{"CM"}\NormalTok{), (}\DecValTok{1994}\NormalTok{, }\StringTok{"MCMXCIV"}\NormalTok{),}
+\NormalTok{])}
+\KeywordTok{def}\NormalTok{ test\_complex(n, roman):}
+    \ControlFlowTok{assert}\NormalTok{ int\_to\_roman(n) }\OperatorTok{==}\NormalTok{ roman}
+
+\CommentTok{\# GREEN: just complete the table — algorithm unchanged}
+\KeywordTok{def}\NormalTok{ int\_to\_roman(n):}
+\NormalTok{    numerals }\OperatorTok{=}\NormalTok{ [}
+\NormalTok{        (}\DecValTok{1000}\NormalTok{,}\StringTok{"M"}\NormalTok{),(}\DecValTok{900}\NormalTok{,}\StringTok{"CM"}\NormalTok{),(}\DecValTok{500}\NormalTok{,}\StringTok{"D"}\NormalTok{),(}\DecValTok{400}\NormalTok{,}\StringTok{"CD"}\NormalTok{),}
+\NormalTok{        (}\DecValTok{100}\NormalTok{,}\StringTok{"C"}\NormalTok{),(}\DecValTok{90}\NormalTok{,}\StringTok{"XC"}\NormalTok{),(}\DecValTok{50}\NormalTok{,}\StringTok{"L"}\NormalTok{),(}\DecValTok{40}\NormalTok{,}\StringTok{"XL"}\NormalTok{),}
+\NormalTok{        (}\DecValTok{10}\NormalTok{,}\StringTok{"X"}\NormalTok{),(}\DecValTok{9}\NormalTok{,}\StringTok{"IX"}\NormalTok{),(}\DecValTok{5}\NormalTok{,}\StringTok{"V"}\NormalTok{),(}\DecValTok{4}\NormalTok{,}\StringTok{"IV"}\NormalTok{),(}\DecValTok{1}\NormalTok{,}\StringTok{"I"}\NormalTok{),}
+\NormalTok{    ]}
+\NormalTok{    result }\OperatorTok{=} \StringTok{""}
+    \ControlFlowTok{for}\NormalTok{ value, symbol }\KeywordTok{in}\NormalTok{ numerals:}
+        \ControlFlowTok{while}\NormalTok{ n }\OperatorTok{\textgreater{}=}\NormalTok{ value:}
+\NormalTok{            result }\OperatorTok{+=}\NormalTok{ symbol}
+\NormalTok{            n }\OperatorTok{{-}=}\NormalTok{ value}
+    \ControlFlowTok{return}\NormalTok{ result}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{REFACTOR:} the code is already clean. We could extract \texttt{numerals} to a module constant, add a guard for \texttt{n\ \textless{}=\ 0}, etc. --- done with green tests covering us.
+
+What TDD \emph{taught us here}: the table-driven algorithm wasn\textquotesingle t designed up front --- it was the simplest response to escalating tests, and it turned out to be the elegant general solution. TDD pushed us toward simplicity.
+
+\subsection{Benefits and criticisms of TDD}\label{benefits-and-criticisms-of-tdd}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4790}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5210}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Benefits
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Criticisms
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Forces testable, decoupled design (you feel coupling immediately) & Doesn\textquotesingle t fit exploratory/spike work where you don\textquotesingle t yet know the API \\
+\rowcolor{zebra}
+100\% of code is covered by a \emph{reason to exist} & Can lead to over-testing trivial getters; mock-heavy TDD breeds brittleness \\
+Tests act as a precise spec \& living docs & Slower for the first version (faster over the lifetime) \\
+\rowcolor{zebra}
+Tiny steps \(\rightarrow\) bugs localized to the last few lines & Bad at finding \emph{integration} and \emph{emergent} bugs (it\textquotesingle s unit-focused) \\
+Refactoring is safe and continuous & Requires discipline; easy to "cheat" and write code first \\
+\end{longtable}
+
+A balanced view (held by most seniors): TDD is a \emph{fantastic design tool} for algorithmic and domain logic, \emph{awkward} for UI and exploratory work, and \emph{insufficient on its own} (you still need integration, E2E, property, and exploratory testing).
+
+\subsection{BDD: Behavior-Driven Development}\label{bdd-behavior-driven-development}
+
+BDD reframes tests as \emph{executable specifications of behavior} written in business language, so non-engineers (PMs, QA) can read and even write them. The structure is \textbf{Given-When-Then} (the same as Arrange-Act-Assert, but in natural language).
+
+\setcodelang{Gherkin}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# features/withdrawal.feature  (Gherkin syntax, run by Cucumber)}
+\NormalTok{Feature: ATM cash withdrawal}
+
+\NormalTok{  Scenario: Successful withdrawal within balance}
+\NormalTok{    Given the account balance is $100}
+\NormalTok{    And the card is valid}
+\NormalTok{    When the customer requests $40}
+\NormalTok{    Then the ATM should dispense $40}
+\NormalTok{    And the new balance should be $60}
+
+\NormalTok{  Scenario: Withdrawal exceeding balance is rejected}
+\NormalTok{    Given the account balance is $30}
+\NormalTok{    When the customer requests $40}
+\NormalTok{    Then the ATM should refuse the transaction}
+\NormalTok{    And the balance should remain $30}
+\end{Highlighting}
+\end{Shaded}
+
+The Gherkin steps are wired to code via \textbf{step definitions}:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# steps/withdrawal\_steps.py  (behave / pytest{-}bdd)}
+\AttributeTok{@given}\NormalTok{(}\StringTok{\textquotesingle{}the account balance is $}\SpecialCharTok{\{amount:d\}}\StringTok{\textquotesingle{}}\NormalTok{)}
+\KeywordTok{def}\NormalTok{ step\_balance(context, amount):}
+\NormalTok{    context.account }\OperatorTok{=}\NormalTok{ Account(balance}\OperatorTok{=}\NormalTok{amount)}
+
+\AttributeTok{@when}\NormalTok{(}\StringTok{\textquotesingle{}the customer requests $}\SpecialCharTok{\{amount:d\}}\StringTok{\textquotesingle{}}\NormalTok{)}
+\KeywordTok{def}\NormalTok{ step\_request(context, amount):}
+\NormalTok{    context.result }\OperatorTok{=}\NormalTok{ context.atm.withdraw(context.account, amount)}
+
+\AttributeTok{@then}\NormalTok{(}\StringTok{\textquotesingle{}the ATM should dispense $}\SpecialCharTok{\{amount:d\}}\StringTok{\textquotesingle{}}\NormalTok{)}
+\KeywordTok{def}\NormalTok{ step\_dispense(context, amount):}
+    \ControlFlowTok{assert}\NormalTok{ context.result.dispensed }\OperatorTok{==}\NormalTok{ amount}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{BDD vs TDD:} TDD is a \emph{developer} discipline (drives design, code-level). BDD is a \emph{collaboration} discipline (drives shared understanding, business-readable). BDD\textquotesingle s value is the conversation it forces between dev, QA, and product \emph{before} coding --- the \texttt{.feature} file becomes the agreed contract. Its cost is the indirection layer (Gherkin \(\rightarrow\) step defs); overused on internal logic it\textquotesingle s pure ceremony.
+
+\textbf{Interview takeaway: Be able to walk a red-green-refactor cycle live, including the "hard-code it first" step that signals you understand TDD\textquotesingle s discipline. Frame BDD as Given-When-Then for cross-functional collaboration, not just "tests in English."}
+
+\section{Integration \& Contract Testing}\label{integration--contract-testing}
+
+\subsection{Why integration tests exist}\label{why-integration-tests-exist}
+
+Unit tests mock the database, so they \emph{cannot} catch: a typo\textquotesingle d SQL column, an ORM that generates the wrong JOIN, a transaction that doesn\textquotesingle t actually commit, a JSON field your deserializer ignores, or a migration that didn\textquotesingle t run. Integration tests wire your code to \textbf{real} infrastructure (a real Postgres, a real Kafka) and verify the seams.
+
+\subsection{Testcontainers: real dependencies, disposable}\label{testcontainers-real-dependencies-disposable}
+
+The old way of integration testing --- a shared "test database" everyone connects to --- is an Order/Isolation nightmare (tests pollute each other, one schema drift breaks everyone). \textbf{Testcontainers} spins up a \emph{throwaway Docker container} per test run: a real Postgres, isolated, gone when the test ends.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# pytest + testcontainers — a REAL Postgres, ephemeral}
+\ImportTok{import}\NormalTok{ pytest}
+\ImportTok{from}\NormalTok{ testcontainers.postgres }\ImportTok{import}\NormalTok{ PostgresContainer}
+\ImportTok{import}\NormalTok{ sqlalchemy}
+
+\AttributeTok{@pytest.fixture}\NormalTok{(scope}\OperatorTok{=}\StringTok{"session"}\NormalTok{)}
+\KeywordTok{def}\NormalTok{ pg\_engine():}
+    \ControlFlowTok{with}\NormalTok{ PostgresContainer(}\StringTok{"postgres:16"}\NormalTok{) }\ImportTok{as}\NormalTok{ pg:}
+\NormalTok{        engine }\OperatorTok{=}\NormalTok{ sqlalchemy.create\_engine(pg.get\_connection\_url())}
+\NormalTok{        run\_migrations(engine)        }\CommentTok{\# apply real schema}
+        \ControlFlowTok{yield}\NormalTok{ engine}
+        \CommentTok{\# container auto{-}destroyed on exit}
+
+\KeywordTok{def}\NormalTok{ test\_order\_persists\_and\_reloads(pg\_engine):}
+\NormalTok{    repo }\OperatorTok{=}\NormalTok{ OrderRepository(pg\_engine)}
+\NormalTok{    order }\OperatorTok{=}\NormalTok{ Order(customer}\OperatorTok{=}\StringTok{"ada"}\NormalTok{, total}\OperatorTok{=}\NormalTok{Money(}\StringTok{"42.00"}\NormalTok{))}
+\NormalTok{    repo.save(order)}
+
+\NormalTok{    loaded }\OperatorTok{=}\NormalTok{ repo.find(order.}\BuiltInTok{id}\NormalTok{)}
+    \ControlFlowTok{assert}\NormalTok{ loaded.total }\OperatorTok{==}\NormalTok{ Money(}\StringTok{"42.00"}\NormalTok{)   }\CommentTok{\# round{-}trips through REAL SQL}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// JUnit 5 + Testcontainers — real Kafka}
+\AttributeTok{@Testcontainers}
+\KeywordTok{class}\NormalTok{ OrderEventsIT }\OperatorTok{\{}
+    \AttributeTok{@Container}
+    \DataTypeTok{static}\NormalTok{ KafkaContainer kafka }\OperatorTok{=}
+        \KeywordTok{new} \FunctionTok{KafkaContainer}\OperatorTok{(}\NormalTok{DockerImageName}\OperatorTok{.}\FunctionTok{parse}\OperatorTok{(}\StringTok{"confluentinc/cp{-}kafka:7.6.0"}\OperatorTok{));}
+
+    \AttributeTok{@Test}
+    \DataTypeTok{void} \FunctionTok{publishesOrderCreatedEvent}\OperatorTok{()} \OperatorTok{\{}
+        \DataTypeTok{var}\NormalTok{ producer }\OperatorTok{=} \KeywordTok{new} \FunctionTok{OrderEventProducer}\OperatorTok{(}\NormalTok{kafka}\OperatorTok{.}\FunctionTok{getBootstrapServers}\OperatorTok{());}
+\NormalTok{        producer}\OperatorTok{.}\FunctionTok{publish}\OperatorTok{(}\KeywordTok{new} \FunctionTok{OrderCreated}\OperatorTok{(}\StringTok{"o{-}1"}\OperatorTok{));}
+
+        \DataTypeTok{var}\NormalTok{ consumed }\OperatorTok{=} \FunctionTok{consumeOne}\OperatorTok{(}\NormalTok{kafka}\OperatorTok{.}\FunctionTok{getBootstrapServers}\OperatorTok{(),} \StringTok{"orders"}\OperatorTok{);}
+        \FunctionTok{assertThat}\OperatorTok{(}\NormalTok{consumed}\OperatorTok{.}\FunctionTok{orderId}\OperatorTok{()).}\FunctionTok{isEqualTo}\OperatorTok{(}\StringTok{"o{-}1"}\OperatorTok{);}  \CommentTok{// real serialization}
+    \OperatorTok{\}}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Testcontainers gives you the realism of production infra with the isolation of a unit test --- the bug where your Avro schema doesn\textquotesingle t match the consumer\textquotesingle s gets caught here, never in production.
+
+\subsection{Database testing strategies: keeping tests isolated}\label{database-testing-strategies-keeping-tests-isolated}
+
+Each integration test must start from a known DB state. Three strategies, by trade-off:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1794}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3970}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0714}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3039}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Strategy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+How
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Speed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Isolation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+When
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Transactional rollback} & Open a transaction in setup, run test, \textbf{roll back} in teardown --- nothing persists & Fastest & Excellent & Default for most repo tests \\
+\rowcolor{zebra}
+\textbf{Truncate / delete} & Wipe relevant tables between tests & Fast & Good & When the SUT manages its own transactions/commits \\
+\textbf{Fresh schema / DB per test} & Recreate schema (or spin a new container) per test & Slow & Perfect & When tests need DDL or test migrations themselves \\
+\end{longtable}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@pytest.fixture}
+\KeywordTok{def}\NormalTok{ db\_session(pg\_engine):}
+\NormalTok{    conn }\OperatorTok{=}\NormalTok{ pg\_engine.}\ExtensionTok{connect}\NormalTok{()}
+\NormalTok{    txn }\OperatorTok{=}\NormalTok{ conn.begin()              }\CommentTok{\# START transaction}
+\NormalTok{    session }\OperatorTok{=}\NormalTok{ Session(bind}\OperatorTok{=}\NormalTok{conn)}
+    \ControlFlowTok{yield}\NormalTok{ session                   }\CommentTok{\# test does its work}
+\NormalTok{    session.close()}
+\NormalTok{    txn.rollback()                  }\CommentTok{\# ROLL BACK — DB is pristine again}
+\NormalTok{    conn.close()}
+\end{Highlighting}
+\end{Shaded}
+
+The transactional-rollback trick is the workhorse: each test runs inside a transaction that is \emph{never committed}, so the database is automatically clean for the next test with zero teardown cost. Caveat: it can\textquotesingle t be used when the code under test commits or uses its own transactions.
+
+\subsection{Consumer-Driven Contract Testing (Pact)}\label{consumer-driven-contract-testing-pact}
+
+The microservices problem: Service A (consumer) calls Service B (provider). Spinning up \emph{both} services for every test is slow and flaky (full E2E). But if you only unit-test A against a \emph{mock} of B, your mock can drift from B\textquotesingle s real behavior --- B renames a field, A\textquotesingle s tests stay green, \textbf{production breaks}.
+
+\textbf{Contract testing} solves this. The consumer declares the \emph{exact requests it makes and responses it expects} --- that declaration is the \textbf{contract (pact)}. The provider then verifies it can satisfy that contract, \emph{independently}, without both running together.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{  CONSUMER side (Service A}\StringTok{\textquotesingle{}s repo)        PROVIDER side (Service B\textquotesingle{}}\NormalTok{s repo)}
+  \OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}      \OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+  \FloatTok{1.}\NormalTok{ Write a test against a Pact          }\FloatTok{3.}\NormalTok{ Pact replays the recorded}
+\NormalTok{     MOCK of B. Pact records every           requests against the REAL B}
+\NormalTok{     request A makes }\OperatorTok{+}\NormalTok{ expected resp.        }\KeywordTok{and}\NormalTok{ checks }\StringTok{B\textquotesingle{}s real responses}
+\ErrorTok{              |                                match the expected ones.}
+\NormalTok{              v                                        }\OperatorTok{\^{}}
+        \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}\NormalTok{   publishes contract   }\OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+        \OperatorTok{|}\NormalTok{  pact.json }\OperatorTok{|} \OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}\textgreater{}}  \OperatorTok{|}\NormalTok{ Pact      }\OperatorTok{|}
+        \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}\NormalTok{    (Pact Broker)       }\OperatorTok{|}\NormalTok{ verifies  }\OperatorTok{|}
+                                             \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+
+\NormalTok{  If B changes a field A depends on, }\StringTok{B\textquotesingle{}s verification FAILS in B\textquotesingle{}}\NormalTok{s CI,}
+\NormalTok{  BEFORE B }\KeywordTok{is}\NormalTok{ deployed }\OperatorTok{{-}\textgreater{}}\NormalTok{ the breakage }\KeywordTok{is}\NormalTok{ caught at the source.}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Consumer side} --- define the expectation:
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// consumer.pact.test.js  (Pact JS)}
+\KeywordTok{const}\NormalTok{ provider }\OperatorTok{=} \KeywordTok{new} \FunctionTok{PactV3}\NormalTok{(\{ }\DataTypeTok{consumer}\OperatorTok{:} \StringTok{\textquotesingle{}OrderUI\textquotesingle{}}\OperatorTok{,} \DataTypeTok{provider}\OperatorTok{:} \StringTok{\textquotesingle{}PricingService\textquotesingle{}}\NormalTok{ \})}\OperatorTok{;}
+
+\NormalTok{provider}
+  \OperatorTok{.}\FunctionTok{given}\NormalTok{(}\StringTok{\textquotesingle{}product P1 exists\textquotesingle{}}\NormalTok{)}
+  \OperatorTok{.}\FunctionTok{uponReceiving}\NormalTok{(}\StringTok{\textquotesingle{}a price request for P1\textquotesingle{}}\NormalTok{)}
+  \OperatorTok{.}\FunctionTok{withRequest}\NormalTok{(\{ }\DataTypeTok{method}\OperatorTok{:} \StringTok{\textquotesingle{}GET\textquotesingle{}}\OperatorTok{,} \DataTypeTok{path}\OperatorTok{:} \StringTok{\textquotesingle{}/price/P1\textquotesingle{}}\NormalTok{ \})}
+  \OperatorTok{.}\FunctionTok{willRespondWith}\NormalTok{(\{}
+    \DataTypeTok{status}\OperatorTok{:} \DecValTok{200}\OperatorTok{,}
+    \DataTypeTok{body}\OperatorTok{:}\NormalTok{ \{ }\DataTypeTok{productId}\OperatorTok{:} \StringTok{\textquotesingle{}P1\textquotesingle{}}\OperatorTok{,} \DataTypeTok{amount}\OperatorTok{:} \FunctionTok{like}\NormalTok{(}\DecValTok{1999}\NormalTok{)}\OperatorTok{,} \DataTypeTok{currency}\OperatorTok{:} \StringTok{\textquotesingle{}USD\textquotesingle{}}\NormalTok{ \}}\OperatorTok{,}
+\NormalTok{  \})}\OperatorTok{;}
+
+\ControlFlowTok{await}\NormalTok{ provider}\OperatorTok{.}\FunctionTok{executeTest}\NormalTok{(}\KeywordTok{async}\NormalTok{ (mockServer) }\KeywordTok{=\textgreater{}}\NormalTok{ \{}
+  \KeywordTok{const}\NormalTok{ client }\OperatorTok{=} \KeywordTok{new} \FunctionTok{PricingClient}\NormalTok{(mockServer}\OperatorTok{.}\AttributeTok{url}\NormalTok{)}\OperatorTok{;}
+  \KeywordTok{const}\NormalTok{ price }\OperatorTok{=} \ControlFlowTok{await}\NormalTok{ client}\OperatorTok{.}\FunctionTok{getPrice}\NormalTok{(}\StringTok{\textquotesingle{}P1\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+  \FunctionTok{expect}\NormalTok{(price}\OperatorTok{.}\AttributeTok{amount}\NormalTok{)}\OperatorTok{.}\FunctionTok{toBe}\NormalTok{(}\DecValTok{1999}\NormalTok{)}\OperatorTok{;}
+  \CommentTok{// this run RECORDS the contract {-}\textgreater{} published to the broker}
+\NormalTok{\})}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Provider side} --- verify it honors every published contract:
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// PricingServiceProviderTest.java  (Pact JVM)}
+\AttributeTok{@Provider}\OperatorTok{(}\StringTok{"PricingService"}\OperatorTok{)}
+\AttributeTok{@PactBroker}\OperatorTok{(}\NormalTok{url }\OperatorTok{=} \StringTok{"https://broker.internal"}\OperatorTok{)}
+\KeywordTok{class}\NormalTok{ PricingContractVerificationTest }\OperatorTok{\{}
+    \AttributeTok{@TestTemplate}
+    \AttributeTok{@ExtendWith}\OperatorTok{(}\NormalTok{PactVerificationInvocationContextProvider}\OperatorTok{.}\FunctionTok{class}\OperatorTok{)}
+    \DataTypeTok{void} \FunctionTok{verifyContracts}\OperatorTok{(}\NormalTok{PactVerificationContext ctx}\OperatorTok{)} \OperatorTok{\{}
+\NormalTok{        ctx}\OperatorTok{.}\FunctionTok{verifyInteraction}\OperatorTok{();}   \CommentTok{// replays consumer expectations vs REAL provider}
+    \OperatorTok{\}}
+
+    \AttributeTok{@State}\OperatorTok{(}\StringTok{"product P1 exists"}\OperatorTok{)}
+    \DataTypeTok{void} \FunctionTok{seedP1}\OperatorTok{()} \OperatorTok{\{}\NormalTok{ repo}\OperatorTok{.}\FunctionTok{save}\OperatorTok{(}\KeywordTok{new} \FunctionTok{Product}\OperatorTok{(}\StringTok{"P1"}\OperatorTok{,} \DecValTok{1999}\OperatorTok{,} \StringTok{"USD"}\OperatorTok{));} \OperatorTok{\}}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Why this prevents microservice breakage: the provider\textquotesingle s CI fails the \emph{instant} it would break any consumer\textquotesingle s expectation, before deploy --- and it does so \textbf{without the consumer running}. You get the safety of E2E coupling with the speed and independence of unit tests. The Pact Broker also enables "can-i-deploy" gating: "can PricingService v2 deploy without breaking any consumer currently in prod?"
+
+\textbf{Interview takeaway: When the interviewer splits a system into microservices and asks "how do you keep service A from breaking service B," the senior answer is consumer-driven contract testing (Pact): the consumer publishes its expectations; the provider verifies them independently in its own CI --- catching breakage at the source without full E2E.}
+
+\section{End-to-End Testing}\label{end-to-end-testing}
+
+\subsection{\texorpdfstring{What E2E is and why you want \emph{few} of them}{What E2E is and why you want few of them}}\label{what-e2e-is-and-why-you-want-few-of-them}
+
+An \textbf{E2E test} drives the \emph{fully assembled system} the way a real user does --- through the browser UI or the public API --- across all real services and databases. It is the only test that proves "a user can actually check out." It is also the slowest, flakiest, and most expensive test you own, which is exactly why the pyramid caps it at 5--10\% and you reserve it for \textbf{critical user journeys}: sign-up, login, checkout, the one or two flows that, if broken, mean lost revenue.
+
+\subsection{Tools: Selenium, Cypress, Playwright}\label{tools-selenium-cypress-playwright}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.0703}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3099}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3162}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3036}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Tool
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Architecture
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Strengths
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Weaknesses
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Selenium} & WebDriver protocol, multi-language, real browsers & Mature, broad browser/grid support & Verbose, slower, manual waits \(\rightarrow\) flaky \\
+\rowcolor{zebra}
+\textbf{Cypress} & Runs \emph{inside} the browser event loop & Great DX, auto-wait, time-travel debugger & Single-tab, weaker cross-origin/multi-domain \\
+\textbf{Playwright} & Out-of-process via CDP/WebSocket & Fast, auto-wait, multi-browser/tab/origin, parallel & Newer; smaller (but growing) ecosystem \\
+\end{longtable}
+
+Modern default for new projects: \textbf{Playwright} (auto-waiting kills the \#1 source of flake --- manual sleeps).
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Playwright — a critical{-}path E2E with the Page Object pattern}
+\FunctionTok{test}\NormalTok{(}\StringTok{\textquotesingle{}user can complete checkout\textquotesingle{}}\OperatorTok{,} \KeywordTok{async}\NormalTok{ (\{ page \}) }\KeywordTok{=\textgreater{}}\NormalTok{ \{}
+  \KeywordTok{const}\NormalTok{ login }\OperatorTok{=} \KeywordTok{new} \FunctionTok{LoginPage}\NormalTok{(page)}\OperatorTok{;}
+  \KeywordTok{const}\NormalTok{ cart  }\OperatorTok{=} \KeywordTok{new} \FunctionTok{CartPage}\NormalTok{(page)}\OperatorTok{;}
+
+  \ControlFlowTok{await}\NormalTok{ login}\OperatorTok{.}\FunctionTok{goto}\NormalTok{()}\OperatorTok{;}
+  \ControlFlowTok{await}\NormalTok{ login}\OperatorTok{.}\FunctionTok{signIn}\NormalTok{(}\StringTok{\textquotesingle{}ada@x.com\textquotesingle{}}\OperatorTok{,} \StringTok{\textquotesingle{}pw\textquotesingle{}}\NormalTok{)}\OperatorTok{;}     \CommentTok{// auto{-}waits for nav}
+
+  \ControlFlowTok{await}\NormalTok{ cart}\OperatorTok{.}\FunctionTok{addItem}\NormalTok{(}\StringTok{\textquotesingle{}Clean Code\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+  \ControlFlowTok{await}\NormalTok{ cart}\OperatorTok{.}\FunctionTok{checkout}\NormalTok{()}\OperatorTok{;}
+
+  \ControlFlowTok{await} \FunctionTok{expect}\NormalTok{(page}\OperatorTok{.}\FunctionTok{getByText}\NormalTok{(}\StringTok{\textquotesingle{}Order confirmed\textquotesingle{}}\NormalTok{))}\OperatorTok{.}\FunctionTok{toBeVisible}\NormalTok{()}\OperatorTok{;}
+\NormalTok{\})}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Page Object Model: don\textquotesingle t duplicate selectors}\label{page-object-model-dont-duplicate-selectors}
+
+The \textbf{Page Object} pattern wraps each screen in a class that exposes \emph{user intentions} (\texttt{signIn}, \texttt{addItem}) and hides the brittle CSS/XPath selectors. When the markup changes, you fix one place, not 50 tests.
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ LoginPage \{}
+  \FunctionTok{constructor}\NormalTok{(page) \{ }\KeywordTok{this}\OperatorTok{.}\AttributeTok{page} \OperatorTok{=}\NormalTok{ page}\OperatorTok{;}\NormalTok{ \}}
+  \FunctionTok{goto}\NormalTok{()  \{ }\ControlFlowTok{return} \KeywordTok{this}\OperatorTok{.}\AttributeTok{page}\OperatorTok{.}\FunctionTok{goto}\NormalTok{(}\StringTok{\textquotesingle{}/login\textquotesingle{}}\NormalTok{)}\OperatorTok{;}\NormalTok{ \}}
+  \KeywordTok{async} \FunctionTok{signIn}\NormalTok{(email}\OperatorTok{,}\NormalTok{ pw) \{}
+    \ControlFlowTok{await} \KeywordTok{this}\OperatorTok{.}\AttributeTok{page}\OperatorTok{.}\FunctionTok{getByLabel}\NormalTok{(}\StringTok{\textquotesingle{}Email\textquotesingle{}}\NormalTok{)}\OperatorTok{.}\FunctionTok{fill}\NormalTok{(email)}\OperatorTok{;}
+    \ControlFlowTok{await} \KeywordTok{this}\OperatorTok{.}\AttributeTok{page}\OperatorTok{.}\FunctionTok{getByLabel}\NormalTok{(}\StringTok{\textquotesingle{}Password\textquotesingle{}}\NormalTok{)}\OperatorTok{.}\FunctionTok{fill}\NormalTok{(pw)}\OperatorTok{;}
+    \ControlFlowTok{await} \KeywordTok{this}\OperatorTok{.}\AttributeTok{page}\OperatorTok{.}\FunctionTok{getByRole}\NormalTok{(}\StringTok{\textquotesingle{}button\textquotesingle{}}\OperatorTok{,}\NormalTok{ \{ }\DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}Sign in\textquotesingle{}}\NormalTok{ \})}\OperatorTok{.}\FunctionTok{click}\NormalTok{()}\OperatorTok{;}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Sources of E2E flakiness (and fixes)}\label{sources-of-e2e-flakiness-and-fixes}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{  Flake source                  Fix}
+  \OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}  \OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{  Fixed sleeps (sleep }\DecValTok{2}\ErrorTok{s}\NormalTok{)       Auto}\OperatorTok{{-}}\NormalTok{wait }\OperatorTok{/}\NormalTok{ wait}\OperatorTok{{-}}\ControlFlowTok{for}\OperatorTok{{-}}\NormalTok{condition, never sleep}
+\NormalTok{  Race }\ControlFlowTok{with} \ControlFlowTok{async}\NormalTok{ rendering     Assert on visible state, }\KeywordTok{not}\NormalTok{ timers}
+\NormalTok{  Shared test data }\OperatorTok{/}\NormalTok{ ordering   Seed fresh data per test}\OperatorTok{;}\NormalTok{ unique IDs}
+\NormalTok{  Animations }\OperatorTok{/}\NormalTok{ transitions      Disable animations }\KeywordTok{in}\NormalTok{ test env}
+\NormalTok{  Network nondeterminism        Stub }\DecValTok{3}\ErrorTok{rd}\OperatorTok{{-}}\NormalTok{party calls}\OperatorTok{;}\NormalTok{ retry only network layer}
+\NormalTok{  Brittle selectors (CSS path)  Use stable test}\OperatorTok{{-}}\NormalTok{ids }\OperatorTok{/}\NormalTok{ roles }\OperatorTok{/}\NormalTok{ labels}
+\NormalTok{  Test interdependence          Each test }\VariableTok{self}\OperatorTok{{-}}\NormalTok{contained (create}\OperatorTok{+}\NormalTok{teardown)}
+\end{Highlighting}
+\end{Shaded}
+
+The golden rule: \textbf{never \texttt{sleep}}. A fixed sleep is either too short (flaky) or too long (slow) --- always wait for a \emph{condition} (element visible, network idle).
+
+\subsection{Visual / snapshot testing}\label{visual--snapshot-testing}
+
+Two flavors:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Snapshot testing} (Jest): serialize a component\textquotesingle s rendered output to a stored snapshot file; future runs diff against it. Cheap regression net for DOM/JSON structure --- but easy to "just update the snapshot" mindlessly, which erodes its value.
+\item
+  \textbf{Visual regression} (Percy, Playwright \texttt{toHaveScreenshot}, Chromatic): capture a \emph{pixel screenshot} and diff it. Catches CSS/layout regressions invisible to DOM assertions (a button shifted off-screen, a color regression). Needs tolerance thresholds and a baseline-approval workflow to manage false positives from font rendering.
+\end{itemize}
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Playwright visual regression}
+\ControlFlowTok{await} \FunctionTok{expect}\NormalTok{(page)}\OperatorTok{.}\FunctionTok{toHaveScreenshot}\NormalTok{(}\StringTok{\textquotesingle{}checkout.png\textquotesingle{}}\OperatorTok{,}\NormalTok{ \{ }\DataTypeTok{maxDiffPixels}\OperatorTok{:} \DecValTok{100}\NormalTok{ \})}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway: E2E = few, critical-path only; Page Objects to fight selector churn; and the cardinal rule is never sleep, always wait-for-condition. Cite Playwright\textquotesingle s auto-wait as the modern flake antidote.}
+
+\section{Advanced Techniques}\label{advanced-techniques}
+
+\subsection{Property-Based Testing}\label{property-based-testing}
+
+Example-based tests check specific inputs you thought of. \textbf{Property-based testing} checks an \emph{invariant} against \emph{hundreds of machine-generated inputs}, including the weird edge cases you\textquotesingle d never think of --- and when it finds a failure, it \textbf{shrinks} it to the minimal reproducing case.
+
+The classic invariant: \texttt{decode(encode(x))\ ==\ x} (round-trip), or \texttt{sort(sort(x))\ ==\ sort(x)} (idempotence), or \texttt{len(sorted(x))\ ==\ len(x)} (sorting preserves length).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Hypothesis — find an edge case in a "merge sorted lists" function}
+\ImportTok{from}\NormalTok{ hypothesis }\ImportTok{import}\NormalTok{ given, strategies }\ImportTok{as}\NormalTok{ st}
+
+\AttributeTok{@given}\NormalTok{(st.lists(st.integers()), st.lists(st.integers()))}
+\KeywordTok{def}\NormalTok{ test\_merge\_is\_sorted\_and\_complete(a, b):}
+\NormalTok{    a.sort()}\OperatorTok{;}\NormalTok{ b.sort()}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ merge\_sorted(a, b)}
+
+    \CommentTok{\# INVARIANT 1: output is sorted}
+    \ControlFlowTok{assert}\NormalTok{ result }\OperatorTok{==} \BuiltInTok{sorted}\NormalTok{(result)}
+    \CommentTok{\# INVARIANT 2: output is a permutation of all inputs}
+    \ControlFlowTok{assert} \BuiltInTok{sorted}\NormalTok{(result) }\OperatorTok{==} \BuiltInTok{sorted}\NormalTok{(a }\OperatorTok{+}\NormalTok{ b)}
+\end{Highlighting}
+\end{Shaded}
+
+Suppose \texttt{merge\_sorted} has a bug handling duplicates across lists. Hypothesis generates thousands of pairs, finds \texttt{a={[}0{]},\ b={[}0{]}} fails, and \emph{shrinks} it: it reports the \textbf{minimal} failing case \texttt{merge\_sorted({[}0{]},\ {[}0{]})} rather than the giant random list that first triggered it. That minimal counterexample is the gift --- it points straight at the bug.
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// jqwik (JVM) — same idea}
+\AttributeTok{@Property}
+\DataTypeTok{void} \FunctionTok{mergedListStaysSorted}\OperatorTok{(}\AttributeTok{@ForAll} \BuiltInTok{List}\OperatorTok{\textless{}}\AttributeTok{@From}\OperatorTok{(}\StringTok{"sortedInts"}\OperatorTok{)} \BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ a}\OperatorTok{,}
+                           \AttributeTok{@ForAll} \BuiltInTok{List}\OperatorTok{\textless{}}\AttributeTok{@From}\OperatorTok{(}\StringTok{"sortedInts"}\OperatorTok{)} \BuiltInTok{Integer}\OperatorTok{\textgreater{}}\NormalTok{ b}\OperatorTok{)} \OperatorTok{\{}
+    \DataTypeTok{var}\NormalTok{ merged }\OperatorTok{=}\NormalTok{ Merger}\OperatorTok{.}\FunctionTok{merge}\OperatorTok{(}\NormalTok{a}\OperatorTok{,}\NormalTok{ b}\OperatorTok{);}
+    \FunctionTok{assertThat}\OperatorTok{(}\NormalTok{merged}\OperatorTok{).}\FunctionTok{isSorted}\OperatorTok{();}
+    \FunctionTok{assertThat}\OperatorTok{(}\NormalTok{merged}\OperatorTok{).}\FunctionTok{hasSize}\OperatorTok{(}\NormalTok{a}\OperatorTok{.}\FunctionTok{size}\OperatorTok{()} \OperatorTok{+}\NormalTok{ b}\OperatorTok{.}\FunctionTok{size}\OperatorTok{());}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Property testing shines for: parsers/serializers (round-trip), data structures (invariants), pure algorithms, and anything with an algebraic law (commutativity, associativity, idempotence).
+
+\subsection{\texorpdfstring{Mutation Testing: how good is your suite \emph{really}?}{Mutation Testing: how good is your suite really?}}\label{mutation-testing-how-good-is-your-suite-really}
+
+Coverage tells you which lines \emph{ran}; it does \textbf{not} tell you whether your assertions would \emph{catch a bug} in those lines. \textbf{Mutation testing} answers the real question: it deliberately introduces small bugs ("mutants") into your code --- flip \texttt{\textgreater{}} to \texttt{\textgreater{}=}, \texttt{+} to \texttt{-}, \texttt{true} to \texttt{false} --- and reruns your tests. If a test \emph{fails}, the mutant is "killed" (good --- your suite caught it). If all tests still \emph{pass}, the mutant "survived" (bad --- your suite is blind to that bug).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   Original:   }\ControlFlowTok{if}\NormalTok{ (age }\OperatorTok{\textgreater{}=} \DecValTok{18}\NormalTok{)  }\ControlFlowTok{return}\NormalTok{ ADULT}\OperatorTok{;}
+                       \OperatorTok{|}
+\NormalTok{                       v   mutate }\OperatorTok{\textgreater{}=}\NormalTok{ to }\OperatorTok{\textgreater{}}
+\NormalTok{   Mutant:     }\ControlFlowTok{if}\NormalTok{ (age }\OperatorTok{\textgreater{}} \DecValTok{18}\NormalTok{)   }\ControlFlowTok{return}\NormalTok{ ADULT}\OperatorTok{;}
+
+\NormalTok{   Re}\OperatorTok{{-}}\NormalTok{run tests:}
+     \OperatorTok{{-}}\NormalTok{ If a test fails }\OperatorTok{{-}\textgreater{}}\NormalTok{ MUTANT KILLED  (your suite catches the boundary)}
+     \OperatorTok{{-}}\NormalTok{ If }\BuiltInTok{all} \ControlFlowTok{pass}     \OperatorTok{{-}\textgreater{}}\NormalTok{ MUTANT SURVIVED (you have NO test }\ControlFlowTok{for}\NormalTok{ age }\OperatorTok{==} \DecValTok{18}\OperatorTok{!}\NormalTok{)}
+
+\NormalTok{   Mutation score }\OperatorTok{=}\NormalTok{ killed }\OperatorTok{/}\NormalTok{ total mutants}
+\end{Highlighting}
+\end{Shaded}
+
+The killer insight: you can have \textbf{100\% line coverage and a 40\% mutation score} --- every line runs, but your assertions are too weak to notice when the logic is wrong. Mutation score is a far truer measure of suite \emph{effectiveness} than coverage. Tools: \textbf{PIT/Pitest} (Java), \textbf{mutmut}/\textbf{cosmic-ray} (Python), \textbf{Stryker} (JS).
+
+\setcodelang{Bash}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# PIT (Java) — reports surviving mutants per class}
+\ExtensionTok{mvn}\NormalTok{ org.pitest:pitest{-}maven:mutationCoverage}
+\CommentTok{\# =\textgreater{} "Line coverage: 92\%   Mutation coverage: 61\%"  \textless{}{-} the gap is the truth}
+\end{Highlighting}
+\end{Shaded}
+
+Mutation testing is slow (it reruns the suite per mutant), so run it on critical modules or in nightly CI, not every commit.
+
+\subsection{Fuzzing}\label{fuzzing}
+
+\textbf{Fuzzing} throws malformed, random, or adversarial input at a program looking for crashes, hangs, memory-safety violations, or unhandled exceptions --- invaluable for parsers, decoders, and anything touching untrusted bytes. \textbf{Coverage-guided fuzzers} (AFL, libFuzzer, Go\textquotesingle s native \texttt{testing.F}, Atheris for Python) mutate inputs \emph{and watch which new code paths they reach}, evolving toward inputs that explore more of the program.
+
+\setcodelang{Go}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Go native fuzzing — finds inputs that crash the parser}
+\KeywordTok{func}\NormalTok{ FuzzParseConfig}\OperatorTok{(}\NormalTok{f }\OperatorTok{*}\NormalTok{testing}\OperatorTok{.}\NormalTok{F}\OperatorTok{)} \OperatorTok{\{}
+\NormalTok{    f}\OperatorTok{.}\NormalTok{Add}\OperatorTok{([]}\DataTypeTok{byte}\OperatorTok{(}\StringTok{"key=value"}\OperatorTok{))}          \CommentTok{// seed corpus}
+\NormalTok{    f}\OperatorTok{.}\NormalTok{Fuzz}\OperatorTok{(}\KeywordTok{func}\OperatorTok{(}\NormalTok{t }\OperatorTok{*}\NormalTok{testing}\OperatorTok{.}\NormalTok{T}\OperatorTok{,}\NormalTok{ data }\OperatorTok{[]}\DataTypeTok{byte}\OperatorTok{)} \OperatorTok{\{}
+        \CommentTok{// The contract: ParseConfig must NEVER panic, only return err.}
+\NormalTok{        \_}\OperatorTok{,}\NormalTok{ \_ }\OperatorTok{=}\NormalTok{ ParseConfig}\OperatorTok{(}\NormalTok{data}\OperatorTok{)}         \CommentTok{// a panic here = a found bug}
+    \OperatorTok{\})}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Run \texttt{go\ test\ -fuzz=FuzzParseConfig}; it evolves inputs and saves any crashing case to the corpus as a permanent regression test.
+
+\subsection{Load / Performance Testing}\label{load--performance-testing}
+
+Functional tests prove \emph{correctness}; load tests prove the system holds its \textbf{latency/throughput SLOs under realistic concurrency}. Tools: \textbf{k6} (script in JS), \textbf{JMeter} (GUI/XML), \textbf{Gatling}, \textbf{Locust}.
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// k6 — ramp to 200 virtual users, assert p95 latency SLO}
+\ImportTok{import}\NormalTok{ http }\ImportTok{from} \StringTok{\textquotesingle{}k6/http\textquotesingle{}}\OperatorTok{;}
+\ImportTok{import}\NormalTok{ \{ check \} }\ImportTok{from} \StringTok{\textquotesingle{}k6\textquotesingle{}}\OperatorTok{;}
+
+\ImportTok{export} \KeywordTok{const}\NormalTok{ options }\OperatorTok{=}\NormalTok{ \{}
+  \DataTypeTok{stages}\OperatorTok{:}\NormalTok{ [}
+\NormalTok{    \{ }\DataTypeTok{duration}\OperatorTok{:} \StringTok{\textquotesingle{}1m\textquotesingle{}}\OperatorTok{,} \DataTypeTok{target}\OperatorTok{:} \DecValTok{200}\NormalTok{ \}}\OperatorTok{,}   \CommentTok{// ramp up}
+\NormalTok{    \{ }\DataTypeTok{duration}\OperatorTok{:} \StringTok{\textquotesingle{}3m\textquotesingle{}}\OperatorTok{,} \DataTypeTok{target}\OperatorTok{:} \DecValTok{200}\NormalTok{ \}}\OperatorTok{,}   \CommentTok{// sustain}
+\NormalTok{    \{ }\DataTypeTok{duration}\OperatorTok{:} \StringTok{\textquotesingle{}1m\textquotesingle{}}\OperatorTok{,} \DataTypeTok{target}\OperatorTok{:} \DecValTok{0}\NormalTok{ \}}\OperatorTok{,}     \CommentTok{// ramp down}
+\NormalTok{  ]}\OperatorTok{,}
+  \DataTypeTok{thresholds}\OperatorTok{:}\NormalTok{ \{ }\DataTypeTok{http\_req\_duration}\OperatorTok{:}\NormalTok{ [}\StringTok{\textquotesingle{}p(95)\textless{}300\textquotesingle{}}\NormalTok{] \}}\OperatorTok{,}  \CommentTok{// SLO: p95 \textless{} 300ms}
+\NormalTok{\}}\OperatorTok{;}
+
+\ImportTok{export} \ImportTok{default} \KeywordTok{function}\NormalTok{ () \{}
+  \KeywordTok{const}\NormalTok{ res }\OperatorTok{=}\NormalTok{ http}\OperatorTok{.}\FunctionTok{get}\NormalTok{(}\StringTok{\textquotesingle{}https://api.example.com/feed\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+  \FunctionTok{check}\NormalTok{(res}\OperatorTok{,}\NormalTok{ \{ }\StringTok{\textquotesingle{}status 200\textquotesingle{}}\OperatorTok{:}\NormalTok{ (r) }\KeywordTok{=\textgreater{}}\NormalTok{ r}\OperatorTok{.}\AttributeTok{status} \OperatorTok{===} \DecValTok{200}\NormalTok{ \})}\OperatorTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Distinguish the four flavors: \textbf{load} (expected peak), \textbf{stress} (beyond peak, find the breaking point), \textbf{soak} (sustained, find leaks/degradation over hours), \textbf{spike} (sudden surge, test autoscaling).
+
+\subsection{Chaos Engineering}\label{chaos-engineering}
+
+Pioneered by Netflix, \textbf{chaos engineering} tests \emph{resilience} by deliberately injecting failure into (often production) systems --- killing instances, adding latency, severing network links --- and verifying the system degrades gracefully and recovers. \textbf{Chaos Monkey} randomly terminates production instances during business hours, forcing engineers to build services that survive instance death. The discipline: form a hypothesis ("if we kill one AZ, p99 stays under SLO"), inject the failure in a controlled blast radius, measure, and either confirm resilience or find the weakness \emph{before} a real outage does.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   Chaos experiment loop:}
+   \FloatTok{1.}\NormalTok{ Define steady state (the metric that means }\StringTok{"healthy"}\NormalTok{, e.g. p99 }\OperatorTok{\textless{}} \DecValTok{300}\ErrorTok{ms}\NormalTok{)}
+   \FloatTok{2.}\NormalTok{ Hypothesize it holds under failure F (kill an instance }\OperatorTok{/}\NormalTok{ AZ }\OperatorTok{/}\NormalTok{ add }\DecValTok{200}\ErrorTok{ms}\NormalTok{)}
+   \FloatTok{3.}\NormalTok{ Inject F into a SMALL blast radius (one cell, low}\OperatorTok{{-}}\NormalTok{traffic window)}
+   \FloatTok{4.}\NormalTok{ Observe: did steady state hold?  }\OperatorTok{{-}\textgreater{}}\NormalTok{ confirmed resilient}
+\NormalTok{                did it }\ControlFlowTok{break}\NormalTok{?          }\OperatorTok{{-}\textgreater{}}\NormalTok{ found a weakness, fix it}
+   \FloatTok{5.}\NormalTok{ Widen blast radius gradually }\ImportTok{as}\NormalTok{ confidence grows}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Interview takeaway: Property-based testing finds edge cases you didn\textquotesingle t think of (and shrinks them); mutation testing measures whether your assertions are strong enough (coverage can\textquotesingle t); chaos engineering tests failure behavior, not just correctness. Name-dropping these signals you test beyond the happy path.}
+
+\section{Testing Hard Things (async, concurrency, time, legacy)}\label{testing-hard-things-async-concurrency-time-legacy}
+
+These are the topics that separate a candidate who has only written textbook \texttt{add(2,2)} tests from someone who has fought real production code.
+
+\subsection{Testing async / await}\label{testing-async--await}
+
+The pitfall: a test finishes \emph{before} the async work does, so it passes without ever asserting anything ("the test forgot to wait"). Always \texttt{await} the operation and use your framework\textquotesingle s async support.
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# pytest{-}asyncio — properly awaited}
+\ImportTok{import}\NormalTok{ pytest}
+
+\AttributeTok{@pytest.mark.asyncio}
+\ControlFlowTok{async} \KeywordTok{def}\NormalTok{ test\_fetch\_user():}
+\NormalTok{    repo }\OperatorTok{=}\NormalTok{ FakeAsyncRepo(\{}\DecValTok{1}\NormalTok{: User(}\DecValTok{1}\NormalTok{, }\StringTok{"ada"}\NormalTok{)\})}
+\NormalTok{    user }\OperatorTok{=} \ControlFlowTok{await}\NormalTok{ get\_user(repo, }\DecValTok{1}\NormalTok{)        }\CommentTok{\# MUST await}
+    \ControlFlowTok{assert}\NormalTok{ user.name }\OperatorTok{==} \StringTok{"ada"}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Jest — return/await the promise so Jest waits for the assertion}
+\FunctionTok{test}\NormalTok{(}\StringTok{\textquotesingle{}resolves to the user\textquotesingle{}}\OperatorTok{,} \KeywordTok{async}\NormalTok{ () }\KeywordTok{=\textgreater{}}\NormalTok{ \{}
+  \ControlFlowTok{await} \FunctionTok{expect}\NormalTok{(}\FunctionTok{getUser}\NormalTok{(}\DecValTok{1}\NormalTok{))}\OperatorTok{.}\AttributeTok{resolves}\OperatorTok{.}\FunctionTok{toEqual}\NormalTok{(\{ }\DataTypeTok{id}\OperatorTok{:} \DecValTok{1}\OperatorTok{,} \DataTypeTok{name}\OperatorTok{:} \StringTok{\textquotesingle{}ada\textquotesingle{}}\NormalTok{ \})}\OperatorTok{;}
+\NormalTok{\})}\OperatorTok{;}
+
+\FunctionTok{test}\NormalTok{(}\StringTok{\textquotesingle{}rejects unknown id\textquotesingle{}}\OperatorTok{,} \KeywordTok{async}\NormalTok{ () }\KeywordTok{=\textgreater{}}\NormalTok{ \{}
+  \ControlFlowTok{await} \FunctionTok{expect}\NormalTok{(}\FunctionTok{getUser}\NormalTok{(}\DecValTok{999}\NormalTok{))}\OperatorTok{.}\AttributeTok{rejects}\OperatorTok{.}\FunctionTok{toThrow}\NormalTok{(}\StringTok{\textquotesingle{}not found\textquotesingle{}}\NormalTok{)}\OperatorTok{;}
+\NormalTok{\})}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+For code that schedules work on timers, use \textbf{fake timers} so you don\textquotesingle t actually wait:
+
+\setcodelang{JavaScript}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{jest}\OperatorTok{.}\FunctionTok{useFakeTimers}\NormalTok{()}\OperatorTok{;}
+\KeywordTok{const}\NormalTok{ cb }\OperatorTok{=}\NormalTok{ jest}\OperatorTok{.}\FunctionTok{fn}\NormalTok{()}\OperatorTok{;}
+\FunctionTok{scheduleRetry}\NormalTok{(cb}\OperatorTok{,} \DecValTok{5000}\NormalTok{)}\OperatorTok{;}
+\NormalTok{jest}\OperatorTok{.}\FunctionTok{advanceTimersByTime}\NormalTok{(}\DecValTok{5000}\NormalTok{)}\OperatorTok{;}   \CommentTok{// jump forward instantly}
+\FunctionTok{expect}\NormalTok{(cb)}\OperatorTok{.}\FunctionTok{toHaveBeenCalledTimes}\NormalTok{(}\DecValTok{1}\NormalTok{)}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Testing concurrency / races}\label{testing-concurrency--races}
+
+Concurrency bugs are \emph{non-deterministic} --- the test passes 99 times and fails once, when the scheduler interleaves threads differently. Strategies, weakest to strongest:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Stress / loop it} --- run the concurrent operation thousands of times across many threads to make races likely. Weak (probabilistic) but cheap.
+\item
+  \textbf{Race detectors} --- instrument runs to flag data races \emph{even if no failure occurs}: Go\textquotesingle s \texttt{-race}, Java\textquotesingle s jcstress, ThreadSanitizer. Far more reliable than hoping a race manifests.
+\item
+  \textbf{Deterministic scheduling} --- control thread interleaving explicitly so you can reproduce a specific race every time.
+\end{enumerate}
+
+\setcodelang{Go}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// Go\textquotesingle{}s race detector — catches the data race even without a wrong result}
+\KeywordTok{func}\NormalTok{ TestCounterConcurrent}\OperatorTok{(}\NormalTok{t }\OperatorTok{*}\NormalTok{testing}\OperatorTok{.}\NormalTok{T}\OperatorTok{)} \OperatorTok{\{}
+\NormalTok{    c }\OperatorTok{:=} \OperatorTok{\&}\NormalTok{Counter}\OperatorTok{\{\}}
+    \KeywordTok{var}\NormalTok{ wg sync}\OperatorTok{.}\NormalTok{WaitGroup}
+    \ControlFlowTok{for}\NormalTok{ i }\OperatorTok{:=} \DecValTok{0}\OperatorTok{;}\NormalTok{ i }\OperatorTok{\textless{}} \DecValTok{1000}\OperatorTok{;}\NormalTok{ i}\OperatorTok{++} \OperatorTok{\{}
+\NormalTok{        wg}\OperatorTok{.}\NormalTok{Add}\OperatorTok{(}\DecValTok{1}\OperatorTok{)}
+        \ControlFlowTok{go} \KeywordTok{func}\OperatorTok{()} \OperatorTok{\{} \ControlFlowTok{defer}\NormalTok{ wg}\OperatorTok{.}\NormalTok{Done}\OperatorTok{();}\NormalTok{ c}\OperatorTok{.}\NormalTok{Inc}\OperatorTok{()} \OperatorTok{\}()}
+    \OperatorTok{\}}
+\NormalTok{    wg}\OperatorTok{.}\NormalTok{Wait}\OperatorTok{()}
+    \ControlFlowTok{if}\NormalTok{ c}\OperatorTok{.}\NormalTok{Value}\OperatorTok{()} \OperatorTok{!=} \DecValTok{1000} \OperatorTok{\{}\NormalTok{ t}\OperatorTok{.}\NormalTok{Fatalf}\OperatorTok{(}\StringTok{"got \%d"}\OperatorTok{,}\NormalTok{ c}\OperatorTok{.}\NormalTok{Value}\OperatorTok{())} \OperatorTok{\}}
+\OperatorTok{\}}
+\CommentTok{// run:  go test {-}race    \textless{}{-} flags the unsynchronized write on c.count}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// CountDownLatch to maximize contention deterministically}
+\AttributeTok{@Test}
+\DataTypeTok{void} \FunctionTok{incrementIsThreadSafe}\OperatorTok{()} \KeywordTok{throws} \BuiltInTok{Exception} \OperatorTok{\{}
+    \DataTypeTok{var}\NormalTok{ counter }\OperatorTok{=} \KeywordTok{new} \FunctionTok{Counter}\OperatorTok{();}
+    \DataTypeTok{int}\NormalTok{ threads }\OperatorTok{=} \DecValTok{50}\OperatorTok{;}
+    \DataTypeTok{var}\NormalTok{ start }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{CountDownLatch}\OperatorTok{(}\DecValTok{1}\OperatorTok{);}
+    \DataTypeTok{var}\NormalTok{ done  }\OperatorTok{=} \KeywordTok{new} \BuiltInTok{CountDownLatch}\OperatorTok{(}\NormalTok{threads}\OperatorTok{);}
+    \DataTypeTok{var}\NormalTok{ pool  }\OperatorTok{=} \BuiltInTok{Executors}\OperatorTok{.}\FunctionTok{newFixedThreadPool}\OperatorTok{(}\NormalTok{threads}\OperatorTok{);}
+    \ControlFlowTok{for} \OperatorTok{(}\DataTypeTok{int}\NormalTok{ i }\OperatorTok{=} \DecValTok{0}\OperatorTok{;}\NormalTok{ i }\OperatorTok{\textless{}}\NormalTok{ threads}\OperatorTok{;}\NormalTok{ i}\OperatorTok{++)} \OperatorTok{\{}
+\NormalTok{        pool}\OperatorTok{.}\FunctionTok{submit}\OperatorTok{(()} \OperatorTok{{-}\textgreater{}} \OperatorTok{\{}
+\NormalTok{            start}\OperatorTok{.}\FunctionTok{await}\OperatorTok{();}                  \CommentTok{// all threads release together}
+            \ControlFlowTok{for} \OperatorTok{(}\DataTypeTok{int}\NormalTok{ j }\OperatorTok{=} \DecValTok{0}\OperatorTok{;}\NormalTok{ j }\OperatorTok{\textless{}} \DecValTok{1000}\OperatorTok{;}\NormalTok{ j}\OperatorTok{++)}\NormalTok{ counter}\OperatorTok{.}\FunctionTok{inc}\OperatorTok{();}
+\NormalTok{            done}\OperatorTok{.}\FunctionTok{countDown}\OperatorTok{();}
+            \ControlFlowTok{return} \KeywordTok{null}\OperatorTok{;}
+        \OperatorTok{\});}
+    \OperatorTok{\}}
+\NormalTok{    start}\OperatorTok{.}\FunctionTok{countDown}\OperatorTok{();}                      \CommentTok{// fire simultaneously {-}\textgreater{} max contention}
+\NormalTok{    done}\OperatorTok{.}\FunctionTok{await}\OperatorTok{();}
+    \FunctionTok{assertEquals}\OperatorTok{(}\DecValTok{50\_000}\OperatorTok{,}\NormalTok{ counter}\OperatorTok{.}\FunctionTok{get}\OperatorTok{());}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The senior point: \textbf{a passing concurrency test proves little; a race detector proving the \emph{absence} of races is what you want.} Better still, \emph{design out} the concurrency (immutability, message passing) so there\textquotesingle s nothing racy to test.
+
+\subsection{Testing with time}\label{testing-with-time}
+
+Code that calls \texttt{now()} directly is untestable ("it\textquotesingle s expired if \texttt{now\ \textgreater{}\ expiry}" --- how do you test that deterministically?). The fix is \textbf{dependency-inject a clock} (or freeze time).
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Inject a clock — the clean, design{-}driven way}
+\ImportTok{from}\NormalTok{ datetime }\ImportTok{import}\NormalTok{ datetime}
+
+\KeywordTok{class}\NormalTok{ Clock:                      }\CommentTok{\# production: real clock}
+    \KeywordTok{def}\NormalTok{ now(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return}\NormalTok{ datetime.utcnow()}
+
+\KeywordTok{def}\NormalTok{ is\_expired(token, clock):}
+    \ControlFlowTok{return}\NormalTok{ clock.now() }\OperatorTok{\textgreater{}}\NormalTok{ token.expires\_at}
+
+\KeywordTok{class}\NormalTok{ FixedClock:}
+    \KeywordTok{def} \FunctionTok{\_\_init\_\_}\NormalTok{(}\VariableTok{self}\NormalTok{, t): }\VariableTok{self}\NormalTok{.t }\OperatorTok{=}\NormalTok{ t}
+    \KeywordTok{def}\NormalTok{ now(}\VariableTok{self}\NormalTok{): }\ControlFlowTok{return} \VariableTok{self}\NormalTok{.t}
+
+\KeywordTok{def}\NormalTok{ test\_token\_expired():}
+\NormalTok{    token }\OperatorTok{=}\NormalTok{ Token(expires\_at}\OperatorTok{=}\NormalTok{datetime(}\DecValTok{2026}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+    \ControlFlowTok{assert}\NormalTok{ is\_expired(token, FixedClock(datetime(}\DecValTok{2026}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{1}\NormalTok{))) }\KeywordTok{is} \VariableTok{True}
+\end{Highlighting}
+\end{Shaded}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# freezegun — when you can\textquotesingle{}t refactor to inject a clock (legacy)}
+\ImportTok{from}\NormalTok{ freezegun }\ImportTok{import}\NormalTok{ freeze\_time}
+
+\AttributeTok{@freeze\_time}\NormalTok{(}\StringTok{"2026{-}06{-}17 12:00:00"}\NormalTok{)}
+\KeywordTok{def}\NormalTok{ test\_report\_uses\_frozen\_now():}
+\NormalTok{    report }\OperatorTok{=}\NormalTok{ generate\_daily\_report()}
+    \ControlFlowTok{assert}\NormalTok{ report.date }\OperatorTok{==}\NormalTok{ date(}\DecValTok{2026}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{17}\NormalTok{)   }\CommentTok{\# now() is frozen everywhere}
+\end{Highlighting}
+\end{Shaded}
+
+(JS: \texttt{jest.useFakeTimers()} + \texttt{jest.setSystemTime()}; Java: inject a \texttt{java.time.Clock}, the JDK\textquotesingle s built-in seam --- \texttt{Clock.fixed(...)} for tests.) Always test the nasty time cases: \textbf{timezone boundaries, DST transitions, leap seconds/years, midnight rollover.}
+
+\subsection{Testing legacy code --- Michael Feathers\textquotesingle{} approach}\label{testing-legacy-code--michael-feathers-approach}
+
+Feathers\textquotesingle{} definition (\emph{Working Effectively with Legacy Code}): \textbf{"legacy code is simply code without tests."} The catch-22: you can\textquotesingle t safely change it without tests, but it\textquotesingle s untestable \emph{because} of its tangled dependencies (it news up a DB connection in the constructor, calls static singletons, has 200-line methods).
+
+The escape, step by step:
+
+\textbf{1. Characterization tests} --- before changing anything, pin down what the code \emph{currently does} (bugs included) so your refactor can\textquotesingle t change behavior unknowingly. You write a test, run it, and let the \emph{actual output} tell you the assertion:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ test\_characterize\_legacy\_pricing():}
+    \CommentTok{\# We don\textquotesingle{}t know the "right" answer — we capture the CURRENT one.}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ legacy\_calculate\_price(qty}\OperatorTok{=}\DecValTok{10}\NormalTok{, code}\OperatorTok{=}\StringTok{"BULK"}\NormalTok{)}
+    \ControlFlowTok{assert}\NormalTok{ result }\OperatorTok{==} \FloatTok{87.50}   \CommentTok{\# \textless{}{-} whatever it actually returns today}
+    \CommentTok{\# Now we have a net: refactors must keep this value (or we decide}
+    \CommentTok{\# intentionally to change it).}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{2. Find a seam} --- a \emph{seam} is a place you can alter behavior without editing the code in that place. The most common is replacing a dependency. The enabling technique is \textbf{dependency-breaking}: extract the hard dependency behind an interface / a parameter so a test can substitute a fake.
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// BEFORE: untestable — news up the gateway internally (no seam)}
+\KeywordTok{class}\NormalTok{ OrderProcessor }\OperatorTok{\{}
+    \DataTypeTok{void} \FunctionTok{process}\OperatorTok{(}\NormalTok{Order o}\OperatorTok{)} \OperatorTok{\{}
+        \DataTypeTok{var}\NormalTok{ gw }\OperatorTok{=} \KeywordTok{new} \FunctionTok{RealPaymentGateway}\OperatorTok{();}   \CommentTok{// hard{-}wired {-}\textgreater{} can\textquotesingle{}t fake}
+\NormalTok{        gw}\OperatorTok{.}\FunctionTok{charge}\OperatorTok{(}\NormalTok{o}\OperatorTok{.}\FunctionTok{total}\OperatorTok{());}
+    \OperatorTok{\}}
+\OperatorTok{\}}
+
+\CommentTok{// AFTER: "Extract and Override" / constructor injection {-}\textgreater{} a SEAM appears}
+\KeywordTok{class}\NormalTok{ OrderProcessor }\OperatorTok{\{}
+    \KeywordTok{private} \DataTypeTok{final}\NormalTok{ PaymentGateway gw}\OperatorTok{;}
+    \FunctionTok{OrderProcessor}\OperatorTok{(}\NormalTok{PaymentGateway gw}\OperatorTok{)} \OperatorTok{\{} \KeywordTok{this}\OperatorTok{.}\FunctionTok{gw} \OperatorTok{=}\NormalTok{ gw}\OperatorTok{;} \OperatorTok{\}}   \CommentTok{// inject {-}\textgreater{} seam}
+    \DataTypeTok{void} \FunctionTok{process}\OperatorTok{(}\NormalTok{Order o}\OperatorTok{)} \OperatorTok{\{}\NormalTok{ gw}\OperatorTok{.}\FunctionTok{charge}\OperatorTok{(}\NormalTok{o}\OperatorTok{.}\FunctionTok{total}\OperatorTok{());} \OperatorTok{\}}
+\OperatorTok{\}}
+\CommentTok{// Now a test passes a FakeGateway. We changed the wiring, not the logic,}
+\CommentTok{// guarded by the characterization test we wrote first.}
+\end{Highlighting}
+\end{Shaded}
+
+The cycle: \textbf{characterize \(\rightarrow\) find/create a seam (dependency-break) \(\rightarrow\) write real tests against the seam \(\rightarrow\) refactor safely \(\rightarrow\) repeat.} This is how you tame a 4,000-line untested service without a big-bang rewrite.
+
+\textbf{Interview takeaway: For legacy code, lead with Feathers --- "code without tests." Characterization tests pin current behavior; seams + dependency-breaking (extract an interface, inject the dependency) make it testable; then you refactor under the net. This is a top senior signal.}
+
+\section{Code Quality \& CI}\label{code-quality--ci}
+
+\subsection{Coverage: a floor, never a goal}\label{coverage-a-floor-never-a-goal}
+
+\textbf{Coverage} measures what fraction of code your tests \emph{execute}. Know the three kinds, increasing in strength:
+
+\setcodelang{}
+
+\begin{verbatim}
+  Line/Statement coverage: did each line run?            (weakest)
+  Branch coverage:         did each if/else branch run?  (stronger)
+  Path coverage:           did each combination of branches run?  (strongest,
+                                                            usually intractable)
+\end{verbatim}
+
+Why \textbf{100\% coverage is a vanity metric}:
+
+\setcodelang{Java}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{int} \FunctionTok{classify}\OperatorTok{(}\DataTypeTok{int}\NormalTok{ age}\OperatorTok{)} \OperatorTok{\{}
+    \ControlFlowTok{if} \OperatorTok{(}\NormalTok{age }\OperatorTok{\textgreater{}=} \DecValTok{18}\OperatorTok{)} \ControlFlowTok{return}\NormalTok{ ADULT}\OperatorTok{;}     \CommentTok{// a test with age=20 covers this LINE}
+    \ControlFlowTok{return}\NormalTok{ MINOR}\OperatorTok{;}                    \CommentTok{// a test with age=10 covers this LINE}
+\OperatorTok{\}}
+\CommentTok{// {-}\textgreater{} 100\% line coverage with two tests.}
+\CommentTok{// But NEITHER tests age == 18 (the boundary) or age == 17.}
+\CommentTok{// Coverage says "done"; the actual bug risk (off{-}by{-}one) is untested.}
+\end{Highlighting}
+\end{Shaded}
+
+Coverage proves a line \emph{ran}, not that an \emph{assertion would catch a bug} in it. You can hit 100\% with zero \texttt{assert} statements. Use coverage as a \textbf{floor} (e.g., "new code must not drop coverage below 80\%") to catch \emph{entirely untested} code, and use \textbf{mutation testing} for the real signal of whether your assertions bite. Chasing 100\% drives developers to write assertion-free tests for trivial getters --- pure cost, zero value.
+
+\subsection{Flaky tests: root causes and the iron rule}\label{flaky-tests-root-causes-and-the-iron-rule}
+
+A \textbf{flaky test} passes and fails non-deterministically on the same code. Flakiness is corrosive: it teaches the team to ignore red builds ("just re-run CI"), which destroys trust in the \emph{entire} suite. Root causes map exactly to the TORN enemies of determinism:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1557}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3995}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4448}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Root cause
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fix
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Time} & asserting on \texttt{now()}, timezone, sleep-based timing & inject/freeze the clock; wait-for-condition not sleep \\
+\rowcolor{zebra}
+\textbf{Order} & test B relies on data test A created & isolate state; fresh fixtures; randomize order to \emph{expose} it \\
+\textbf{Shared state} & a static/global mutated across tests & reset between tests; avoid shared mutable singletons \\
+\rowcolor{zebra}
+\textbf{Random} & unseeded RNG/UUID in assertions & seed the RNG; assert on shape not exact value \\
+\textbf{Network} & real HTTP/DNS to a flaky 3rd party & stub external calls; Testcontainers for owned infra \\
+\rowcolor{zebra}
+\textbf{Async/concurrency} & race between assert and background work & proper await; race detectors; deterministic scheduling \\
+\end{longtable}
+
+The \textbf{iron rule: never blind-retry to make flakiness "go away."} Blind retries (auto-rerun-3-times-and-pass) hide real intermittent bugs and let flake accumulate. The disciplined response:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+   \FloatTok{1.}\NormalTok{ Detect: track per}\OperatorTok{{-}}\NormalTok{test }\ControlFlowTok{pass}\OperatorTok{/}\NormalTok{fail history}\OperatorTok{;}\NormalTok{ flag the flaky ones.}
+   \FloatTok{2.}\NormalTok{ Quarantine: move the flaky test out of the blocking suite so it}
+\NormalTok{      stops blocking deploys }\OperatorTok{{-}{-}}\NormalTok{ but DON}\StringTok{\textquotesingle{}T delete it (that loses coverage).}
+\ErrorTok{   3. Root{-}cause and FIX it }\NormalTok{(find which TORN cause it }\KeywordTok{is}\NormalTok{).}
+   \FloatTok{4.}\NormalTok{ De}\OperatorTok{{-}}\NormalTok{quarantine once it}\StringTok{\textquotesingle{}s stable.}
+\ErrorTok{   Re{-}running blindly is step 0 of giving up {-}{-} avoid it.}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Linters, static analysis, type checking}\label{linters-static-analysis-type-checking}
+
+The cheapest, leftmost layer --- catches bugs \textbf{without running the code}:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1461}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3941}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4598}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Tool class
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Catches
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Linters} & ESLint, Pylint, RuboCop, Checkstyle & style, unused vars, simple anti-patterns \\
+\rowcolor{zebra}
+\textbf{Static analysis} & SonarQube, Infer (Meta), CodeQL, SpotBugs & null derefs, resource leaks, security holes, complexity \\
+\textbf{Type checkers} & mypy, TypeScript, Flow & type mismatches, missing-None handling, wrong signatures \\
+\rowcolor{zebra}
+\textbf{Formatters} & Prettier, Black, gofmt & consistent style (no human review of formatting) \\
+\end{longtable}
+
+Type checking deserves emphasis: a static type system eliminates an \emph{entire category} of tests. In a typed language you never write a test asserting "this function rejects a string argument" --- the compiler guarantees it. This is the base of Kent Dodds\textquotesingle{} Testing Trophy: types + lint give enormous bug-catching leverage for near-zero test-authoring cost.
+
+\subsection{The CI pipeline: cheap first, fail fast}\label{the-ci-pipeline-cheap-first-fail-fast}
+
+CI runs the whole quality machine automatically on every push. The crucial design principle: \textbf{order stages cheapest-and-most-likely-to-fail first, so feedback is fast and you don\textquotesingle t burn 30 minutes of E2E to discover a lint error.}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   git push }\OperatorTok{/} \BuiltInTok{open}\NormalTok{ PR}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{1.}\NormalTok{ Lint }\OperatorTok{+} \BuiltInTok{format}\NormalTok{ check ]   seconds   }\OperatorTok{{-}{-}}\NormalTok{ fail here }\OperatorTok{=}\NormalTok{ instant feedback}
+        \OperatorTok{|}\NormalTok{  (}\ControlFlowTok{pass}\NormalTok{)}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{2.}\NormalTok{ Type check ]            seconds}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{3.}\NormalTok{ Unit tests ]           seconds    }\OperatorTok{{-}{-}}\NormalTok{ the fast pyramid base}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{4.}\NormalTok{ Integration tests ]    }\DecValTok{1}\OperatorTok{{-}}\DecValTok{3} \BuiltInTok{min}    \OperatorTok{{-}{-}}\NormalTok{ Testcontainers spin up}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{5.}\NormalTok{ Contract tests ]       }\OperatorTok{\textasciitilde{}}\DecValTok{1} \BuiltInTok{min}     \OperatorTok{{-}{-}}\NormalTok{ Pact verification}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{6.}\NormalTok{ E2E (critical path) ]  minutes    }\OperatorTok{{-}{-}}\NormalTok{ few, slowest, last}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   [ }\FloatTok{7.}\NormalTok{ Coverage gate }\OperatorTok{+}\NormalTok{ build artifact ]}
+        \OperatorTok{|}
+\NormalTok{        v}
+\NormalTok{   merge }\OperatorTok{/}\NormalTok{ deploy}
+
+\NormalTok{   FAIL FAST: a lint error must NOT wait }\ControlFlowTok{for}\NormalTok{ E2E to report. Each stage}
+\NormalTok{   gates the }\BuiltInTok{next}\NormalTok{. Parallelize within a stage (shard tests across runners).}
+\end{Highlighting}
+\end{Shaded}
+
+This mirrors the cost curve: catch the cheap-to-find problems with the cheap-to-run checks, and only pay for the expensive E2E run on code that already passed everything below it.
+
+\subsection{Test naming and structure}\label{test-naming-and-structure}
+
+A test\textquotesingle s name is documentation. The best pattern: \textbf{what is being tested, under what condition, with what expected result.}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# GOOD: reads as a spec sentence}
+\KeywordTok{def}\NormalTok{ test\_withdraw\_with\_insufficient\_funds\_raises\_error(): ...}
+\KeywordTok{def}\NormalTok{ test\_apply\_discount\_at\_exactly\_100\_percent\_yields\_zero(): ...}
+
+\CommentTok{\# BAD: tells you nothing when it fails in CI}
+\KeywordTok{def}\NormalTok{ test\_1(): ...}
+\KeywordTok{def}\NormalTok{ test\_withdraw(): ...}
+\end{Highlighting}
+\end{Shaded}
+
+Pattern: \texttt{test\_\textless{}unit\textgreater{}\_\textless{}scenario\textgreater{}\_\textless{}expected\textgreater{}} or the BDD \texttt{should\_\textless{}expected\textgreater{}\_when\_\textless{}scenario\textgreater{}}. When \texttt{test\_withdraw\_with\_insufficient\_funds\_raises\_error} goes red in CI, you know \emph{exactly} what broke without opening the file.
+
+\subsection{Code review as a quality gate}\label{code-review-as-a-quality-gate}
+
+Automated checks catch the mechanical; \textbf{code review} catches design, intent, naming, missing edge cases, and "is this even the right approach." Effective review (Google\textquotesingle s standards): focus on \emph{correctness, design, tests, readability}; review small diffs (big PRs get rubber-stamped); be specific and kind; and crucially --- \textbf{a reviewer should check that the tests actually test the change, not just that tests exist.}
+
+\subsection{Worked scenario: how you\textquotesingle d test a payment service}\label{worked-scenario-how-youd-test-a-payment-service}
+
+This is the canonical "test this whole feature" question. Layer by layer, matching the pyramid:
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   PAYMENT SERVICE — test strategy by layer}
+
+\NormalTok{   UNIT (many, fast)}
+     \OperatorTok{{-}}\NormalTok{ fee}\OperatorTok{/}\NormalTok{amount calculation: rounding, currency, }\BuiltInTok{min}\OperatorTok{/}\BuiltInTok{max}
+     \OperatorTok{{-}}\NormalTok{ state machine: PENDING }\OperatorTok{{-}\textgreater{}}\NormalTok{ AUTHORIZED }\OperatorTok{{-}\textgreater{}}\NormalTok{ CAPTURED }\OperatorTok{{-}\textgreater{}}\NormalTok{ REFUNDED}
+\NormalTok{       (}\KeywordTok{and}\NormalTok{ illegal transitions, e.g. CAPTURED }\OperatorTok{{-}\textgreater{}}\NormalTok{ AUTHORIZED rejected)}
+     \OperatorTok{{-}}\NormalTok{ validation: negative amount, zero, unsupported currency}
+     \OperatorTok{{-}}\NormalTok{ idempotency}\OperatorTok{{-}}\NormalTok{key dedup logic (pure function on the key store)}
+
+\NormalTok{   INTEGRATION (some, Testcontainers)}
+     \OperatorTok{{-}}\NormalTok{ repository }\BuiltInTok{round}\OperatorTok{{-}}\NormalTok{trips against REAL Postgres (txn rollback per test)}
+     \OperatorTok{{-}}\NormalTok{ gateway client against a FAKE gateway (}\KeywordTok{in}\OperatorTok{{-}}\NormalTok{memory) }\ControlFlowTok{for}\NormalTok{ success,}
+\NormalTok{       decline, timeout, }\KeywordTok{and}\NormalTok{ network}\OperatorTok{{-}}\NormalTok{error responses}
+     \OperatorTok{{-}}\NormalTok{ the outbox}\OperatorTok{/}\NormalTok{event publish to a real Kafka container}
+
+\NormalTok{   CONTRACT (Pact)}
+     \OperatorTok{{-}}\NormalTok{ consumer contract vs the external payment GATEWAY}\StringTok{\textquotesingle{}s API shape,}
+\ErrorTok{       so a gateway field rename is caught before deploy}
+
+\NormalTok{   E2E (few, critical path only)}
+     \OperatorTok{{-}}\NormalTok{ one happy}\OperatorTok{{-}}\NormalTok{path: }\StringTok{"user checks out {-}\textgreater{} card charged {-}\textgreater{} order CONFIRMED"}
+
+\NormalTok{   PROPERTY}\OperatorTok{{-}}\NormalTok{BASED}
+     \OperatorTok{{-}}\NormalTok{ invariant: refund(amount) }\OperatorTok{\textless{}=}\NormalTok{ captured(amount) }\ControlFlowTok{for} \BuiltInTok{all}\NormalTok{ amounts}
+     \OperatorTok{{-}}\NormalTok{ invariant: }\BuiltInTok{sum}\NormalTok{ of partial captures }\OperatorTok{==}\NormalTok{ total authorized}
+
+\NormalTok{   IDEMPOTENCY tests (CRITICAL }\ControlFlowTok{for}\NormalTok{ payments)}
+     \OperatorTok{{-}}\NormalTok{ SAME idempotency key twice }\OperatorTok{{-}\textgreater{}}\NormalTok{ charged ONCE, second returns the}
+\NormalTok{       first result (}\ControlFlowTok{assert}\NormalTok{ gateway.charge called exactly once)}
+     \OperatorTok{{-}}\NormalTok{ concurrent duplicate requests }\OperatorTok{{-}\textgreater{}}\NormalTok{ exactly one charge (concurrency test)}
+
+\NormalTok{   EDGE }\OperatorTok{/}\NormalTok{ FAILURE cases}
+     \OperatorTok{{-}}\NormalTok{ gateway timeout after charge succeeded }\OperatorTok{{-}\textgreater{}}\NormalTok{ reconcile, don}\StringTok{\textquotesingle{}t double{-}charge}
+\ErrorTok{     {-} partial failure: charge ok, DB write fails {-}\textgreater{} outbox/retry, no lost money}
+     \OperatorTok{{-}}\NormalTok{ currency rounding at boundaries}\OperatorTok{;}\NormalTok{ expired card}\OperatorTok{;}\NormalTok{ insufficient funds}
+\end{Highlighting}
+\end{Shaded}
+
+The senior framing: for a payment service, \textbf{correctness is necessary but not sufficient --- idempotency and failure behavior are where money is lost.} You test the happy path with one E2E, but you spend most of your effort on \emph{duplicate-charge prevention} (idempotency under concurrency and retries) and \emph{partial-failure reconciliation} (the charge succeeded but the DB write failed). That\textquotesingle s the difference between "I tested it works" and "I tested it doesn\textquotesingle t lose money."
+
+\textbf{Interview takeaway: Coverage is a floor (100\% is vanity; mutation testing is the real signal). Never blind-retry flaky tests --- detect, quarantine, root-cause, fix. CI orders stages cheap-first to fail fast. For a payment service, the hard part isn\textquotesingle t the happy path --- it\textquotesingle s idempotency and partial-failure.}
+
+\section{Architecture / Diagrams}\label{architecture--diagrams}
+
+\subsection{The complete testing \& quality stack}\label{the-complete-testing--quality-stack}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+   \OperatorTok{|}\NormalTok{                     DEVELOPER LAPTOP                       }\OperatorTok{|}
+   \OperatorTok{|}\NormalTok{  edit }\OperatorTok{{-}\textgreater{}}\NormalTok{ [}\BuiltInTok{type}\NormalTok{ check] }\OperatorTok{{-}\textgreater{}}\NormalTok{ [lint] }\OperatorTok{{-}\textgreater{}}\NormalTok{ [unit tests] (seconds)  }\OperatorTok{|}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                                \OperatorTok{|}\NormalTok{ git push }\OperatorTok{/}\NormalTok{ PR}
+\NormalTok{                                v}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+   \OperatorTok{|}\NormalTok{                      CI PIPELINE (fail fast)               }\OperatorTok{|}
+   \OperatorTok{|}\NormalTok{  lint }\OperatorTok{{-}\textgreater{}}\NormalTok{ types }\OperatorTok{{-}\textgreater{}}\NormalTok{ unit }\OperatorTok{{-}\textgreater{}}\NormalTok{ integration }\OperatorTok{{-}\textgreater{}}\NormalTok{ contract }\OperatorTok{{-}\textgreater{}}\NormalTok{ e2e   }\OperatorTok{|}
+   \OperatorTok{|}\NormalTok{   (s)     (s)     (s)      (}\BuiltInTok{min}\NormalTok{, TC)      (}\BuiltInTok{min}\NormalTok{)     (}\BuiltInTok{min}\NormalTok{)   }\OperatorTok{|}
+   \OperatorTok{|}                                                            \OperatorTok{|}
+   \OperatorTok{|}  \OperatorTok{+}\NormalTok{ coverage gate (floor)   }\OperatorTok{+}\NormalTok{ mutation (nightly)            }\OperatorTok{|}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                                \OperatorTok{|} \BuiltInTok{all}\NormalTok{ green}
+\NormalTok{                                v}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+   \OperatorTok{|}\NormalTok{                       DEPLOY PIPELINE                      }\OperatorTok{|}
+   \OperatorTok{|}\NormalTok{  can}\OperatorTok{{-}}\NormalTok{i}\OperatorTok{{-}}\NormalTok{deploy? (Pact broker)  }\OperatorTok{{-}\textgreater{}}\NormalTok{  canary  }\OperatorTok{{-}\textgreater{}}\NormalTok{  full rollout }\OperatorTok{|}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+                                \OperatorTok{|} \KeywordTok{in}\NormalTok{ production}
+\NormalTok{                                v}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+   \OperatorTok{|}\NormalTok{              PRODUCTION TESTING }\OperatorTok{\&}\NormalTok{ RESILIENCE              }\OperatorTok{|}
+   \OperatorTok{|}\NormalTok{  synthetic monitoring  }\OperatorTok{+}\NormalTok{  load}\OperatorTok{/}\NormalTok{soak  }\OperatorTok{+}\NormalTok{  chaos engineering  }\OperatorTok{|}
+   \OperatorTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Test double decision tree}\label{test-double-decision-tree}
+
+\setcodelang{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   Need to replace a collaborator?}
+        \OperatorTok{|}
+        \OperatorTok{+{-}{-}}\NormalTok{ Just need to fill a param you never use? }\OperatorTok{{-}{-}{-}{-}{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ DUMMY}
+        \OperatorTok{|}
+        \OperatorTok{+{-}{-}}\NormalTok{ Need it to RETURN specific data to drive a path? }\OperatorTok{{-}\textgreater{}}\NormalTok{ STUB}
+        \OperatorTok{|}
+        \OperatorTok{+{-}{-}}\NormalTok{ Need to }\ControlFlowTok{assert}\NormalTok{ the SUT CALLED it?}
+        \OperatorTok{|}        \OperatorTok{|}
+        \OperatorTok{|}        \OperatorTok{+{-}{-}} \ControlFlowTok{assert}\NormalTok{ AFTER the fact (record then check) }\OperatorTok{{-}\textgreater{}}\NormalTok{ SPY}
+        \OperatorTok{|}        \OperatorTok{+{-}{-}}\NormalTok{ pre}\OperatorTok{{-}}\NormalTok{program expectations }\ImportTok{as}\NormalTok{ the spec }\OperatorTok{{-}{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ MOCK}
+        \OperatorTok{|}
+        \OperatorTok{+{-}{-}}\NormalTok{ Need real}\OperatorTok{{-}}\NormalTok{ish behavior, but fast}\OperatorTok{/}\KeywordTok{in}\OperatorTok{{-}}\NormalTok{memory? }\OperatorTok{{-}{-}{-}{-}{-}{-}\textgreater{}}\NormalTok{ FAKE}
+
+\NormalTok{   Default bias: use the REAL thing }\ControlFlowTok{if}\NormalTok{ it}\StringTok{\textquotesingle{}s fast \& deterministic.}
+\ErrorTok{   Reach for a double only at a boundary }\NormalTok{(network}\OperatorTok{/}\NormalTok{DB}\OperatorTok{/}\NormalTok{clock}\OperatorTok{/}\NormalTok{random).}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{State vs interaction testing}\label{state-vs-interaction-testing}
+
+\setcodelang{}
+
+\begin{verbatim}
+   STATE TEST                         INTERACTION TEST
+   (classicist / Detroit)             (mockist / London)
+   -------------------------          --------------------------
+   act on SUT                         pre-program mock expectations
+   inspect resulting state            act on SUT
+   assert the OUTCOME                 assert the CALLS happened
+
+   robust to refactor (asserts WHAT)  brittle to refactor (asserts HOW)
+   default choice                     use when side-effect IS the behavior
+                                      (email sent, card charged)
+\end{verbatim}
+
+\section{Real-World Examples}\label{real-world-examples}
+
+\subsection{Google: the monorepo and "test certified"}\label{google-the-monorepo-and-test-certified}
+
+Google\textquotesingle s monorepo runs an enormous test graph: a commit triggers only the tests \emph{affected} by the change (computed from the Bazel/Blaze build dependency graph), running massively in parallel. The "Beyoncé Rule" --- \emph{if you liked it, you shoulda put a test on it} --- means any behavior you care about must be guarded by a test, or you can\textquotesingle t complain when someone breaks it. Flaky tests are tracked and quarantined automatically; a test that flakes too often is removed from the blocking set and assigned back to its owner.
+
+\subsection{Netflix: chaos in production}\label{netflix-chaos-in-production}
+
+Netflix\textquotesingle s Chaos Monkey randomly terminates production EC2 instances during business hours. This \emph{forces} every service to be resilient to instance death --- you cannot ship a service that falls over when one node dies, because Chaos Monkey will kill a node and page you. The broader Simian Army adds Latency Monkey (injects delays), Chaos Gorilla (kills a whole availability zone), and more. The philosophy: the best way to verify your failure handling works is to \emph{continuously cause failures} in a controlled way, rather than discovering on the night of a real outage that your fallback was never wired up.
+
+\subsection{Meta: static analysis at diff time}\label{meta-static-analysis-at-diff-time}
+
+Meta runs \textbf{Infer} (interprocedural static analysis catching null-deref, resource leaks, concurrency issues) and \textbf{Sapienz} (automated UI test-input generation that finds crashes) on essentially every code change in Phabricator, \emph{before} it lands. The bet: at billions of users and continuous deployment, you cannot rely on humans to catch null-pointer bugs --- you automate the detection and surface it as an inline review comment, shifting detection as far left as possible.
+
+\subsection{Stripe / payments: idempotency keys}\label{stripe--payments-idempotency-keys}
+
+Payment APIs (Stripe being the canonical example) require \textbf{idempotency keys} precisely because networks retry. A client sends \texttt{Idempotency-Key:\ abc123}; if the request is retried (timeout, then resend), the server recognizes the key and returns the \emph{original} result instead of charging again. The test suite for such a service spends enormous effort proving "the same key never charges twice, even under concurrent duplicate requests" --- the exact idempotency + concurrency tests from the payment scenario above.
+
+\section{Real-Life Analogies}\label{real-life-analogies}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1773}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8227}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Analogy
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Test pyramid} & Building inspection: many cheap material checks (unit), some assembly checks (integration), one final walkthrough (E2E). You don\textquotesingle t do a full walkthrough to verify a single brick. \\
+\rowcolor{zebra}
+\textbf{Ice-cream cone} & Skipping all component checks and only doing a final walkthrough --- you find problems too late, when fixing means tearing down finished walls. \\
+\textbf{Unit test} & Testing one Lego brick clicks and holds, before building the castle. \\
+\rowcolor{zebra}
+\textbf{Integration test} & Checking two bricks actually snap together --- individually fine, but the studs might not align. \\
+\textbf{E2E test} & Walking the finished castle the way a visitor would. \\
+\rowcolor{zebra}
+\textbf{Test double / mock} & A stunt double in a film --- stands in for the expensive/dangerous real actor for a specific shot. \\
+\textbf{Stub} & A cardboard cutout that says one fixed line. \\
+\rowcolor{zebra}
+\textbf{Mock} & An actor with a script you check they followed exactly. \\
+\textbf{Fake} & A driving simulator --- real controls, real feedback, but no actual road. \\
+\rowcolor{zebra}
+\textbf{TDD red-green-refactor} & Sculpting: rough out the shape (red\(\rightarrow\)green), then refine (refactor), checking against the reference photo (the test) constantly. \\
+\textbf{Property-based testing} & Hiring a chaos-loving QA tester who tries thousands of weird inputs \emph{and} hands you the single simplest one that broke it. \\
+\rowcolor{zebra}
+\textbf{Mutation testing} & A fire drill for your alarm system: deliberately start small "fires" (mutants) to check the alarms (tests) actually go off. \\
+\textbf{Coverage} & A checklist of rooms you \emph{entered} --- says nothing about whether you \emph{inspected} anything in them. \\
+\rowcolor{zebra}
+\textbf{Flaky test} & A smoke detector that beeps randomly --- soon everyone ignores it, including when there\textquotesingle s a real fire. \\
+\textbf{Contract test} & A pre-agreed wiring diagram between two contractors, each verifying their side independently before the walls go up. \\
+\rowcolor{zebra}
+\textbf{Chaos engineering} & A fire drill for the whole building, run on purpose, so the real fire isn\textquotesingle t the first time you find the exits are locked. \\
+\textbf{Characterization test} & Photographing an old machine\textquotesingle s exact output before you repair it, so you can prove you didn\textquotesingle t change its behavior. \\
+\end{longtable}
+
+\section{Memory Tricks / Mnemonics}\label{memory-tricks--mnemonics}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{AAA} --- \emph{Arrange, Act, Assert}. The skeleton of every test.
+\item
+  \textbf{FIRST} --- \emph{Fast, Isolated, Repeatable, Self-validating, Timely}. The five virtues of a unit test.
+\item
+  \textbf{TORN} --- \emph{Time, Order, Random, Network/concurrency}. The four enemies of determinism = the four root causes of flaky tests.
+\item
+  \textbf{Given-When-Then} --- the BDD phrasing of AAA; the language of contracts.
+\item
+  \textbf{Red-Green-Refactor} --- the TDD heartbeat.
+\item
+  \textbf{Dummy / Stub / Spy / Mock / Fake} --- the five doubles. Mnemonic order of increasing capability: \emph{"Dumb Stubs Spy on Mocking Fakes."}
+\item
+  \textbf{Pyramid shape} --- \emph{many at the bottom, few at the top}. If it\textquotesingle s inverted (ice-cream cone), it\textquotesingle s broken.
+\item
+  \textbf{"Mock at the boundary, not in the middle"} --- the over-mocking antidote.
+\item
+  \textbf{"Coverage is a floor, mutation is the truth."}
+\item
+  \textbf{"Never sleep, always wait."} --- E2E flakiness rule.
+\item
+  \textbf{"Never blind-retry flake."} --- detect \(\rightarrow\) quarantine \(\rightarrow\) root-cause \(\rightarrow\) fix.
+\item
+  \textbf{Beyoncé Rule} --- \emph{"if you liked it you shoulda put a test on it."} (Google.)
+\item
+  \textbf{Feathers\textquotesingle{} definition} --- \emph{"legacy code is code without tests."}
+\end{itemize}
+
+\section{Common Interview Questions}\label{common-interview-questions}
+
+\subsection{Q1: "What is the test pyramid, and what goes wrong when it\textquotesingle s inverted?"}\label{q1-what-is-the-test-pyramid-and-what-goes-wrong-when-its-inverted}
+
+\textbf{Model answer:} The pyramid (Mike Cohn) prescribes \emph{many} fast, isolated unit tests at the base (\textasciitilde60--80\%), \emph{some} integration tests in the middle (\textasciitilde15--30\%), and \emph{few} slow, realistic E2E tests at the top (\textasciitilde5--10\%). The shape follows a cost/value trade-off: unit tests are fast, stable, and pinpoint the broken function; E2E tests are slow, flaky, and only tell you "something in checkout broke." Inverting it --- the \textbf{ice-cream cone} (mostly E2E + manual QA, few unit) --- produces 40-minute builds where a third of runs fail on infra, so the team learns to ignore red and the suite dies. The right shape depends on where bugs come from: logic-heavy backends lean pyramid; integration/glue-heavy front-ends lean toward Kent Dodds\textquotesingle{} testing trophy (fat integration middle).
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"How many E2E tests should a service have?"} \(\rightarrow\) Few --- only critical revenue paths (login, checkout). They\textquotesingle re the most expensive to maintain.
+\item
+  \emph{"What\textquotesingle s the testing trophy?"} \(\rightarrow\) Front-end-oriented variant: static (types+lint) base, mostly integration, some unit, few E2E. "Write tests. Not too many. Mostly integration."
+\end{itemize}
+
+\subsection{Q2: "Explain the difference between a mock, a stub, and a fake."}\label{q2-explain-the-difference-between-a-mock-a-stub-and-a-fake}
+
+\textbf{Model answer:} All three are \emph{test doubles}, but they differ in purpose. A \textbf{stub} provides canned return values to drive the SUT down a path --- it answers but never asserts. A \textbf{mock} is pre-programmed with the interactions it \emph{expects} and fails if they don\textquotesingle t happen --- it\textquotesingle s a \emph{specification of behavior}, used for interaction testing. A \textbf{fake} has real, working logic but cuts production corners (an in-memory repository instead of a real DB) --- fast and deterministic with real behavior. (Plus \emph{dummy} --- a never-used placeholder --- and \emph{spy} --- records calls to assert after the fact.) Default bias: use the real collaborator if it\textquotesingle s fast and deterministic; reach for a double only at a boundary.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"When would you prefer a fake over a mock?"} \(\rightarrow\) When the call \emph{sequence} shouldn\textquotesingle t be coupled to the test --- a fake lets you assert on resulting \emph{state} (robust to refactor), whereas a mock locks in \emph{how} the SUT calls collaborators (brittle).
+\item
+  \emph{"What\textquotesingle s the over-mocking trap?"} \(\rightarrow\) Mocking your own domain objects produces tautological tests that pass even when integration is broken and shatter on every refactor.
+\end{itemize}
+
+\subsection{Q3: "Walk me through TDD with a concrete example."}\label{q3-walk-me-through-tdd-with-a-concrete-example}
+
+\textbf{Model answer:} Red-green-refactor. I write the smallest failing test first --- say \texttt{int\_to\_roman(1)\ ==\ "I"} --- it fails because the function doesn\textquotesingle t exist (RED). I make it pass with the \emph{simplest} code, even hard-coding \texttt{return\ "I"} (GREEN). Then a new test \texttt{int\_to\_roman(2)\ ==\ "II"} forces generality \(\rightarrow\) \texttt{"I"\ *\ n}. A test for \texttt{5\ ==\ "V"} forces a lookup-and-subtract loop, which a test for \texttt{4\ ==\ "IV"} extends with a subtractive pair --- and that same table-driven algorithm scales to the whole numeral system. The design \emph{emerged} from the tests rather than being designed up front, and it stayed minimal. Each step I refactor with green tests as a net.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Isn\textquotesingle t hard-coding \texttt{return\ \textquotesingle{}I\textquotesingle{}} silly?"} \(\rightarrow\) It proves the harness works and resists over-engineering; the next test forces real logic. Tiny steps mean bugs are localized to the last few lines.
+\item
+  \emph{"When is TDD a bad fit?"} \(\rightarrow\) Exploratory spikes where you don\textquotesingle t yet know the API, and UI work. TDD is also unit-focused --- it won\textquotesingle t find integration/emergent bugs.
+\end{itemize}
+
+\subsection{Q4: "How would you test code that depends on the current time?"}\label{q4-how-would-you-test-code-that-depends-on-the-current-time}
+
+\textbf{Model answer:} Never call \texttt{now()} directly inside logic --- it\textquotesingle s non-deterministic and untestable. The clean fix is to \textbf{inject a clock} abstraction; production uses the real clock, tests pass a \texttt{FixedClock} returning a known instant, so "is this token expired?" becomes deterministic. If I can\textquotesingle t refactor (legacy), I use a time-freezing library --- \texttt{freezegun} in Python, \texttt{jest.setSystemTime} in JS, \texttt{Clock.fixed} in Java. I\textquotesingle d also explicitly test the nasty cases: timezone boundaries, DST transitions, leap years, and midnight rollover.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Same question for randomness?"} \(\rightarrow\) Inject a seeded RNG, or assert on the \emph{shape} of the output, not the exact value.
+\item
+  \emph{"What if a downstream library calls \texttt{now()} internally?"} \(\rightarrow\) Freeze at the system-clock level (freezegun patches \texttt{datetime.now}), or wrap the library behind a seam you can fake.
+\end{itemize}
+
+\subsection{Q5: "What\textquotesingle s the difference between code coverage and mutation testing?"}\label{q5-whats-the-difference-between-code-coverage-and-mutation-testing}
+
+\textbf{Model answer:} Coverage measures which lines/branches your tests \emph{execute} --- it proves a line \emph{ran}, not that an assertion would \emph{catch a bug} in it. You can have 100\% line coverage with zero \texttt{assert} statements. Mutation testing measures suite \emph{effectiveness}: it injects small bugs (mutants) --- flip \texttt{\textgreater{}=} to \texttt{\textgreater{}}, \texttt{+} to \texttt{-} --- reruns the tests, and checks whether any test \emph{fails} (kills the mutant). Surviving mutants reveal logic your assertions can\textquotesingle t detect. It\textquotesingle s common to see 100\% coverage with a 60\% mutation score --- the 40\% gap is your real blind spot. So: coverage is a \emph{floor} to find entirely-untested code; mutation score is the \emph{truth} about assertion strength.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Why not run mutation testing on every commit?"} \(\rightarrow\) It reruns the suite per mutant --- too slow. Run it on critical modules or nightly.
+\item
+  \emph{"Why is chasing 100\% coverage harmful?"} \(\rightarrow\) It drives assertion-free tests on trivial getters: pure cost, false confidence.
+\end{itemize}
+
+\subsection{Q6: "You have a flaky test. What do you do?"}\label{q6-you-have-a-flaky-test-what-do-you-do}
+
+\textbf{Model answer:} First, I do \textbf{not} blind-retry it --- auto-rerunning until green hides real intermittent bugs and trains the team to ignore red, which destroys trust in the whole suite. Instead: (1) \textbf{detect} --- confirm it\textquotesingle s flaky from pass/fail history; (2) \textbf{quarantine} --- move it out of the blocking suite so it stops gating deploys, but don\textquotesingle t delete it (that loses coverage); (3) \textbf{root-cause} --- it\textquotesingle s almost always one of TORN: Time, Order/shared-state, Random, or Network/concurrency; (4) \textbf{fix} the underlying cause --- inject the clock, isolate the fixture, seed the RNG, stub the network, fix the await/race; (5) \textbf{de-quarantine} once stable.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"What\textquotesingle s the most common cause?"} \(\rightarrow\) Order/shared state (a test depending on another\textquotesingle s leftover data) and time. Randomizing test order \emph{exposes} order dependence.
+\item
+  \emph{"How do you catch a race that only fails 1-in-1000?"} \(\rightarrow\) A race detector (\texttt{go\ test\ -race}, jcstress, ThreadSanitizer) flags the race \emph{even when no failure manifests} --- far better than hoping it surfaces.
+\end{itemize}
+
+\subsection{Q7: "Two microservices, A calls B. How do you stop B\textquotesingle s deploy from breaking A --- without running both?"}\label{q7-two-microservices-a-calls-b-how-do-you-stop-bs-deploy-from-breaking-a--without-running-both}
+
+\textbf{Model answer:} Consumer-driven contract testing, e.g. Pact. On the consumer (A) side, I write tests against a Pact \emph{mock} of B; Pact records the exact requests A makes and responses it expects into a \textbf{contract} published to a broker. On the provider (B) side, B\textquotesingle s CI replays those recorded expectations against the \emph{real} B and fails if it can\textquotesingle t satisfy them. So if B renames a field A depends on, B\textquotesingle s \emph{own} CI goes red before deploy --- catching the breakage at the source, with neither service running the other. The broker also enables "can-i-deploy" gating: B v2 can\textquotesingle t ship if it breaks any consumer currently in production.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Why not just E2E both services?"} \(\rightarrow\) Slow, flaky, and combinatorial as services multiply; contract tests give the same safety at unit-test speed and independence.
+\item
+  \emph{"What about async/event contracts?"} \(\rightarrow\) Pact and similar tools support message contracts --- the producer\textquotesingle s published event shape vs the consumer\textquotesingle s expectations.
+\end{itemize}
+
+\subsection{Q8: "How do you test a payment service?"}\label{q8-how-do-you-test-a-payment-service}
+
+\textbf{Model answer:} Layer by layer. \textbf{Units} for the pure logic: fee/rounding math, the PENDING\(\rightarrow\)AUTHORIZED\(\rightarrow\)CAPTURED\(\rightarrow\)REFUNDED state machine (including rejecting illegal transitions), and validation. \textbf{Integration} (Testcontainers): repository round-trips against real Postgres with transactional rollback, and the gateway client against a \emph{fake} gateway covering success/decline/timeout/network-error. \textbf{Contract} (Pact) against the external gateway\textquotesingle s API so a field rename is caught pre-deploy. \textbf{One E2E} for the happy path. \textbf{Property-based} invariants (refund \(\leq\) captured; partial captures sum to authorized). But the real focus for payments is \textbf{idempotency} --- same idempotency key charges exactly once, even under concurrent duplicate requests --- and \textbf{partial-failure reconciliation} --- gateway charge succeeds but the DB write fails, and we must not lose or double-charge money. Correctness is necessary; \emph{not losing money under retries and failures} is the point.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"How do you test the duplicate-charge case under concurrency?"} \(\rightarrow\) Fire concurrent requests with the same idempotency key and assert \texttt{gateway.charge} was called exactly once (interaction test) plus a race detector / contention harness.
+\item
+  \emph{"Charge succeeds but your DB write fails --- how do you test the recovery?"} \(\rightarrow\) Simulate the failure (fake DB throws after the fake gateway returns success), assert the outbox/retry reconciles to a single consistent charge.
+\end{itemize}
+
+\subsection{Q9: "When do you mock versus use the real thing?"}\label{q9-when-do-you-mock-versus-use-the-real-thing}
+
+\textbf{Model answer:} Default to the \textbf{real} collaborator when it\textquotesingle s fast and deterministic --- including your own value objects and domain logic. Reach for a double only at an \emph{architectural boundary}: the network, the database, the clock, randomness, or anything with slow/irreversible side effects (sending email, charging a card). Mocking inside your own domain produces tautological, refactor-brittle tests that pass while integration is broken --- the over-mocking trap. So the rule is "mock at the boundary, not in the middle," and prefer \textbf{state} assertions (assert the outcome) over \textbf{interaction} assertions (assert the calls) unless the side effect itself is the behavior.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Mockist vs classicist?"} \(\rightarrow\) Mockist (London) mocks everything; classicist (Detroit) uses real collaborators when cheap. Most seniors lean classicist for robustness to refactoring.
+\item
+  \emph{"Downside of a fake DB vs a real one?"} \(\rightarrow\) A fake can drift from real SQL/transaction semantics; that\textquotesingle s why you \emph{also} keep a thin layer of integration tests against a real Postgres (Testcontainers).
+\end{itemize}
+
+\subsection{Q10: "How do you make code that wasn\textquotesingle t written to be testable, testable?"}\label{q10-how-do-you-make-code-that-wasnt-written-to-be-testable-testable}
+
+\textbf{Model answer:} Michael Feathers\textquotesingle{} playbook --- "legacy code is code without tests." First I write \textbf{characterization tests} that pin down current behavior (capturing whatever it actually outputs today, bugs included) so any refactor is guarded. Then I find or create a \textbf{seam} --- a place to alter behavior without editing that code --- typically by \textbf{dependency-breaking}: extract a hard-wired dependency (a \texttt{new\ RealGateway()} in a constructor) behind an interface and inject it, so a test can substitute a fake. Now I write real tests against the seam, refactor safely under the characterization net, and repeat. This tames a huge untested class incrementally instead of a risky big-bang rewrite.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"What if the dependency is a static singleton or global?"} \(\rightarrow\) Wrap it behind an instance interface (a thin adapter) and inject the adapter; or use a "extract and override" subclass for testing.
+\item
+  \emph{"How do you know your refactor didn\textquotesingle t change behavior?"} \(\rightarrow\) The characterization tests stay green; if one changes, it\textquotesingle s an intentional decision, not an accident.
+\end{itemize}
+
+\subsection{Q11: "What is property-based testing and when would you use it?"}\label{q11-what-is-property-based-testing-and-when-would-you-use-it}
+
+\textbf{Model answer:} Instead of asserting on specific examples, you assert an \emph{invariant} that must hold for \emph{all} inputs, and the framework (Hypothesis, jqwik) generates hundreds of random inputs to try to falsify it --- then \textbf{shrinks} any failure to the minimal reproducing case. Great invariants: round-trip (\texttt{decode(encode(x))\ ==\ x}), idempotence (\texttt{sort(sort(x))\ ==\ sort(x)}), or "merge of two sorted lists is sorted and a permutation of the inputs." It excels at parsers/serializers, data structures, and pure algorithms with algebraic laws, and routinely finds edge cases (empty, duplicates, extreme values) that humans forget. The shrinking is the magic --- it hands you \texttt{merge({[}0{]},{[}0{]})} instead of the giant random list that first failed.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"Downsides?"} \(\rightarrow\) You need to \emph{find} a good invariant (sometimes hard); failures can be intermittent across seeds, so you pin the failing seed as a regression test.
+\item
+  \emph{"How is it different from fuzzing?"} \(\rightarrow\) Fuzzing typically hunts crashes/security on untrusted bytes; property testing asserts \emph{semantic} invariants. They overlap (both generate inputs) but answer different questions.
+\end{itemize}
+
+\subsection{Q12: "What\textquotesingle s the difference between integration and E2E testing?"}\label{q12-whats-the-difference-between-integration-and-e2e-testing}
+
+\textbf{Model answer:} Both exercise more than one component, but at different scope and cost. An \textbf{integration test} verifies \emph{your code} against a \emph{real} slice of infrastructure --- your repository against a real Postgres (Testcontainers), your producer against a real Kafka --- catching serialization, SQL, schema, and transaction-boundary bugs that unit tests miss because they mocked the DB. An \textbf{E2E test} drives the \emph{fully assembled system} as a user does, through the UI or public API across all real services, catching broken user journeys, routing, and auth flows. Integration tests are medium-speed and you have a fair number; E2E are slow and flaky, so you keep them few and reserved for critical paths.
+
+\textbf{Follow-ups:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{"How do you keep integration DB tests isolated?"} \(\rightarrow\) Transactional rollback per test (open a txn, never commit), or truncate/fresh-schema per test depending on whether the code manages its own transactions.
+\item
+  \emph{"Why are E2E flaky and how do you reduce it?"} \(\rightarrow\) Timing, async rendering, shared data, brittle selectors, third-party networks. Fix with auto-wait (never sleep), fresh seeded data, stable test-ids, and stubbing external services.
+\end{itemize}
+
+\section{Senior-Level Discussion Points}\label{senior-level-discussion-points}
+
+\begin{itemize}
+\item
+  \textbf{Tests are a design tool, not just a verification tool.} Hard-to-test code is badly-designed code: if you need 20 mocks, your class has too many responsibilities. The \emph{pain} of writing the test is the most honest design-smell detector you have. A senior treats "this is hard to test" as "this needs to be redesigned," not "I\textquotesingle ll skip the test."
+\item
+  \textbf{The cost of a test is its maintenance, not its authoring.} A brittle, over-mocked test that breaks on every refactor has \emph{negative} value --- it slows you down more than the bug it might catch. Optimize for tests that fail \emph{only} when behavior actually changes. Asserting on \emph{what} (state) rather than \emph{how} (interactions) is the main lever.
+\item
+  \textbf{Confidence-per-effort is the real metric.} Not coverage, not test count. Kent Dodds\textquotesingle{} point: the question is "what gives me the most confidence per unit of effort and maintenance?" --- and the answer skews toward integration tests for glue code and unit tests for logic, with few E2E.
+\item
+  \textbf{Determinism is a property of the architecture.} Flakiness isn\textquotesingle t bad luck; it\textquotesingle s leaked non-determinism (TORN). The fix is often \emph{design}: inject clocks, isolate state, make domain objects immutable, push side effects to the edges. A codebase designed for testability is rarely flaky.
+\item
+  \textbf{Testing in production is legitimate.} Synthetic monitoring, canary analysis, feature flags, shadow traffic, and chaos engineering test things you \emph{cannot} fully replicate in staging (real scale, real data distributions, real failure modes). Mature orgs test \emph{both} pre- and post-deploy.
+\item
+  \textbf{Mutation testing exposes the coverage lie at the team level.} When a team is proud of 95\% coverage, run mutation testing once and watch the score come back at 55\%. It reframes the conversation from "are lines covered" to "would we actually catch a bug" --- a more honest, motivating metric.
+\item
+  \textbf{Contract testing is an organizational tool.} It decouples teams: each service team can deploy independently, confident they haven\textquotesingle t broken consumers, \emph{without} coordinating an integrated E2E environment. As the org scales to hundreds of services, full E2E becomes combinatorially impossible --- contracts are what make independent deployment safe.
+\item
+  \textbf{You cannot test quality in; you build it in.} Tests \emph{reveal} quality, they don\textquotesingle t \emph{create} it. Pairing tests with type systems, static analysis, small reviewed diffs, and good design is what produces quality --- testing is one pillar, not the whole building.
+\item
+  \textbf{Flaky tests have an org-level cost: they erode trust in red.} Once "the build is red but it\textquotesingle s probably just flaky" becomes acceptable, \emph{every} real failure is at risk of being ignored. Maintaining a green, trustworthy \texttt{main} is a cultural asset worth aggressive quarantine policies to protect.
+\end{itemize}
+
+\section{Typical Mistakes Candidates Make}\label{typical-mistakes-candidates-make}
+
+\begin{itemize}
+\item
+  \textbf{Only testing the happy path.} Juniors test \texttt{add(2,2)==4}. Seniors immediately enumerate empty, null, zero, negative, max-int, and the \emph{boundary} (the exact \texttt{==18} case). The boundaries are where bugs live.
+\item
+  \textbf{Over-mocking.} Mocking everything --- including their own domain objects --- producing tautological tests that pass while the system is broken and shatter on every refactor. (The \#1 testing anti-pattern.)
+\item
+  \textbf{Confusing mock and stub.} Saying "I\textquotesingle ll mock the database to return a user" when they mean \emph{stub} (canned return, no interaction assertion). Interviewers notice the imprecision.
+\item
+  \textbf{Treating 100\% coverage as the goal.} Not realizing coverage proves a line \emph{ran}, not that an assertion would \emph{catch a bug}. Chasing 100\% with assertion-free tests.
+\item
+  \textbf{Asserting on \texttt{now()} / random / order} and then being surprised the test is flaky. Not recognizing TORN as the root cause.
+\item
+  \textbf{Blind-retrying flaky tests} to get a green build --- hiding real intermittent bugs and normalizing red.
+\item
+  \textbf{Inverting the pyramid} by reaching for E2E ("test the real thing!") for logic that belongs in a fast unit test --- ending up with a slow, flaky suite.
+\item
+  \textbf{Using \texttt{sleep} in E2E tests} instead of waiting for a condition --- guaranteeing either flake (too short) or slowness (too long).
+\item
+  \textbf{Writing tests \emph{after} the fact as an afterthought} rather than alongside the code --- leading to tests that merely echo the implementation instead of specifying behavior.
+\item
+  \textbf{For microservices, proposing full E2E} to prevent breakage instead of contract testing --- not realizing it\textquotesingle s combinatorially unscalable.
+\item
+  \textbf{Forgetting idempotency and failure cases} for money/critical flows --- testing that a charge works, but not that a \emph{retry} doesn\textquotesingle t double-charge.
+\item
+  \textbf{Saying "I\textquotesingle d write tests" without specifics} when asked how to test their solution --- instead of enumerating equivalence classes, boundaries, and which layer each case belongs to.
+\end{itemize}
+
+\section{How This Connects to Other Topics}\label{how-this-connects-to-other-topics}
+
+\begin{itemize}
+\item
+  \textbf{Low-Level Design (06):} Testability \emph{is} good design. SOLID --- especially Dependency Inversion --- is what makes code mockable; a class that depends on an \emph{interface} can be tested with a fake. The over-mocking trap is a symptom of poor cohesion. "Hard to test" \(\equiv\) "bad LLD."
+\item
+  \textbf{System Design / HLD:} Contract testing is the answer to "how do services evolve independently." Idempotency, retries, and timeouts (designed at the HLD level) are exactly what the test suite must verify. Testability shapes architecture (hexagonal/ports-and-adapters exists largely to make the core testable).
+\item
+  \textbf{Performance Engineering (09):} Load, stress, soak, and spike tests are performance testing applied as a \emph{gate}. The same percentile discipline (p95/p99 SLOs) shows up as load-test thresholds. Chaos engineering tests resilience, the failure side of performance.
+\item
+  \textbf{Concurrency / Multithreading:} Race detectors, deterministic scheduling, and "design out the concurrency" all live at the intersection. A concurrency test that passes proves little; a race detector proving \emph{absence} of races is the goal --- and immutable design makes both easier.
+\item
+  \textbf{CI/CD \& DevOps:} The test suite is the engine of continuous deployment. Fail-fast pipeline ordering, can-i-deploy gating, canary analysis, and feature flags are all test-and-quality machinery. No trustworthy suite \(\rightarrow\) no continuous deployment.
+\item
+  \textbf{Distributed Systems:} Testing partial failure, network partitions, and idempotency under retries is core to both distributed-systems design \emph{and} its test strategy. Chaos engineering directly tests the fallacies of distributed computing.
+\item
+  \textbf{Security:} Fuzzing and static analysis (CodeQL, Infer) overlap heavily with security testing --- both hunt for the unhandled input that crashes or exploits the system.
+\end{itemize}
+
+\section{FAANG Interview Tips}\label{faang-interview-tips}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{After you code, volunteer the tests.} Don\textquotesingle t wait to be asked. "Let me note the test cases: empty input, single element, the boundary at N, the overflow case, and the null case." This is a strong seniority signal.
+\item
+  \textbf{Always name the boundary.} For any logic, the off-by-one boundary (\texttt{==}, the exact threshold) is the highest-value test. Saying "and critically, the \texttt{age\ ==\ 18} case" shows you know where bugs hide.
+\item
+  \textbf{Use precise vocabulary.} Say \emph{stub} when you mean canned-return, \emph{mock} when you mean interaction-assertion, \emph{fake} for in-memory. Imprecision reads as inexperience.
+\item
+  \textbf{Reach for the pyramid by name} and the ice-cream-cone anti-pattern. If front-end, mention the testing trophy. It frames your whole answer.
+\item
+  \textbf{For microservices, say "consumer-driven contract testing (Pact)"} the moment independent deployment comes up. It\textquotesingle s the senior answer to "stop A breaking B."
+\item
+  \textbf{Know the over-mocking trap cold.} "I\textquotesingle d mock at the boundary --- the gateway and the DB --- but use real domain objects, to avoid tautological tests that break on refactor." Instant credibility.
+\item
+  \textbf{Frame coverage correctly.} "I use coverage as a floor to find untested code, but mutation testing for the real signal of assertion strength." Sets you apart from "we hit 90\% coverage."
+\item
+  \textbf{Handle flaky tests with the disciplined process,} never "re-run it." Detect \(\rightarrow\) quarantine \(\rightarrow\) root-cause (TORN) \(\rightarrow\) fix.
+\item
+  \textbf{For time/random/async, lead with dependency injection} (inject a clock/RNG), falling back to freeze-libraries for legacy.
+\item
+  \textbf{For payments / money / critical flows, emphasize idempotency and partial-failure}, not just the happy path. "The hard part isn\textquotesingle t that it charges --- it\textquotesingle s that a retry doesn\textquotesingle t charge twice."
+\item
+  \textbf{For legacy code, cite Feathers:} characterization tests \(\rightarrow\) seams \(\rightarrow\) dependency-breaking \(\rightarrow\) refactor under the net.
+\item
+  \textbf{Connect to design.} "This was hard to test, which tells me the class has too many responsibilities --- I\textquotesingle d extract the gateway behind an interface." Testing as a design signal lands well at the senior bar.
+\end{enumerate}
+
+\section{Revision Cheat Sheet}\label{revision-cheat-sheet}
+
+\subsection{10-Minute Summary}\label{10-minute-summary}
+
+Testing buys \textbf{confidence under change}. The cost of a bug grows \textasciitilde10\(\times\) per stage it escapes --- so \textbf{shift left}. The \textbf{test pyramid} says many fast unit tests, some integration, few slow E2E; the inverted \textbf{ice-cream cone} (mostly E2E + manual) is the anti-pattern; the \textbf{testing trophy} (integration-heavy + static base) is the front-end alternative.
+
+A good unit test follows \textbf{AAA} (Arrange-Act-Assert) and \textbf{FIRST} (Fast, Isolated, Repeatable, Self-validating, Timely). \textbf{Five doubles:} dummy (placeholder), stub (canned return), spy (records calls), mock (interaction spec), fake (in-memory real logic). Prefer \textbf{state} over \textbf{interaction} testing; \textbf{mock at the boundary, not in the middle} (over-mocking trap).
+
+\textbf{TDD} = red-green-refactor: failing test \(\rightarrow\) simplest pass \(\rightarrow\) clean up. \textbf{BDD} = Given-When-Then in business language (Gherkin/Cucumber) for cross-functional contracts.
+
+\textbf{Integration} tests use real infra via \textbf{Testcontainers} (ephemeral Postgres/Kafka), isolated by \textbf{transactional rollback}. \textbf{Contract testing (Pact)} lets the consumer publish expectations the provider verifies independently --- stops microservice breakage without full E2E.
+
+\textbf{E2E:} few, critical-path only; \textbf{never sleep, always wait} (Playwright auto-wait). \textbf{Advanced:} property-based (invariants + shrinking, Hypothesis/jqwik), mutation testing (kills mutants \(\rightarrow\) real assertion strength, beats coverage), fuzzing, load/k6, chaos engineering (Netflix).
+
+\textbf{Hard things:} inject a \textbf{clock} for time (freezegun fallback); \textbf{race detectors} (\texttt{go\ test\ -race}) for concurrency; proper \textbf{await} for async; \textbf{characterization tests + seams + dependency-breaking} (Feathers) for legacy.
+
+\textbf{Quality:} coverage is a \textbf{floor} (100\% is vanity); mutation testing is the truth. \textbf{Flaky} tests \(\rightarrow\) detect, quarantine, root-cause (\textbf{TORN}), fix --- \textbf{never blind-retry}. CI runs \textbf{cheap-first, fail fast} (lint \(\rightarrow\) types \(\rightarrow\) unit \(\rightarrow\) integration \(\rightarrow\) contract \(\rightarrow\) e2e).
+
+\subsection{Key Points}\label{key-points}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Shift left} --- every stage a bug survives costs \textasciitilde10\(\times\) more.
+\item
+  \textbf{Pyramid} --- many unit, some integration, few E2E. Inverted = ice-cream cone (bad).
+\item
+  \textbf{FIRST + AAA} --- the anatomy of a good unit test.
+\item
+  \textbf{5 doubles} --- dummy, stub, spy, mock, fake. Know each precisely.
+\item
+  \textbf{State \textgreater{} interaction}; \textbf{mock at the boundary} --- the over-mocking antidote.
+\item
+  \textbf{TDD} --- red-green-refactor; design emerges, stays minimal.
+\item
+  \textbf{Testcontainers} for real-infra integration; \textbf{transactional rollback} for DB isolation.
+\item
+  \textbf{Contract testing (Pact)} --- independent deployment without combinatorial E2E.
+\item
+  \textbf{Never sleep} in E2E; auto-wait for conditions.
+\item
+  \textbf{Property-based} finds + shrinks edge cases; \textbf{mutation} measures assertion strength.
+\item
+  \textbf{Coverage = floor; mutation = truth.} 100\% coverage with weak asserts is vanity.
+\item
+  \textbf{TORN} --- Time, Order, Random, Network = the four causes of flakiness.
+\item
+  \textbf{Never blind-retry flake} --- detect \(\rightarrow\) quarantine \(\rightarrow\) root-cause \(\rightarrow\) fix.
+\item
+  \textbf{Inject the clock}; \textbf{race detectors} for concurrency; \textbf{Feathers} for legacy.
+\item
+  \textbf{Payments} --- idempotency + partial-failure, not just the happy path.
+\end{itemize}
+
+\subsection{Cheat Sheet Table}\label{cheat-sheet-table}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1783}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3647}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4570}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Concept
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rule / Mnemonic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Insight
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Cost of a bug & \textasciitilde10\(\times\) per stage escaped & Shift detection left \\
+\rowcolor{zebra}
+Test pyramid & many unit / some integ / few E2E & Inverted = ice-cream cone \\
+Testing trophy & static / integration-heavy / few E2E & Front-end alternative \\
+\rowcolor{zebra}
+Good unit test & AAA + FIRST & Fast, Isolated, Repeatable, Self-validating, Timely \\
+5 doubles & Dummy, Stub, Spy, Mock, Fake & Increasing capability \\
+\rowcolor{zebra}
+Mock vs stub & mock asserts calls; stub returns data & Don\textquotesingle t conflate \\
+State vs interaction & assert WHAT vs assert HOW & Prefer state (refactor-robust) \\
+\rowcolor{zebra}
+Over-mocking & mock at boundary, not in middle & Avoid tautological tests \\
+TDD & Red \(\rightarrow\) Green \(\rightarrow\) Refactor & Simplest pass first \\
+\rowcolor{zebra}
+BDD & Given-When-Then (Gherkin) & Cross-functional contract \\
+Integration & Testcontainers (real infra) & Catches SQL/serialization bugs \\
+\rowcolor{zebra}
+DB isolation & transactional rollback & Open txn, never commit \\
+Contract test & Pact, consumer-driven & Independent deploy, no E2E \\
+\rowcolor{zebra}
+E2E & few + critical path; never sleep & Auto-wait (Playwright) \\
+Property test & invariant + shrink (Hypothesis) & Finds edge cases you forgot \\
+\rowcolor{zebra}
+Mutation test & kill mutants & Truer than coverage \\
+Coverage & line \textless{} branch \textless{} path & A floor, not a goal \\
+\rowcolor{zebra}
+Flaky causes & \textbf{TORN} & Time/Order/Random/Network \\
+Flaky process & detect\(\rightarrow\)quarantine\(\rightarrow\)fix & Never blind-retry \\
+\rowcolor{zebra}
+Time testing & inject clock / freezegun & Deterministic now() \\
+Concurrency & race detector (\texttt{-race}) & Proves absence of races \\
+\rowcolor{zebra}
+Legacy & Feathers: characterize + seams & Dependency-breaking \\
+CI order & cheap-first, fail fast & lint\(\rightarrow\)types\(\rightarrow\)unit\(\rightarrow\)integ\(\rightarrow\)e2e \\
+\rowcolor{zebra}
+Payments & idempotency + partial-failure & Don\textquotesingle t lose money on retry \\
+Chaos & Netflix Chaos Monkey & Test failure, not just correctness \\
+\end{longtable}
+
+\subsection{Most Important Concepts}\label{most-important-concepts}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Shift left} --- bugs cost \textasciitilde10\(\times\) more per stage; catch them early.
+\item
+  \textbf{Test pyramid} --- many unit, few E2E; avoid the ice-cream cone.
+\item
+  \textbf{AAA + FIRST} --- the anatomy of a trustworthy unit test.
+\item
+  \textbf{Five doubles, used precisely} --- stub returns, mock asserts, fake runs.
+\item
+  \textbf{Mock at the boundary} --- avoid the over-mocking trap; prefer state testing.
+\item
+  \textbf{TDD red-green-refactor} --- design emerges, stays minimal.
+\item
+  \textbf{Contract testing (Pact)} --- independent microservice deployment.
+\item
+  \textbf{Coverage is a floor; mutation testing is the truth.}
+\item
+  \textbf{TORN} --- the four causes of flakiness; never blind-retry.
+\item
+  \textbf{Idempotency + partial-failure} --- the real test of any money/critical flow.
+\end{enumerate}
+
+\end{document}
