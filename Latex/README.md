@@ -58,6 +58,7 @@ python3 build.py --status   # progress table
 python3 make_index.py       # rebuild the index + bookmarked merged collection
 python3 make_anki.py        # regenerate the Anki flashcard decks
 python3 make_flashcards_ui.py   # regenerate flashcards.html (browser study app)
+python3 make_readmes.py     # refresh the pdf/ + tex/ index READMEs (links to every edition)
 ```
 
 **Flashcards UI:** `flashcards.html` is a self-contained study app (open in any browser, no
