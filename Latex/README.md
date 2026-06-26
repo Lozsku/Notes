@@ -48,44 +48,190 @@ plus one `.tsv` per topic, importable straight into Anki (see `anki/README.md`).
 
 ## Adding a new edition (step by step)
 
-**You never hand-write `.tex` or PDF — they are generated from Markdown.** To add a new note:
+> **You never hand-write `.tex` or PDF.** You write **one Markdown file**, register it in
+> two small places, and the scripts generate the styled `.tex`, the PDF, the merged book,
+> the flashcards, and the index links for you.
 
-1. **Write the note in Markdown** under `Interview-Prep/` (any sub-folder is fine), following
-   the same section format as the others (`# Title`, then `## Overview — What It Is`, … ,
-   `## Common Interview Questions` with `### Qn:` blocks, … , `## Revision Cheat Sheet`).
-   *Tip: copy an existing file as a skeleton.*
+This walkthrough adds a fictional edition called **GraphQL** end-to-end. Substitute your own
+topic. Everything runs from the `Latex/` directory:
 
-2. **Register it** — add one row to the `REG` list near the top of `build.py`:
-   ```python
-   # key,        source (rel. to Interview-Prep/),  title,                 track,           num, accent,  accent2
-   ("caching",   "15-caching.md",                   "Caching",             "Design Track",  "",  "c2410c","fb923c"),
-   ```
-   `key` is the output filename; `accent`/`accent2` are hex colours (no `#`) for the theme.
+```bash
+export PATH="$HOME/.local/bin:$PATH"   # so pandoc + tectonic are on PATH
+cd /home/harsha/kite_algo_trader/Notes/Latex
+```
 
-3. **Put it in a folder** — add the `key` to the `FOLDER` map in `build.py` (which concept
-   sub-folder its `.tex`/`.pdf` land in). Use an existing folder or a new one:
-   ```python
-   "caching": "system-design",      # → tex/system-design/ and pdf/system-design/
-   ```
-   (If you add a brand-new folder, also add it to `FOLDER_META` in `make_readmes.py` so it
-   shows up in the index READMEs.)
+### Step 1 — Write the Markdown note
 
-4. **Build it:**
-   ```bash
-   python3 build.py --only caching      # builds just this one (or run build.py for all)
-   ```
-   This auto-generates `tex/<folder>/caching.tex` and `pdf/<folder>/caching.pdf`.
+Create the source file under `../Interview-Prep/` (the `Interview-Prep/` folder is the build's
+source root, called `SRC`). Any sub-folder is fine. **Easiest start: copy an existing note and
+edit it** so you inherit the exact section structure:
 
-5. **Refresh the aggregate outputs:**
-   ```bash
-   python3 make_index.py          # adds it to the merged bookmarked collection + catalogue
-   python3 make_anki.py           # flashcards from its ### Qn: blocks
-   python3 make_flashcards_ui.py  # updates flashcards.html
-   python3 make_readmes.py        # adds it to pdf/README.md + tex/README.md
-   ```
+```bash
+cp ../Interview-Prep/15-caching.md ../Interview-Prep/22-graphql.md
+# now edit 22-graphql.md — change the title and content
+```
 
-That's it — no LaTeX by hand. Editing an existing note? Just edit its `.md` and re-run
-`python3 build.py` (it rebuilds only what changed) plus the refresh scripts above.
+The build expects this shape (it's what every edition uses; `(BT)` below means a literal
+triple-backtick ` ``` ` — shown this way so the example itself doesn't break):
+
+````text
+# GraphQL                          ← H1 = the cover title (exactly ONE, at the very top)
+
+> **How to use this file:** …      ← short intro blockquote (optional)
+
+## Table of Contents               ← optional; the PDF builds its own clickable TOC
+- …
+
+## Overview — What It Is           ## headings -> numbered sections in the PDF
+…
+### A sub-topic                    ### headings -> numbered sub-sections (1.1, 1.2 …)
+
+(BT)java                           code fences: TAG with a language (java/python/sql/
+   …  your code …                  bash/json/…) to get IDE-style syntax highlighting
+(BT)
+
+(BT)                               an UNTAGGED fence = rendered as an ASCII-diagram card
+   ┌────┐   ───►  ┌────┐
+(BT)
+
+## Common Interview Questions
+### Q1: <the question>             ← `### Qn:` blocks are auto-extracted into FLASHCARDS
+**Model answer:** …
+**Follow-ups:**
+- …
+
+## Revision Cheat Sheet
+…
+````
+
+Rules that matter: exactly **one `# H1`** (the cover title), use `##`/`###` for everything
+else, language-tag code fences you want highlighted, and write questions as `### Qn:` +
+`**Model answer:**` if you want flashcards from them.
+
+### Step 2 — Register it in `build.py` (`REG`)
+
+Open `build.py`, find the `REG = [ … ]` list near the top, and add **one row**. Columns are:
+`key`, `source path (relative to Interview-Prep/)`, `title`, `track`, `number`, `accent`, `accent2`.
+
+```python
+REG = [
+  …
+  ("caching",  "15-caching.md", "Caching", "Design Track", "", "c2410c","fb923c"),
+  ("graphql",  "22-graphql.md", "GraphQL", "Design Track", "", "e535ab","f0a6d6"),   # ← ADD THIS
+  …
+]
+```
+
+- **`key`** (`"graphql"`) = the output filename → `graphql.tex` / `graphql.pdf`. Keep it
+  unique, lowercase, no spaces.
+- **`title`** = what prints big on the cover. Escape `&` as `\\&` (e.g. `"Testing \\& Code Quality"`).
+- **`track`** = the group it's filed under in the catalogue (e.g. `"Design Track"`, or a new one).
+- **`number`** = the big faded number on the cover (use `""` for none).
+- **`accent`/`accent2`** = two hex colours **without `#`** for the theme (cover, headings, code bar).
+
+### Step 3 — Put it in a folder (`FOLDER`)
+
+Still in `build.py`, find the `FOLDER = { … }` map and add the key → which concept sub-folder
+its `.tex`/`.pdf` go into:
+
+```python
+FOLDER = {
+  …
+  "caching": "system-design",
+  "graphql": "system-design",      # ← ADD THIS  → tex/system-design/ + pdf/system-design/
+  …
+}
+```
+
+Reuse an existing folder (`foundations`, `systems`, `infrastructure`, `system-design`, `data`,
+`dev-practices`, `dsa`, `ai-ml`, `behavioral`). **Only if you invent a NEW folder**, also add it
+to `FOLDER_META` in `make_readmes.py` (with a display label) so it appears in the index READMEs:
+
+```python
+FOLDER_META = [
+  …
+  ("system-design", "🏗️ System Design"),
+  ("my-new-folder", "🆕 My New Folder"),   # ← only when adding a brand-new folder
+]
+```
+
+### Step 4 — Build it → generates the `.tex` and PDF
+
+```bash
+python3 build.py --only graphql
+```
+
+**Expected output:**
+
+```
+  ++ graphql            building…
+  ok graphql            -> graphql.pdf  (7.4s, 210 KB)
+
+DONE: 1 ok, 0 failed, 1 attempted.
+```
+
+> `--only graphql` builds just this one (matches any key containing the text). Run
+> `python3 build.py` alone to build everything that changed; add `--force` to rebuild ignoring
+> the cache. If you only edited the `.md`, plain `build.py` rebuilds just that doc.
+
+**Verify the files were generated:**
+
+```bash
+ls pdf/system-design/graphql.pdf tex/system-design/graphql.tex
+# → pdf/system-design/graphql.pdf   tex/system-design/graphql.tex
+```
+
+Open `pdf/system-design/graphql.pdf` to eyeball it.
+
+### Step 5 — Refresh the aggregate outputs
+
+These pull your new edition into the merged book, flashcards, and index pages:
+
+```bash
+python3 make_index.py          # merged bookmarked collection + catalogue
+python3 make_anki.py           # Anki decks from ### Qn: blocks
+python3 make_flashcards_ui.py  # flashcards.html study app
+python3 make_readmes.py        # pdf/README.md + tex/README.md index links
+```
+
+**Expected output (counts grow by your edition):**
+
+```
+# make_index.py
+  ok  00-Collection-Index.pdf  (5 pp, 46 KB)
+  ok  Complete-Collection.pdf  (1255 pp, 12104 KB, 40 editions, bookmarked)
+# make_anki.py
+  ok  254 flashcards across 31 topics -> …/Latex/anki
+# make_flashcards_ui.py
+  ok  254 cards across 31 decks -> …/Latex/flashcards.html
+# make_readmes.py
+  ok  pdf/README.md  (41 editions linked)
+  ok  tex/README.md  (41 editions linked)
+```
+
+Done — your topic is now a styled PDF, in the merged book, in the flashcards, and linked from
+`pdf/README.md`. **No LaTeX written by hand.**
+
+### Editing an existing edition
+
+Just edit its `.md` and re-run the build (it rebuilds only what changed) + the refreshers:
+
+```bash
+python3 build.py                # detects the changed source via manifest.json, rebuilds it
+python3 make_index.py && python3 make_anki.py && python3 make_flashcards_ui.py && python3 make_readmes.py
+```
+
+### Troubleshooting
+
+| Symptom | Cause / fix |
+|---------|-------------|
+| `!! missing source: …` | the `source` path in `REG` is wrong (it's relative to `Interview-Prep/`). |
+| Doc lands in a `misc/` folder | you added the `REG` row but forgot the `FOLDER` entry for that key. |
+| New folder's PDFs aren't in `pdf/README.md` | add the folder to `FOLDER_META` in `make_readmes.py`. |
+| `pandoc: command not found` | run `export PATH="$HOME/.local/bin:$PATH"` first. |
+| `!! pandoc failed …` | a Markdown issue — usually a malformed table or an unclosed ``` code fence. |
+| PDF built but a figure/section looks off | check for one stray `#` H1 in the body (only the first line should be H1). |
+| Cover title shows a literal `\&` | in the `REG` title use `\\&` for an ampersand. |
 
 ## Rebuild / resume
 
