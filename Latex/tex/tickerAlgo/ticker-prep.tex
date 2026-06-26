@@ -1,0 +1,267 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Kite Algo Trader — Interview Prep}
+\newcommand{\ThemeKicker}{Project Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{0d9488}{2dd4bf}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+Personal notes. Untracked on purpose --- do \textbf{not} commit.
+\end{quote}
+
+\section{1. The 30-second pitch}\label{1-the-30-second-pitch}
+
+\begin{quote}
+"I built a multi-strategy algorithmic trading platform for Indian equities, index
+options, and MCX commodities --- \textasciitilde31 strategies running concurrently, paper and live
+(via Zerodha). It ingests real-time market data over WebSockets, runs a paper/live
+order engine, has a full observability stack, and a backtesting engine that replays
+the \emph{real} strategy code. It runs 24/7 on two cloud VMs. The interesting parts
+weren\textquotesingle t the strategies --- they were keeping a stateful, real-time, money-handling
+system \emph{reliable}: crash recovery, data-feed failures, resource limits, race conditions."
+\end{quote}
+
+Lead with \textbf{"reliability of a stateful real-time system"} --- that\textquotesingle s what makes it
+senior-level, not "I wrote trading strategies."
+
+\section{2. Tech stack (and why each)}\label{2-tech-stack-and-why-each}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0856}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.6334}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2810}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Layer
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tech
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Backend & Python, Flask, Flask-SocketIO, \textbf{eventlet} & Real-time push to UI; async I/O on one process \\
+\rowcolor{zebra}
+Data feeds & \textbf{Angel One SmartAPI} (WS+REST, primary), \textbf{Dhan} (WS option ticks), yfinance (fallback) & Multi-source with fallback behind one facade \\
+Execution & \textbf{KiteConnect/Zerodha} (live orders + OAuth), custom PaperEngine & Paper-first, selective live \\
+\rowcolor{zebra}
+Storage & \textbf{SQLite (WAL)} for live state/trades, \textbf{DuckDB + Parquet} for analytics/cold tier & Lightweight OLTP + columnar OLAP, no DB server \\
+Frontend & Vanilla JS SPA, Socket.IO, \textbf{PWA/service worker}, Lightweight Charts & Mobile-installable, no framework overhead \\
+\rowcolor{zebra}
+Observability & \textbf{VictoriaMetrics}, \textbf{Grafana}, \textbf{Loki}, process-exporter/Alloy, \textbf{GlitchTip} (Sentry-compatible) & Full RED monitoring across 2 hosts \\
+Quant & Pure-Python indicators (EMA/ATR/RSI/ADX/SuperTrend/VWAP), Black-Scholes greeks, \textbf{QuantLib} IV, \textbf{pandera}, \textbf{Optuna} & Backtest optimization + data validation \\
+\rowcolor{zebra}
+Infra/DevOps & \textbf{Oracle Cloud} (1 GB micro + 24 GB ARM), \textbf{systemd} units+timers, \textbf{nginx} TLS, \textbf{OCI Object Storage} backups, \textbf{GitHub Actions} CI (ruff, pytest, gitleaks, pip-audit, Dependabot) & Free-tier-constrained, automated \\
+\end{longtable}
+
+\section{3. Architecture in six boxes}\label{3-architecture-in-six-boxes}
+
+\texttt{Data\ feeds\ \$\textbackslash{}rightarrow\$\ MarketDataService\ (caching\ facade)\ \$\textbackslash{}rightarrow\$\ 31\ Strategy\ threads\ (BaseStrategy\ ABC)\ \$\textbackslash{}rightarrow\$\ OrderManager\ \$\textbackslash{}rightarrow\$\ Paper/Live\ engine\ \$\textbackslash{}rightarrow\$\ SQLite}, with three cross-cutting safety systems:
+\textbf{Watchdog} (detects stuck strategies), \textbf{TradeResumer} (restores open trades after
+restart), \textbf{Reconciler} (detects position\(\leftrightarrow\)state drift). Plus a \textbf{backtest engine} that
+replays the real strategy code, and the \textbf{observability stack}.
+
+\section{4. Problems faced \& how we solved them (the part interviewers care about)}\label{4-problems-faced--how-we-solved-them-the-part-interviewers-care-about}
+
+\textbf{(1) Duplicate orders / orphaned positions (thread-lifecycle race)}
+
+\begin{itemize}
+\tightlist
+\item
+  Symptom: a strategy bought the same option 4\(\times\) in 60s; positions accumulated; legs left open after close \(\rightarrow\) hidden losses.
+\item
+  Root cause: the watchdog recycled a "stuck" strategy with \texttt{stop();\ start()}, but \texttt{stop()} only flipped a flag --- never \textbf{joined} the thread. If the strategy was hung on a blocking call (when it looks stuck), the old thread was alive, so \texttt{start()} spawned a SECOND thread. Two threads each fired entries.
+\item
+  Fix: \texttt{start()} refuses to spawn while the old thread is alive; two-phase recycle (stop \(\rightarrow\) drain \(\rightarrow\) restart); 15:25 EOD square-off net.
+\item
+  Lesson: a kill that doesn\textquotesingle t join is not a kill. Thread lifecycle + idempotency.
+\end{itemize}
+
+\textbf{(2) Watchdog killing healthy strategies (liveness vs progress)}
+
+\begin{itemize}
+\tightlist
+\item
+  Symptom: strategies recycled every few minutes, then daily \textasciitilde14:54.
+\item
+  Root cause: watchdog recycles anything whose heartbeat is stale; idle/wait loops used plain \texttt{time.sleep()} \(\rightarrow\) no heartbeat \(\rightarrow\) looked hung.
+\item
+  Fix: heartbeat-aware \texttt{self.\_sleep()} --- beats every 30s but stays interruptible, so a GENUINE hang (stuck outside the sleep) is still caught.
+\item
+  Lesson: distinguish "alive" from "making progress"; the liveness signal must come from the work loop.
+\end{itemize}
+
+\textbf{(3) Expired options stranded forever (don\textquotesingle t gate exits on data)}
+
+\begin{itemize}
+\tightlist
+\item
+  Symptom: a 16-Jun Iron Condor still held on 17-Jun.
+\item
+  Root cause: exit computed AFTER an LTP fetch --- \texttt{if\ net\_premium\ \textless{}\ 0:\ retry}. Expired options stop ticking \(\rightarrow\) premium permanently unavailable \(\rightarrow\) retried forever, never exited.
+\item
+  Fix: expiry-date safety net (settle at intrinsic-vs-spot, no LTP); state-independent sweep that parses expiry from the position symbol; paper engine accepts ₹0 settlement only for a genuine expired close.
+\item
+  Lesson: never gate a critical exit behind data that can disappear.
+\end{itemize}
+
+\textbf{(4) ₹33k phantom loss from a fabricated price}
+
+\begin{itemize}
+\tightlist
+\item
+  Root cause: when live price was missing, the close used a hard-coded \texttt{or\ 0.5} fallback fill.
+\item
+  Fix: never fabricate --- retry, then skip; settle at intrinsic or not at all.
+\item
+  Lesson: in a money system, a WRONG number is more dangerous than NO number.
+\end{itemize}
+
+\textbf{(5) The 1 GB VM core-dumping (SIGBUS)}
+
+\begin{itemize}
+\tightlist
+\item
+  Root cause: DuckDB default memory \textasciitilde80\% of RAM; concurrent with the trader on 1 GB \(\rightarrow\) over-commit, swap-thrash, page fault on an \textbf{mmap\textquotesingle d Parquet} page \(\rightarrow\) SIGBUS, killing the whole process.
+\item
+  Fix: cap DuckDB memory/threads + disk-spill temp dir (env-overridable); also disabled SQLite mmap (same SIGBUS-under-concurrent-write mode). systemd Restart=on-failure as backstop.
+\item
+  Lesson: resource limits in constrained envs; why mmap faults become SIGBUS.
+\end{itemize}
+
+\textbf{(6) NSE 403-blocking cloud IPs (vendor reliability)}
+
+\begin{itemize}
+\tightlist
+\item
+  Root cause: NSE blocks data-center IPs; feed silently went stale on VMs (worked locally).
+\item
+  Fix: migrated ALL live data to Angel One (incl. VIX), gated dead NSE behind a flag. The MarketDataService facade meant 31 strategies didn\textquotesingle t change.
+\item
+  Lesson: abstract vendors behind a facade; don\textquotesingle t trust one external dependency.
+\end{itemize}
+
+\textbf{(7) API rate-limit storms}
+
+\begin{itemize}
+\tightlist
+\item
+  Root cause: Angel One throttled (\textasciitilde1,400 hits/host/day); candle fetches returned empty \(\rightarrow\) strategies blind.
+\item
+  Fix: caching (dedup fetches) + process-wide throttle (3 req/s) + exponential backoff (5\(\rightarrow\)10\(\rightarrow\)20\(\rightarrow\)40s) + alerting. \textasciitilde90\% fewer hits.
+\item
+  Lesson: caching + throttling + backoff as the standard rate-limit pattern.
+\end{itemize}
+
+\textbf{(8) eventlet broke SSL libs (async monkey-patching pitfall)}
+
+\begin{itemize}
+\tightlist
+\item
+  Root cause: eventlet monkey-patches the SSL stack; Telegram/yfinance recursed infinitely.
+\item
+  Fix: pull the original un-patched \texttt{urllib.request} via \texttt{eventlet.patcher.original()} for those calls.
+\item
+  Lesson: know your concurrency model\textquotesingle s failure modes; monkey-patching is leaky.
+\end{itemize}
+
+\textbf{(9) Crash recovery \& state drift}
+
+\begin{itemize}
+\tightlist
+\item
+  Problem: a restart could lose in-memory state while positions stayed open \(\rightarrow\) strategy went blind, re-entered, accumulated orphans.
+\item
+  Fix: TradeResumer restores open trades on boot; Reconciler detects "position without trade-state" drift; re-entry guard refuses a new position-group while untracked legs are held.
+\item
+  Lesson: stateful systems need explicit crash-recovery + a reconciliation loop.
+\end{itemize}
+
+\textbf{(10) A refactor silently broke DB reads}
+
+\begin{itemize}
+\tightlist
+\item
+  Symptom: History/P\&L tabs went blank after a code reorg.
+\item
+  Root cause: moving files into deeper packages broke \texttt{\_\_file\_\_}-relative path math \(\rightarrow\) DB path resolved to an empty file. Tests masked it (override the path); boot didn\textquotesingle t error (empty DB returns no rows).
+\item
+  Fix: corrected path math + regression tests pinning every \texttt{\_\_file\_\_}-derived path to repo root.
+\item
+  Lesson: depth-changing refactors are sneaky; "it imports and boots" \(\neq\) "it works."
+\end{itemize}
+
+\textbf{⑪ Backtests that didn\textquotesingle t match live}
+
+\begin{itemize}
+\tightlist
+\item
+  Problem: original backtester used per-strategy adapters \(\rightarrow\) diverged from live.
+\item
+  Fix: rebuilt to replay the REAL strategy code against recorded data, with a data-fidelity grade, Optuna optimization + walk-forward, as a niced subprocess so it never starves the live trader.
+\item
+  Lesson: backtest-live parity --- different code = the backtest is lying.
+\end{itemize}
+
+\section{\texorpdfstring{5. Likely questions \(\rightarrow\) answers}{5. Likely questions \textbackslash rightarrow answers}}\label{5-likely-questions-rightarrow-answers}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Hardest bug?} \(\rightarrow\) (1) duplicate orders: observability \(\rightarrow\) two threads \(\rightarrow\) \texttt{stop()} never joined \(\rightarrow\) spawn guard + two-phase recycle. Root cause, not symptom; killed a class.
+\item
+  \textbf{Reliable long-running system?} \(\rightarrow\) detection (watchdog/heartbeat), recovery (crash-restart + persisted state, resume not re-fire), reconciliation (drift loop), systemd floor. Each added after a real incident.
+\item
+  \textbf{Unreliable external data?} \(\rightarrow\) facade + multi-source fallback + cache/throttle/backoff + "no data is a first-class state, never fabricate." NSE swap touched 1 module not 31.
+\item
+  \textbf{Testing vs live markets?} \(\rightarrow\) paper engine mirrors live path; backtest replays real code; parity tests (old impls as oracles, bit-for-bit); unit tests on money paths.
+\item
+  \textbf{Resource constraints?} \(\rightarrow\) 1 GB VM: DuckDB caps + hot/cold Parquet tiering + tpool offload; same code scales to 24 GB via env vars.
+\item
+  \textbf{Observability?} \(\rightarrow\) metrics+Grafana+Loki+GlitchTip, RED dashboards, per-strategy P\&L, data-source freshness, config-change tracking. Most debugging started from a dashboard.
+\item
+  \textbf{Decision you\textquotesingle d revisit?} \(\rightarrow\) SQLite+eventlet single-process was right for solo free-tier, but caused SIGBUS/concurrency + monkey-patch pitfalls; at scale \(\rightarrow\) Postgres + real task model. Also front-load tests.
+\item
+  \textbf{Ship safely?} \(\rightarrow\) one-command multi-host deploy (ff-only + compile-check + restart + health-check), CI every push, DB changes after close; hardened deploy to fail loudly after a silent no-op.
+\item
+  \textbf{Concurrency model?} \(\rightarrow\) eventlet (green threads) for I/O + Socket.IO, OS threads per strategy; bugs lived at that boundary (join semantics, heartbeat starvation, SSL monkey-patch).
+\end{itemize}
+
+\section{6. "What would you do differently"}\label{6-what-would-you-do-differently}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Storage: SQLite was right for solo/free-tier but hit SIGBUS/concurrency walls; Postgres removes a bug class --- simplicity vs concurrency-safety tradeoff.
+\item
+  Tests first: best fixes ended with "\ldots and added the test that would\textquotesingle ve caught it" (phantom-fill, path-depth) --- both invisible to "it runs."
+\end{enumerate}
+
+\textbf{Closing framing:} "Solo project, but I treated it like production --- because it trades
+real money. Most of the engineering went into the boring-but-hard parts: not crashing,
+not double-trading, not trusting a feed, and being able to see what it\textquotesingle s doing."
+
+\end{document}

@@ -1,0 +1,1000 @@
+\documentclass[11pt]{article}
+
+% ---- theme variables (passed via pandoc -V) ----
+\newcommand{\ThemeName}{Kite Algo Trader — Detailed Prep}
+\newcommand{\ThemeKicker}{Project Track}
+\newcommand{\ThemeNumber}{}
+
+\usepackage{interviewstyle}
+\setthemecolor{0d9488}{2dd4bf}
+
+% pandoc-required plumbing
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\providecommand{\pandocbounded}[1]{#1}
+
+% syntax-highlighting macros emitted by pandoc (skylighting)
+
+
+\begin{document}
+
+\makecoverpage
+
+\thispagestyle{empty}
+{\hypersetup{hidelinks}\tableofcontents}
+\clearpage
+
+\begin{quote}
+Personal notes. \textbf{Untracked on purpose --- do not commit.}
+Companion to \texttt{INTERVIEW\_PREP.md} (the quick-reference). This one is the long-form,
+STAR-format, "talk for 5--10 minutes" version. Read the pitch + 3 stories cold;
+skim the rest.
+\end{quote}
+
+\section{0. How to use this in an interview}\label{0-how-to-use-this-in-an-interview}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Lead with reliability, not strategies.} The senior-level signal is "I kept a
+  stateful, real-time, money-handling system alive 24/7," not "I wrote trading logic."
+\item
+  \textbf{Tell stories, not features.} Every strong answer below is a real incident with a
+  symptom \(\rightarrow\) investigation \(\rightarrow\) root cause \(\rightarrow\) fix \(\rightarrow\) lesson arc.
+\item
+  \textbf{Always name the trade-off.} Interviewers reward "I chose X knowing it cost me Y,
+  because Z mattered more for a solo free-tier system."
+\item
+  \textbf{Own the mistakes.} Two bugs were caused by \emph{my own refactors} (path-depth, fabricated
+  fill). Volunteering those reads as maturity, not weakness.
+\end{itemize}
+
+\section{1. The pitch (30--45 seconds)}\label{1-the-pitch-3045-seconds}
+
+\begin{quote}
+"It\textquotesingle s a multi-strategy algorithmic trading platform for Indian markets --- equities, index
+options, and MCX commodities. Around 31 strategies run concurrently, in paper or live mode
+through Zerodha. It ingests real-time data over WebSockets, runs its own paper/live order
+engine, has a full observability stack --- Grafana, Loki, metrics, error tracking --- and a
+backtesting engine that replays the \emph{actual} strategy code rather than a reimplementation.
+It runs 24/7 on two cloud VMs.
+
+The interesting engineering wasn\textquotesingle t the strategies --- those are the easy part. It was making
+a stateful, real-time, money-handling system \emph{reliable}: surviving crashes without losing
+open positions, surviving feed outages, not double-trading under race conditions, and
+running inside a 1 GB free-tier VM without getting OOM-killed."
+\end{quote}
+
+\section{\texorpdfstring{2. Technologies \& tools (and the \emph{why} behind each)}{2. Technologies \& tools (and the why behind each)}}\label{2-technologies--tools-and-the-why-behind-each}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.0743}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4581}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4676}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Layer
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tech
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Why this, not the alternative
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Language} & Python 3 & Quant ecosystem (numpy/pandas), broker SDKs are Python-first, fast iteration for a solo dev \\
+\rowcolor{zebra}
+\textbf{Web/Backend} & Flask + Flask-SocketIO + \textbf{eventlet} & Needed server\(\rightarrow\)browser push (live ticks, P\&L). Eventlet green threads give async I/O in one process --- no separate async runtime to operate \\
+\textbf{Realtime feeds} & \textbf{Angel One SmartAPI} (WS+REST, primary), \textbf{Dhan} (WS option ticks), \textbf{yfinance} (fallback) & Multi-vendor behind one facade; no single point of failure for data \\
+\rowcolor{zebra}
+\textbf{Execution} & \textbf{KiteConnect/Zerodha} (live + OAuth), custom \textbf{PaperEngine} & Paper-first by default; live is opt-in per strategy \\
+\textbf{OLTP storage} & \textbf{SQLite (WAL mode)} & Live state, trades, signals. Zero-ops, single-file, good enough for one writer; WAL gives concurrent reads \\
+\rowcolor{zebra}
+\textbf{OLAP storage} & \textbf{DuckDB + Parquet} (hot/cold tiering) & Columnar analytics + backtest data without standing up a DB server; cold tier is just Parquet files \\
+\textbf{Frontend} & Vanilla JS SPA + Socket.IO + \textbf{PWA/service worker} + Lightweight Charts & Mobile-installable, offline shell, no framework/build overhead to maintain solo \\
+\rowcolor{zebra}
+\textbf{Quant} & Pure-Python indicators (EMA/ATR/RSI/ADX/SuperTrend/VWAP), Black--Scholes greeks, \textbf{QuantLib} (IV), \textbf{pandera} (data validation), \textbf{Optuna} (optimization) & Transparent, debuggable math; Optuna for walk-forward param search \\
+\textbf{Observability} & \textbf{VictoriaMetrics}, \textbf{Grafana}, \textbf{Loki}, process-exporter/Alloy, \textbf{GlitchTip} (Sentry-compatible) & RED metrics + logs + error tracking across both hosts; GlitchTip is self-hosted so it\textquotesingle s free \\
+\rowcolor{zebra}
+\textbf{Infra} & \textbf{Oracle Cloud} (1 GB micro + 24 GB ARM), \textbf{systemd} units+timers, \textbf{nginx} (TLS), \textbf{OCI Object Storage} (DB backups w/ lifecycle), bash deploy & Free-tier-constrained; systemd is the supervisor + scheduler \\
+\textbf{CI/CD} & \textbf{GitHub Actions} (ruff, pytest, gitleaks, pip-audit, Dependabot), one-command multi-host deploy script & Lint + test + secret-scan + dependency-audit on every push \\
+\end{longtable}
+
+\textbf{Anticipated "why" questions and one-liners:}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Why SQLite not Postgres?} Solo, free-tier, one writer. Zero ops beat concurrency-safety ---
+  and I learned where that line is (the SIGBUS story).
+\item
+  \emph{Why eventlet not asyncio/threads?} Socket.IO integration + one-process I/O concurrency.
+  It bit me (SSL monkey-patching), but for the scale it was the right operational simplicity.
+\item
+  \emph{Why DuckDB + Parquet not just SQLite?} Backtests scan millions of rows columnar; SQLite
+  row-store would be slow and bloated. DuckDB reads Parquet directly, no import step.
+\item
+  \emph{Why two VMs of different sizes?} Free tier. The 1 GB micro forced real resource discipline
+  (caps, tiering) --- same code runs on the 24 GB ARM box by changing env vars.
+\end{itemize}
+
+\section{3. Architecture in six boxes}\label{3-architecture-in-six-boxes}
+
+\setcodelang{}
+
+\begin{verbatim}
+Data feeds (Angel/Dhan/yfinance)
+        │
+        ▼
+MarketDataService  ── caching facade, throttle, freshness tracking
+        │
+        ▼
+~31 Strategy threads  ── BaseStrategy ABC (heartbeat, sleep, lifecycle)
+        │
+        ▼
+OrderManager ──► Paper/Live engine ──► SQLite (state/trades/signals)
+\end{verbatim}
+
+Three cross-cutting \textbf{safety systems}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Watchdog} --- detects strategies whose heartbeat is stale and recycles them.
+\item
+  \textbf{TradeResumer} --- on boot, restores open trades from SQLite so a restart doesn\textquotesingle t go blind.
+\item
+  \textbf{Reconciler} --- continuously detects position\(\leftrightarrow\)state drift (a held position with no tracking state).
+\end{itemize}
+
+Plus a \textbf{backtest engine} that replays the real strategy code, and the \textbf{observability stack}.
+
+\section{4. Problem-solving stories (STAR) --- the core of the interview}\label{4-problem-solving-stories-star--the-core-of-the-interview}
+
+\begin{quote}
+These are ordered by how impressive/teachable they are. Know stories (1)(2)(3) verbatim;
+the rest are "I can also tell you about\ldots" material.
+\end{quote}
+
+\subsection{(1) Duplicate orders from a thread-lifecycle race flagship story}\label{1-duplicate-orders-from-a-thread-lifecycle-race-flagship-story}
+
+\textbf{Situation.} I noticed in the trade journal that one strategy had bought the \emph{same} option
+four times within about a minute. Positions were accumulating, and sometimes legs were left
+open after a "close," which meant silent, real losses.
+
+\textbf{Task.} Figure out how a single strategy could fire the same entry multiple times --- and kill
+the whole class of bug, not just patch the one symptom.
+
+\textbf{Action.} I traced it back through the logs to the watchdog. The watchdog\textquotesingle s job is to recycle
+a "stuck" strategy with \texttt{stop();\ start()}. But \texttt{stop()} only flipped a boolean flag --- it never
+\emph{joined} the thread. So if a strategy looked stuck because it was hung on a blocking call, the
+old thread was still alive when \texttt{start()} ran, and \texttt{start()} happily spawned a \emph{second} thread.
+Now two threads were running the same strategy, each independently hitting the entry condition
+and placing orders. The "fix it later" version would\textquotesingle ve been to dedupe orders downstream --- but
+that just hides a process running twice. So I fixed the lifecycle: \texttt{start()} now refuses to
+spawn while the previous thread is still alive, and the recycle became two-phase --- stop, drain,
+\emph{then} restart --- so there\textquotesingle s never a window with two live threads. I also added a 15:25 EOD
+square-off net to clean up anything that slipped through.
+
+\textbf{Result.} The duplicate-entry class disappeared. The mental model I took away: \textbf{a kill that
+doesn\textquotesingle t join is not a kill.} Any supervisor that restarts work has to guarantee the old worker
+is actually dead first, otherwise "restart" becomes "duplicate."
+
+\textbf{Lesson / one-liner.} "Thread lifecycle and idempotency: a restart primitive is only safe if
+it\textquotesingle s also a \emph{join}."
+
+\subsection{\texorpdfstring{(2) Watchdog killing \emph{healthy} strategies (liveness \(\neq\) progress)}{(2) Watchdog killing healthy strategies (liveness \textbackslash neq progress)}}\label{2-watchdog-killing-healthy-strategies-liveness-neq-progress}
+
+\textbf{Situation.} After adding the watchdog, strategies started getting recycled constantly --- every
+few minutes early on, and later a stubborn daily recycle around 14:54 for one specific strategy.
+
+\textbf{Task.} Stop the watchdog from euthanizing strategies that were actually fine, without making
+it blind to genuine hangs.
+
+\textbf{Action.} The watchdog recycles anything whose heartbeat is stale. The problem was that idle
+and wait loops used a plain \texttt{time.sleep()} --- during a long sleep, no heartbeat went out, so a
+perfectly healthy strategy \emph{looked} hung. The naive fix is "make the timeout longer," but that
+just makes you slower to catch real hangs. Instead I introduced a heartbeat-aware
+\texttt{self.\_sleep()}: it sleeps in short interruptible chunks and emits a heartbeat roughly every 30
+seconds. So a strategy that\textquotesingle s deliberately idle keeps signaling "alive," but a strategy that\textquotesingle s
+genuinely wedged \emph{outside} the sleep (stuck on a blocking call) still goes stale and gets caught.
+The daily 14:54 recycle was the last straggler --- a post-force-exit wait loop that still used
+raw \texttt{time.sleep(60)}. I swept the codebase and converted \textasciitilde74 raw \texttt{time.sleep()} calls to the
+heartbeat-aware sleep.
+
+\textbf{Result.} Needless recycles went away; real hangs are still detected. The conceptual win is
+the distinction between \textbf{"the process is alive"} and \textbf{"the work is making progress"} --- the
+liveness signal has to be emitted \emph{by the work loop itself}, not inferred from the process being
+up.
+
+\begin{quote}
+Interview gold: there\textquotesingle s a moment here where the interviewer (playing me) had it backwards ---
+I initially assumed \texttt{time.sleep} was \emph{deliberately} used to avoid recycling. I checked git
+history and found the opposite: the heartbeat sleep was added \emph{on purpose} to stop needless
+recycles, and the remaining \texttt{time.sleep} calls were just un-migrated leftovers. \textbf{Verifying a
+plausible assumption against the actual history instead of trusting memory} is a good story
+on its own.
+\end{quote}
+
+\subsection{(3) Expired options stranded forever (never gate an exit on data that can vanish)}\label{3-expired-options-stranded-forever-never-gate-an-exit-on-data-that-can-vanish}
+
+\textbf{Situation.} An Iron Condor opened on the 16th was still showing open legs on the 17th, even
+though the options had expired. And this had \emph{recurred} --- we\textquotesingle d "fixed" an expiry strand before
+and it came back.
+
+\textbf{Task.} Get expired positions to actually settle, and find why the earlier fix didn\textquotesingle t hold.
+
+\textbf{Action.} There were three compounding root causes:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{The exit was gated behind a live price.} The close logic computed net premium first, and
+  if it couldn\textquotesingle t (\texttt{net\ \textless{}\ 0} / missing), it retried. But expired options \emph{stop ticking} --- the
+  price is gone forever --- so it retried until expiry and never exited.
+\item
+  \textbf{The expiry safety-net was itself gated} behind \texttt{if\ self.\_in\_trade}, which was False
+  whenever the in-memory trade state had been lost (e.g. after a restart) --- exactly the case
+  where you most need the net.
+\item
+  \textbf{The paper engine rejected ₹0 settlements} (a \texttt{price\ \textless{}=\ 0} guard), so even when the net
+  \emph{did} fire, the settlement order bounced.
+\end{enumerate}
+
+I fixed all three: a \textbf{state-independent sweep} that reads positions directly, parses the
+expiry out of the option symbol, and settles expired legs at \textbf{intrinsic-vs-spot} with no LTP
+needed; the paper engine now accepts a ₹0 fill \emph{only} for a genuine expired-option close; and a
+re-entry guard so a strategy won\textquotesingle t open a fresh position group while it still holds untracked
+legs.
+
+\textbf{Result.} Expired strands cleared on both VMs and stopped recurring. The durable lesson:
+\textbf{never gate a critical exit behind data that can disappear.} Expiry is a \emph{time} fact --- derive
+it from the clock and the symbol, not from a price feed that goes silent precisely when you need
+to act.
+
+\subsection{(4) A ₹33k phantom loss from a fabricated price}\label{4-a-33k-phantom-loss-from-a-fabricated-price}
+
+\textbf{Situation.} A close booked a large loss that didn\textquotesingle t match reality.
+
+\textbf{Task.} Find where a wrong number entered the money path.
+
+\textbf{Action.} When the live price was missing, the close had a hard-coded \texttt{or\ 0.5} fallback --- it
+\emph{fabricated} a fill price to keep going. That fabricated number flowed straight into P\&L.
+
+\textbf{Result / lesson.} Removed all fabricated fallbacks: retry, then skip, then settle at intrinsic
+or not at all. \textbf{In a money system, a \emph{wrong} number is more dangerous than \emph{no} number} --- "no
+data" has to be a first-class, handled state, never papered over with a default.
+
+\subsection{(5) The 1 GB VM core-dumping with SIGBUS}\label{5-the-1-gb-vm-core-dumping-with-sigbus}
+
+\textbf{Situation.} The micro VM kept crashing the whole trading process with SIGBUS (a bus error /
+core dump), seemingly at random.
+
+\textbf{Task.} Stop the crashes on a box I couldn\textquotesingle t make bigger (free tier).
+
+\textbf{Action.} SIGBUS pointed at memory-mapped I/O. DuckDB defaults to using \textasciitilde80\% of RAM; running
+concurrently with the trader on a 1 GB box, that over-committed memory. Under pressure the kernel
+swap-thrashed, and a page fault on an \textbf{mmap\textquotesingle d Parquet page} that couldn\textquotesingle t be backed surfaced as
+SIGBUS --- which kills the process, not just the query. I capped DuckDB\textquotesingle s memory and thread count
+and gave it a disk-spill temp dir (all env-overridable so the big VM can use more). I also
+disabled SQLite\textquotesingle s mmap, which had the same SIGBUS-under-concurrent-write failure mode. systemd
+\texttt{Restart=on-failure} is the backstop so any residual crash self-heals.
+
+\textbf{Result / lesson.} Crashes stopped. The takeaway is understanding \emph{why mmap faults become
+SIGBUS} and that \textbf{defaults tuned for a workstation are dangerous in a constrained container} ---
+resource limits aren\textquotesingle t optional on small hosts.
+
+\subsection{(6) NSE 403-blocking cloud IPs (don\textquotesingle t trust a single vendor)}\label{6-nse-403-blocking-cloud-ips-dont-trust-a-single-vendor}
+
+\textbf{Situation.} A data feed worked perfectly on my laptop but silently went stale on the VMs.
+
+\textbf{Task.} Find why prod-only, and de-risk the dependency.
+
+\textbf{Action.} NSE blocks data-center IP ranges with 403s. Locally I had a residential IP; in the
+cloud I was blocked --- and the failure was \emph{silent staleness}, not an error. Because all data
+already flowed through the MarketDataService facade, I migrated every live feed (including India
+VIX) to Angel One and gated the dead NSE path behind a flag. The 31 strategies didn\textquotesingle t change a
+line.
+
+\textbf{Result / lesson.} The facade paid for itself --- \textbf{abstract external vendors behind your own
+interface} so swapping one is a one-module change, and \textbf{treat "works locally" as unproven in
+prod} when third-party access is environmental.
+
+\subsection{(7) API rate-limit storms}\label{7-api-rate-limit-storms}
+
+\textbf{Situation.} Angel One started throttling --- roughly 1,400 hits/host/day --- and candle fetches
+came back empty, leaving strategies blind.
+
+\textbf{Task.} Get under the limit without losing data freshness.
+
+\textbf{Action.} The standard three-part pattern: a \textbf{cache} so N strategies asking for the same
+candle = one fetch; a \textbf{process-wide throttle} (\textasciitilde3 req/s) so bursts can\textquotesingle t stampede; and
+\textbf{exponential backoff} (5\(\rightarrow\)10\(\rightarrow\)20\(\rightarrow\)40s) on throttle responses, with alerting. I captured a
+pre-fix baseline from metrics so I could \emph{prove} the improvement.
+
+\textbf{Result / lesson.} \textasciitilde90\% fewer API hits, strategies stayed fed. \textbf{Cache + throttle + backoff is
+the canonical rate-limit triad}, and baselining before/after with metrics is how you show it
+worked.
+
+\subsection{(8) eventlet broke the SSL stack (async monkey-patching is leaky)}\label{8-eventlet-broke-the-ssl-stack-async-monkey-patching-is-leaky}
+
+\textbf{Situation.} After enabling eventlet, Telegram notifications and yfinance calls hit infinite
+recursion.
+
+\textbf{Task.} Keep cooperative concurrency without breaking blocking HTTP libraries.
+
+\textbf{Action.} eventlet monkey-patches the standard SSL/socket stack to make it cooperative; some
+libraries don\textquotesingle t tolerate the patched stack and recurse. The fix was to fetch the \emph{original},
+un-patched \texttt{urllib.request} via \texttt{eventlet.patcher.original()} for those specific calls, so they
+use real blocking sockets while everything else stays green.
+
+\textbf{Result / lesson.} \textbf{Know your concurrency model\textquotesingle s failure modes.} Monkey-patching the runtime
+is convenient but leaks into every library that touches sockets --- you need an escape hatch.
+
+\subsection{(9) Crash recovery \& state drift}\label{9-crash-recovery--state-drift}
+
+\textbf{Situation.} A restart could drop in-memory trade state while real positions stayed open ---
+the strategy would come back blind, re-enter, and accumulate orphans.
+
+\textbf{Task.} Make restarts safe for a stateful, money-handling process.
+
+\textbf{Action.} Three layers: \textbf{TradeResumer} restores open trades from SQLite on boot (resume, not
+re-fire); the \textbf{Reconciler} continuously flags drift --- a position with no matching trade state ---
+and exposes it as a metric; and a re-entry guard refuses a new position group while untracked
+legs are held.
+
+\textbf{Result / lesson.} Restarts became boring. \textbf{Stateful systems need explicit crash recovery
+\emph{plus} a reconciliation loop} --- you can\textquotesingle t assume in-memory state and the broker\textquotesingle s reality stay
+in sync across a restart.
+
+\subsection{(10) A refactor silently broke DB reads (my own bug)}\label{10-a-refactor-silently-broke-db-reads-my-own-bug}
+
+\textbf{Situation.} After I reorganized the code into deeper packages, the History and P\&L tabs went
+blank --- but the app booted fine and tests passed.
+
+\textbf{Task.} Find why reads returned nothing with no error anywhere.
+
+\textbf{Action.} The DB path was computed from \texttt{\_\_file\_\_} with a fixed number of \texttt{os.path.dirname()}
+calls. Moving the module one directory deeper changed the relative depth, so the path resolved to
+a \emph{different, empty} file. Nothing errored: an empty SQLite DB just returns zero rows, and the
+tests had been \emph{overriding} the path so they never exercised the real resolution. I corrected the
+path math and added regression tests that pin every \texttt{\_\_file\_\_}-derived path to the repo root.
+
+\textbf{Result / lesson.} \textbf{"It imports and boots" \(\neq\) "it works,"} and \textbf{depth-changing refactors are
+sneaky} because relative-path math breaks silently. Tests that mock the thing they should verify
+give false confidence.
+
+\subsection{⑪ Backtests that didn\textquotesingle t match live}\label{ux246a-backtests-that-didnt-match-live}
+
+\textbf{Situation.} The original backtester used per-strategy \emph{adapters} --- reimplementations of the
+strategy logic for backtesting --- and results drifted from live behavior.
+
+\textbf{Task.} Make backtests trustworthy.
+
+\textbf{Action.} I rebuilt the engine to replay the \textbf{real strategy code} against recorded market
+data --- same class, same logic, no adapter. I added a \textbf{data-fidelity grade} so you know how
+trustworthy a given backtest\textquotesingle s inputs were, Optuna optimization with walk-forward validation, and
+ran it as a \texttt{nice}d subprocess so a heavy backtest never starves the live trader.
+
+\textbf{Result / lesson.} Backtest and live can\textquotesingle t diverge if they\textquotesingle re literally the same code. \textbf{If
+your backtest runs different code than production, the backtest is lying to you} --- parity is the
+whole game.
+
+\section{5. STAR answers to the classic interview prompts}\label{5-star-answers-to-the-classic-interview-prompts}
+
+\begin{quote}
+Conversational, \textasciitilde1--2 minutes each. Pick the matching story above and compress.
+\end{quote}
+
+\textbf{"Why did you choose this technology?" (SQLite/eventlet)}
+
+\begin{quote}
+\emph{(S)} Solo project, free-tier cloud, real money. \emph{(T)} I needed something I could operate
+alone with near-zero ops. \emph{(A)} I chose SQLite over Postgres and eventlet over a heavier async
+stack --- single-process, single-file, no servers to babysit. \emph{(R)} It let me move fast and the
+system ran 24/7. \emph{(Trade-off I name out loud)} both choices later bit me --- SQLite\textquotesingle s mmap caused
+SIGBUS on the 1 GB box, eventlet\textquotesingle s monkey-patching broke SSL libs --- and I can tell you exactly
+where I\textquotesingle d switch to Postgres + a real task runner if this grew past one operator.
+\end{quote}
+
+\textbf{"What was the hardest technical challenge?"}
+
+\begin{quote}
+\(\rightarrow\) Story (1) (duplicate orders). Emphasize: symptom in the journal \(\rightarrow\) traced to the watchdog \(\rightarrow\)
+\texttt{stop()} never joined \(\rightarrow\) spawn guard + two-phase recycle. "Hardest because the bug only appeared
+when a strategy was \emph{already} in a bad state, so it was rare and timing-dependent --- and the
+tempting fix (dedupe orders) would\textquotesingle ve hidden a process running twice instead of fixing it."
+\end{quote}
+
+\textbf{"Tell me about a production issue you faced."}
+
+\begin{quote}
+\(\rightarrow\) Story (3) (expired-option strand) or (5) (SIGBUS). Both are clean "real money / real crash"
+incidents with a layered root cause.
+\end{quote}
+
+\textbf{"Describe a scaling / resource problem."}
+
+\begin{quote}
+\(\rightarrow\) Story (5) (1 GB SIGBUS) + (7) (rate-limit storm). Frame (5) as scaling \emph{down}: "the interesting
+constraint wasn\textquotesingle t traffic, it was running a real-time system in 1 GB --- which forced memory caps
+and hot/cold data tiering that a bigger box would\textquotesingle ve let me get lazy about."
+\end{quote}
+
+\textbf{"Tell me about a design decision that backfired."}
+
+\begin{quote}
+\(\rightarrow\) Story (10) (path-depth refactor) --- \emph{my own} bug --- or the SQLite/eventlet choices. "The refactor
+made the code cleaner but broke \texttt{\_\_file\_\_}-relative paths silently. It backfired because it
+passed every check I had --- it imported, it booted, tests were green --- and still served an empty
+database. That taught me to distrust tests that mock the exact thing they claim to verify."
+\end{quote}
+
+\textbf{"What trade-offs did you make?"}
+
+\begin{quote}
+Operational simplicity vs concurrency-safety (SQLite/single-process), freshness vs API budget
+(cache TTL vs rate limits), latency vs reliability (retry/skip instead of fabricating a fill),
+and feature velocity vs test coverage (I shipped fast, then back-filled tests after incidents ---
+which I\textquotesingle d reverse if doing it again).
+\end{quote}
+
+\textbf{"How did you debug difficult issues?"}
+
+\begin{quote}
+Almost everything started at a \textbf{dashboard or a log}, not in the code. RED metrics in Grafana,
+structured logs in Loki, errors in GlitchTip. The duplicate-order bug surfaced in the trade
+journal; the recycle bug in the watchdog logs; the feed outage as a \emph{freshness} metric going
+stale rather than an exception. Then I reproduce, find the \emph{root} cause not the symptom, and add
+the test that would\textquotesingle ve caught it.
+\end{quote}
+
+\textbf{"How did you ensure reliability and maintainability?"}
+
+\begin{quote}
+Defense in depth: heartbeat + watchdog (detection), TradeResumer (recovery), Reconciler (drift
+detection), systemd \texttt{Restart=on-failure} (floor), and CI (ruff/pytest/gitleaks/pip-audit) on
+every push. Crucially, \textbf{every safety system was added in response to a real incident} --- I
+didn\textquotesingle t build them speculatively.
+\end{quote}
+
+\textbf{"If given more time, what would you improve?"}
+
+\begin{quote}
+Move to Postgres (kills the SQLite concurrency/mmap class of bug), front-load tests instead of
+back-filling them, replace eventlet with a cleaner async or real task model, and add automated
+end-to-end paper-trading smoke tests in CI so a regression like the blank-DB one can\textquotesingle t ship.
+\end{quote}
+
+\textbf{"What was your personal contribution?"}
+
+\begin{quote}
+Solo project --- I designed, built, and operate all of it: the strategy framework, data facade,
+paper/live engines, the three safety systems, the backtest engine, the observability stack, and
+the deploy pipeline. More importantly, I \emph{ran} it in production and every reliability feature
+came from an incident I diagnosed and fixed myself.
+\end{quote}
+
+\section{6. Top 20 likely interview questions --- with answers}\label{6-top-20-likely-interview-questions--with-answers}
+
+\textbf{1. Give me the high-level architecture and the data flow from feed to order.}
+
+\begin{quote}
+Data comes in from broker WebSockets and REST --- Angel One as primary, Dhan for option ticks,
+yfinance as a fallback. Everything goes through one \textbf{MarketDataService} facade that caches,
+throttles, and tracks freshness, so no strategy ever talks to a vendor directly. About 31
+strategy threads --- all subclasses of a \textbf{BaseStrategy} ABC --- read from that facade, make
+decisions, and emit signals to an \textbf{OrderManager}, which routes to either the \textbf{PaperEngine}
+or the live Zerodha path. State, trades, and signals persist to \textbf{SQLite}. Wrapped around all
+of that are three safety systems --- a \textbf{Watchdog}, a \textbf{TradeResumer}, and a \textbf{Reconciler} ---
+plus an observability stack and a backtest engine. The one-line version: \emph{feed \(\rightarrow\) caching facade
+\(\rightarrow\) strategy threads \(\rightarrow\) order manager \(\rightarrow\) paper/live engine \(\rightarrow\) SQLite, with detection/recovery/drift
+loops cross-cutting all of it.}
+\end{quote}
+
+\textbf{2. Why SQLite instead of a client-server database?}
+
+\begin{quote}
+Solo project, free-tier hardware, real money --- I optimized for zero operational overhead. One
+writer, single file, no server to babysit, and WAL mode gives me concurrent reads. For the
+actual write load (one process, a handful of trades a minute) it\textquotesingle s plenty. I\textquotesingle ll be honest about
+the boundary: it bit me twice --- mmap caused SIGBUS on the 1 GB box, and concurrency gets dicey
+if I ever had multiple writers. The day this becomes multi-process or multi-operator, I move to
+Postgres. But for what it is, SQLite was the right call, and I can tell you exactly where the
+line is.
+\end{quote}
+
+\textbf{3. Why eventlet / how does your concurrency model work?}
+
+\begin{quote}
+Two layers. Eventlet green threads give me cooperative async I/O in a single process, which is
+what Flask-SocketIO wants for pushing live ticks and P\&L to the browser. On top of that, each
+strategy runs in its own OS thread. Most of my hardest bugs lived exactly at that boundary ---
+thread join semantics, heartbeat starvation, and eventlet\textquotesingle s SSL monkey-patching breaking
+blocking HTTP libraries. It\textquotesingle s not the model I\textquotesingle d pick at scale, but for one process serving a
+realtime UI it kept the operational footprint tiny.
+\end{quote}
+
+\textbf{4. How do \textasciitilde31 strategies share market data without hammering the API?}
+
+\begin{quote}
+The MarketDataService facade is the single choke point. When ten strategies want the same NIFTY
+candle, that\textquotesingle s one fetch, cached, not ten. On top of caching there\textquotesingle s a process-wide throttle
+(\textasciitilde3 req/s) so bursts can\textquotesingle t stampede the vendor, and exponential backoff when we do get
+throttled. Before this I was doing \textasciitilde1,400 API hits per host per day and getting rate-limited
+blind; after, about 90\% fewer hits. The freshness of each cached value is tracked and exposed
+as a metric so "is this data stale?" is observable, not a guess.
+\end{quote}
+
+\textbf{5. What happens to open positions if the process restarts?}
+
+\begin{quote}
+This was a real failure mode early on --- a restart dropped in-memory state while real positions
+stayed open, so the strategy came back blind and re-entered. Now the \textbf{TradeResumer} restores
+open trades from SQLite on boot --- it \emph{resumes}, it doesn\textquotesingle t re-fire entries. And the
+\textbf{Reconciler} continuously checks for drift between what the broker says I hold and what my
+state says, so if a restart ever did lose something, I\textquotesingle d see it as a drift metric rather than
+discover it as an orphaned position later.
+\end{quote}
+
+\textbf{6. How do you detect and recover from a stuck strategy?}
+
+\begin{quote}
+Every strategy emits a heartbeat from its work loop roughly every 30 seconds via a
+heartbeat-aware sleep. The \textbf{Watchdog} recycles any strategy whose heartbeat goes stale past a
+threshold. The subtlety is distinguishing "deliberately idle" from "genuinely hung" --- an idle
+wait loop still heartbeats, so it\textquotesingle s not killed, but a strategy wedged on a blocking call outside
+the sleep goes stale and gets recycled. Recovery is a two-phase recycle: stop, drain, then
+restart --- never two live threads at once.
+\end{quote}
+
+\textbf{7. Walk me through your hardest production bug.}
+
+\begin{quote}
+\(\rightarrow\) Tell story (1) (duplicate orders). Journal showed the same option bought 4\(\times\) in a minute \(\rightarrow\)
+traced to the watchdog \(\rightarrow\) \texttt{stop()} flipped a flag but never \emph{joined} the thread \(\rightarrow\) if the
+strategy was hung, \texttt{start()} spawned a second thread \(\rightarrow\) two threads each firing entries. Fix:
+spawn guard + two-phase recycle. Lesson: a kill that doesn\textquotesingle t join is not a kill.
+\end{quote}
+
+\textbf{8. How do you handle a data feed going down or going stale?}
+
+\begin{quote}
+Two cases. \emph{Down} --- the facade has multi-vendor fallback (Angel \(\rightarrow\) Dhan \(\rightarrow\) yfinance), so one
+vendor dying doesn\textquotesingle t blind the system. \emph{Stale} --- this is the nastier one, and I learned it the
+hard way: NSE silently 403-blocked my cloud IPs, so the feed didn\textquotesingle t error, it just stopped
+updating. Now freshness is a first-class tracked metric, and critical logic treats "data this
+old" as unusable rather than trusting it. The facade also meant migrating off NSE entirely was
+a one-module change, not 31.
+\end{quote}
+
+\textbf{9. How do you make sure backtests reflect live behavior?}
+
+\begin{quote}
+The backtest engine replays the \textbf{real strategy code} --- same class, same logic --- against
+recorded data. The old version used per-strategy adapters (reimplementations) and they drifted;
+different code means the backtest is lying. I also added a data-fidelity grade so I know how
+trustworthy a given run\textquotesingle s inputs were, and it runs as a \texttt{nice}d subprocess so a heavy backtest
+never starves the live trader.
+\end{quote}
+
+\textbf{10. How do you avoid placing duplicate or erroneous orders?}
+
+\begin{quote}
+Duplicates: the root fix was the thread spawn guard so a strategy can\textquotesingle t run twice (story (1)),
+plus a re-entry guard that refuses a new position group while untracked legs are still held, plus
+a 15:25 EOD square-off net as a backstop. Erroneous: I never fabricate a price --- if the live
+price is missing, I retry then skip, never fill at a made-up number (that fabrication once cost
+me a ₹33k phantom loss). In a money system a wrong number is worse than no number.
+\end{quote}
+
+\textbf{11. How do you run real-time + analytics workloads on a 1 GB VM?}
+
+\begin{quote}
+Discipline forced by constraints. DuckDB defaults to \textasciitilde80\% of RAM, which over-committed a 1 GB
+box and caused SIGBUS via mmap\textquotesingle d Parquet --- so I capped its memory and threads and gave it a
+disk-spill temp dir, all env-overridable so the 24 GB box can use more. Data is hot/cold tiered:
+recent stuff in SQLite, historical in Parquet read columnar by DuckDB. Heavy work runs niced or
+offloaded so it can\textquotesingle t starve the trader. systemd \texttt{Restart=on-failure} is the floor.
+\end{quote}
+
+\textbf{12. What\textquotesingle s your observability setup and how do you actually use it to debug?}
+
+\begin{quote}
+VictoriaMetrics for metrics, Grafana for dashboards, Loki for logs, GlitchTip for error
+tracking, process-exporter/Alloy for host metrics --- across both VMs. The honest answer to "how
+do you use it" is that almost every bug I\textquotesingle ve described \emph{started} at a dashboard or log, not in
+the code. Duplicate orders showed up in the trade journal, the recycle storm in watchdog logs,
+the feed outage as a freshness metric going flat. I also track per-strategy P\&L, data-source
+freshness, and config changes correlated with P\&L.
+\end{quote}
+
+\textbf{13. How do you deploy safely to two hosts without downtime surprises?}
+
+\begin{quote}
+A one-command multi-host deploy script: it does a fast-forward-only pull, a compile-check, then
+restart, then a health-check, per host. CI runs ruff + pytest + gitleaks + pip-audit on every
+push. DB schema changes happen after market close, with a backup snapshot to OCI Object Storage
+first. I hardened the deploy to fail \emph{loudly} after a silent no-op --- because a deploy that
+"succeeds" without actually changing anything is its own bug.
+\end{quote}
+
+\textbf{14. How do you handle expired-option settlement?}
+
+\begin{quote}
+Expiry is a \emph{time} fact, so I derive it from the clock and the option symbol --- never from a
+price feed, because expired options stop ticking. A state-independent sweep reads my actual
+positions, parses the expiry out of each symbol, and settles expired legs at intrinsic-vs-spot
+with no LTP needed. The paper engine accepts a ₹0 settlement \emph{only} for a genuine expired close.
+This came out of a bug where an Iron Condor held expired legs for a day because the exit was
+gated behind a price that no longer existed.
+\end{quote}
+
+\textbf{15. Paper vs live --- how do you keep them consistent?}
+
+\begin{quote}
+They share the same code path up to the engine boundary --- same OrderManager, same signals; only
+the final execution differs. The PaperEngine mirrors the live fill path as closely as possible.
+Live is opt-in per strategy, defaulting to paper, so going live is a deliberate switch, not the
+default risk.
+\end{quote}
+
+\textbf{16. What\textquotesingle s your testing strategy for a system that touches money?}
+
+\begin{quote}
+Unit tests on the money paths (entry/exit/settlement), parity tests where old implementations
+act as oracles for bit-for-bit comparison, and the backtest engine itself as a behavioral check
+since it runs the real code. My honest weakness: I shipped fast and back-filled tests \emph{after}
+incidents --- the phantom-fill and blank-DB bugs both ended with "\ldots and I added the test that
+would\textquotesingle ve caught it." If I rebuilt it I\textquotesingle d front-load that, especially an end-to-end paper-trading
+smoke test in CI.
+\end{quote}
+
+\textbf{17. How do you handle secrets and security (broker keys, OAuth)?}
+
+\begin{quote}
+Broker keys and tokens live in environment/config outside the repo, never committed --- and
+gitleaks runs in CI to enforce that. Zerodha live trading uses OAuth, so there\textquotesingle s a daily auth
+flow rather than long-lived credentials. pip-audit and Dependabot watch the dependency surface.
+nginx terminates TLS in front of the app.
+\end{quote}
+
+\textbf{18. What were the biggest trade-offs you made and why?}
+
+\begin{quote}
+Operational simplicity vs concurrency-safety (SQLite + single process --- right for solo, wrong at
+scale). Data freshness vs API budget (caching with bounded TTL vs rate limits). Reliability vs
+latency (retry/skip instead of fabricating a fill). And feature velocity vs test coverage --- I
+moved fast and paid it back after incidents, which I\textquotesingle d reverse next time. The theme: I
+consistently chose what one person could \emph{operate}, and accepted the failure modes that came
+with it as long as I understood them.
+\end{quote}
+
+\textbf{19. What would you change if you rebuilt it today?}
+
+\begin{quote}
+Postgres instead of SQLite --- kills the mmap/concurrency bug class outright. Front-load tests,
+especially an automated end-to-end paper smoke test in CI so a regression like the blank-DB one
+can\textquotesingle t ship. Reconsider eventlet for a cleaner async or a real task runner. And I\textquotesingle d build the
+reconciliation loop \emph{first} rather than after the first orphaned position taught me I needed it.
+\end{quote}
+
+\textbf{20. What was the role of the watchdog/reconciler/resumer trio?}
+
+\begin{quote}
+They\textquotesingle re defense in depth for a long-running stateful process. \textbf{Watchdog} = liveness detection
+and recovery (recycle stuck strategies). \textbf{TradeResumer} = crash recovery (restore open trades
+on boot so a restart doesn\textquotesingle t go blind). \textbf{Reconciler} = correctness (detect drift between my
+state and broker reality). Each one was added in response to a real incident, not built
+speculatively --- detection, recovery, and reconciliation are the three things a stateful money
+system can\textquotesingle t live without.
+\end{quote}
+
+\section{7. Top 10 deep-dive technical questions --- with answers}\label{7-top-10-deep-dive-technical-questions--with-answers}
+
+\textbf{1. Why does an mmap page fault surface as SIGBUS, and why does it kill the whole process?}
+
+\begin{quote}
+When you mmap a file, the kernel maps pages lazily --- they\textquotesingle re faulted in on first access. A
+normal SIGSEGV is "you touched memory you don\textquotesingle t have rights to." SIGBUS is different: it\textquotesingle s "the
+mapping is valid but the kernel \emph{can\textquotesingle t satisfy the backing}" --- e.g. the page is beyond the
+file\textquotesingle s actual length, or there\textquotesingle s no physical memory/swap to back it under pressure. On the 1 GB
+box, DuckDB over-committing plus mmap\textquotesingle d Parquet meant a fault couldn\textquotesingle t be backed, so the kernel
+delivered SIGBUS. And because it\textquotesingle s a synchronous fault on a normal memory access --- not a syscall
+returning an error you can check --- the default disposition terminates the process. You can\textquotesingle t
+\texttt{try/except} a bus error; the only real fixes are \emph{don\textquotesingle t over-commit} (memory caps) and \emph{don\textquotesingle t
+rely on mmap under pressure} (disk spill, disable SQLite mmap).
+\end{quote}
+
+\textbf{2. Heartbeat design: deliberately-idle loop vs genuine hang?}
+
+\begin{quote}
+The key decision is \emph{where} the heartbeat is emitted. If I beat from a background timer, every
+process that\textquotesingle s merely \emph{up} looks alive --- useless. So the heartbeat is emitted from inside the
+work loop, via the sleep primitive itself: \texttt{self.\_sleep()} breaks a long wait into short
+interruptible chunks and beats every \textasciitilde30s. So a strategy that\textquotesingle s \emph{deliberately} idle (waiting for
+the next session) keeps beating --- not killed. But a strategy stuck \emph{outside} the sleep, on a
+blocking call, never reaches the next beat, goes stale, and gets recycled. The liveness signal
+has to be coupled to forward progress, not to the process existing.
+\end{quote}
+
+\textbf{3. eventlet monkey-patching failure modes, and how \texttt{patcher.original()} fixes them?}
+
+\begin{quote}
+eventlet replaces stdlib socket/SSL/threading with cooperative versions so blocking calls yield
+to the green-thread scheduler instead of blocking the whole process. The leak: some libraries ---
+certain SSL paths in Telegram/yfinance --- don\textquotesingle t tolerate the patched stack and recurse infinitely
+or deadlock, because they make assumptions the green version violates. \texttt{eventlet.patcher.original\ ("urllib.request")} hands back the \emph{real, un-patched} module, so those specific calls use genuine
+blocking sockets on a real OS thread while everything else stays cooperative. The lesson: global
+monkey-patching needs a per-call escape hatch, because you can\textquotesingle t predict every library\textquotesingle s
+assumptions.
+\end{quote}
+
+\textbf{4. SQLite WAL: what concurrency does it give, and where does it stop?}
+
+\begin{quote}
+WAL (write-ahead logging) decouples readers from the writer: readers see a consistent snapshot
+and don\textquotesingle t block the writer, and the writer appends to the WAL instead of locking the main DB
+file. So \emph{many readers + one writer} run concurrently --- perfect for my one-process trader with a
+realtime UI reading. Where it stops: it\textquotesingle s still \textbf{one writer}. Two processes writing serialize
+hard (and can hit "database is locked"). WAL also needs periodic checkpointing or the WAL file
+grows. And \texttt{PRAGMA\ mmap\_size} on top of WAL reintroduced the SIGBUS risk. So WAL bought me exactly
+what I needed (concurrent reads) and nothing it couldn\textquotesingle t give (multi-writer) --- which is the
+Postgres trigger.
+\end{quote}
+
+\textbf{5. Two-phase recycle: the states between stop and start, and the race you closed?}
+
+\begin{quote}
+The original race: \texttt{stop()} set \texttt{\_active\ =\ False} and returned immediately; \texttt{start()} checked
+\texttt{\_active} and spawned. But the \emph{thread} could still be alive (hung on a blocking call) when
+\texttt{start()} ran --- \texttt{\_active} being False doesn\textquotesingle t mean the thread has exited. So you\textquotesingle d get thread A
+(dying, but not dead) and thread B (fresh) both live, both firing entries. Two-phase recycle
+splits it: phase one signals stop and waits for the thread to actually wind down (the drain);
+only phase two, on a later pass once the old thread is confirmed gone, does the restart. The
+guard is \texttt{start()} refusing to spawn while \texttt{\_thread.is\_alive()}. The closed window is the gap
+between "asked to stop" and "actually stopped."
+\end{quote}
+
+\textbf{6. How does the Reconciler define "drift," and avoid false positives on in-flight orders?}
+
+\begin{quote}
+Drift = a broker position with no matching trade-state on my side (an orphan), or trade-state
+with no matching position. The false-positive risk is exactly the in-flight window --- I\textquotesingle ve sent an
+order, the broker hasn\textquotesingle t confirmed the position yet, so momentarily they disagree legitimately.
+The reconciler treats drift as a \emph{metric} (\texttt{trader\_position\_drift}) to observe and alert on,
+with tolerance for transient states, rather than an auto-corrector that might cancel a real
+in-flight trade. You want it to \emph{tell} you about drift loudly, not act blindly --- auto-remediation
+on a money system is how you turn a glitch into a loss.
+\end{quote}
+
+\textbf{7. DuckDB over Parquet hot/cold tiering --- what\textquotesingle s hot, and the read path?}
+
+\begin{quote}
+Hot = recent/live data the trader needs right now, kept in SQLite for low-latency point reads.
+Cold = historical bars for backtesting/analytics, written to Parquet files partitioned by
+date/symbol. The read path for analytics: DuckDB queries the Parquet directly --- no import step ---
+using columnar vectorized scans with projection and predicate pushdown, so a query for one
+symbol\textquotesingle s close over a date range only touches the relevant column chunks and row groups, not the
+whole file. The cutover policy is age-based: once data ages out of the hot window it\textquotesingle s archived to
+Parquet.
+\end{quote}
+
+\textbf{8. Backtest fidelity grading --- what determines the grade, and why it matters?}
+
+\begin{quote}
+The grade reflects how trustworthy the \emph{input data} was for a given run --- gaps in the recorded
+ticks, missing candles, low-liquidity symbols where prices are unreliable, resolution mismatches
+between what the strategy needs and what was recorded. It matters because a backtest\textquotesingle s headline
+number is meaningless if the data feeding it was full of holes --- without the grade you\textquotesingle d treat a
+run on pristine data and a run on swiss-cheese data as equally credible and over-fit to noise.
+The grade turns "this backtest says +20\%" into "this backtest says +20\% \emph{and here\textquotesingle s how much you
+should believe it}."
+\end{quote}
+
+\textbf{9. Rate-limit triad --- sizing cache TTL vs throttle vs backoff so they don\textquotesingle t fight?}
+
+\begin{quote}
+They operate at different layers, so they compose rather than conflict. \textbf{Cache TTL} is sized to
+the data\textquotesingle s natural update rate --- a 1-minute candle doesn\textquotesingle t need re-fetching within the minute, so
+TTL \(\approx\) the bar period; that alone collapses N strategies into one fetch. \textbf{Throttle} (\textasciitilde3 req/s)
+is the steady-state ceiling that protects the vendor from bursts the cache \emph{doesn\textquotesingle t} absorb (lots
+of distinct symbols). \textbf{Backoff} (5\(\rightarrow\)10\(\rightarrow\)20\(\rightarrow\)40s) only engages on an actual throttle response --- it\textquotesingle s
+the reactive safety valve when the first two underestimate. The trick is the cache absorbs
+\emph{redundant} load, the throttle shapes \emph{distinct} load, and backoff handles \emph{being wrong} --- each
+targets a different cause, so tuning one doesn\textquotesingle t destabilize the others.
+\end{quote}
+
+\textbf{10. Settling an expired option without a price --- intrinsic-vs-spot, and edge cases?}
+
+\begin{quote}
+Cash-settled index options settle at intrinsic value on expiry: for a call, \texttt{max(0,\ spot\ \$-\$\ strike)}; for a put, \texttt{max(0,\ strike\ \$-\$\ spot)}. So I don\textquotesingle t need the option\textquotesingle s last price at all --- I
+need the \emph{underlying} spot and the strike (which I parse from the symbol). I close shorts as BUY
+and longs as SELL at that intrinsic value. Edge cases: getting the right settlement spot (the
+exchange uses an average, I approximate with the underlying at expiry); deep OTM legs settle at
+₹0, which is exactly why the paper engine had to \emph{allow} a ₹0 fill for genuine expired closes;
+and MCX vs NFO symbols parse differently, so the symbol parser has to handle both formats.
+\end{quote}
+
+\section{8. Top 10 follow-up questions (experienced interviewer) --- with answers}\label{8-top-10-follow-up-questions-experienced-interviewer--with-answers}
+
+\textbf{1. "Why not just add a join instead of a two-phase recycle?"}
+
+\begin{quote}
+Because a blocking \texttt{join()} in the watchdog would freeze the watchdog itself on the exact thing
+it\textquotesingle s trying to fix --- a hung thread. If the strategy is wedged on a network call that never
+returns, \texttt{join()} blocks forever (or I\textquotesingle d need a timeout, and then I\textquotesingle m back to "is it really
+dead?"). Two-phase decouples it: signal stop, return immediately, and on a \emph{later} watchdog pass
+check \texttt{is\_alive()} before restarting. The watchdog stays responsive and never spawns a duplicate.
+A join couples the supervisor\textquotesingle s liveness to the worker\textquotesingle s death --- the opposite of what you want.
+\end{quote}
+
+\textbf{2. "Heartbeat every 30s but timeout 600s --- how\textquotesingle d you pick those, and the latency cost?"}
+
+\begin{quote}
+30s is well inside the timeout so a healthy-but-busy strategy has many chances to beat before it\textquotesingle s
+ever suspected --- avoids false kills from one slow cycle. 600s (vs the original 300s) came directly
+from an incident: strategies with a poll interval \(\geq\)300s raced the 300s watchdog and got recycled
+mid-work. Widening to 600s gives genuine slow strategies headroom. The cost is detection latency ---
+a truly hung strategy can sit dead for up to \textasciitilde10 minutes before recycle. For my strategies, which
+mostly act on minute-or-slower signals, 10 minutes of one strategy being down is acceptable;
+false-killing a healthy one mid-trade is worse. It\textquotesingle s a deliberate latency-vs-false-positive trade.
+\end{quote}
+
+\textbf{3. "If you\textquotesingle d had Postgres from day one, which bugs disappear and which remain?"}
+
+\begin{quote}
+Disappear: the SIGBUS-from-SQLite-mmap, the concurrency/locking risk, and arguably the path-depth
+blank-DB bug would\textquotesingle ve been \emph{louder} (a connection failure vs a silently empty file). Remain:
+everything that wasn\textquotesingle t about storage --- the thread-duplicate race, watchdog heartbeat starvation,
+the expired-option strand, the fabricated fill, the eventlet SSL recursion, the NSE feed outage.
+That\textquotesingle s the honest answer --- Postgres fixes a \emph{class} of bug (storage/concurrency), but the majority
+of my hard bugs were concurrency and external-dependency problems that no database choice touches.
+\end{quote}
+
+\textbf{4. "Caching market data sounds dangerous --- how do you bound staleness?"}
+
+\begin{quote}
+The cache is for \emph{fetch deduplication}, not for serving arbitrarily old prices. TTL is tied to the
+data\textquotesingle s update cadence --- a minute candle is valid for its minute. More importantly, freshness is
+tracked and exposed as a metric, so staleness is \emph{observable}, and the genuinely dangerous path ---
+critical exits/stop-losses --- doesn\textquotesingle t act on a stale or missing price at all; it falls back to
+intrinsic-vs-spot. So the cache speeds up reads without ever being the thing that decides a trade
+on bad data. The NSE incident actually taught me this: staleness is the silent killer, so I made
+it loud.
+\end{quote}
+
+\textbf{5. "How do you \emph{know} you removed every other fabricated value?"}
+
+\begin{quote}
+I can\textquotesingle t claim 100\%, and I\textquotesingle d say so. What I did: grepped out every \texttt{or\ \textless{}number\textgreater{}} fallback in the
+price/fill paths, removed them, and replaced fabrication with explicit retry\(\rightarrow\)skip\(\rightarrow\)intrinsic. Then
+I added tests that assert a missing price results in \emph{no trade} rather than a default fill --- so a
+regression reintroducing fabrication would fail CI. The honest framing is: I eliminated the ones I
+found and built a guardrail so new ones get caught, but "prove a negative across the whole
+codebase" is exactly why I\textquotesingle d want broader money-path test coverage if I rebuilt it.
+\end{quote}
+
+\textbf{6. "Backtest runs real code --- but recorded data isn\textquotesingle t live. Where can it still lie?"}
+
+\begin{quote}
+Several places, which is why the fidelity grade exists. Recorded data has no real fill modeling ---
+I assume I get filled at the recorded price, but live I\textquotesingle d face slippage, partial fills, and
+liquidity limits, especially on the illiquid option strikes my strategies trade. There\textquotesingle s no
+latency in replay --- live, the gap between signal and order matters. And survivorship/gap issues in
+the recorded set. So the backtest is faithful to my \emph{logic} but optimistic about \emph{execution} --- it
+tells me if the strategy reasons correctly, not that I\textquotesingle d capture the same P\&L live.
+\end{quote}
+
+\textbf{7. "Why didn\textquotesingle t an idempotency key at the order layer save you from the duplicate orders?"}
+
+\begin{quote}
+Because the two threads weren\textquotesingle t retrying the \emph{same} logical order --- they were two independent
+strategy instances each \emph{independently deciding} to enter, generating distinct order intents at
+slightly different times/prices. An idempotency key dedupes "the same order sent twice," but this
+was "two correct-looking-but-distinct orders from a process that should only exist once." The bug
+was upstream of the order layer --- at process lifecycle. An idempotency key would\textquotesingle ve been a band-aid
+over a duplicated \emph{actor}; the real fix had to prevent the second actor from existing.
+\end{quote}
+
+\textbf{8. "How do you ensure a systemd restart loop doesn\textquotesingle t itself cause duplicate trades?"}
+
+\begin{quote}
+The restart path goes through the \emph{same} recovery as any boot: TradeResumer restores open trades
+and \emph{resumes} monitoring rather than re-firing entries, and the re-entry guard refuses a new
+position group while legs are already held. So even if systemd restarts repeatedly, each boot
+reconciles against persisted state instead of opening fresh positions. The Reconciler would also
+surface any drift a crash-loop introduced. Restart safety = idempotent boot, not just "start the
+process again."
+\end{quote}
+
+\textbf{9. "Adding safety only after incidents --- isn\textquotesingle t that just reactive engineering?"}
+
+\begin{quote}
+Partly, and deliberately. For a solo free-tier system, building speculative safety for failures
+that may never happen is its own waste --- over-engineering. What incidents gave me was the \emph{real}
+failure mode, so the safety I built is targeted and proven, not cargo-culted. What I\textquotesingle d defend as
+the mature part isn\textquotesingle t "I reacted" --- it\textquotesingle s that each reaction ended with a \emph{systemic} fix and a
+regression test, so the same class can\textquotesingle t recur. Proactive would\textquotesingle ve looked like: reconciliation
+and end-to-end paper smoke tests from day one, since those are generic to any stateful money
+system --- and that\textquotesingle s exactly what I\textquotesingle d front-load if rebuilding.
+\end{quote}
+
+\textbf{10. "What\textquotesingle s your blast radius if the broker returns \emph{wrong} data, not no data?"}
+
+\begin{quote}
+That\textquotesingle s the scariest case and I\textquotesingle ll be straight: wrong-but-plausible data is the hardest to defend
+against, because my whole "never fabricate, treat missing as missing" design handles \emph{absence},
+not \emph{lies}. Current mitigations are partial --- sanity bounds on prices, cross-checking the
+underlying spot against the option-derived value, and the Reconciler catching position-level
+disagreements. But a subtly wrong LTP that passes bounds could drive a bad exit. If I were
+hardening this, I\textquotesingle d add cross-vendor agreement checks (does Angel\textquotesingle s price match Dhan\textquotesingle s within a
+tolerance?) and circuit-breaker logic on implausible moves. It\textquotesingle s a known gap, not a solved
+problem.
+\end{quote}
+
+\section{9. Where the interviewer may challenge you --- and how to defend}\label{9-where-the-interviewer-may-challenge-you--and-how-to-defend}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3062}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6938}}@{}}
+\toprule\noalign{}
+\rowcolor{acc!16}
+\begin{minipage}[b]{\linewidth}\raggedright
+Challenge
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Defense
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+"SQLite in a trading system is amateur." & One writer, free-tier, zero-ops was the right call for solo scale; I name the exact failure points (mmap SIGBUS, concurrency) and the migration trigger to Postgres. I understood the boundary, didn\textquotesingle t stumble into it. \\
+\rowcolor{zebra}
+"Eventlet monkey-patching is fragile." & Agreed, and I hit it (SSL recursion). It bought single-process Socket.IO + async I/O with minimal ops. I have the escape hatch (\texttt{patcher.original()}) and know when I\textquotesingle d move to a real task model. \\
+"Caching market data risks acting on stale prices." & Cache is for \emph{fetch dedup} across strategies with bounded TTL and freshness tracking exposed as a metric; critical exits never act on a price that\textquotesingle s gone --- they fall back to intrinsic-vs-spot. \\
+\rowcolor{zebra}
+"You only added safety after incidents --- that\textquotesingle s reactive." & True and deliberate: I didn\textquotesingle t over-engineer speculative safety for a solo system. Each incident taught the \emph{real} failure mode, so the safety is targeted, not cargo-culted. The meta-fix was adding the regression test each time. \\
+"A 15:25 EOD square-off net is a band-aid over the duplicate-order bug." & The spawn guard is the real fix; the EOD net is defense-in-depth, not the primary control. In a money system you want both the fix \emph{and} a backstop. \\
+\rowcolor{zebra}
+"Backtest-on-real-code still trusts your recorded data." & Hence the data-fidelity grade --- it tells you how much to trust a given run rather than pretending all backtests are equal. \\
+\end{longtable}
+
+\section{10. Things to study/refresh before the interview}\label{10-things-to-studyrefresh-before-the-interview}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Memory \& mmap internals:} why a fault on an mmap\textquotesingle d page \(\rightarrow\) SIGBUS vs SIGSEGV; OOM-killer vs over-commit; swap behavior under pressure.
+\item
+  \textbf{SQLite WAL semantics:} readers vs the single writer, checkpointing, where WAL stops scaling, and \texttt{PRAGMA\ mmap\_size} risks.
+\item
+  \textbf{eventlet / green threads:} cooperative vs preemptive scheduling, what monkey-patching replaces, and which libraries break.
+\item
+  \textbf{Thread lifecycle in Python:} \texttt{join}, daemon threads, the GIL\textquotesingle s role here, why "set a flag" isn\textquotesingle t a stop.
+\item
+  \textbf{Rate-limit patterns:} token bucket vs leaky bucket, jittered exponential backoff, idempotency keys.
+\item
+  \textbf{Options settlement math:} intrinsic value, expiry mechanics (cash-settled index options), why premium \(\rightarrow\) 0 at expiry.
+\item
+  \textbf{Observability vocabulary:} RED vs USE methods, what makes a good SLI, cardinality pitfalls in metrics.
+\item
+  \textbf{DuckDB execution model:} vectorized columnar scans, predicate/projection pushdown into Parquet, memory limits.
+\item
+  \textbf{Crash-consistency / reconciliation:} idempotency, exactly-once vs at-least-once, the "ledger vs reality" reconciliation pattern.
+\item
+  \textbf{Be ready to whiteboard:} the watchdog/heartbeat state machine and the two-phase recycle, since those are your strongest stories.
+\end{itemize}
+
+\section{11. One-line closer}\label{11-one-line-closer}
+
+\begin{quote}
+"It\textquotesingle s a solo project, but I treated it like production --- because it trades real money. Most of
+the engineering went into the boring-but-hard parts: not crashing, not double-trading, not
+trusting a single feed, and always being able to \emph{see} what it\textquotesingle s doing."
+\end{quote}
+
+\end{document}

@@ -46,6 +46,47 @@ plus one `.tsv` per topic, importable straight into Anki (see `anki/README.md`).
   Liberation/Ubuntu/DejaVu if those aren't present.
 - **pypdf** (merged-book bookmarks) — `pip install pypdf` if missing.
 
+## Adding a new edition (step by step)
+
+**You never hand-write `.tex` or PDF — they are generated from Markdown.** To add a new note:
+
+1. **Write the note in Markdown** under `Interview-Prep/` (any sub-folder is fine), following
+   the same section format as the others (`# Title`, then `## Overview — What It Is`, … ,
+   `## Common Interview Questions` with `### Qn:` blocks, … , `## Revision Cheat Sheet`).
+   *Tip: copy an existing file as a skeleton.*
+
+2. **Register it** — add one row to the `REG` list near the top of `build.py`:
+   ```python
+   # key,        source (rel. to Interview-Prep/),  title,                 track,           num, accent,  accent2
+   ("caching",   "15-caching.md",                   "Caching",             "Design Track",  "",  "c2410c","fb923c"),
+   ```
+   `key` is the output filename; `accent`/`accent2` are hex colours (no `#`) for the theme.
+
+3. **Put it in a folder** — add the `key` to the `FOLDER` map in `build.py` (which concept
+   sub-folder its `.tex`/`.pdf` land in). Use an existing folder or a new one:
+   ```python
+   "caching": "system-design",      # → tex/system-design/ and pdf/system-design/
+   ```
+   (If you add a brand-new folder, also add it to `FOLDER_META` in `make_readmes.py` so it
+   shows up in the index READMEs.)
+
+4. **Build it:**
+   ```bash
+   python3 build.py --only caching      # builds just this one (or run build.py for all)
+   ```
+   This auto-generates `tex/<folder>/caching.tex` and `pdf/<folder>/caching.pdf`.
+
+5. **Refresh the aggregate outputs:**
+   ```bash
+   python3 make_index.py          # adds it to the merged bookmarked collection + catalogue
+   python3 make_anki.py           # flashcards from its ### Qn: blocks
+   python3 make_flashcards_ui.py  # updates flashcards.html
+   python3 make_readmes.py        # adds it to pdf/README.md + tex/README.md
+   ```
+
+That's it — no LaTeX by hand. Editing an existing note? Just edit its `.md` and re-run
+`python3 build.py` (it rebuilds only what changed) plus the refresh scripts above.
+
 ## Rebuild / resume
 
 ```bash

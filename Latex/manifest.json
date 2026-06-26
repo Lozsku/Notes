@@ -1,5 +1,5 @@
 {
-  "style": "980189706f88",
+  "style": "f57a71acfe2d",
   "docs": {
     "01-concurrency": {
       "src": "ef5dac1e8e64",
@@ -266,6 +266,20 @@
       "pdf_ok": true,
       "error": "",
       "built": "2026-06-17 12:33"
+    },
+    "ticker-prep": {
+      "src": "62e794e986d2",
+      "style": "f57a71acfe2d",
+      "pdf_ok": true,
+      "error": "",
+      "built": "2026-06-26 12:10"
+    },
+    "ticker-detailed": {
+      "src": "0f9a5e05b0da",
+      "style": "f57a71acfe2d",
+      "pdf_ok": true,
+      "error": "",
+      "built": "2026-06-26 12:10"
     }
   }
 }

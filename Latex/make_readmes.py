@@ -22,6 +22,7 @@ FOLDER_META = [
     ("dsa",           "🧩 DSA"),
     ("ai-ml",         "🤖 AI / ML"),
     ("behavioral",    "💬 Behavioral"),
+    ("tickerAlgo",    "📈 Project — Kite Algo Trader"),
 ]
 TITLE = {key: title.replace("\\&", "&") for key, _, title, *_ in REG}
 

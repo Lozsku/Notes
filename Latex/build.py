@@ -80,6 +80,9 @@ REG = [
   ("linux",         "20-linux-cli.md",                             "Linux \\& the Command Line",           "Platform Track",        "",   "334155","64748b"),
   ("vector-databases","21-vector-databases.md",                    "Vector Databases \\& Embeddings",      "Data Track",            "",   "0d9488","2dd4bf"),
   ("ai-agents",     "AI-ML/07-ai-agents.md",                       "AI Agents \\& Tool Use",               "AI/ML Track",           "07", "7c3aed","a78bfa"),
+  # Project: Kite Algo Trader
+  ("ticker-prep",   "tickerAlgo/INTERVIEW_PREP.md",                "Kite Algo Trader — Interview Prep",    "Project Track",         "",   "0d9488","2dd4bf"),
+  ("ticker-detailed","tickerAlgo/interview_detailed.md",           "Kite Algo Trader — Detailed Prep",     "Project Track",         "",   "0d9488","2dd4bf"),
 ]
 
 # ----------------------------------------------------------------------
@@ -113,6 +116,8 @@ FOLDER = {
   "aiml-00-index": "ai-ml", "aiml-01-fund": "ai-ml", "aiml-02-classic": "ai-ml",
   "aiml-03-dl": "ai-ml", "aiml-04-tf": "ai-ml", "aiml-05-genai": "ai-ml",
   "aiml-06-mlops": "ai-ml", "ai-agents": "ai-ml",
+  # project
+  "ticker-prep": "tickerAlgo", "ticker-detailed": "tickerAlgo",
 }
 def folder_of(key): return FOLDER.get(key, "misc")
 def texdir_for(key):

@@ -89,7 +89,9 @@ Notes are authored in Markdown and rendered to professional PDFs via
 - A single **bookmarked** `Complete-Collection.pdf` plus per-topic PDFs.
 - **Flashcards** auto-extracted from each note's interview Q&A → Anki decks + a browser app.
 
-Full details and commands: [`Latex/README.md`](Latex/README.md).
+You **never hand-write LaTeX** — write a note in Markdown, register it, and the `.tex` +
+PDF are generated. Step-by-step for adding a new edition, plus all commands and design
+notes: [`Latex/README.md`](Latex/README.md#adding-a-new-edition-step-by-step).
 
 ```bash
 cd Latex
