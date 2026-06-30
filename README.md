@@ -36,7 +36,9 @@ professional, book-quality PDF library with auto-generated flashcards.
 - Cloud & Infrastructure · Security Fundamentals · **Linux & the Command Line**
 - **Testing & Code Quality** · **Git & Dev Workflow**
 
-**DSA** — Patterns & Templates · Data Structures · Algorithms & Complexity
+**DSA** — Patterns & Templates · Data Structures · Algorithms & Complexity ·
+**Data Structure Problems** & **Algorithm Problems** (121 worked solutions — optimal
+algorithm, idea, runnable code, and error-prone tips for every named interview question)
 
 **AI / ML** — ML Fundamentals · Classic ML · Deep Learning · Transformers & LLMs · LLM
 Applications & GenAI · MLOps & ML System Design · **AI Agents & Tool Use** ·

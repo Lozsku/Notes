@@ -5,3 +5,6 @@ __pycache__/
 Interview-Prep/.magazine/_tmp_*.html
 Interview-Prep/.magazine/_cheat.html
 Interview-Prep/.magazine/concurrency_magazine.html
+
+# LaTeX build logs
+Latex/pdf/**/*.log

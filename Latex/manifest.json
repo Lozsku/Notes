@@ -1,285 +1,306 @@
 {
-  "style": "f57a71acfe2d",
+  "style": "cdf86928a10a",
   "docs": {
     "01-concurrency": {
       "src": "ef5dac1e8e64",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:13"
+      "built": "2026-06-30 07:23"
     },
     "00-index": {
-      "src": "665cbc8e9bbd",
-      "style": "980189706f88",
+      "src": "53842add0648",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:31"
+      "built": "2026-06-30 07:23"
     },
     "02-os": {
       "src": "fefb9a274fa3",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:13"
+      "built": "2026-06-30 07:23"
     },
     "03-networks": {
       "src": "96d76bde91c4",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:13"
+      "built": "2026-06-30 07:23"
     },
     "04-cloud": {
       "src": "22b315321b93",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:14"
+      "built": "2026-06-30 07:23"
     },
     "05-system-design": {
       "src": "6b6ae61ee624",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:14"
+      "built": "2026-06-30 07:24"
     },
     "06-lld": {
       "src": "77be50bb4ae7",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:14"
+      "built": "2026-06-30 07:24"
     },
     "07-distributed": {
       "src": "bd1e7169a7d2",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:14"
+      "built": "2026-06-30 07:24"
     },
     "08-databases": {
       "src": "e763b1b81a00",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:24"
     },
     "09-performance": {
       "src": "8244bfaea236",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:25"
     },
     "10-security": {
       "src": "d22bd4d290c7",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:25"
     },
     "11-behavioral": {
       "src": "a899059d130a",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:25"
     },
     "cheatsheet": {
       "src": "0e4612a939be",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:25"
     },
     "dsa-00-index": {
-      "src": "e37147de7ebd",
-      "style": "980189706f88",
+      "src": "e1416ddf887b",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:25"
     },
     "dsa-01-patterns": {
       "src": "7da272ab4ec6",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:15"
+      "built": "2026-06-30 07:25"
     },
     "dsa-02-ds": {
       "src": "a3c69c282669",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:16"
+      "built": "2026-06-30 07:26"
     },
     "dsa-03-algos": {
       "src": "df55fdb4a900",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:16"
+      "built": "2026-06-30 07:26"
     },
     "aiml-00-index": {
       "src": "f4f0beeba0c7",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:16"
+      "built": "2026-06-30 07:27"
     },
     "aiml-01-fund": {
       "src": "c7aefbf4c0e9",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:16"
+      "built": "2026-06-30 07:27"
     },
     "aiml-02-classic": {
       "src": "de63bdb52579",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:16"
+      "built": "2026-06-30 07:27"
     },
     "aiml-03-dl": {
       "src": "3404a4de131b",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:17"
+      "built": "2026-06-30 07:27"
     },
     "aiml-04-tf": {
       "src": "1fd29ca8d236",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:17"
+      "built": "2026-06-30 07:28"
     },
     "aiml-05-genai": {
       "src": "af1870cd7d5a",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:17"
+      "built": "2026-06-30 07:28"
     },
     "aiml-06-mlops": {
       "src": "a421ed3057f1",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:17"
+      "built": "2026-06-30 07:28"
     },
     "sdp-1": {
       "src": "27635e7aaee1",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:17"
+      "built": "2026-06-30 07:28"
     },
     "sdp-2": {
       "src": "48bef9646bf4",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:18"
+      "built": "2026-06-30 07:28"
     },
     "lld-coded": {
       "src": "547ba7f4c776",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:18"
+      "built": "2026-06-30 07:28"
     },
     "12-oop": {
       "src": "a391e7bd2048",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 02:14"
+      "built": "2026-06-30 07:24"
     },
     "design-patterns": {
-      "src": "c45eebf28182",
-      "style": "980189706f88",
+      "src": "832b5e0e422d",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:31"
+      "built": "2026-06-30 07:29"
     },
     "api-design": {
       "src": "c262a59bf7ef",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:31"
+      "built": "2026-06-30 07:29"
     },
     "caching": {
       "src": "c91a9acaf263",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:31"
+      "built": "2026-06-30 07:29"
     },
     "message-queues": {
       "src": "badedb1651c7",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:32"
+      "built": "2026-06-30 07:29"
     },
     "testing": {
       "src": "108204331194",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:32"
+      "built": "2026-06-30 07:30"
     },
     "observability": {
       "src": "b4fb29afb77e",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:32"
+      "built": "2026-06-30 07:30"
     },
     "git": {
       "src": "7d1d2187b0fc",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:32"
+      "built": "2026-06-30 07:30"
     },
     "linux": {
       "src": "f3d9d4c451ef",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:33"
+      "built": "2026-06-30 07:31"
     },
     "vector-databases": {
       "src": "37e85da188f1",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:33"
+      "built": "2026-06-30 07:31"
     },
     "ai-agents": {
       "src": "b919eb629f48",
-      "style": "980189706f88",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-17 12:33"
+      "built": "2026-06-30 07:31"
     },
     "ticker-prep": {
       "src": "62e794e986d2",
-      "style": "f57a71acfe2d",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-26 12:10"
+      "built": "2026-06-30 07:32"
     },
     "ticker-detailed": {
       "src": "0f9a5e05b0da",
-      "style": "f57a71acfe2d",
+      "style": "cdf86928a10a",
       "pdf_ok": true,
       "error": "",
-      "built": "2026-06-26 12:10"
+      "built": "2026-06-30 07:32"
+    },
+    "containers-k8s": {
+      "src": "0f09493df65e",
+      "style": "cdf86928a10a",
+      "pdf_ok": true,
+      "error": "",
+      "built": "2026-06-30 07:31"
+    },
+    "dsa-04-ds-problems": {
+      "src": "4a0ee37f2d1d",
+      "style": "cdf86928a10a",
+      "pdf_ok": true,
+      "error": "",
+      "built": "2026-06-30 07:26"
+    },
+    "dsa-05-algo-problems": {
+      "src": "5fba457ffe8a",
+      "style": "cdf86928a10a",
+      "pdf_ok": true,
+      "error": "",
+      "built": "2026-06-30 07:26"
     }
   }
 }

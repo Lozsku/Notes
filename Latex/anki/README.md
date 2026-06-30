@@ -1,6 +1,6 @@
 # Anki flashcards
 
-Auto-generated from the Q&A sections of the notes — **242 cards**.
+Auto-generated from the Q&A sections of the notes — **254 cards**.
 
 ## Import into Anki
 1. Anki → File → Import → choose `ALL-flashcards.tsv` (or a single topic's `.tsv`).
@@ -40,3 +40,4 @@ Auto-generated from the Q&A sections of the notes — **242 cards**.
 - Linux & the Command Line: 12
 - Vector Databases & Embeddings: 13
 - AI Agents & Tool Use: 12
+- Containers, Kubernetes & Helm: 12

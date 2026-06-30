@@ -65,6 +65,7 @@ Publication-quality, magazine-style PDFs of every topic — custom typography, f
 | 19 | Git & Dev Workflow | [19-git-version-control.md](19-git-version-control.md) |
 | 20 | Linux & the Command Line | [20-linux-cli.md](20-linux-cli.md) |
 | 21 | Vector Databases & Embeddings | [21-vector-databases.md](21-vector-databases.md) |
+| 22 | Containers, Kubernetes & Helm | [22-containers-kubernetes-helm.md](22-containers-kubernetes-helm.md) |
 
 > AI Agents & Tool Use lives in the [AI-ML series](AI-ML/00-INDEX.md).
 

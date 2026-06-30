@@ -56,6 +56,8 @@ REG = [
   ("dsa-01-patterns","DSA/01-patterns-and-templates.md",           "DSA Patterns \\& Templates",           "DSA Track",             "01", "be123c","fb7185"),
   ("dsa-02-ds",     "DSA/02-data-structures.md",                   "Data Structures",                      "DSA Track",             "02", "be123c","fb7185"),
   ("dsa-03-algos",  "DSA/03-algorithms-and-complexity.md",         "Algorithms \\& Complexity",            "DSA Track",             "03", "be123c","fb7185"),
+  ("dsa-04-ds-problems","DSA/04-data-structure-problems.md",       "Data Structure Problems",              "DSA Track",             "04", "be123c","fb7185"),
+  ("dsa-05-algo-problems","DSA/05-algorithm-problems.md",          "Algorithm Problems",                   "DSA Track",             "05", "be123c","fb7185"),
   # AI-ML
   ("aiml-00-index", "AI-ML/00-INDEX.md",                           "AI / ML — Index",                      "AI/ML Track",           "",   "7c3aed","a78bfa"),
   ("aiml-01-fund",  "AI-ML/01-ml-fundamentals.md",                 "ML Fundamentals",                      "AI/ML Track",           "01", "7c3aed","a78bfa"),
@@ -80,6 +82,7 @@ REG = [
   ("linux",         "20-linux-cli.md",                             "Linux \\& the Command Line",           "Platform Track",        "",   "334155","64748b"),
   ("vector-databases","21-vector-databases.md",                    "Vector Databases \\& Embeddings",      "Data Track",            "",   "0d9488","2dd4bf"),
   ("ai-agents",     "AI-ML/07-ai-agents.md",                       "AI Agents \\& Tool Use",               "AI/ML Track",           "07", "7c3aed","a78bfa"),
+  ("containers-k8s","22-containers-kubernetes-helm.md",            "Containers, Kubernetes \\& Helm",      "Platform Track",        "",   "326ce5","6c8ff0"),
   # Project: Kite Algo Trader
   ("ticker-prep",   "tickerAlgo/INTERVIEW_PREP.md",                "Kite Algo Trader — Interview Prep",    "Project Track",         "",   "0d9488","2dd4bf"),
   ("ticker-detailed","tickerAlgo/interview_detailed.md",           "Kite Algo Trader — Detailed Prep",     "Project Track",         "",   "0d9488","2dd4bf"),
@@ -112,10 +115,12 @@ FOLDER = {
   "11-behavioral": "behavioral",
   # dsa
   "dsa-00-index": "dsa", "dsa-01-patterns": "dsa", "dsa-02-ds": "dsa", "dsa-03-algos": "dsa",
+  "dsa-04-ds-problems": "dsa", "dsa-05-algo-problems": "dsa",
   # ai / ml
   "aiml-00-index": "ai-ml", "aiml-01-fund": "ai-ml", "aiml-02-classic": "ai-ml",
   "aiml-03-dl": "ai-ml", "aiml-04-tf": "ai-ml", "aiml-05-genai": "ai-ml",
   "aiml-06-mlops": "ai-ml", "ai-agents": "ai-ml",
+  "containers-k8s": "infrastructure",
   # project
   "ticker-prep": "tickerAlgo", "ticker-detailed": "tickerAlgo",
 }
@@ -351,6 +356,15 @@ def _style_tables(s: str) -> str:
 def postprocess_tex(tex: Path, key: str = ""):
     s = tex.read_text()
     s = _style_tables(s)
+    # problem books: many short bold-led fields (Problem./Idea./...). Drop the
+    # first-line paragraph indent and separate fields by a little vertical space
+    # instead, so each field starts flush-left with no "indent gap" before it.
+    if key in ("dsa-04-ds-problems", "dsa-05-algo-problems"):
+        s = s.replace(
+            r"\begin{document}",
+            "\\begin{document}\n"
+            r"\setlength{\parindent}{0pt}\setlength{\parskip}{0.45\baselineskip}",
+            1)
     # inline figures: @@VFIGn@@ -> \visualfigure{path}{caption}
     figs = load_figures().get(key, [])
     def figrepl(m):
